@@ -1,0 +1,320 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    
+
+    .funkyradio-success input[type="radio"]:checked ~ label:before, .funkyradio-success input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5cb85c;
+    }
+
+    .funkyradio-danger input[type="radio"]:checked ~ label:before, .funkyradio-danger input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #d9534f;
+    }
+
+    .funkyradio-warning input[type="radio"]:checked ~ label:before, .funkyradio-warning input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #f0ad4e;
+    }
+
+    .funkyradio-info input[type="radio"]:checked ~ label:before, .funkyradio-info input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5bc0de;
+    }
+    body {
+        font-family: arial, sans-serif;
+    }
+
+    .checkcaption {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .check {
+        width: 60px;
+        height: 30px;
+        border: #222 solid 2px;
+        position: relative;
+        margin: 10px auto;
+        border-radius: 15px;
+    }
+
+        .check input {
+            visibility: hidden;
+            height: 30px;
+            width: 60px;
+        }
+
+        .check label {
+            display: block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #e74c3c;
+            cursor: pointer;
+            position: absolute;
+            top: 18%;
+            left: 12%;
+            -webkit-transition: all .3s ease;
+            transition: all .3s ease;
+        }
+
+        .check input:checked + label {
+            left: 55%;
+            background-color: #7b3;
+        }
+
+    div#timeline {
+        background-color: #6ab0de;
+        margin-top: 150px;
+        height: 5px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+    }
+
+        div#timeline .inside {
+            position: absolute;
+            height: 1px;
+            background-color: #7b3;
+            width: 0%;
+            top: 3px;
+            left: 0;
+        }
+
+        div#timeline .dot {
+            z-index: 99;
+            -webkit-transition: 0.3s ease-in-out;
+            transition: 0.3s ease-in-out;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            top: -7px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+
+
+            div#timeline .dot:hover {
+                -webkit-transform: scale(1.2);
+                transform: scale(1.2);
+            }
+
+            div#timeline .dot date {
+                font-family: roboto;
+                font-size: 1.1rem;
+                display: block;
+                position: relative;
+                top: -30px;
+                text-align: center;
+            }
+
+            div#timeline .dot span {
+                display: inline-block;
+                margin-top: 10px;
+                width: 20px;
+                height: 20px;
+                background-color: #fff;
+                position: relative;
+                border-radius: 50%;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            }
+
+    article {
+        display: none;
+        position: relative;
+        top: 30px;
+        max-width: 960px;
+        background-color: #fff;
+        padding: 20px;
+        margin: auto;
+    }
+
+        article date {
+            display: block;
+            text-align: right;
+        }
+
+        article h2 {
+            font-family: merriweather, sans-serif;
+            font-size: 5rem;
+            padding: 10px 0;
+            border-bottom: solid #111 2px;
+            margin-bottom: 20px;
+        }
+
+        article p {
+            line-height: 130%;
+        }
+    </style>
+<div class="card">
+    <div class="col-md-12" style="margin-bottom: 15px; margin-top: 15px">
+        <div class="input-group date" id="datetimepicker" style="float: left">
+            <input id="sTime" type="text" class="col-md-5 input-group-addon form-control myInputCelender" style="padding-left: 0px !important;height: 37px; margin-top: -1px;" data-provide="datepicker"><span class="input-group-addon myCerlenderSpan">
+                <span class="fa fa-calendar"></span>
+            </span>
+        </div>
+        <div class="input-group-btn">
+            <a class="btn btn-primary btn-sm" onclick="initEmployeeDatatable()" style="float:left">
+                <i class="left-icon fa fa-search"></i>     Tìm
+            </a>
+            <a class="btn btn-primary btn-sm" style="float:right;background-color:red;height: 30px; width:200px">
+                Ca Làm Việc
+            </a>
+            <a class="btn btn-primary btn-sm" style="float:right;background-color:#00bcd4;height: 30px;width:200px">
+                Thời gian làm việc
+            </a>
+        </div>
+    </div>
+    <div class="col-md-12" style="overflow-x:scroll;overflow-y:scroll">
+        <div class="col-md-12" style="float:left; ">
+            <table id="item-type-table" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th class="col-md-2"><label>Tên nhân viên</label></th>
+                        <th class="col-md-1"><label>Tùy chọn</label></th>
+                        <th class="col-md-8"><label>Ca làm việc va mốc điểm danh</label></th>
+
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="container" id="checkBoxModal">
+
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('#sTime').datepicker({
+            format: 'dd/mm/yyyy',
+        });
+        initEmployeeDatatable();
+    });
+    function showAttendanceCheckBox(data) {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ShowAttendanceSet", "Overview")',
+            data: {
+                'EmpId': data,
+                'CheckFingerId': -1,
+                'date': "",
+                'dateSearch': "",
+                'Choice': 0
+            },
+            success: function (result) {
+                $('#checkBoxModal').html(result);
+                $('#ShowAttendanceSetModal').modal('show');
+            },
+            error: function (error) {
+                showMessage("Đã có lỗi xảy ra, vui lòng thử lại sau.");
+            }
+        });
+    }
+
+    function showAttendanceCheckBoxWithCheckPoint(EmpId, CheckFingerId) {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ShowAttendanceSet", "Overview")',
+            data: { 'EmpId': EmpId, 'CheckFingerId': CheckFingerId, 'date': $("#" + CheckFingerId).data('time'), 'dateSearch': $('#sTime').val(), 'Choice': 1 },
+            success: function (result) {
+                $('#checkBoxModal').html(result);
+                $('#ShowAttendanceSetModal').modal('show');
+            },
+            error: function (error) {
+                showMessage("Đã có lỗi xảy ra, vui lòng thử lại sau.");
+            }
+        });
+    }
+    function drawCheckPoint(item, index) {
+        $("#timeline" + item.Id).append("<div id='" + item.checkFingerId + "' onclick='showAttendanceCheckBoxWithCheckPoint(" + item.Id + "," + item.checkFingerId + ")' data-time='" + item.checkFinger.Hours + ":" + item.checkFinger.Minutes + "' style='left:" + (item.checkFinger.TotalMinutes / 14.4) + "% ;background-color:coral; z-index: 99;-webkit-transition: 0.3s ease-in-out;transition: 0.3s ease-in-out;width: 20px;height: 20px; border-radius: 50%;position: absolute;top: -7px;text-align: center; cursor: pointer;' data-toggle='tooltip' data-placement='bottom' title='Móc điểm danh'><date style='font-family: roboto;font-size: 1.1rem;display: block;position: relative;top: -20px;text-align: center; '><date>" + item.checkFinger.Hours + ":" + item.checkFinger.Minutes + "</date></div>")
+
+    }
+    function drawShift(item, index) {
+        $("#timeline" + item.EmployeeId).append("<div  style='z-index: 0;height: 20px;top:-7.5; width: auto;background-color:red; position: absolute; #73AD21;left:" + (item.shiftMin.TotalMinutes / 14.4) + "%;right:" + (97.9 - (item.shiftMax.TotalMinutes / 14.4)) + "%' data-toggle='tooltip' data-placement='bottom' title='Ca làm việc từ: " + item.shiftMin.Hours + ":" + item.shiftMin.Minutes + " đến " + item.shiftMax.Hours + ":" + item.shiftMax.Minutes + "'></div>")
+        $("#timeline" + item.EmployeeId).append("<div  style='z-index: 0;height: 10px;top:-2.5; width: auto;background-color:#00bcd4; position: absolute; #73AD21;left:" + (item.checkMin.TotalMinutes / 14.4) + "%;right:" + (97.9 - (item.checkMax.TotalMinutes / 14.4)) + "%' data-toggle='tooltip' data-placement='bottom' title='Thời gian làm việc: " + item.checkMin.Hours + ":" + item.checkMin.Minutes + " đến " + item.checkMax.Hours + ":" + item.checkMax.Minutes + "'></div>")
+
+    }
+    function initEmployeeDatatable() {
+        $("#item-type-table").dataTable().fnDestroy();
+        $("#item-type-table").dataTable({
+            "bSearchable": false,
+            "bSort": false,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("GetAllEmployee", "Overview")",
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "dateSearch", "value": $('#sTime').val() });
+            },
+            "bProcessing": true,
+            "aLengthMenu": [10, 25, 50],
+            "bFilter": true,
+            "oLanguage": {
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [1],
+                    "sClass": "text-center",
+                    "bSortable": false
+                },
+                {
+                    "aTargets": [1],
+                    "mRender": function (data, type, row) {
+                        var detail = "<a title='Thêm ca làm việc'class='btn btn-sm btn-success' onclick='showAttendanceCheckBox(" + data + ")'><i class='glyphicon glyphicon-eye-open'></i></a>";
+
+                        return detail;
+                    },
+                },
+                {
+                    "aTargets": [2],
+                    "mRender": function (data, type, row) {
+                        var attendanceData = row[3];
+                        var checkFingerData = row[2];
+                        var data2 = row[1];
+                        var html = "<div id='body" + data2 + "' style='width: 760.73px'><div id='timeline" + data2 + "'style='position: relative; background-color: gray;margin-top: 20px;margin-bottom: 20px;height: 5px;width: 100%; z-index: 1;'</div></div>";
+                        if (attendanceData!= "[]") {
+                            Attendace(attendanceData)
+                        }
+                        if (checkFingerData != "[]")
+                        {
+                            CheckFinger(checkFingerData);
+                        }
+                        return html;
+                    },
+                }
+
+            ],
+            "bAutoWidth": false,
+        });
+    }
+    function Attendace(data) {
+        var attendance=JSON.parse(data);
+        attendance.forEach(drawShift);
+    }
+    function CheckFinger(data) {
+        var checkFinger = JSON.parse(data);
+        checkFinger.forEach(drawCheckPoint);
+    }
+
+
+</script>

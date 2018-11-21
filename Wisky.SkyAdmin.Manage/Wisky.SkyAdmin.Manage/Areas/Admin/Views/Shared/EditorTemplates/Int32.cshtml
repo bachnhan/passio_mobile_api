@@ -1,0 +1,8 @@
+﻿@model int?
+
+@{ 
+    var isRequired= (ViewData.ModelMetadata).ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName).HasRequiredAttribute();
+}
+
+<input type="number" name="@this.Html.NameForModel()" id="@this.Html.IdForModel()"
+       class="form-control" required="@(isRequired ? "" : null)" value="@this.Html.ValueForModel()" />

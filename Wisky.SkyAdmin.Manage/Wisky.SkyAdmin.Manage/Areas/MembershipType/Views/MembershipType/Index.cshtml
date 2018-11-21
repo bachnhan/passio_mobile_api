@@ -1,0 +1,195 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Quản lý loại thẻ thành viên</h3>
+            </div>
+           
+            <div class="col-md-4 text-right">
+
+                <button class="btn btn-primary btn-icon-text waves-effect addNewEmp" data-action="open-modalMembershipType" data-type="create">
+                    <i class="zmdi zmdi-plus"></i>Thêm loại thẻ thành viên
+                </button>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="allcust">
+                <!-- Datatable -->
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <table id="MembershipTypeDatatable" class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label class="">STT</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Loại thẻ thành viên</label>
+                                    </th>                                    
+                                    <th>
+                                        <label class="">Tùy chọn</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalMembershipType">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+   
+    $(document)
+        .ready(function () {
+            InitMembershipTypeDatatable();
+        });
+    function InitMembershipTypeDatatable() {
+        $("#MembershipTypeDatatable").dataTable({
+            "bFilter": true,
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadMembershipType", "MembershipType")",
+            "bProcessing": true,
+            "fnServerParams": function (aoData) {
+                aoData.push(
+                    //{ "name": "storeId", "value": $('#storeId').val() },
+                    //{ "name": "filterId", "value": $('#filterId').val() },
+                    //{ "name": "customerTypeId", "value": $('#customerTypeId').val() }
+
+                );
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Loại thẻ thành viên",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+               
+                {
+                    "aTargets": [2],
+                    "mRender": function (data, type, row) {
+                        data = row[2];
+
+                        $edit = $('<button/>', {
+                            'class': 'btn btn-sm btn-primary',
+                            'data-action': 'open-modalMembershipType',
+                            'data-type': 'edit',
+                            'data-id': data,
+                            'html': '<i class="glyphicon glyphicon-pencil"></i>'
+                        });
+                        var deleteMembershipCard = " <a class='btn btn-sm btn-danger' onclick='deleteMembershipCard(" + data + ")'><i class='glyphicon glyphicon-trash'></i></a>";
+
+                        return $edit[0].outerHTML + deleteMembershipCard;
+
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                }
+
+            ],
+            "bAutoWidth": false,
+            }).fnSetFilteringDelay(delaySearch);
+    }
+    function reDrawDatatable(id) {
+        $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+            if (oSettings.oFeatures.bServerSide === false) {
+                var before = oSettings._iDisplayStart;
+                oSettings.oApi._fnReDraw(oSettings);
+                //iDisplayStart has been reset to zero - so lets change it back
+                oSettings._iDisplayStart = before;
+                oSettings.oApi._fnCalculateEnd(oSettings);
+            }
+
+            //draw the 'current' page
+            oSettings.oApi._fnDraw(oSettings);
+        };
+        $(id).dataTable().fnStandingRedraw();
+    }
+
+    //user datatable
+    function RefreshTable() {
+        reDrawDatatable("#MembershipTypeDatatable");
+    }
+    $(document).on('click', '[data-action="open-modalMembershipType"]', function (e) {
+        var me = $(e.currentTarget);
+        var type = me.attr('data-type');
+        var modal = $('#modalMembershipType');
+        modal.modal('show');
+        if (type == 'create') {
+            $.ajax({
+                url: '@Url.Action("Create")',
+                type: 'GET',
+                dataType: 'html',
+                success: function (result) {
+                    modal.find('.modal-content').html(result);
+                }
+            });
+        } else {
+            $.ajax({
+                url: '@Url.Action("Edit")',
+                type: 'GET',
+                data: { id: me.attr('data-id') },
+                dataType: 'html',
+                success: function (result) {
+                    modal.find('.modal-content').html(result);
+                }
+            });
+        }
+    });
+    function deleteMembershipCard(data) {
+        ShowConfirm("Bạn có muốn xóa loại thẻ thành viên này?", function () {
+            $.ajax({
+                type: "POST",
+                "url": "@(Url.Action("Delete", "MembershipType"))",
+                data: { id: parseInt(data) },
+            dataType: 'json',
+            success: function (result) {
+                if (result.success) {
+                    ShowAlert(result.msg, 2);
+                    RefreshTable();
+                } else {
+                    ShowAlert(result.msg, 1);
+                }
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                //ShowAlert("ErrorOccured", 1);
+            }
+        });
+    });
+    }
+
+</script>

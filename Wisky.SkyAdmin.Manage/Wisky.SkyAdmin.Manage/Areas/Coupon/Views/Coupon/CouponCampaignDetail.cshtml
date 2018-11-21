@@ -1,0 +1,100 @@
+﻿@model HmsService.ViewModels.CouponCampaignEditViewModel
+@{
+    ViewBag.Title = "CouponCampaignDetail";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h1>Thông tin chi tiết chiến dịch</h1>
+            </div>
+            <div class="col-md-4 text-right">
+                <a data-toggle="modal" data-target="#createCouponProvider" class="btn btn-primary btn-icon-text waves-effect addNewEmp">
+                    <i class="zmdi zmdi-plus"></i> Thêm nhà cung cấp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <table id="CouponTable" class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr class="gray">
+                <th class="">Mã</th>
+                <th class="">Tên nhà cung cấp</th>
+                <th class="">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <form role="form" method="post" id="createCoupon" action="@Url.Action("CreateCouponProvider","Coupon")" enctype="multipart/form-data">
+        @this.Html.AntiForgeryToken()
+        <div class="modal fade" id="createCouponProvider" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Thêm nhà cung cấp</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label>VUi lòng chọn nhà cung cấp:</label>
+                        @this.Html.DropDownListFor(q => q.CouponProvider.ProviderName, this.Model.AvailableProvider,
+                                            new { @class = "form-control", @id = "providerName" })
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default">Đóng</button>
+                        <a onclick="duplicateProvider()" class="btn btn-default">Xác nhận</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h1>Danh sách đợt khuyến mãi</h1>
+            </div>
+            <div class="col-md-4 text-right">
+                <a data-toggle="modal" data-target="#createCouponProvider" class="btn btn-primary btn-icon-text waves-effect addNewEmp">
+                    <i class="zmdi zmdi-plus"></i> Thêm nhà cung cấp
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <table id="CouponTable" class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr class="gray">
+                <th class="">Mã</th>
+                <th class="">Tên nhà cung cấp</th>
+                <th class="">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <form role="form" method="post" id="createCoupon" action="@Url.Action("CreateCouponProvider","Coupon")" enctype="multipart/form-data">
+        @this.Html.AntiForgeryToken()
+        <div class="modal fade" id="createCouponProvider" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Thêm nhà cung cấp</h4>
+                    </div>
+                    <div class="modal-body">
+                        <label>VUi lòng chọn nhà cung cấp:</label>
+                        @this.Html.DropDownListFor(q => q.CouponProvider.ProviderName, this.Model.AvailableProvider,
+                                            new { @class = "form-control", @id = "providerName" })
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default">Đóng</button>
+                        <a onclick="duplicateProvider()" class="btn btn-default">Xác nhận</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,129 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+
+@model MenuEditViewModel
+
+<div class="card">
+    <form role="form" method="post">
+        @this.Html.AntiForgeryToken()
+
+        <div class="card-header">
+            <div class="row">                
+                <div class="col-md-4 text-right">
+                    <ul class="actions">
+                        <li>
+                            <button type="button" class="btn btn-primary" id="btn-submit-store">Hoàn tất</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+
+
+        @if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+            {
+            <div class="card">
+                <div class="card-body card-padding text-danger">
+                    @this.Html.ValidationSummary()
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-6 p-l-45">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin chính</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="form-group">
+                            <label for="MenuText" class="control-label">Tên Menu</label><span style="color:red">*</span>
+                            <br>
+                            <div class="fg-line">
+                                @*<input type="text" name="Name" id="Name" class="form-control" required="" value="@Model.Name">*@
+                                @Html.TextBoxFor(q => q.MenuText, new { id = "MenuText", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Area" class="control-label">Area</label>
+                            <br>
+                            <div class="fg-line">
+                                @Html.DropDownListFor(q => q.Area, Model.DropDownForAreas, new { id = "Area", @class = "form-control" })
+                            </div>
+                        
+                            <label for="Controller" class="control-label">Controller</label>
+                            <br>
+                            <div class="fg-line">
+                                @Html.DropDownListFor(q => q.Controller, new List<SelectListItem>(), new { id = "Controller", @class = "form-control" })
+                            </div>
+                        
+                            <label for="Action" class="control-label">Action</label>
+                            <br>
+                            <div class="fg-line">
+                                @Html.DropDownListFor(q => q.Action, new List<SelectListItem>(), new { id = "Action", @class = "form-control" })
+                            </div>
+                        </div>                      
+                    </div>
+                </div>
+            </div>           
+        </div>
+    </form>
+</div>
+<script>
+    $(document).ready(function () {
+    });
+
+    $("#Area").on("change", function () {
+        var area = $(this).val();
+        fillController(area);
+    });
+
+    $("#Controller").on("change", function () {
+        var ctrl = $(this).val();
+        var area = $("#Area").val();
+        fillAction(ctrl, area);
+    });
+
+    function fillController(area) {
+        $.ajax({
+            url: '@Url.Action("GetAllControllerInArea")',
+            type: "GET",
+            dataType: "JSON",
+            data: { area: area },
+            success: function (controllers) {
+                $("#Controller").html(""); // clear before appending new list
+                $.each(controllers, function (i, item) {
+                    $("#Controller").append(
+                        $('<option></option>').val(item).html(item));
+                });
+            }
+        });
+    }
+
+    function fillAction(ctrl, area) {
+        $.ajax({
+            type: "GET",
+            dataType: "JSON",
+            data: {
+                ctrl: ctrl,
+                area: area
+            },
+            url: '@Url.Action("GetAllActionsInController")',
+            success: function (actions) {
+                $("#Action").html(""); // clear before appending new list
+                $.each(actions, function (i, item) {
+                    $("#Action").append(
+                        $('<option></option>').val(item).html(item));
+                });
+            }
+        });
+    }
+</script>
+

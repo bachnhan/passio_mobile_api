@@ -1,0 +1,246 @@
+﻿@model HmsService.ViewModels.CostCategoryViewModel
+@{
+    ViewBag.Title = "IndexCostManage";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Danh sách nhóm doanh thu chi
+                </h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <button class="btn btn-primary btn-icon-text waves-effect addNewEmp" data-action="open-modalCostCategory" data-type="create">
+                    <i class="zmdi zmdi-plus"></i>    Thêm nhóm doanh thu/chi mới
+                </button>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="group-radio-buttons myChoosebox">
+        <div class="row small-margin" style="text-align:center">
+
+            <div class="col-md-4" style="text-align:right">
+                <input type="radio" name="report-filter" value="3" class="nice-check" id="filter3" checked />
+                <label for="filter3"><span>Tất cả</span></label>
+            </div>
+            <div class="col-md-4">
+                <input type="radio" name="report-filter" value="1" class="nice-check" id="filter1" />
+                <label for="filter1"><span>Thu</span></label>
+            </div>
+            <div class="col-md-4" style="text-align:left">
+                <input type="radio" name="report-filter" value="2" class="nice-check" id="filter2" />
+                <label for="filter2"><span>Chi</span></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-padding">
+        <div id="datatable">
+            <table id="costCategory" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label class="">STT</label>
+                        </th>
+                        <th>
+                            <label class="">Nhóm doanh thu/chi</label>
+                        </th>
+                        <th>
+                            <label class="">Loại</label>
+                        </th>
+                        <th>
+                            <label class="">Tùy chọn</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="modalCostCategory">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<script>
+
+    $(document).ready(function () {
+        InitVoucherCampaignDatatable();
+        $('[name="report-filter"]').change(function (e) {
+            RefreshTableFilter("#costCategory", true);
+        });
+
+        $(document).on('click', '[data-action="open-modalCostCategory"]', function (e) {
+            //console.log($("input[name='CatName']").val());
+            var me = $(e.currentTarget);
+            var type = me.attr('data-type');
+            var modal = $('#modalCostCategory');
+            modal.modal('show');
+            if (type == 'create') {
+                $.ajax({
+                    url: '@Url.Action("Create","CostManage")',
+                    type: 'GET',
+                    dataType: 'html',
+                    success: function (result) {
+                        modal.find('.modal-content').html(result);
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: '@Url.Action("Edit", "CostManage")',
+                    type: 'GET',
+                    data: { id: me.attr('data-id') },
+                    dataType: 'html',
+                    success: function (result) {
+                        modal.find('.modal-content').html(result);
+                    }
+                });
+            }
+        });
+
+
+    });
+
+
+    function InitVoucherCampaignDatatable() {
+        var table = $("#costCategory").dataTable({
+            "bFilter": true,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("GetDataCostCategory")",
+            "bProcessing": true,
+            "bFilter": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "status", "value": $('input[name=report-filter]:checked').val() });
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfo": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sInfoEmpty": "Hiển thị 0 từ 0 của 0 dòng",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                },
+                "sSearchPlaceholder": "Nhóm doanh thu/chi"
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 2, 3],
+                    "sClass": "text-center"
+                },
+               {
+                   "aTargets": [0, 1],
+                   "bSortable": false,
+               },
+
+               {
+                   "aTargets": [2],
+                   "mRender": function (data, type, row) {
+                       var data = row[2];
+                       var result = "";
+                       if (data === 1) {
+                           result = "<div class='label myStatus meStatus' style='background-color: #d15b47; color: white;'>Thu</div>";
+                       } else
+                           result = "<div class='label myStatus meStatus' style='background-color: #4caf50; color: white;'>Chi</div>";
+                       return result;
+
+                   }
+               },
+
+            {
+                "aTargets": [3],
+                "mRender": function (data, type, row) {
+                    var data = row[3];
+
+                    $edit = $('<button/>', {
+                        'title':'Chỉnh sửa',
+                        'class': 'btn btn-sm btn-primary',
+                        'data-action': 'open-modalCostCategory',
+                        'data-type': 'edit',
+                        'data-id': data,
+                        'html': '<i class="glyphicon glyphicon-pencil"></i>'
+
+                       
+                    });
+                     var deleteCostManage = "<a class='btn btn-sm btn-danger' onclick='Delete(" + data + ")'><i class='glyphicon glyphicon-remove'></i></a>";
+                    $trash = $('<button/>', {
+                        'class': 'btn btn-sm btn-danger',
+                        'onclick': 'Delete(' + data + ')',
+                        'html': '<i class="fa fa-trash"></i>'
+                    });
+                    return $edit[0].outerHTML + $trash[0].outerHTML
+
+
+                },
+                "bSortable": false,
+            }
+
+            ],
+            "bAutoWidth": false,
+        }).fnSetFilteringDelay(delaySearch);
+    }
+
+    function reDrawDatatable(id) {
+        $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+            if (oSettings.oFeatures.bServerSide === false) {
+                var before = oSettings._iDisplayStart;
+                oSettings.oApi._fnReDraw(oSettings);
+                //iDisplayStart has been reset to zero - so lets change it back
+                oSettings._iDisplayStart = before;
+                oSettings.oApi._fnCalculateEnd(oSettings);
+            }
+
+            //draw the 'current' page
+            oSettings.oApi._fnDraw(oSettings);
+        };
+        $(id).dataTable().fnStandingRedraw();
+    }
+    //user datatable
+    function RefreshTable() {
+        reDrawDatatable("#costCategory");
+    }
+
+    function Delete(id) {
+        ShowConfirm("Xác nhận xóa danh mục?", function () {
+            $.ajax({
+                "type": "POST",
+                "url": "@(Url.Action("Delete", "CostManage"))",
+                "data": {
+                    id: parseInt(id)
+                },
+                success: function (result) {
+                    if (result.success == true) {
+                        ShowAlert('Đã xóa thành công!', 2);
+                        RefreshTable();
+                    }
+                    else {
+                        ShowAlert("Danh mục này không thể xóa được vì danh mục này có phiếu thu/chi.", 1);
+                    }
+
+                },
+                error: function (result) {
+                    ShowAlert("Có lỗi xảy ra. Xin hãy thử lại!", 3);
+                }
+               
+            });
+        });
+    }
+</script>
+

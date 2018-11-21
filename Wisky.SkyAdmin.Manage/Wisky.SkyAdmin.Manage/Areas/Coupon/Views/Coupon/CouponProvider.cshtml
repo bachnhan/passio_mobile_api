@@ -1,0 +1,282 @@
+﻿@model HmsService.ViewModels.CouponProviderEditViewModel
+@{
+    ViewBag.Title = "CouponProvider";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách nhà cung cấp</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <a data-toggle="modal" data-target="#createCouponProvider" class="btn btn-primary btn-icon-text waves-effect addNewEmp">
+                    <i class="zmdi zmdi-plus"></i> Thêm nhà cung cấp
+                </a>
+            </div>
+        </div>
+        <hr />
+
+    </div>
+    <div class="card-body">
+        <div class="card-padding">
+            <div class="row">
+                <table id="CouponTable" class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <label>Mã</label>
+                            </th>
+                            <th>
+                                <label>Tên nhà cung cấp</label>
+                            </th>
+                            <th>
+                                <label>Thao tác</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <form role="form" method="post" id="createCoupon" action="@Url.Action("CreateCouponProvider","Coupon")" enctype="multipart/form-data">
+        @this.Html.AntiForgeryToken()
+        <div class="modal fade" id="createCouponProvider" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h3 class="modal-title">Thêm nhà cung cấp</h3>
+                    </div>
+                    <div class="modal-body">
+                        <label>Vui lòng chọn nhà cung cấp:</label>
+
+                        @Html.TextBoxFor(q => q.ProviderName, new { @id = "providerName", @class = "form-control fg-line" })
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-danger">Đóng</button>
+                        <a onclick="duplicateProvider()" class="btn btn-primary">Xác nhận</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+</div>
+<div id="editCouponProviderPanel" class="modal fade" data-backdrop="static" data-keyboard="true"></div>
+
+@section CouponCampaign{
+    <script>
+
+        function RefreshTable() {
+            var oTable = $("#CouponTable").dataTable();
+            oTable._fnPageChange(0);
+            oTable._fnAjaxUpdate();
+        }
+
+        function deleteProvider(id) {
+            @*var rs = confirm("Xác nhận xóa nhà cung cấp Coupon?");
+            if (rs) {
+                $.ajax({
+                    "type": "post",
+                    "url": "@(Url.Action("Delete","Coupon"))",
+                    "data": {
+                        id: parseInt(id)
+                    },
+                    success: function (result) {
+                        location.href = "@(Url.Action("CouponProvider","Coupon"))";
+                    }
+                });
+            }*@
+
+            ShowConfirm("Bạn có chắc là mình muốn xóa nhà cung cấp này không??", function () {
+                $.ajax({
+                    url: '@Url.Action("Delete")',
+                    data: {
+                        id: id
+                    },
+                    type: 'POST',
+                    success: function (result) {
+                        if (result.success) {
+                            ShowAlert(result.message, 2);
+                            RefreshTable();
+                            @*location.href = "@(Url.Action("CouponProvider","Coupon"))";*@
+                        }
+                        else {
+                            ShowAlert(result.message, 1);
+                        }
+
+                    },
+                    error: function (error) {
+                        ShowAlert(error.message, 1);
+                    }
+                });
+            });
+        }
+        function duplicateProvider() {
+            if ($("input[name='ProviderName']").val() == "") {
+                ShowMessage("Tên nhà cung cấp không được để trống", 1);
+                return;
+            }
+            var rs = document.getElementById("providerName").value;
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("ValidateProvider","Coupon"))",
+                "data": {
+                    name: rs
+                },
+                success: function (result) {
+                    if (result == "duplicated") {
+                        alert("Nhà cung cấp này đã tồn tại!");
+                    }
+                    else {
+                        document.getElementById('createCoupon').submit();
+                    }
+                }
+            });
+        }
+
+
+
+        function editDuplicateProvider() {
+            var rs = document.getElementById("providerName").value;
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("ValidateProvider","Coupon"))",
+                "data": {
+                    name: rs
+                },
+                success: function (result) {
+                    if (result == "duplicated") {
+                        alert("Nhà cung cấp này đã tồn tại!");
+                    }
+                    else {
+                        document.getElementById('editCoupon').submit();
+                    }
+                }
+            });
+        }
+
+
+
+        function showEditCouponProvider(providerId) {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("EditCouponProvider", "Coupon"))",
+                data: { id: providerId },
+                success: function (result) {
+                    $('#editCouponProviderPanel').html(result);
+                    $('#editCouponProviderPanel').modal('show');
+                    setModalHeaderWidth();
+                },
+                error: function (error) {
+                    alert("Error Occured")
+                }
+            });
+        }
+        function editCouponProvider() {
+            var formData = $('#editCoupon').serialize();
+
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("EditCouponProvider")',
+                dataType: 'JSON',
+                data: formData,
+                success: function (result) {
+                    alert(result.message);
+                    if (result.success) {
+                        $('#editCouponProviderPanel').modal('hide');
+
+                    }
+                },
+
+                error: function (error) {
+                    alert("Error Occured");
+                }
+            });
+        }
+        function setModalHeaderWidth() {
+            //set width
+            $('#fixedHeader').css('width', $('#modal-dialog').width() + "px");
+            $(window).resize(function () {
+                $('#fixedHeader').css('width', $('#modal-dialog').width() + "px");
+            });
+        }
+
+
+        $(document).ready(function () {
+            CouponProviderProcess();
+        });
+
+        function CouponProviderProcess() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("LoadCouponProvider","Coupon")',
+                success: function (result) {
+
+                    //console.log(result.aaData);
+                    InitCouponProviderDatatable(result.aaData);
+                }
+            });
+        };
+        function InitCouponProviderDatatable(data) {
+            $("#CouponTable").dataTable({
+                "bFilter": true,
+                "bSort": false,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "data": data,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearchPlaceholder": "Tên nhà cung cấp",
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfoEmpty": "Không có dữ liệu",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                     {
+                         "bSearchable": false,
+                         "aTargets": [0, 2],
+                     },
+                    {
+                        "aTargets": [0, 1],
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [2],
+                        "mRender": function (data, type, row) {
+                            var data = row[0];
+                            var editCouponProvider = "<a title='Chỉnh sửa' data-toggle='modal' onclick='showEditCouponProvider(" + data + ")' data-target='#editCouponProvider' class='btn btn-sm btn-primary' ><i class='glyphicon glyphicon-pencil'></i></a>";
+
+                            var deleteCustomer = "<a title='Xóa' class='btn btn-sm btn-danger' onclick='deleteProvider(" + data + ")'><i class='glyphicon glyphicon-trash'></i></a>";
+
+                            return editCouponProvider + " " + deleteCustomer;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+        
+
+
+
+    </script>
+}
+

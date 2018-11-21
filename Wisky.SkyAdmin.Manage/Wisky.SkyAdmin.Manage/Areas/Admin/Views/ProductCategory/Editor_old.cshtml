@@ -1,0 +1,502 @@
+﻿@model HmsService.ViewModels.ProductCategoryEditViewModel
+@{
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var storeId = 0;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+    var store = Utils.GetStore(storeId);
+}
+
+@if (store.Type == (int)StoreTypeEnum.Website)
+{
+    <form role="form" method="post">
+        @*@this.Html.AntiForgeryToken()
+        @this.Html.HiddenFor(q => q.CateID)
+        <input type="hidden" name="ImageFontAwsomeCss" value="." />
+        <div class="block-header">
+            <h2>Thêm mới loại sản phẩm</h2>
+
+            <ul class="actions">
+                <li class="m-r-10">
+                    <a href="@this.Url.Action("Index", new { parameters = currentStoreDomain.Directory })" class="btn btn-default">Quay lại</a>
+                </li>
+                <li>
+                    <button type="submit" class="btn btn-primary" id="btn-submit-product">Hoàn tất</button>
+                </li>
+            </ul>
+        </div>*@
+
+        @if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+        {
+            <div class="card">
+                <div class="card-body card-padding text-danger">
+                    @this.Html.ValidationSummary()
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-7 p-l-45">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin chính</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="form-group">
+                            <label for="inputTitle" class="control-label">Tên loại sản phẩm</label>
+                            <div class="fg-line" style="float:none">
+                                @this.Html.EditorFor(q => q.CateName,
+                                new
+                                {
+                                    additionalClasses = "seo-source",
+                                    htmlAttributes = new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("data-seo-target", "#SeoName"), }
+                                })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputTitle" class="control-label">Đường dẫn SEO</label>
+                            <div class="fg-line" style="float:none">
+                                @this.Html.EditorFor(q => q.SeoName)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Hình ảnh đại diện</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="row sm-margin">
+                            <div class="col-md-4">
+                                <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                                    @if (this.Model.PicUrl != null)
+                                    {
+                                        <li class="col-md-4 photo-item removeable">
+                                            <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                <div class="ratio-item">
+                                                    <div class="img-container">
+                                                        <img src="@(this.Model.PicUrl)" />
+                                                    </div>
+                                                    <input type="hidden" name="@(this.Html.NameFor(a=>a.PicUrl))" value="@(this.Model.PicUrl)" />
+                                                    <span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                        <div>
+                            <input type="hidden" id="PicUrl" data-name="@(this.Html.NameFor(a => a.PicUrl))" />
+                            @*<button type="button" id="GetElImage" class="btn btn-sm btn-success getimagefromelfinder">
+                                <i class="icon-upload"></i>Browse
+                            </button>*@
+                            <div style="display: none">
+                                <input type="file" hidden id="uploadImage" accept="image/gif, image/jpeg, image/png" class="btn btn-sm btn-success uploadImageToBlob" />
+                            </div>
+                            <button type="button" id="btnUploadImage" class="btn btn-sm btn-success">
+                                <i class="icon-upload"></i>Browse
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5 p-r-45">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Liên kết</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <label for="" class="control-label">Nhóm cha</label>
+                        <div class="fg-line" style="float:none">
+                            <div class="select">
+                                @this.Html.DropDownListFor(q => q.ParentCateId, this.Model.AvailableCategories, new { @class = "form-control", })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="card">
+                        <div class="card-header">
+                            <h2>Sản phẩm kèm theo</h2>
+                        </div>
+                        <div class="card-body card-padding">
+                            <div class="form-group">
+                                @this.Html.EditorFor(q => q.IsExtra, new { DisplayString = "Là loại sản phẩm kèm theo", })
+                            </div>
+                            <div class="form-group">
+                                @this.Html.EditorFor(q => q.IsDisplayed, new { DisplayString = "Hiển thị trong danh sách", })
+                            </div>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+        <div class="form-group" hidden>
+            <label for="inputDescription" class="control-label">Nội dung</label>
+            <div class="fg-line" style="float:none">
+                <input id="inputDescription"/>
+            </div>
+        </div>
+    </form>
+    <template id="tmpPhotoBlock">
+        <li class="col-md-4 photo-item">
+            <div class="ratio-wrapper ratio-wrapper-1-1">
+                <div class="ratio-item">
+                    <div class="img-container">
+                        <img />
+                    </div>
+                    <input type="hidden" name="@(this.Html.NameFor(a=>a.PicUrl))" value="" />
+                </div>
+            </div>
+        </li>
+    </template>
+
+    <template id="templatePairGroup">
+        <div class="pair-group form-group xs-margin">
+            <div class="col-sm-5">
+                <div class="fg-line">
+                    <input type="text" class="form-control" name="Specifications.Name" placeholder="Tên" />
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="fg-line">
+                    <input type="text" class="form-control" name="Specifications.Value" placeholder="Nội dung" />
+                </div>
+            </div>
+            <div class="col-sm-1">
+                <button type="button" class="btn btn-danger form-control" data-action="remove-pair-group">
+                    <i class="zmdi zmdi-close"></i>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template Variant Group -->
+    <template id="templateVariantGroup">
+        <div class="variant-group form-group sm-margin">
+            <div class="col-sm-4">
+                <div class="fg-line">
+                    <input type="text" class="form-control" name="title" />
+                </div>
+            </div>
+            <div class="col-sm-7">
+                <div class="fg-line">
+                    <input type="text" class="form-control" name="content" />
+                </div>
+            </div>
+            <div class="col-sm-1">
+                <button type="button" class="btn btn-danger form-control" data-action="remove-variant-group">
+                    <i class="zmdi zmdi-close"></i>
+                </button>
+            </div>
+        </div>
+    </template>
+
+    <!-- Template Mutant Group -->
+    <template id="templateMutantGroup">
+        <div class="mutant-group form-group sm-margin">
+            <div class="col-sm-4 mutant-label"></div>
+            <div class="col-sm-8">
+                <div class="fg-line">
+                    <input type="text" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <script>
+        $(document).ready(function () {
+            $("#btnUploadImage").on('click', function () {
+                $('#uploadImage').click();
+            });
+
+            $("#uploadImage").on('change', function () {
+                var file, img;
+                file = this.files[0];
+                if (file.type != "image/gif" && file.type != "image/png" && file.type != "image/jpeg") {
+                    ShowMessage("Sai định dạng hình, xin hãy chọn hình .png, .jpg hoặc .gif", 3);
+                    return;
+                }
+
+                if (file) {
+                    sendFile(file);
+                }
+            });
+        });
+
+        function sendFile(file) {
+            var formData = new FormData();
+            formData.append('file', file);
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("UploadImage", "File")',
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        var htmlInnerData = '<li class="col-md-4 photo-item removeable">' +
+                        '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                        '<div class="ratio-item"><div class="img-container"><img src="' + result.imageUrl + '"/></div>' +
+                        '<input type="hidden" name="PicUrl" value="' + result.imageUrl + '"/>'
+                        + '<span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                    '</div></div></li>';
+
+                        $("#avatar-preview").html(htmlInnerData);
+                    }
+                },
+                processData: false,
+                contentType: false,
+                error: function () {
+                    ShowMessage("Có lỗi xảy ra!", 1);
+                }
+            });
+        }
+    </script>
+}
+else
+{
+    if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+    {
+        <div class="card">
+            <div class="card-body card-padding text-danger">
+                @this.Html.ValidationSummary()
+            </div>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-7 p-l-45">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Thông tin chính</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label for="inputTitle" class="control-label">Tên danh mục sản phẩm</label><br />
+                        <div class="fg-line">
+                            @*@this.Html.EditorFor(q => q.CateName,
+                                new
+                                {
+                                    additionalClasses = "seo-source",
+                                    htmlAttributes = new KeyValuePair<string, string>[] {new KeyValuePair<string, string>("data-seo-target", "#SeoName"),}
+                                })*@
+                            <input type="text" name="CateName" id="CateName" class="form-control seo-source" required="" value="@Model.CateName" data-seo-target="#SeoName">
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label">Phân loại</label><br />
+                        <div class="fg-line">
+                            <div class="select">
+                                @Html.EnumDropDownListFor(model => model.CategoryTypes, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Nhóm sản phẩm extra</label><br />
+                        <div class="fg-line">
+                            <select class="selectpicker" name="@this.Html.NameFor(q => q.SelectedProductCategoryExtras)" multiple>
+                                @foreach (var item in this.Model.AvailableCategoryExtras)
+                                {
+                                    <option value="@(item.Value)" selected="@(item.Selected ? "" : null)">@(item.Text)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @Html.HiddenFor(model => model.AdjustmentNote)
+            @*            <input type="hidden" name="@Html.NameFor(Model.AdjustmentNote)" id="adjustmentNote" value="@Model.AdjustmentNote" />*@
+            <div class="card">
+                <div class="card-header">
+                    <h2>Ghi chú</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label for="" class="control-label">Ghi chú 1:</label>
+                        <div class="fg-line">
+                            @*                            <div class="select">*@
+                            <input type="text" id="note11" />
+                            <input type="text" id="note12" />
+                            <input type="text" id="note13" />
+                            @*                            </div>*@
+                            @*                        </div>*@
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="control-label">Ghi chú 2:</label>
+                            <div class="fg-line">
+                                @*                            <div class="select">*@
+                                <input type="text" id="note21" />
+                                <input type="text" id="note22" />
+                                <input type="text" id="note23" />
+                                @*                            </div>*@
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="control-label">Ghi chú 3:</label>
+                            <div class="fg-line">
+                                @*                            <div class="select">*@
+                                <input type="text" id="note31" />
+                                <input type="text" id="note32" />
+                                <input type="text" id="note33" />
+                                @*                            </div>*@
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="" class="control-label">Biểu tượng</label>
+                            <div class="fg-line">
+                                <div class="select">
+                                    @Html.EnumDropDownListFor(model => model.IconEnum, new { @class = "form-control iconoption", @style = "font-family: 'FontAwesome', Helvetica;" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        @*        </div>*@
+        <div class="col-md-5 p-r-45">
+            <div class="card">
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        @*@this.Html.EditorFor(q => q.Active, new { DisplayString = "Kích hoạt", })*@
+                        <div class="form-group">
+                            @*<div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" @(@Model.Active ? "checked" : "") name="Active" value="@Model.Active" />
+                                        <i class="input-helper"></i>
+                                        Kích hoạt
+                                    </label>
+                                </div>*@
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" @(@Model.IsDisplayed ? "checked" : "") name="myDisplay" value="" />
+                                    <i class="input-helper"></i>
+                                    Kích hoạt
+                                </label>
+                            </div>
+                            <input type="hidden" id="checkboxHiddenActive" name="@(this.Html.NameFor(q=>q.IsDisplayed))" value="" />
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @*<div class="checkbox">
+                                <label>
+                                    <input type="checkbox" @(@Model.IsExtra ? "checked" : "") name="IsExtra" value="@Model.IsExtra" />
+                                    <i class="input-helper"></i>
+                                    Là sản phẩm kèm
+                                </label>
+                            </div>*@
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" @(@Model.IsExtra ? "checked" : "") name="result" value="" />
+                                <i class="input-helper"></i>
+                                Là sản phầm kèm theo
+                            </label>
+
+                        </div>
+                        <input type="hidden" id="checkboxHidden" name="@Html.NameFor(q=>q.IsExtra)" value="" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Liên kết</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <label for="" class="control-label">Nhóm cha</label>
+                    <div class="fg-line">
+                        <div class="select">
+                            @this.Html.DropDownListFor(q => q.ParentCateId, this.Model.AvailableCategories, new { @class = "form-control", })
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="card">
+                    <div class="card-header">
+                        <h2>Sản phẩm kèm theo</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="form-group">
+                            @this.Html.EditorFor(q => q.IsExtra, new { DisplayString = "Là loại sản phẩm kèm theo", })
+                        </div>
+                        <div class="form-group">
+                            @this.Html.EditorFor(q => q.IsDisplayed, new { DisplayString = "Hiển thị trong danh sách", })
+                        </div>
+                    </div>
+                </div>*@
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>SEO</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <label for="" class="control-label">Đường dẫn SEO</label>
+                    <div class="fg-line">
+                        @this.Html.TextBoxFor(q => q.SeoName, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Độ ưu tiên</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <label for="" class="control-label">Ưu tiên hiển thị</label>
+                    <div class="fg-line">
+                        @this.Html.TextBoxFor(q => q.Position, new { @class = "form-control" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        $(document).ready(function () {
+            $('.selectpicker').selectpicker({
+                size: 10,
+            });
+
+            if ($("#Position").val() == "") {
+                $("#Position").val(1000);
+            }
+
+            /*la san pham con*/
+            if ($('[name="result"]').prop("checked")) {
+                $('#checkboxHidden').val(true);
+            } else {
+                $('#checkboxHidden').val(false);
+            }
+            $('[name="result"]').change(function () {
+                if ($('[name="result"]').is(":checked")) {
+                    $('#checkboxHidden').val(true);
+                } else {
+                    $('#checkboxHidden').val(false);
+                }
+            });
+            /*kich hoat*/
+
+            if ($('[name="myDisplay"]').prop("checked")) {
+                $('#checkboxHiddenActive').val(true);
+            } else {
+                $('#checkboxHiddenActive').val(false);
+            }
+            $('[name="myDisplay"]').change(function () {
+                if ($('[name="myDisplay"]').is(":checked")) {
+                    $('#checkboxHiddenActive').val(true);
+                } else {
+                    $('#checkboxHiddenActive').val(false);
+                }
+            });
+
+        });
+
+    </script>
+}

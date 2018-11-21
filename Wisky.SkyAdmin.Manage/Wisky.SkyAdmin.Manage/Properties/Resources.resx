@@ -1,0 +1,504 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ACCOUNT_NO_EN" xml:space="preserve">
+    <value>A/C No.</value>
+  </data>
+  <data name="ACCOUNT_NO_VN" xml:space="preserve">
+    <value>Số tài khoản</value>
+  </data>
+  <data name="ADDRESS_EN" xml:space="preserve">
+    <value>Address</value>
+  </data>
+  <data name="ADDRESS_VN" xml:space="preserve">
+    <value>Địa chỉ</value>
+  </data>
+  <data name="AMOUNT_EN" xml:space="preserve">
+    <value>Unit price</value>
+  </data>
+  <data name="AMOUNT_VN" xml:space="preserve">
+    <value>Thành tiền</value>
+  </data>
+  <data name="BILLIONS_VN" xml:space="preserve">
+    <value>TỈ</value>
+  </data>
+  <data name="BIRTHDAY" xml:space="preserve">
+    <value>Ngày sinh</value>
+  </data>
+  <data name="BIRTHDAY_FORMAT" xml:space="preserve">
+    <value>dd/MM/yyyy</value>
+  </data>
+  <data name="BUYER_EN" xml:space="preserve">
+    <value>Buyer</value>
+  </data>
+  <data name="BUYER_VN" xml:space="preserve">
+    <value>Người mua hàng</value>
+  </data>
+  <data name="COLON" xml:space="preserve">
+    <value>:</value>
+  </data>
+  <data name="COMMA" xml:space="preserve">
+    <value>,</value>
+  </data>
+  <data name="COMPANY_EN" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="COMPANY_VN" xml:space="preserve">
+    <value>Tên đơn vị</value>
+  </data>
+  <data name="CURRENCY_EN" xml:space="preserve">
+    <value>DONG</value>
+  </data>
+  <data name="CURRENCY_VN" xml:space="preserve">
+    <value>ĐỒNG</value>
+  </data>
+  <data name="CUSTOMER_EN" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="CUSTOMER_LIST" xml:space="preserve">
+    <value>Customer_List</value>
+  </data>
+  <data name="CUSTOMER_VN" xml:space="preserve">
+    <value>Họ tên người mua hàng</value>
+  </data>
+  <data name="DATE_EN" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="DATE_TIME_FORMAT" xml:space="preserve">
+    <value>dd-MM-yyyy hh-mm-ss tt</value>
+  </data>
+  <data name="DATE_VN" xml:space="preserve">
+    <value>Ngày</value>
+  </data>
+  <data name="DESCRIPTION_EN" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="DESCRIPTION_VN" xml:space="preserve">
+    <value>Tên hàng hóa, dịch vụ</value>
+  </data>
+  <data name="DIRECTOR_EN" xml:space="preserve">
+    <value>Director</value>
+  </data>
+  <data name="DIRECTOR_VN" xml:space="preserve">
+    <value>Thủ trưởng đơn vị</value>
+  </data>
+  <data name="DOT" xml:space="preserve">
+    <value>.</value>
+  </data>
+  <data name="DOUBLE_WHITE_SPACE" xml:space="preserve">
+    <value>  </value>
+  </data>
+  <data name="EIGHT" xml:space="preserve">
+    <value>8</value>
+  </data>
+  <data name="EIGHT_VN" xml:space="preserve">
+    <value>TÁM</value>
+  </data>
+  <data name="EMAIL" xml:space="preserve">
+    <value>Email</value>
+  </data>
+  <data name="EQUAL" xml:space="preserve">
+    <value>=</value>
+  </data>
+  <data name="ERROR_MESSAGE" xml:space="preserve">
+    <value>Không thể xuất hóa đơn VAT!</value>
+  </data>
+  <data name="FEMALE_VN" xml:space="preserve">
+    <value>Nữ</value>
+  </data>
+  <data name="FIRST_COPY_EN" xml:space="preserve">
+    <value>1st copy: File</value>
+  </data>
+  <data name="FIRST_COPY_VN" xml:space="preserve">
+    <value>Liên 1: Lưu</value>
+  </data>
+  <data name="FIVE" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="FIVE_1_VN" xml:space="preserve">
+    <value>NĂM</value>
+  </data>
+  <data name="FIVE_2_VN" xml:space="preserve">
+    <value>LĂM</value>
+  </data>
+  <data name="FONT_PATH" xml:space="preserve">
+    <value>\fonts\times.ttf</value>
+  </data>
+  <data name="FORM_EN" xml:space="preserve">
+    <value>Form</value>
+  </data>
+  <data name="FORM_VALUE" xml:space="preserve">
+    <value>01GTKT2/001</value>
+  </data>
+  <data name="FORM_VN" xml:space="preserve">
+    <value>Mẫu số</value>
+  </data>
+  <data name="FOUR" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="FOUR_VN" xml:space="preserve">
+    <value>BỐN</value>
+  </data>
+  <data name="GENDER_VN" xml:space="preserve">
+    <value>Giới tính</value>
+  </data>
+  <data name="GRAND_TOTAL_EN" xml:space="preserve">
+    <value>Grand amount</value>
+  </data>
+  <data name="GRAND_TOTAL_VN" xml:space="preserve">
+    <value>Tổng tiền thanh toán</value>
+  </data>
+  <data name="HEADER_ADDRESS" xml:space="preserve">
+    <value>52 Pasteur, Phường Bến Nghé, Quận 1, TP. HCM</value>
+  </data>
+  <data name="HEADER_COMP_EN" xml:space="preserve">
+    <value>The Elbow-room Restaurant Co., Ltd</value>
+  </data>
+  <data name="HEADER_COMP_VN" xml:space="preserve">
+    <value>CÔNG TY TNHH TRỞ TAY QUÁN</value>
+  </data>
+  <data name="HEADER_LOGO" xml:space="preserve">
+    <value>~/Content/images/logoElbowRoom.jpg</value>
+  </data>
+  <data name="HEADER_TEL" xml:space="preserve">
+    <value>(08) 3821 4327</value>
+  </data>
+  <data name="HEADER_VAT_CODE" xml:space="preserve">
+    <value>0 3 0 8 6 1 8 4 9 4</value>
+  </data>
+  <data name="HUNDREDS_VN" xml:space="preserve">
+    <value>TRĂM</value>
+  </data>
+  <data name="IN_WORD_EN" xml:space="preserve">
+    <value>In word</value>
+  </data>
+  <data name="IN_WORD_VN" xml:space="preserve">
+    <value>Số tiền viết bằng chữ</value>
+  </data>
+  <data name="LEFT_PARENTHESIS" xml:space="preserve">
+    <value>(</value>
+  </data>
+  <data name="MALE_VN" xml:space="preserve">
+    <value>Nam</value>
+  </data>
+  <data name="MILLIONS_VN" xml:space="preserve">
+    <value>TRIỆU</value>
+  </data>
+  <data name="MONTH_EN" xml:space="preserve">
+    <value>month</value>
+  </data>
+  <data name="MONTH_VN" xml:space="preserve">
+    <value>tháng</value>
+  </data>
+  <data name="MULTIPLY" xml:space="preserve">
+    <value>x</value>
+  </data>
+  <data name="NAME_VN" xml:space="preserve">
+    <value>Tên khách hàng</value>
+  </data>
+  <data name="NINE" xml:space="preserve">
+    <value>9</value>
+  </data>
+  <data name="NINE_VN" xml:space="preserve">
+    <value>CHÍN</value>
+  </data>
+  <data name="NOTE_VN" xml:space="preserve">
+    <value>Cần kiểm tra đối chiếu khi lập, giao, nhận hóa đơn</value>
+  </data>
+  <data name="NO_EN" xml:space="preserve">
+    <value>No.</value>
+  </data>
+  <data name="NO_VN" xml:space="preserve">
+    <value>Số</value>
+  </data>
+  <data name="ONE" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="ONE_1_VN" xml:space="preserve">
+    <value>MỘT</value>
+  </data>
+  <data name="ONE_2_VN" xml:space="preserve">
+    <value>MỐT</value>
+  </data>
+  <data name="ORDER_NO_VN" xml:space="preserve">
+    <value>STT</value>
+  </data>
+  <data name="PAYMENT_METHOD_EN" xml:space="preserve">
+    <value>Payment method</value>
+  </data>
+  <data name="PAYMENT_METHOD_VN" xml:space="preserve">
+    <value>Hình thức thanh toán</value>
+  </data>
+  <data name="QUANTITY_EN" xml:space="preserve">
+    <value>Quantity</value>
+  </data>
+  <data name="QUANTITY_VN" xml:space="preserve">
+    <value>Số lượng</value>
+  </data>
+  <data name="RIGHT_PARENTHESIS" xml:space="preserve">
+    <value>)</value>
+  </data>
+  <data name="SECOND_COPY_EN" xml:space="preserve">
+    <value>2nd copy: Customer</value>
+  </data>
+  <data name="SECOND_COPY_VN" xml:space="preserve">
+    <value>Liên 2: Giao cho người mua</value>
+  </data>
+  <data name="SELLER_EN" xml:space="preserve">
+    <value>Seller</value>
+  </data>
+  <data name="SELLER_VN" xml:space="preserve">
+    <value>Người bán hàng</value>
+  </data>
+  <data name="SERIAL_EN" xml:space="preserve">
+    <value>Serial</value>
+  </data>
+  <data name="SERIAL_VALUE" xml:space="preserve">
+    <value>TQ/13T</value>
+  </data>
+  <data name="SERIAL_VN" xml:space="preserve">
+    <value>Ký hiệu</value>
+  </data>
+  <data name="SEVEN" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="SEVEN_VN" xml:space="preserve">
+    <value>BẢY</value>
+  </data>
+  <data name="SIGN_AND_FULLNAME_EN" xml:space="preserve">
+    <value>Sign &amp; full name</value>
+  </data>
+  <data name="SIGN_AND_FULLNAME_VN" xml:space="preserve">
+    <value>Ký, ghi rõ họ tên</value>
+  </data>
+  <data name="SIGN_STAMP_AND_FULLNAME_EN" xml:space="preserve">
+    <value>Sign, stamp &amp; full name</value>
+  </data>
+  <data name="SIGN_STAMP_AND_FULLNAME_VN" xml:space="preserve">
+    <value>Ký, đóng dấu, ghi rõ họ tên</value>
+  </data>
+  <data name="SIX" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="SIX_VN" xml:space="preserve">
+    <value>SÁU</value>
+  </data>
+  <data name="TEL_EN" xml:space="preserve">
+    <value>Tel</value>
+  </data>
+  <data name="TEL_VN" xml:space="preserve">
+    <value>Điện thoại</value>
+  </data>
+  <data name="TENTH_1_VN" xml:space="preserve">
+    <value>MƯỜI</value>
+  </data>
+  <data name="TENTH_2_VN" xml:space="preserve">
+    <value>MƯƠI</value>
+  </data>
+  <data name="THOUSANDS_VN" xml:space="preserve">
+    <value>NGHÌN</value>
+  </data>
+  <data name="THREE" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="THREE_VN" xml:space="preserve">
+    <value>BA</value>
+  </data>
+  <data name="TOTAL_AMOUNT_EN" xml:space="preserve">
+    <value>Total amount</value>
+  </data>
+  <data name="TOTAL_AMOUNT_VN" xml:space="preserve">
+    <value>Tổng cộng tiền hàng</value>
+  </data>
+  <data name="TRIPLE_WHITE_SPACE" xml:space="preserve">
+    <value>   </value>
+  </data>
+  <data name="TWO" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="TWO_VN" xml:space="preserve">
+    <value>HAI</value>
+  </data>
+  <data name="UNDEFINE_VN" xml:space="preserve">
+    <value>Không xác định</value>
+  </data>
+  <data name="UNDERSCORE" xml:space="preserve">
+    <value>_</value>
+  </data>
+  <data name="UNIT_EN" xml:space="preserve">
+    <value>Unit</value>
+  </data>
+  <data name="UNIT_PRICE_EN" xml:space="preserve">
+    <value>Unit price</value>
+  </data>
+  <data name="UNIT_PRICE_VN" xml:space="preserve">
+    <value>Đơn giá</value>
+  </data>
+  <data name="UNIT_VN" xml:space="preserve">
+    <value>ĐVT</value>
+  </data>
+  <data name="VAT" xml:space="preserve">
+    <value>10%</value>
+  </data>
+  <data name="VAT_AMOUNT_EN" xml:space="preserve">
+    <value>VAT amount</value>
+  </data>
+  <data name="VAT_AMOUNT_VN" xml:space="preserve">
+    <value>Tiền thuế GTGT</value>
+  </data>
+  <data name="VAT_CODE_EN" xml:space="preserve">
+    <value>VAT Code</value>
+  </data>
+  <data name="VAT_CODE_VN" xml:space="preserve">
+    <value>Mã số thuế</value>
+  </data>
+  <data name="VAT_INVOICE_EN" xml:space="preserve">
+    <value>VAT INVOICE</value>
+  </data>
+  <data name="VAT_INVOICE_FILE_NAME" xml:space="preserve">
+    <value>VAT_Invoice</value>
+  </data>
+  <data name="VAT_INVOICE_VN" xml:space="preserve">
+    <value>HÓA ĐƠN GIÁ TRỊ GIA TĂNG</value>
+  </data>
+  <data name="VAT_RATE_EN" xml:space="preserve">
+    <value>VAT rate</value>
+  </data>
+  <data name="VAT_RATE_VN" xml:space="preserve">
+    <value>Thuế suất GTGT</value>
+  </data>
+  <data name="WHITE_SPACE" xml:space="preserve">
+    <value> </value>
+  </data>
+  <data name="YEAR_EN" xml:space="preserve">
+    <value>year</value>
+  </data>
+  <data name="YEAR_VN" xml:space="preserve">
+    <value>năm</value>
+  </data>
+  <data name="ZERO" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="ZERO_1_VN" xml:space="preserve">
+    <value>KHÔNG</value>
+  </data>
+  <data name="ZERO_2_VN" xml:space="preserve">
+    <value>LẺ</value>
+  </data>
+</root>

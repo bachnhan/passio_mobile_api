@@ -1,0 +1,606 @@
+﻿@model Wisky.SkyAdmin.Manage.Areas.Admin.Models.ViewModels.ProductEditViewModel
+
+@{
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var productSpecifications = this.Model.ProductSpecifications;
+    var firstImage = true;
+    var generalProduct = this.Model.GeneralProduct;
+}
+
+<style>
+    .pair-group .btn,
+    .variant-group .btn {
+        font-weight: 500 !important;
+        padding-left: 13px !important;
+    }
+
+    .col-md-4 {
+        padding-top: 10px;
+    }
+
+    .control-label {
+        padding-top: 8px;
+    }
+</style>
+
+<div class="card">
+    <form role="form" method="post">
+        @this.Html.AntiForgeryToken()
+        @*@this.Html.HiddenFor(q => q.ProductID)
+            @this.Html.HiddenFor(q => q.Active)*@
+        @this.Html.HiddenFor(q => q.Product.ProductID)
+        @this.Html.HiddenFor(q => q.Product.GeneralProductId)
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    @if (this.Model.ProductName == null)
+                    {
+                        <h3 class="margin-bottom30">Thêm mới sản phẩm</h3>
+                    }
+                    else
+                    {
+                        <h3 class="margin-bottom30">Chỉnh sửa sản phẩm: <strong>@this.Model.ProductName</strong></h3>
+                    }
+                </div>
+                <div class="col-md-6 text-right">
+                    <ul class="actions">
+                        <li class="m-r-10">
+                            <a href="@this.Url.Action("ProductGeneralDetail/" + this.Model.Product.GeneralProductId, "ProductGeneral")" class="btn btn-success myComeback">Quay lại</a>
+                        </li>
+                        <li>
+                            <button type="button" class="btn btn-primary" id="btn-submit-product">Hoàn tất</button>
+                            <button type="submit" class="btn btn-success" style="display: none"></button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+
+
+        @if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+        {
+            <div class="card">
+                <div class="card-body card-padding text-danger">
+                    @this.Html.ValidationSummary()
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="card-body card-padding">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin chính</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+                        <div class="col-md-6">
+                            <div class="form-group  row">
+                                <label for="Product_ProductName" class="control-label col-md-4">Tên sản phẩm</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @*@Html.TextBoxFor(q => q.Product.ProductName, new { @class = "form-control" })*@
+                                        <input class="form-control seo-source" data-seo-target="#Product_SeoName" value="@this.Model.Product.ProductName" id="@(Html.IdFor(q => q.Product.ProductName))" name="@(Html.NameFor(q => q.Product.ProductName))" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group  row">
+                                <label for="Product_Code" class="control-label col-md-4">Mã sản phẩm</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.Code, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="Product_CatID" class="control-label col-md-4">Nhóm sản phẩm</label>
+                                <div class="col-md-8">
+                                    @Html.DropDownListFor(q => q.Product.CatID, this.Model.AvailableCategories)
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="Product_Price" class="control-label col-md-4">Giá sản phẩm</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.Price, new { @class = "form-control number" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group  row">
+                                <label for="Product_DiscountPercent" class="control-label col-md-4">Giảm giá (%)</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.DiscountPercent, new { @class = "form-control number" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group  row">
+                                <label for="Product_IsAvailable" class="control-label col-md-4">Kích hoạt</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="Product_IsAvailable" name="Product.IsAvailable" @(this.Model.Product.IsAvailable ? "checked" : null) value="true" />
+                                                <i class="input-helper"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div>
+                                <input type="hidden" id="PicURL" data-name="@this.Html.NameFor(q => q.SelectedImages)" />
+                                <div style="display: none">
+                                    <input type="file" hidden id="uploadImage" accept="image/gif, image/jpeg, image/png" class="btn btn-sm btn-success uploadImageToBlob" multiple />
+                                </div>
+                                <button type="button" id="btnUploadImage" class="btn btn-sm btn-success">
+                                    <i class="icon-upload"></i>Browse
+                                </button>
+                            </div>
+                            <div class="row sm-margin">
+                                <div class="col-md-4">
+                                    <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                                        @if (this.Model.ProductImages != null && this.Model.ProductImages.Count() > 0 && !string.IsNullOrEmpty(this.Model.ProductImages.First().ImageUrl))
+                                        {
+                                            var url = this.Model.ProductImages.First().ImageUrl;
+
+                                            <li class="col-md-4 photo-item removeable">
+                                                <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                    <div class="ratio-item">
+                                                        <div class="img-container">
+                                                            <img src="@(url)" />
+                                                        </div>
+                                                        <input type="hidden" name="@this.Html.NameFor(q => q.SelectedImages)" value="@(url)" />
+                                                        <span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="col-md-4 photo-item removeable">
+                                                <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                    <div class="ratio-item">
+                                                        <div class="img-container">
+                                                            <img id="imgName" src="/Content/images/Default_product_img.jpg" />
+                                                        </div>
+                                                        <input type="hidden" id="imgValue" name="@this.Html.NameFor(q => q.SelectedImages)" />
+                                                        <span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                                <div class="col-md-8">
+                                    <ul class="row sm-margin images-preview" id="images-preview">
+                                        @if (this.Model.ProductImages != null && this.Model.ProductImages.Count() > 1)
+                                        {
+                                            foreach (var image in this.Model.ProductImages)
+                                            {
+                                                if (firstImage)
+                                                {
+                                                    firstImage = false;
+                                                    continue;
+                                                }
+
+                                                var url = image.ImageUrl;
+
+                                                <li class="col-md-4 photo-item removeable">
+                                                    <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                        <div class="ratio-item">
+                                                            <div class="img-container">
+                                                                <img src="@(url)" />
+                                                            </div>
+                                                            <input type="hidden" name="@this.Html.NameFor(q => q.SelectedImages)" value="@(url)" />
+                                                            <span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="form-group ">
+                                <label for="inputDescription" class="control-label">Mô tả</label>
+                                <div class="fg-line" style="float:none">
+                                    @this.Html.EditorFor(q => q.Product.Description, new
+                               {
+                                   TextArea = true,
+                                   Rows = 5,
+                                   additionalClasses = "ckeditor",
+                                   @class = "ckeditor"
+                               })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @if (this.Model.Product.GeneralProductId != null)
+                {
+                    <div class="card" id="Product_types">
+                        <div class="row">
+                            <div class="col-md-5">
+                                <div class="card-header">
+                                    <h2>Dòng sản phẩm</h2>
+                                </div>
+                            </div>
+                            <div class="col-md-7" id="list-header"></div>
+                        </div>
+                        <div class="card-header p-t-0">
+                            <div class="row">
+                                <h3 class="col-md-12">@(this.Model.GeneralProduct.ProductName)</h3>
+                            </div>
+                        </div>
+                        <div class="card-body card-padding">
+                            @if (!String.IsNullOrEmpty(this.Model.GeneralProduct.Att1))
+                            {
+                                <div class="form-group row">
+                                    <label class="control-label col-md-2">@(this.Model.GeneralProduct.Att1)</label>
+                                    <div class="col-md-10">
+                                        <input class="form-control" name="Atts" value="@(this.Model.Product.Att1)" />
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!String.IsNullOrEmpty(this.Model.GeneralProduct.Att2))
+                            {
+                                <div class="form-group row">
+                                    <label class="control-label col-md-2">@(this.Model.GeneralProduct.Att2)</label>
+                                    <div class="col-md-10">
+                                        <input class="form-control" name="Atts" value="@(this.Model.Product.Att2)" />
+                                    </div>
+                                </div>
+                            }
+
+                            @if (!String.IsNullOrEmpty(this.Model.GeneralProduct.Att3))
+                            {
+                                <div class="form-group row">
+                                    <label class="control-label col-md-2">@(this.Model.GeneralProduct.Att3)</label>
+                                    <div class="col-md-10">
+                                        <input class="form-control" name="Atts" value="@(this.Model.Product.Att3)" />
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Seo</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="Product_SeoKeyWords" class="control-label col-md-4">Từ khóa SEO</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.SeoKeyWords, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="Product_SeoDescription" class="control-label col-md-4">Mô tả SEO</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.SeoDescription, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="Product_SeoName" class="control-label col-md-4">Đường dẫn SEO</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.SeoName, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông số</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="form-horizontal">
+                            <div class="pair-panel">
+                                @if (productSpecifications != null)
+                                {
+                                    foreach (var spec in productSpecifications)
+                                    {
+                                        <div class="pair-group form-group xs-margin">
+                                            <div class="col-sm-4">
+                                                <div class="fg-line">
+                                                    <input type="text" class="form-control" name="Specifications.Name" placeholder="Tên" value="@(spec.Name)">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="fg-line">
+                                                    <input type="text" class="form-control" name="Specifications.Value" placeholder="Nội dung" value="@(spec.Value)">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <button type="button" class="btn btn-danger form-control myForm" data-action="remove-pair-group">
+                                                    <i class="glyphicon glyphicon-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-default btn-icon-text waves-effect" data-action="add-pair-group">
+                                        <i class="zmdi zmdi-plus"></i>Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Cấu hình POS</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+                        <div class="form-horizontal">
+                            <div class="Advance-Setting-panel">
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <div class="col-sm-12">
+                                        <button type="button" class="btn btn-default btn-icon-text waves-effect" data-action="add-adv-setting">
+                                            <i class="zmdi zmdi-settings"></i>Cài đặt nâng cao
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="advPanel" class="group-append">
+                                    <div class="card-header">
+                                        <h2>Cài đặt nâng cao</h2>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="Ưu tiên hiển thị" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                <input type="number" class="form-control" id="displayPriority" name="@(Html.NameFor(a => a.Product.Position))" value="@(Model.Product.Position)" placeholder="Ưu tiên hiển thị" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="X" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                <input type="number" class="form-control" id="txtX" name="@(Html.NameFor(a => a.Product.PosX))" value="@(Model.Product.PosX)" placeholder="X" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="Y" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                <input type="number" class="form-control" id="txtY" name="@(Html.NameFor(a => a.Product.PosY))" value="@(Model.Product.PosY)" placeholder="Y" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="Nhóm màu" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                @Html.EnumDropDownListFor(q => q.ProductColorGroup, new { @class = "selectpicker" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="Nhóm" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                @Html.EnumDropDownListFor(q => q.ProductGroup, new { @class = "selectpicker" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <button type="button" class="btn btn-default btn-icon-text waves-effect" data-action="remove-advSet">
+                                                <i class="zmdi zmdi-replay"></i>Ẩn cài đặt
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<!-- Template Pair Group -->
+<template id="templatePairGroup">
+    <div class="pair-group form-group xs-margin">
+        <div class="col-sm-4">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="Specifications.Name" placeholder="Tên" />
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="Specifications.Value" placeholder="Nội dung" />
+            </div>
+        </div>
+        <div class="col-sm-2" style="align-items:center">
+            <button type="button" class="btn btn-danger form-control myForm" data-action="remove-pair-group">
+                <i class="glyphicon glyphicon-trash" style="margin-right: 12px;"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Template Photo Block -->
+<template id="tmpPhotoBlock">
+    <li class="col-md-4 photo-item removeable">
+        <div class="ratio-wrapper ratio-wrapper-1-1">
+            <div class="ratio-item">
+                <div class="img-container">
+                    <img />
+                </div>
+                <input type="hidden" name="@this.Html.NameFor(q => q.SelectedImages)" value="" />
+            </div>
+        </div>
+    </li>
+</template>
+
+<script>
+    var firstImage = '@firstImage'.toLowerCase() === 'true';
+
+    $(document).ready(function () {
+
+        var re = /^((0|[1-9]\d?)(\.\d{1,2})?|100(\.00?)?)$/;
+        $("#Product_DiscountPercent").val("@(this.Model.Product.DiscountPercent + "%")");
+        $("#Product_DiscountPercent").blur(function () {
+            var data = $(this).val();
+            if (re.test(data)) {
+                data = data + "%";
+                $(this).val(data);
+            } else {
+                var y = parseFloat(data);
+                if (re.test(y)) {
+                    y = y + "%";
+                    $(this).val(y);
+                } else {
+                    $(this).val("@(this.Model.Product.DiscountPercent + "%")");
+                }
+            }
+        });
+
+        windowWidth = $(window).width();
+
+        // validate number
+        $(".number").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $('#Product_types').show();
+        $('#advPanel').hide();
+
+        $("#btnUploadImage").on('click', function () {
+            $('#uploadImage').click();
+        });
+
+        $("#uploadImage").on('change', function () {
+            var files = this.files;
+
+            // Kiểm tra file extension hợp lệ hay không
+            for (var i = 0; i < files.length; ++i) {
+                var exType = files[i].type;
+                if (exType != "image/gif" && exType != "image/png" && exType != "image/jpeg") {
+                    ShowMessage("Sai định dạng hình, xin hãy chọn hình .png, .jpg hoặc .gif", 3);
+                    return;
+                }
+            }
+
+            // Kiểm tra ảnh đại diện có hay không
+            if (!$.trim($("#avatar-preview").html())) {
+                firstImage = true;
+            }
+
+            if (files) {
+                sendFiles(files);
+            }
+        });
+
+        $('#btn-submit-product').parent().parent().css('z-index', '6');
+        $('.myComeback').parent().fixedScroll(70);
+        $('#btn-submit-product').parent().fixedScroll(70);
+
+        $(window).resize(function () {
+            if (windowWidth != $(window).width()) {
+                $('#btn-submit-product').parent().removeAttr('style');
+                $('.myComeback').parent().removeAttr('style');
+                $('.myComeback').parent().fixedScroll(70);
+                $('#btn-submit-product').parent().fixedScroll(70);
+                windowWidth = $(window).width();
+            }
+        });
+    });
+
+    function sendFiles(files) {
+        var formData = new FormData();
+        if (files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                formData.append('file-' + i, files[i]);
+            }
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("UploadImages", "File")',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    for (var i = 0; i < result.imagesUrl.length; ++i) {
+                        var htmlInnerData = '<li class="col-md-4 photo-item removeable">' +
+                        '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                        '<div class="ratio-item"><div class="img-container"><img src="' + result.imagesUrl[i] + '"/></div>' +
+                    '<input type="hidden" name="SelectedImages" value="' + result.imagesUrl[i] + '"/>'
+                    + '<span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                    '</div></div></li>';
+                        if (firstImage) {
+                            $("#avatar-preview").html(htmlInnerData);
+                            firstImage = false;
+                        }
+                        else {
+                            $('#images-preview').append(htmlInnerData);
+                        }
+                    }
+                }
+            },
+            processData: false,
+            contentType: false,
+            error: function () {
+                ShowMessage("Có lỗi xảy ra!", 1);
+            }
+        });
+    }
+</script>

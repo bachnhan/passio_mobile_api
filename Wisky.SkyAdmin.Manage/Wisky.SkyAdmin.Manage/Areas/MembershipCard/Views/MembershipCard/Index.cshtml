@@ -1,0 +1,930 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var brandId = int.Parse(ViewContext.RouteData.Values["brandId"]?.ToString());
+    var storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+}
+
+<style>
+    .tab-nav.tn-justified > li {
+        width: 33% !important;
+        padding: 0px;
+    }
+
+    .block {
+        display: block;
+    }
+
+    .cardStatus {
+        padding: 5px 17px;
+        margin-bottom: 5px;
+        display: inline-block;
+        font-size: 12px;
+        border-radius: 5px;
+    }
+</style>
+<style>
+    .modal {
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* The Modal (background) */
+    #modalMembership.modal, #modalError.modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 12; /* Sit on top */
+        padding-top: 100px; /* Location of the box */
+        padding-left: 100px;
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+    #modalMembership.modal-content, #modalError.modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 100%;
+    }
+
+    /* The Close Button */
+    /*.close {
+        color: #aaaaaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }*/
+</style>
+@* begin pop-up *@
+<div id="editMembershipCard_popup" class="modal">
+    <div class="modal-content">
+        <span class="close">×</span>
+        <div class="row">
+            <label class="col-md-3 control-label">Mã thẻ</label>
+            <input class="col-md-7 form-control seo-source" id="Card_Code" readonly value="">
+        </div>
+        <div class="row">
+            <label class="col-md-3 control-label">CSV</label>
+            <input class="col-md-7 form-control seo-source" id="Info_CSV" value="">
+        </div>
+        <div class="row">
+            <label class="col-md-3 control-label">Tên khách hàng</label>
+            <input class="col-md-7 form-control seo-source" id="Customer_Name" value="">
+        </div>
+        <div class="row">
+            <label class="col-md-3 control-label">Thời gian tạo</label>
+            <input class="col-md-7 form-control seo-source" readonly type="text" id="Date_Create" value="">
+        </div>
+        <div class="row">
+            <label class="col-md-3 control-label">Loại thẻ</label>
+            <input class="col-md-7 form-control seo-source" id="Card_Type" value="Member card">
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="btnDoneEdit" class="btn btn-primary">Cập nhật</button>
+        </div>
+    </div>
+</div>
+@* end pop-up *@
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Quản lý thẻ thành viên</h3>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="container" style="width: calc(100%)">
+
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="row">
+                    <div class="">
+                        <div class="card-body card-padding">
+                            <ul id="TabList" class="tab-nav tn-justified" style="overflow: hidden; width: 100%">
+                                <li id="tab-chuaKichHoat" class="waves-effect active col-lg-6"><a data-toggle="tab" href="#chuaKichHoat">Thẻ chưa kích hoạt</a></li>
+                                <li id="tab-dangSuDung" class="waves-effect col-lg-6"><a data-toggle="tab" href="#dangSuDung">Thẻ đang sử dụng</a></li>
+                                <li id="tab-tamDung" class="waves-effect col-lg-6"><a data-toggle="tab" href="#tamDung">Thẻ đã tạm dừng</a></li>
+                            </ul>
+                            <div class="col-md-12 m-t-15 p-0">
+                                <div class="col-md-12 p-0">
+                                    <label class="right-icon pull-left" style="line-height: 25px;">Loại thẻ: &nbsp;</label>
+                                    <div class="col-md-3">
+                                        <div class="fg-line">
+                                            <button type="button" id="btn-customerType" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                                                <span class="caret"></span>
+                                            </button>
+                                            <ul class="dropdown-menu" style="overflow-y : scroll; max-height: 150px; top:32px" id="customerType-menu"></ul>
+
+                                            <input type="hidden" id="customerTypeId" name="customerTypeId" value="-1" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4 pull-right p-0">
+                                        <div class="fg-line">
+                                            <label class="right-icon pull-left col-md-3 p-0" style="line-height: 25px;">Cửa hàng: &nbsp;</label>
+                                            <div class="col-md-9 p-0">
+                                                <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7"></select>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="tab-content">
+                                <div id="chuaKichHoat" class="tab-pane fade in active" name="card-type">
+
+                                    <div class="col-md-12 pull-left p-0">
+                                        <button id="add-member" class="btn btn-primary "><i class="left-icon fa fa-plus"></i> Thêm thẻ thành viên</button>
+                                        @*<form id="form-upload-excel">
+                                                <button type="button" id="upload-excel" class="btn btn-primary btn-icon-text waves-effect addNewEmp"><i class="zmdi zmdi-plus"></i>Thêm từ Excel</button>
+                                                <input type="file" name="FileUpload" id="input-upload-excel" onchange="StartUpload();" style="display: none" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                                            </form>*@
+                                    </div>
+                                    @*<div class="col-md-4">
+                                            <form id="form-upload-excel-active-all">
+                                                <button type="button" id="upload-excel-active-all" class="btn btn-primary btn-icon-text waves-effect addNewEmp"><i class="zmdi zmdi-plus"></i>Thêm và kích hoạt từ Excel</button>
+                                                <input type="file" name="FileUpload" id="input-upload-excel-active-all" onchange="StartUploadAndActive();" style="display: none" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" />
+                                                <input type="text" name="FilterMembershipCard" id="membership-filter-id" value="-1" style="display:none" />
+                                            </form>
+                                        </div>*@
+                                    <div class="col-md-12 p-0">
+                                        <table id="chuaKichHoat-table" class="table table-striped table-bordered table-hover table-condensed">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <label>STT</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Mã thẻ</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Thời gian tạo</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Loại thẻ</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Khách hàng</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Cửa hàng</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Tùy chọn</label>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div id="dangSuDung" class="tab-pane fade in ">
+
+                                    <div class="col-md-12 p-0">
+
+                                        <table id="dangSuDung-table" class="table table-striped table-bordered table-hover table-condensed">
+                                            <thead>
+                                                <tr>
+
+                                                    <th>
+                                                        <label>STT</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Mã thẻ</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Tên khách hàng</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Thời gian tạo</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Loại thẻ</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Cửa Hàng</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Tùy chọn</label>
+                                                    </th>
+
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div id="tamDung" class="tab-pane fade in">
+
+                                    <div class="col-md-12 p-0">
+
+                                        <table id="tamDung-table" class="table table-striped table-bordered table-hover table-condensed">
+                                            <thead>
+                                                <tr>
+
+                                                    <th>
+                                                        <label>STT</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Mã thẻ</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Tên khách hàng</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Thời gian tạo</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Loại thẻ</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Cửa Hàng</label>
+                                                    </th>
+                                                    <th>
+                                                        <label>Tùy chọn</label>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="modal fade" id="modalMembership" data-backdrop="false" data-keyboard="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<form hidden action="@Url.Action("editcard","MembershipCard")" method="POST" id="formViewEdit">
+    <input type="text" name="Card_Id" id="Card_Id" value="" />
+</form>
+<div class="modal fade" id="modalError" data-backdrop="static" data-keyboard="true" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="">
+                    <button type="button" class="close btn btn-danger" data-dismiss="modal">&times;</button>
+                    <h3 style="color:#f1404b;margin-top:7px;" class="modal-title">Upload không hoàn toàn</h3>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="cardQuantity">
+
+                </div>
+                <div class="cardCode">
+                    <div class="row"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" class="btn btn-primary">Đóng</a>
+                @*<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Get the modal
+    var modal = document.getElementById('editMembershipCard_popup');
+
+    // Get the button that opens the modal
+    var btn = document.getElementById("btn_openPopup");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks the button, open the modal , submit form
+    function popupEditInfor(cardId) {
+        $('#Card_Id').val(cardId);
+        $("#formViewEdit").submit();
+    }
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function () {
+        modal.style.display = "none";
+    }
+    var updateMembershipCard = document.getElementById("btnDoneEdit");
+    updateMembershipCard.onclick = function () {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function (event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
+
+<script>
+    var storeFilterId = 0;
+    var checkValue0 = false;
+    var checkValue1 = false;
+    var checkValue2 = false;
+    $(document)
+      .ready(function () {
+          setupListStoreFilter();
+          loadAllMembershipType();
+          //InitActiveDatatable();
+          InitDeactiveDatatable();
+          //InitCloseDatatable();
+          $('#tab-chuaKichHoat').data('clicked', true);
+          $('#upload-excel').click(function () {
+              UploadExcel();
+          })
+          $('#upload-excel-active-all').click(function () {
+              ActiveAll();
+          });
+          $('#listStoreId').on('change', function () {
+              storeFilterId = $('#listStoreId').val();
+              RefreshTable();
+          });
+      });
+    $(document).on('click', '[id="add-member"]', function (e) {
+
+        @*var me = $(e.currentTarget);
+        var modal = $('#modalMembership');
+        modal.modal('show');
+        $.ajax({
+            url: '@Url.Action("Create","MembershipCard")',
+            type: 'GET',
+            dataType: 'html',
+            success: function (result) {
+                modal.find('.modal-content').html(result);
+            }
+        });*@
+        window.location = '@Url.Action("CreateMembershipCard")';
+
+    });
+
+    $(document).on('click', '[data-action="open-modalMembershipCard"]', function (e) {
+
+        var me = $(e.currentTarget);
+        var modal = $('#modalMembership');
+        modal.modal('show');
+        $.ajax({
+            url: '@Url.Action("Edit","MembershipCard")',
+            type: 'GET',
+            data: { id: me.attr('data-id') },
+            dataType: 'html',
+            success: function (result) {
+                modal.find('.modal-content').html(result);
+            }
+        });
+    });
+
+    function UploadExcel() {
+        $('#input-upload-excel').trigger('click');
+    }
+
+    function ActiveAll() {
+        $('#input-upload-excel-active-all').trigger('click');
+    }
+
+    function StartUpload() {
+        var form = new FormData($('#form-upload-excel')[0]);
+
+        if ($('input[id="input-upload-excel"]')[0].files[0].size > 1000000) {
+            ShowAlert('File quá lớn', 1);
+            $('#input-upload-excel').val('');
+        } else {
+            form.append('FileUpload', $('input[id="input-upload-excel"]')[0].files[0])
+            $.ajax({
+                url: '@Url.Action("UploadExcel")',
+                type: 'POST',
+                data: form,
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    if (result.success) {
+                        if (result.redundantCardCodeList.length == 0) {
+                            ShowAlert('Upload thành công', 2);
+                        }
+                        else {
+                            var listCode = result.redundantCardCodeList;
+                            $('#modalError .modal-body .cardQuantity').html("");
+                            $('#modalError .modal-body .cardQuantity').html("<h4>Số lượng thẻ không hợp lệ (Không đủ thông tin, bị trùng hoặc loại thẻ đã tồn tại): " + listCode.length + "</h4><br/><h4>Mã thẻ/Loại thẻ không hợp lệ :</h4> ");
+                            $('#modalError .modal-body .cardCode .row').html("");
+                            for (var i = 0; i < listCode.length; i++) {
+                                $('#modalError .modal-body .cardCode .row').append("<div class='col-md-6'><li>" + listCode[i] + "</li></div>")
+                            }
+                            $('#modalError').modal('show');
+                        }
+
+                        $("#chuaKichHoat-table").DataTable().ajax.reload();
+                        $('#input-upload-excel').val('');
+                    } else {
+                        ShowAlert(result.data, 1);
+                        $("#chuaKichHoat-table").DataTable().ajax.reload();
+                        $('#input-upload-excel').val('');
+                    }
+                },
+                error: function () {
+                    ShowMessage('Không thể kết nối tới máy chủ', 1);
+                    $("#chuaKichHoat-table").DataTable().ajax.reload();
+                    $('#input-upload-excel').val('');
+                }
+            });
+        }
+    }
+
+    function StartUploadAndActive() {
+        var form = new FormData($('#form-upload-excel-active-all')[0]);
+
+        if ($('input[id="input-upload-excel-active-all"]')[0].files[0].size > 1000000) {
+            ShowAlert('File quá lớn', 1);
+            $('#input-upload-excel-active-all').val('');
+        } else {
+            form.append('FileUpload', $('input[id="input-upload-excel-active-all"]')[0].files[0]);
+            form.append('FilterMembershipCard', $('input[id="imembership-filter-id"]').val());
+            $.ajax({
+                url: '@Url.Action("UploadExcelActiveAll")',
+                type: 'POST',
+                data: form,
+                contentType: false,
+                processData: false,
+                success: function (result) {
+                    if (result.success) {
+                        if (result.redundantCardCodeList.length == 0) {
+                            ShowAlert('Upload thành công', 2);
+                        }
+                        else {
+                            var listCode = result.redundantCardCodeList;
+                            $('#modalError .modal-body .cardQuantity').html("");
+                            $('#modalError .modal-body .cardQuantity').html("<h4>Số lượng tài khoản không hợp lệ (trùng email, thiếu thông tin): " + listCode.length + "</h4><br/><h4>Thông tin không hợp lệ :</h4> ");
+                            $('#modalError .modal-body .cardCode .row').html("");
+                            for (var i = 0; i < listCode.length; i++) {
+                                $('#modalError .modal-body .cardCode .row').append("<span class='col-md-6'><li>" + listCode[i] + "</li></span>")
+                            }
+                            $('#modalError').modal('show');
+                        }
+
+                        RefreshTable();
+                        $('#input-upload-excel-active-all').val('');
+                    } else {
+                        ShowAlert(result.data, 1);
+                        RefreshTable();
+                        $('#input-upload-excel-active-all').val('');
+                    }
+                },
+                error: function () {
+                    ShowMessage('Không thể kết nối tới máy chủ', 1);
+                    RefreshTable();
+                    $('#input-upload-excel-active-all').val('');
+                }
+            });
+        }
+    }
+
+    function InitDeactiveDatatable() {
+        $("#chuaKichHoat-table").dataTable({
+            "bFilter": true,
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadDeactiveMembershipCard", "MembershipCard")",
+            "bProcessing": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "membershipTypeId", "value": $('#customerTypeId').val() });
+                aoData.push({ "name": "storeFilterId", "value": storeFilterId });
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Mã thẻ",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2],
+                    "bSortable": false
+                },
+                {
+                    "aTargets": [0, 2, 3, 4],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [4],
+                    "mRender": function (name, type, row) {
+                        var data = row[5];
+                        if (data != null) {
+                            var detail = "<a href='@Url.Action("CustomerDetail", "Customer", new { brandId = brandId, storeId = storeId, area = "CRM" })/" + data + "\' target = '_blank' >" + name + "</a>";
+                            return detail;
+                        } else return "---";
+                    },
+                },
+                {
+                    "aTargets": [5],
+                    "mRender": function (name, type, row) {
+                        var data = row[7];
+                        if (data != null) {
+                            var detail = data;
+                            return detail;
+                        } else return "---";
+                    },
+                },
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, row) {
+                        data = row[6];
+                        data2 = row[5];
+                        var status = "<a  title='Đổi trạng thái' class='btn btn-sm btn-success' data-id=" + data + " data-cusId=" + data2 + " onclick='onActivate(this)'>Kích hoạt</a> ";
+                        var editer = "<a class='btn btn-primary btn-sm' title='Cập nhật thông tin' href='@Url.Action("editcard","MembershipCard")/" + data + "'><i class='glyphicon glyphicon-pencil btnEdit'></i></a> ";
+                        var deleteMembershipCard = "<a title='Xóa' class='btn btn-danger btn-sm' onclick='deleteMembershipCard(" + data + ")'><i class='glyphicon glyphicon-trash'></i></a>";
+
+                        return status + editer + deleteMembershipCard;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                }
+            ],
+            "bAutoWidth": false,
+        }).fnSetFilteringDelay(delaySearch);
+    }
+
+    function onActivate(btn) {
+        var id = $(btn).attr("data-id");
+        var cusId = $(btn).attr("data-cusId");
+        if (cusId == "null") {
+            window.location.href = "@this.Url.Action("ActivateCard")/" + id;
+        } else {
+            changeStatus(id, 0);
+        }
+    }
+    function InitActiveDatatable() {
+        $("#dangSuDung-table").dataTable({
+            "bFilter": true,
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadActiveMembershipCard", "MembershipCard")",
+            "bProcessing": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "membershipTypeId", "value": $('#customerTypeId').val() });
+                aoData.push({ "name": "storeFilterId", "value": storeFilterId });
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Mã thẻ hoặc tên KH",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                    "bSortable": false
+                },
+                {
+                    "aTargets": [0, 2, 4, 5],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [2],
+                    "mRender": function (name, type, row) {
+                        var data = row[6];
+                        var detail = "<a href='@Url.Action("CustomerDetail", "Customer", new { brandId = brandId, storeId = storeId, area = "CRM" })/" + data + "\' target = '_blank'>" + name + "</a>";
+                        return detail;
+
+                    },
+                },
+                  {
+                      "aTargets": [5],
+                      "mRender": function (name, type, row) {
+                          var data = row[8];
+                          var detail = data;
+                          return detail;
+
+                      },
+                  },
+                //{
+                //    "aTargets": [5],
+                //    "mRender": function (name, type, row) {
+                //        var result = "";
+
+                //        return data;
+                //    }
+                //},
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, row) {
+                        data = row[5];
+
+                        var status = "<a class='btn btn-sm btn-warning' title='Đổi trạng thái' onclick='changeStatus(" + data + "," + row[7] + ")'>Khóa</a> ";
+                        var editer = "<a class='btn btn-primary btn-sm' title='Cập nhật thông tin' href='@Url.Action("editcard","MembershipCard")/" + data + "'><i class='glyphicon glyphicon-pencil btnEdit'></i></a> ";
+                        var deleteMembershipCard = "<a title='Xóa' class='btn btn-danger btn-sm' onclick='deleteMembershipCard(" + data + ")'><i class='glyphicon glyphicon-trash'></i></a>";
+
+                        return status + editer + deleteMembershipCard;
+
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                }
+
+            ],
+            "bAutoWidth": false,
+        }).fnSetFilteringDelay(delaySearch);
+    }
+
+    function InitCloseDatatable() {
+        $("#tamDung-table").dataTable({
+            "bFilter": true,
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadCloseMembershipCard", "MembershipCard")",
+            "bProcessing": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "membershipTypeId", "value": $('#customerTypeId').val() });
+                aoData.push({ "name": "storeFilterId", "value": storeFilterId });
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Mã thẻ hoặc tên KH",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                    "bSortable": false
+                },
+                {
+                    "aTargets": [0, 2, 4, 5],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [2],
+                    "mRender": function (name, type, row) {
+                        var data = row[6];
+                        var detail = "<a href='@Url.Action("CustomerDetail", "Customer", new { brandId = brandId, storeId = storeId, area = "CRM" })/" + data + "\' target = '_blank' >" + name + "</a>";
+                        return detail;
+                    },
+                },
+                {
+                    "aTargets": [5],
+                    "mRender": function (name, type, row) {
+                        var data = row[8];
+                        var detail = data;
+                        return detail;
+
+                    },
+                },
+                //{
+                //    "aTargets": [5],
+                //    "mRender": function (name, type, row) {
+                //        var result = "";
+                //        var data = row[5];
+                //        if (data == "4") {
+                //            //result += "<span class='badge p-5 p-l-15 p-r-15' style='background-color:blueviolet'><b>" + data[i].Name + "</b></span><br />";
+                //            result += "<div class='block text-center'><div class='label label-success cardStatus'>" + "Thẻ thanh toán" + "</div></div>";
+                //        }
+                //        else if (data == "5") {
+                //            //result += "<span class='badge p-5 p-l-15 p-r-15' style='background-color:green'><b>" + data[i].Name + "</b></span><br />";
+                //            result += "<div class='block text-center'><div class='label label-warning cardStatus'>" + "Thẻ sản phẩm" + "</div></div>";
+                //        }
+                //        else if (data == "6") {
+                //            //result += "<span class='badge p-5 p-l-15 p-r-15' style='background-color:blue'><b>" + data[i].Name + "</b></span><br />";
+                //            result += "<div class='block text-center'><div class='label label-primary cardStatus'>" + "Thẻ tích điểm" + "</div></div>";
+                //        }
+                //        else {
+                //            result = "<span>---</span>";
+                //        }
+
+                //        return result;
+                //    }
+                //},
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, row) {
+                        data = row[5];
+                        var status = "<a class='btn btn-success btn-sm' title='Đổi trạng thái' onclick='changeStatus(" + data + "," + row[7] + ")'>Kích hoạt<i></i></a> ";
+
+                        var editer = "<a class='btn btn-primary btn-sm' title='Cập nhật thông tin' href='@Url.Action("editcard","MembershipCard")/" + data + "'><i class='glyphicon glyphicon-pencil btnEdit'></i></a> ";
+                        var deleteMembershipCard = "<a title='Xóa' class='btn btn-danger btn-sm' onclick='deleteMembershipCard(" + data + ")'><i class='glyphicon glyphicon-trash'></i></a>";
+
+                        return status + editer + deleteMembershipCard;
+
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                }
+
+            ],
+            "bAutoWidth": false,
+        }).fnSetFilteringDelay(delaySearch);
+    }
+
+
+    function deleteMembershipCard(data) {
+        ShowConfirm("Bạn có muốn xóa thẻ thành viên này?", function () {
+            $.ajax({
+                type: "POST",
+                "url": "@(Url.Action("Delete", "MembershipCard"))",
+                data: { id: parseInt(data) },
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        ShowAlert(result.msg, 2);
+
+                        if ($('#tab-dangSuDung').hasClass('active')) {
+                            $('#tab-dangSuDung').data('clicked', true);
+                            $('#tab-tamDung').data('clicked', false);
+                            $('#tab-chuaKichHoat').data('clicked', false);
+                        } else if ($('#tab-tamDung').hasClass('active')) {
+                            $('#tab-tamDung').data('clicked', true);
+                            $('#tab-dangSuDung').data('clicked', false);
+                            $('#tab-chuaKichHoat').data('clicked', false);
+                        } else if ($('#tab-chuaKichHoat').hasClass('active')) {
+                            $('#tab-chuaKichHoat').data('clicked', true);
+                            $('#tab-tamDung').data('clicked', false);
+                            $('#tab-dangSuDung').data('clicked', false);
+                        }
+
+                        RefreshTable();
+                    } else {
+                        ShowAlert(result.msg, 1);
+                        RefreshTable();
+                    }
+                },
+                error: function (xhr, ajaxOptions, thrownError) {
+                    //ShowAlert("ErrorOccured", 1);
+                    RefreshTable();
+                }
+            });
+        });
+    }
+    function changeStatus(id, status) {
+        $.ajax({
+            type: "url",
+            method: "POST",
+            url: '@Url.Action("ChangeStatus", "MembershipCard")',
+            data: { id: id, status: status },
+            success: function (result) {
+                ShowMessage("Đổi trạng thái thành công", 2);
+                RefreshTable();
+
+            },
+
+            error: function (error) {
+                alert("Error Occured");
+                RefreshTable();
+            }
+        });
+    }
+
+    function reDrawDatatable(id) {
+
+        $(id).dataTable()._fnPageChange(0);
+        $(id).dataTable()._fnAjaxUpdate();
+    }
+    function RefreshTable() {
+        if ($("#tab-chuaKichHoat").data("clicked")) {
+            reDrawDatatable("#chuaKichHoat-table");
+        } else if ($("#tab-dangSuDung").data("clicked")) {
+            if (checkValue2 == false) {
+                InitActiveDatatable();
+                checkValue2 = true;
+            } else {
+                reDrawDatatable("#dangSuDung-table");
+            }
+        } else if ($("#tab-tamDung").data("clicked")) {
+            if (checkValue1 == false) {
+                InitCloseDatatable();
+                checkValue1 = true;
+            } else {
+                reDrawDatatable("#tamDung-table");
+            }
+        }
+    }
+
+    $('#TabList>li').on('click', function () {
+        $(this).data('clicked', true);
+        $.each($(this).siblings(), function (index, el) {
+            $(el).data('clicked', false);
+        });
+        RefreshTable();
+    });
+
+    function loadAllMembershipType() {
+
+        $.ajax({
+            url: '@Url.Action("LoadAllMembershipType")',
+            type: "POST",
+            success: function (result) {
+                if (result != null && result.length > 0) {
+                    //render to store dropdown
+                    $('#customerType-menu').html();
+                    $('#customerType-menu').append("<li onclick=\"changeMembershipType(-1, \'Tất cả\')\"><a href=\'#\'>Tất cả</a></li>");
+                    for (var i = 0; i < result.length; i++) {
+                        $('#customerType-menu').append("<li onclick=\"changeMembershipType(" + result[i].MembershipType + ", \'" + result[i].Name + "\')\"><a href=\'#\'>" + result[i].Name + "</a></li>");
+                    }
+
+
+                    //default store
+                    $('#btn-customerType').html('Tất cả &#9660');
+                    $('#customerTypeId').val(-1);
+
+                } else {
+                    $('#btn-customerType').html('Không tìm thấy loại thẻ');
+                    $('#customerTypeId').val(-2);
+                }
+            },
+            error: function (error) {
+                alert("Có lỗi xảy ra, vui lòng thử lại. Nếu lỗi tiếp tục tiếp diễn xin vui lòng liên hệ admin");
+            }
+        });
+    }
+
+    function changeMembershipType(cusTypeId, storeName) {
+        $('#btn-customerType').html(storeName + " &#9660");
+        $('#customerTypeId').val(cusTypeId);
+        $('#membership-filter-id').val(cusTypeId)
+        RefreshTable();
+
+    }
+    function setupListStoreFilter() {
+        $.ajax({
+            type: "GET",
+            url: "@(Url.Action("GetListStore", "MembershipCard"))",
+            success: function (data) {
+                var content = "";
+                content += "<option value='0'>" + "Tất cả cửa hàng" + "</option>";
+                for (var i = 0; i < data.listresult.length; ++i) {
+                    content += "<option value='" + data.listresult[i].storeId + "'>" + data.listresult[i].storeName + "</option>";
+                }
+                $("#listStoreId").html(content);
+                $("#listStoreId").selectpicker('refresh');
+                storeFilterId = $('#listStoreId').val();
+            },
+            error: function (error) {
+                alert("Error Occured")
+            }
+        });
+    }
+</script>
+<style>
+    #modalError.modal-content, #modalMembership.modal-content {
+        width: 50% !important;
+    }
+</style>

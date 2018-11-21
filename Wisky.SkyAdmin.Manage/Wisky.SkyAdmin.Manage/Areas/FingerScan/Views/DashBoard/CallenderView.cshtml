@@ -1,0 +1,189 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<link href="~/Content/calendarResource/calendar.css" rel="stylesheet" />
+<div class="navigator clearfix">
+    <div class="col-xs-6 go-left"><a rel="nofollow" rel="noreferrer" href="" id="goLeft"><span class="glyphicon glyphicon-arrow-left"></span></a></div>
+    <div class="col-xs-6 go-right"><a rel="nofollow" rel="noreferrer" href="" id="goRight"><span class="glyphicon glyphicon-arrow-right"></span></a></div>
+</div>
+
+<div class="container-fluid cearfix" id="weekly_calendar">
+
+    <div class="columns clearfix">
+
+        <div class="hour-column clearfix">
+            <div class="headings">
+                <div class="empty heading">
+
+                </div>
+            </div>
+            <div class="hour">
+                <div class="hours">
+                    <div class="hr">all day</div>
+                    <div class="hr">12 Am</div>
+                    <div class="hr">1 Am</div>
+                    <div class="hr">2 Am</div>
+                    <div class="hr">3 Am</div>
+                    <div class="hr">4 Am</div>
+                    <div class="hr">5 Am</div>
+                    <div class="hr">7 Am</div>
+                    <div class="hr">6 Am</div>
+                    <div class="hr">8 Am</div>
+                    <div class="hr">9 Am</div>
+                    <div class="hr">10 Am</div>
+                    <div class="hr">11 Am</div>
+                    <div class="hr">12 Pm</div>
+                    <div class="hr">1 Pm</div>
+                    <div class="hr">2 Pm</div>
+                    <div class="hr">3 Pm</div>
+                    <div class="hr">4 Pm</div>
+                    <div class="hr">5 Pm</div>
+                    <div class="hr">6 Pm</div>
+                    <div class="hr">7 Pm</div>
+                    <div class="hr">8 Pm</div>
+                    <div class="hr">9 Pm</div>
+                    <div class="hr">10 Pm</div>
+                    <div class="hr">11 Pm</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="event-column clearfix">
+            <header class="headings clearfix">
+                <div class="weekdays clearfix">
+                    <div class="weekend heading">Sunday</div>
+                    <div class="weekday heading">Monday</div>
+                    <div class="weekday heading non-visible">Tuesday</div>
+                    <div class="weekday heading non-visible">Wednesday</div>
+                    <div class="weekday heading non-visible">Thursday</div>
+                    <div class="weekday heading non-visible">Friday</div>
+                    <div class="weekend heading non-visible">Saturday</div>
+                </div>
+            </header>
+            <div class="week-grid clearfix">
+                <div class="hours-grid">
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                    <div class="grid"></div>
+                </div>
+            </div>
+            <div class="events clearfix">
+                <div class="event-outer clearfix">
+                    <div class="event-cont">
+                        <div class="event" data-duration="1" data-start="2" style="background: rgba(242,93,57,0.3)">
+                            <span class="bar" style="background: rgba(242,93,57,0.5);"></span>
+                            <p>A New Event Created By Tashrik</p>
+                        </div>
+                    </div>
+                    <div class="event-cont"></div>
+                    <div class="event-cont non-visible">
+                        <div class="event" data-duration="6.3" data-start="7" style="background: rgba(96,191,97,0.3)">
+                            <span class="bar" style="background: rgba(96,191,97,0.5);"></span>
+                            <p>A New Event</p>
+                        </div>
+                    </div>
+                    <div class="event-cont non-visible"></div>
+                    <div class="event-cont today non-visible">
+                        <div class="event" data-duration="2.3" data-start="10" style="background: rgba(109,169,190,0.3)">
+                            <span class="bar" style="background: rgba(109,169,190,0.5);"></span>
+                            <p>A New Event</p>
+                        </div>
+                    </div>
+                    <div class="event-cont non-visible"></div>
+                    <div class="event-cont non-visible"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    @section scripts
+{
+        <script>
+            var dEvent = $('.event');
+
+            // var h = dEvent.attr('data-duration');
+            // var pos = dEvent.attr('data-start');
+
+
+
+            $('.event').each(function () {
+                var $this = $(this);
+                var h = $this.attr('data-duration');
+                var pos = $this.attr('data-start');
+                $this.css({
+                    'height': h * 60,
+                    'top': pos * 60
+                });
+            });
+
+            $(window).resize(function () {
+                if ($(window).width() < '650') {
+                    $('.event-column').css('margin-left', "60px");
+                } else {
+                    $('.event-column').css('margin-left', "0");
+                    $('.event-column').css('left', '0')
+                }
+            });
+
+
+            if ($(window).width() < '650') {
+                $('.event-column').css('margin-left', "60px");
+            }
+
+            $("#goRight").click(function (event) {
+                event.preventDefault();
+                var left = $('.event-column').css('left');
+                var leftVal = parseInt(left.replace("px", ""));
+                if (leftVal === 0) {
+                    $('.event-column').css('left', "-114px");
+                } else if (leftVal > '-570') {
+                    var newPos = (leftVal - 114);
+                    $('.event-column').css({
+                        left: newPos + 'px'
+                    });
+                }
+                $("#goLeft").css("opacity", "1");
+            });
+
+            $("#goLeft").click(function (event) {
+                event.preventDefault();
+
+                var left = $('.event-column').css('left');
+                var leftVal = parseInt(left.replace("px", ""));
+                if (leftVal === 0) {
+                    event.preventDefault();
+                } else if (leftVal >= '-684') {
+                    var newPos = (leftVal + 114);
+                    $('.event-column').css({
+                        left: newPos + 'px'
+                    });
+                }
+                $("#goLeft").css("opacity", "1");
+            });
+
+        </script>
+    }

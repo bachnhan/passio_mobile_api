@@ -1,0 +1,109 @@
+﻿
+@model HmsService.ViewModels.ThemeViewModel
+
+@{
+    ViewBag.Title = "Thêm Mới Theme";
+}
+
+<style>
+    .pair-group .btn,
+    .variant-group .btn {
+        font-weight: 500 !important;
+        padding-left: 13px !important;
+    }
+  .thumb {
+    height: 100px;
+    border: 1px solid #000;
+    margin: 10px 5px 0 0;
+  }
+</style>
+
+<div class="card">
+    <form role="form" method="post">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-8">
+                    @if (Model.ThemeName == null)
+                    {
+                        <h3 class="margin-bottom30">Thêm mới Theme</h3>
+                    }
+                    else
+                    {
+                        <h3 class="margin-bottom30">Chỉnh sửa Theme: <strong>@Model.ThemeName</strong></h3>
+                    }
+                </div>
+                <div class="col-md-4 text-right">
+                    <ul class="actions">
+                        <li class="m-r-10">
+                            <a href="@this.Url.Action("Index", "Theme")" class="btn btn-success myComeback">Quay lại</a>
+                        </li>
+                        <li>
+                            <button type="button" class="btn btn-primary" id="btn-submit-theme">Hoàn tất</button>
+                            <button type="submit" class="btn btn-primary" style="display: none"></button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+
+
+        @if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+        {
+            <div class="card">
+                <div class="card-body card-padding text-danger">
+                    @this.Html.ValidationSummary()
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-7 p-l-45">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin chính</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="form-group">
+                            <label for="inputTitle" class="control-label">Tên Theme</label>
+                            <div class="fg-line">
+                                <input type="text" name="ThemeName" id="ThemeName" class="form-control" required="" value="@Model.ThemeName" >
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputTitle" class="control-label">Thư mục Theme</label>
+                            <div class="fg-line">
+                                @this.Html.TextBoxFor(q => q.ThemeFolderUrl, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Theme style</label>
+                            <div class="fg-line">
+                                @this.Html.TextBoxFor(q => q.ThemeStyle, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Mô tả</label>
+                            <div class="fg-line">
+                                @this.Html.TextAreaFor(q => q.Description, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Mô tả</label>
+                            <div class="fg-line">
+                                <input type="file" id="files" name="ImageUrl"  accept="image/*" single  />
+                                <output id="list"></output>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+      
+
+            </div>
+            
+        </div>
+    </form>
+</div>
+

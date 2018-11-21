@@ -1,0 +1,300 @@
+﻿
+@{
+    ViewBag.Title = "Báo cáo doanh thu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Báo cáo doanh thu tháng</h3>
+                <h5 data-role="small-date" id="dateRange"></h5>
+            </div>
+            <div class="col-md-4 text-right">
+                <button type="submit" id="export" class="btn btn-primary btn-sm">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>
+            </div>
+        </div>
+        <hr />
+        <div class="report-date-button">
+            <div class="pull-right text-right myDatetimePicker">
+                <div class="input-group">
+                    <!-- Daterange picker -->
+                    @*<div class="dateTime pull-right width230">
+                        <div id="reportrange" class="fg-line m-t-5">
+                            <input id="date-string" readonly class="form-control text-center">
+                            <a class="myCelenderA"><i class="fa fa-calendar"></i></a>
+                        </div>
+                    </div>*@
+                        @*<div class="fg-line m-t-5">
+                                <div id="reportrange" class="btn-datetime form-control">
+                                    <span class="p-r-10"></span><i class="fa fa-calendar"></i>
+                                    <b class="caret"></b>
+                                </div>
+                            </div>*@
+                    
+
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group-btn FindButtonDateTime">
+                        <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                            <i class="left-icon fa fa-search"></i>  Tìm
+                        </a>
+                    </div>
+                </div>
+                <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+            </div>
+        </div>
+        @*<div class="input-group">
+                <div class="date-picker">
+                    <input type="text" id="date-string" readonly="">
+                    <a id="reportrange"><i class="fa fa-calendar"></i></a>
+                </div><!-- /input-group -->
+                <div class="input-group-btn">
+                    <a class="btn btn-primary btn-sm" id="btnSearch">
+                        <i class="left-icon fa fa-search"></i>Tìm
+                    </a>
+                </div>
+            </div>
+            <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+            <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />*@
+    </div>
+
+    <!-- export to excel -->
+
+    <div class="card-padding">
+        <div id="datatable">
+            <table id="systemReportDatatable" class="table table-striped table-bordered table-hover" style="width: 100% !important">
+                <thead style="white-space: nowrap; text-overflow: ellipsis;">
+                    <tr>
+                        <th>
+                            <label class="">Ngày</label>
+                        </th>
+                        <th>
+                            <label class="">Tổng doanh thu</label>
+                        </th>
+                        <th>
+                            <label class="">Giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu sau giảm giá</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <th style="text-align:right">Tổng tất cả các ngày:</th>
+                        <th></th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+<form class="hidden" id="formReportExcel" action="@Url.Action("ExportExcelRevenueReport", "SystemReport")">
+    <input name="startTime" />
+    <input name="endTime" />
+</form>
+
+
+<script>
+    $(document).ready(function () {
+        cb(moment().startOf('month'), moment(), "Tháng này");
+        setupDaterangepicker();
+        dataReport();
+    });
+
+    var numberWithSeparator = function (x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    };
+
+    var dataReport = function () {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadRevenueReport","SystemReport")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val() },
+            success: function (result) {
+
+                initRevenueDatatable(result.dataList);
+            }
+        });
+    };
+
+    var initRevenueDatatable = function (datalist) {
+        // Reset table
+        $("#datatable").html("<table id=\"systemReportDatatable\" class=\"table table-striped table-bordered table-hover\" style=\"width: 100% !important\">"
+                    + "<thead style=\"white-space: nowrap; text-overflow: ellipsis;\">"
+                        + "<tr>"
+                            + "<th>"
+                                + "<label class=\"\">Ngày</label>"
+                            + "</th>"
+                            + "<th>"
+                                + "<label class=\"\">Tổng doanh thu</label>"
+                            + "</th>"
+                            + "<th>"
+                                + "<label class=\"\">Giảm giá</label>"
+                            + "</th>"
+                            + "<th>"
+                                + "<label class=\"\">Doanh thu sau giảm giá</label>"
+                            + "</th>"
+                        + "</tr>"
+                    + "</thead>"
+                    + "<tbody></tbody>"
+                    + "<tfoot>"
+                        + "<tr>"
+                            + "<th style=\"text-align:right\">Tổng tất cả các ngày:</th>"
+                            + "<th></th>"
+                            + "<th></th>"
+                            + "<th></th>"
+                        + "</tr>"
+                    + "</tfoot>"
+                + "</table>");
+
+        // Inite new datatable
+        $("#systemReportDatatable").dataTable({
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(), data;
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                        i : 0;
+                };
+
+                // Total over all pages
+                totalIncome = api
+                    .column(1)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                totalDiscount = api
+                    .column(2)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0)
+
+                totalFinalIncome = api
+                    .column(3)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0)
+                var cells = row.getElementsByTagName('th');
+                cells[1].innerHTML = numberWithSeparator(totalIncome);
+                cells[2].innerHTML = numberWithSeparator(totalDiscount);
+                cells[3].innerHTML = numberWithSeparator(totalFinalIncome);
+            },
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": datalist,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3],
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+    };
+
+    $('#btnSearch').on('click', function () {
+        if ($("#eTime").val().length > 16 || $("#sTime").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            dataReport();
+        }
+    });
+
+    // Export to excel
+    @*$("#export").on('click', function () {
+        $.ajax({
+            url: '@Url.Action("ExportExcelRevenueReport", "SystemReport")',
+            type: 'GET',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val() },
+            success: function (rs) {
+                if (rs.success == true) {
+                    ShowMessage('Xuất file Excel thành công <br/>' + rs.fileName, 3);
+                } else {
+                    ShowMessage('Xuất file Excel thất bại', 1);
+                }
+            }
+        });
+    });*@
+
+    $("#export").on('click', function () {
+        $('[name=startTime]').val($('#sTime').val());
+        $('[name=endTime]').val($('#eTime').val());
+        $('#formReportExcel').submit();
+    });
+
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+
+        $("#sTime").val(startTime);
+        $("#eTime").val(endTime);
+        $("#dateRange").html(dateString);
+    }
+
+    //init dateRange picker
+    function setupDaterangepicker() {
+        $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+    }
+</script>

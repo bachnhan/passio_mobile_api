@@ -1,0 +1,154 @@
+@font-face {
+    font-family: 'OpenSans';
+    src: url('../fonts/OpenSans/OPENSANS-LIGHT.TTF');
+    font-weight: 100;
+}
+
+@font-face {
+    font-family: 'OpenSans';
+    src: url('../fonts/OpenSans/OPENSANS-REGULAR.TTF');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'OpenSans';
+    src: url('../fonts/OpenSans/OPENSANS-SEMIBOLD.TTF');
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'OpenSans';
+    src: url('../fonts/OpenSans/OPENSANS-BOLD.TTF');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'OpenSans';
+    src: url('../fonts/OpenSans/OPENSANS-EXTRABOLD.TTF');
+    font-weight: 800;
+}
+
+/* Custom Margin */
+.no-margin {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+    .no-margin > [class*="col-"] {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+.xsmall-margin {
+    margin-left: -2.5px !important;
+    margin-right: -2.5px !important;
+}
+
+    .xsmall-margin > [class*="col-"] {
+        padding-left: 2.5px !important;
+        padding-right: 2.5px !important;
+    }
+
+.small-margin {
+    margin-left: -5px !important;
+    margin-right: -5px !important;
+    margin-top: 0px !important;
+}
+
+    .small-margin > [class*="col-"] {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+/* Ratio Wrapper */
+.ratio-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+    .ratio-wrapper:before {
+        content: "";
+        display: block;
+    }
+
+    .ratio-wrapper.ratio-wrapper-27-10:before {
+        padding-top: 33%; /* initial ratio 27:10*/
+    }
+
+    .ratio-wrapper.ratio-wrapper-2-1:before {
+        padding-top: 50%; /* initial ratio 2:1*/
+    }
+
+    .ratio-wrapper.ratio-wrapper-16-9:before {
+        padding-top: 56.25%; /* initial ratio 16:9*/
+    }
+
+    .ratio-wrapper.ratio-wrapper-4-3:before {
+        padding-top: 75%; /* initial ratio 4:3*/
+    }
+
+    .ratio-wrapper.ratio-wrapper-1-1:before {
+        padding-top: 100%; /* initial ratio 1:1*/
+    }
+
+    .ratio-wrapper > .ratio-item {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+    }
+
+button:focus, a:focus, input:focus, select:focus {
+    outline: none !important;
+}
+
+/* Smart phones (portrait and landscape) ----------- */
+@media only screen and (min-width : 320px) and (max-width : 568px) {
+    /* Styles */
+}
+
+/* Smart phones (portrait) ----------- */
+@media only screen and (max-width : 320px) and (orientation: portrait) {
+    /* Styles */
+}
+
+/* Smart phones (landscape) ----------- */
+@media only screen and (min-width : 568px) and (orientation: landscape) {
+    /* Styles */
+}
+
+/* iPads (portrait and landscape) ----------- */
+@media only screen and (min-width : 768px) and (max-width : 1024px) {
+    /* Styles */
+}
+
+/* iPads (portrait) ----------- */
+@media only screen and (min-width : 768px) and (max-width : 1024px) and (orientation : portrait) {
+    /* Styles */
+}
+
+/* iPads (landscape) ----------- */
+@media only screen and (min-width : 768px) and (max-width : 1024px) and (orientation : landscape) {
+    /* Styles */
+}
+
+@media only screen and (min-width : 992px) {
+    .col-md-20 {
+        width: 20%;
+        padding-left: 15px;
+        padding-right: 15px;
+        float: left;
+    }
+}
+
+/* Desktops and laptops ----------- */
+@media only screen and (min-width : 1224px) {
+    /* Styles */
+}
+
+/* Large screens ----------- */
+@media only screen and (min-width : 1824px) {
+    /* Styles */
+}

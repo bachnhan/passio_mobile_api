@@ -1,0 +1,436 @@
+﻿@model AccountViewModel
+
+
+@{
+    Layout = null;
+}
+
+<div class="modal-dialog">
+    @Html.ValidationSummary()
+    <form id="editAccount" method="post" action="@Url.Action("Edit", "Account")">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3>Chỉnh sửa tài khoản</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px;">
+                        @Html.HiddenFor(q => q.CustomerID)
+                        @Html.HiddenFor(q => q.AccountID)
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="AccountCode">Mã số thẻ<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.AccountCode, new { id = "AccountCode", @class = "form-control fg-line", placeholder = "Nhập mã số thẻ", required = "required", @readonly = "readonly", maxlength = "30" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="AccountName">Tên tài khoản<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.AccountName, new { id = "AccountName", @class = "form-control fg-line", placeholder = "Nhập tên tài khoản", required = "required", maxlength = "30" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="AccountNameEnglish">Tên tiếng anh<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.AccountNameEnglish, new { id = "AccountNameEnglish", @class = "form-control fg-line", placeholder = "Nhập tên tiếng anh", maxlength = "30" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Ngày bắt đầu - Ngày hết hạn</label>
+                            <div class="col-md-6 dateTime">
+                                <div class="fg-line">
+                                    <div id="reportrange" class="btn-datetime pull-right form-control">
+                                        <i class="fa fa-calendar"></i>
+                                        <span></span> <b class="caret"></b>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="StartDate" name="StartDate" value="@(String.Format("{0:dd-MM-yyyy}",this.Model.StartDate))" />
+                            <input type="hidden" id="FinishDate" name="FinishDate" value="@(String.Format("{0:dd-MM-yyyy}",this.Model.FinishDate))" />
+                        </div>
+
+                        <div class="form-group">
+
+                            <div class="col-md-4 toggle-switch" data-ts-color="green">
+                                <label for="IsDetailAccount" class="ts-label">Chi tiết tài khoản</label>
+
+                            </div>
+                            <div class="col-md-6 toggle-switch" data-ts-color="green">
+                                <input id="IsDetailAccount" name="IsDetailAccount" type="checkbox" value="true" hidden="hidden" maxlength = "30" />
+                                <label for="IsDetailAccount" class="ts-helper"></label>
+                            </div>
+                        </div>
+
+                        <div id="detail-account-field" style="display:none">
+                            <!--Banking-->
+
+                            <div class="form-group">
+                                <div class="toggle-switch col-md-3 col-md-offset-1" data-ts-color="green">
+                                    <label for="IsCredit" class="ts-label">Thẻ ngân hàng</label>
+                                </div>
+                                <div class="toggle-switch col-md-6" data-ts-color="green">
+                                    <input id="IsCredit" name="IsCredit" type="checkbox" value="true" hidden="hidden" maxlength = "30" />
+                                    <label for="IsCredit" class="ts-helper"></label>
+                                </div>
+                            </div>
+                            <div id="bank-field" style="display:none">
+                                <div class="form-group" id="bank-name-field">
+                                    <label class="col-md-4 control-label"><i>Tên ngân hàng </i></label>
+                                    <div class="col-md-6">
+                                        <div class="fg-line">
+                                            @Html.TextBoxFor(q => q.BankName, new { id = "BankName", @class = "form-control fg-line", placeholder = "Nhập tên ngân hàng", maxlength = "30" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" id="bank-account-no-field">
+                                    <label class="col-md-4 control-label"><i>Số tài khoản </i></label>
+                                    <div class="col-md-6">
+                                        @Html.TextBoxFor(q => q.BankAccountNo, new { id = "BankAccountNo", @class = "form-control fg-line", placeholder = "Nhập mã số thẻ", maxlength = "30" })
+                                    </div>
+                                </div>
+                                <div class="form-group" id="owner-name-field">
+                                    <label class="control-label col-md-4" for="OwnerName">Tên chủ thẻ<span style="color:red"></span></label>
+                                    <div class="col-md-6">
+                                        @Html.TextBoxFor(q => q.OwnerName, new { id = "OwnerName", @class = "form-control fg-line", placeholder = "Nhập tên chủ sở hữu thẻ", maxlength = "30" })
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Asset-->
+                            <div class="form-group">
+                                <div class="toggle-switch col-md-3 col-md-offset-1" data-ts-color="green">
+                                    <label for="IsAsset" class="ts-label">Có tài sản</label>
+                                </div>
+                                <div class="toggle-switch col-md-6" data-ts-color="green">
+                                    <input id="IsAsset" name="IsAsset" type="checkbox" value="true" hidden="hidden" />
+                                    <label for="IsAsset" class="ts-helper"></label>
+                                </div>
+                            </div>
+                            <div class="form-group" id="balance-field" style="display:none">
+                                <label class="col-md-4 control-label"><i>Tiền hiện có </i></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Balance, new { @type = "number", @min = 0, id = "Balance", @class = "form-control fg-line", placeholder = "Nhập tiền hiện có", oninput = "correctBalance()" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                <button type="button" onclick="validateEditAccount()" class="btn btn-success">Lưu</button>
+            </div>
+        </div>
+    </form>
+</div>
+<style>
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+
+    .toggle-switch {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+</style>
+<script>
+    var oldAccountName;
+
+    $('#IsCredit').change(function () {
+        if ($(this).prop('checked')) {
+            $('#BankName').attr("required", "");
+            $('#BankAccountNo').attr("required", "");
+            $('#OwnerName').attr("required", "");
+        } else {
+            $('#BankName').removeAttr("required", "");
+            $('#BankAccountNo').removeAttr("required", "");
+            $('#OwnerName').removeAttr("required", "");
+        }
+        $('#bank-field').slideToggle();
+    });
+    $('#IsAsset').change(function () {
+
+        if ($(this).prop('checked')) {
+            $('#Balance').attr("required", "");
+            $('#balance-field').slideToggle();
+        }
+        else {
+            swal({
+                title: "Thay đổi tài sản sẽ đồng nghĩa với việc xóa toàn bộ tiền trong tài khoản.\n Bạn có chắc không?",
+                type: "warning",
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: "Đồng ý",
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonText: "Không",
+                showCancelButton: true,
+                closeOnConfirm: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $('#Balance').removeAttr("required", "");
+                    $('#balance-field').slideToggle();
+                } else {
+                    $('#IsAsset').prop('checked', true);
+                }
+            })
+        }
+    });
+    $('#IsDetailAccount').change(function () {
+        if ($('#IsAsset').prop('checked') == true && $('#IsDetailAccount').prop('checked') == false) {
+            swal({
+                title: "Thay đổi tài sản sẽ đồng nghĩa với việc xóa toàn bộ tiền trong tài khoản.\n Bạn có chắc không?",
+                type: "warning",
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: "Đồng ý",
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonText: "Không",
+                showCancelButton: true,
+                closeOnConfirm: true
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $('#detail-account-field').slideToggle();
+                } else {
+                    $('#IsDetailAccount').prop('checked', true);
+                }
+            })
+        }
+        else {
+            $('#detail-account-field').slideToggle();          
+        }
+
+    });
+
+
+    function checkDetailAccount() {
+        $('#detail-account-field').slideToggle();
+    }
+
+    function checkAsset() {
+        $('#balance-field').slideToggle();
+        if ($('#IsAsset').prop('checked')) {
+            $('#Balance').attr("required", "");
+        }
+        else {
+            $('#Balance').removeAttr("required", "");
+        }
+    }
+
+    function correctBalance() {
+        var balance = $('#Balance').val().replace(/[^\d]/g, '');
+        $('#Balance').val(balance);
+    }
+
+    function checkCredit() {
+        if ($('#IsCredit').prop('checked')) {
+            $('#BankName').attr("required", "");
+            $('#BankAccountNo').attr("required", "");
+            $('#OwnerName').attr("required", "");
+        } else {
+            $('#BankName').removeAttr("required", "");
+            $('#BankAccountNo').removeAttr("required", "");
+            $('#OwnerName').removeAttr("required", "");
+        }
+        $('#bank-field').slideToggle();
+    }
+
+    $(document).ready(function () {
+        oldAccountName = document.getElementById("AccountName").value;
+
+        setupDaterangepicker();
+        @if (Model.IsDetailAccount)
+        {
+            <text>
+        $('#IsDetailAccount').prop("checked", true);
+        checkDetailAccount();
+        </text>
+        }       
+        @if (Model.IsCredit)
+        {
+            <text>
+        $('#IsCredit').prop("checked", true);
+        checkCredit();
+        </text>
+        }
+        @if (Model.IsAsset)
+        {
+            <text>
+        $('#IsAsset').prop("checked", true);
+        checkAsset();
+        </text>
+        }
+
+
+        @if(Model.StartDate.HasValue) {
+            <text>
+        var start = '@Model.StartDate.GetValueOrDefault().ToString("MM/dd/yyyy")';
+        var end = '@Model.FinishDate.GetValueOrDefault().ToString("MM/dd/yyyy")';
+        $('#reportrange span').html(moment(start).format('DD/MM/YYYY') + ' - ' + moment(end).format('DD/MM/YYYY'));
+        var startDate = $('#reportrange').data('daterangepicker').startDate.toISOString();
+        var finishDate = $('#reportrange').data('daterangepicker').endDate.toISOString();
+        $('#StartDate').val(startDate);
+        $('#FinishDate').val(finishDate);
+        </text>
+        }
+    });
+
+    function setupDaterangepicker() {
+        @if (Model.StartDate.HasValue) {
+            <text>
+        var start = moment('@Model.StartDate.GetValueOrDefault().ToString("MM/dd/yyyy")').format("DD/MM/YYYY");
+        var end = moment('@Model.FinishDate.GetValueOrDefault().ToString("MM/dd/yyyy")').format("DD/MM/YYYY");
+        </text>
+        }
+        else
+        {
+            <text>
+        var start = moment().add(0, 'days');
+        var end = moment().add(0, 'days');
+        //$('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        </text>
+        }
+        //$('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        $('#reportrange').daterangepicker({
+            "locale": {
+                "format": "DD/MM/YYYY",
+                "separator": " - ",
+                minDate: '01/01/2012',
+                maxDate: '31/12/2100',
+                "showDropdowns": true,
+                "showWeekNumbers": true,
+                "timePicker": false,
+                "timePicker12Hour": true,
+                "autoUpdateInput": false,
+                "parentEl": '.modal-body',
+                "applyLabel": "Apply",
+                "cancelLabel": "Cancel",
+                "fromLabel": "From",
+                "toLabel": "To",
+                "opens": "left",
+                "customRangeLabel": "Custom",
+                "daysOfWeek": [
+                    "Su",
+                    "Mo",
+                    "Tu",
+                    "We",
+                    "Th",
+                    "Fr",
+                    "Sa"
+                ],
+                "monthNames": [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December"
+                ],
+                "firstDay": 1
+            },
+            "startDate": start,
+            "endDate": end,
+            "opens": "left"
+        }, function (start, end, label) {
+            //console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+            $('#reportrange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+        });
+
+        $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
+            startDate = picker.startDate.toISOString();
+            endDate = picker.endDate.toISOString();
+            $('#StartDate').val(startDate);
+            $('#FinishDate').val(endDate);
+        });
+    }
+
+    function validateEditAccount() {
+        if ($("input[name='AccountName']").val() == "") {
+            ShowMessage("Tên tài khoản không được bỏ trống", 3);
+            return;
+        }
+
+        var newAccountName = document.getElementById("AccountName").value;
+
+        // Kiểm tra account name có thay đổi hay không, có thì thực hiện edit.
+        if (oldAccountName == newAccountName) {
+            editAccount();
+        } else {
+            // Kiểm tra account name mới đã tồn tại hay chưa, hiện lỗi nếu đã tồn tại.
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("ValidateAccountName","Account"))",
+                "data": {
+                    AccountName: newAccountName
+                },
+                success: function (result) {
+                    // Nếu chưa tồn tại thì cho edit.
+                    if (result == "True") {
+                        editAccount();
+                    }
+                    else {
+                        ShowMessage("Tên tài khoản này đã tồn tại", 3);
+                    }
+                }
+            });
+        }
+    }
+
+    function editAccount() {
+        var formData = $("#editAccount").serialize();
+        $.ajax({
+            "type": "post",
+            "url": "@(Url.Action("Edit","Account"))",
+            "data": formData,
+            success: function (result) {
+                $('#editAccountPanel').modal('hide');
+                $('body').removeClass('modal-open');
+                $('.modal-backdrop').remove();
+
+                var defaultId = $('#defaultAccountId').val();
+
+                if (result.id == defaultId) {
+                    $("#dAccName").html('Tài khoản: ' + result.name);
+                    $("#defaultAccountName2").html(result.name)
+                    if (result.finish != null) {
+                        var date = convertNETDateTime(result.finish);
+                        var finishDate = date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
+                        $("#dAccFinish").html('Ngày hết hạn: ' + finishDate);
+                    } else {
+                        $("#dAccFinish").html('Ngày hết hạn: N/A');
+                    }
+
+                    if (result.bank != null) {
+                        $("#dAccBank").html('Ngân hàng: ' + result.bank);
+                    }
+
+                    if (result.balance != null && result.balance != "") {
+                        $("#dAccBalance").html('Số dư tài khoản: ' + result.balance);
+                        $("#defaultAccountBalance2").html(result.balance);
+                    } else {
+                        $("#dAccBalance").html('Số dư tài khoản: 0');
+                        $("#defaultAccountBalance2").html('0')
+                    }
+
+                };
+
+                ShowMessage(result.message, 2);
+                RefreshCustomerAccountTable();
+                loadTransactionOverview();
+                location.reload();
+            },
+            error: function (error) {
+                ShowMessage("Có lỗi xảy ra", 3);
+            }
+        });
+    }
+
+</script>

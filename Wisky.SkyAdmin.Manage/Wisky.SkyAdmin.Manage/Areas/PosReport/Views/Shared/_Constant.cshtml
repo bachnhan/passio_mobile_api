@@ -1,0 +1,32 @@
+﻿@{
+    var currentStoreDomain = this.ViewBag.CurrentDomain as HmsService.ViewModels.StoreDomainViewModel;
+}
+<script>
+    window.urls = {
+        "WebInformation_LoadGeneralInfo": "@(Url.Action("LoadGeneralInfo", "WebInformation", new { parameters = currentStoreDomain.Directory }))",
+        "WebInformation_UpdateGeneralInfo": "@(Url.Action("UpdateGeneralInfo","WebInformation", new { parameters = currentStoreDomain.Directory }))",
+        "ProductCollection_UpdateCollection": "@(Url.Action("UpdateCollection", "ProductCollection", new { parameters = currentStoreDomain.Directory }))",
+        "ProductCollection_LoadCollectionDetail": "@(Url.Action("LoadCollectionDetail", "ProductCollection", new { parameters = currentStoreDomain.Directory }))",
+        "ProductCollection_ChangeCollectionStatus": "@(Url.Action("ChangeCollectionStatus", "ProductCollection", new { parameters = currentStoreDomain.Directory }))",
+        "ProductCollection_GetCollections": "@(Url.Action("GetCollections", "ProductCollection", new { parameters = currentStoreDomain.Directory }))",
+        "FILE_LOADFILE": "@(Url.Action("LoadFile","File", new { parameters = currentStoreDomain.Directory }))",
+        "FILE_GetImageFromElfinder": "@(Url.Action("GetImageFromElfinder", "File", new { parameters = currentStoreDomain.Directory }))",
+        "FILE_BrowseFile": "@(Url.Action("BrowseFile", "File", new { parameters = currentStoreDomain.Directory }))",
+        "FILE_Upload": "@(Url.Action("Upload", "File", new { parameters = currentStoreDomain.Directory }))",
+        "BlogPost_GetData": "@(Url.Action("GetData", "BlogPost", new { parameters = currentStoreDomain.Directory }))",
+        "BlogPost_ChangeStatus": "@(Url.Action("ChangeStatus", "BlogPost", new { parameters = currentStoreDomain.Directory }))",
+        "BlogPost_Edit": "@(Url.Action("Edit", "BlogPost", new { parameters = currentStoreDomain.Directory }))",
+        "WebPage_GetData": "@(Url.Action("GetData", "WebPage", new { parameters = currentStoreDomain.Directory }))",
+        "WebPage_ChangeStatus": "@(Url.Action("ChangeStatus", "WebPage", new { parameters = currentStoreDomain.Directory }))",
+        "WebPage_Edit": "@(Url.Action("Edit", "WebPage", new { parameters = currentStoreDomain.Directory }))",
+        "WebInformation_LoadSocialDetail": "@(Url.Action("LoadSocialDetail", "WebInformation", new { parameters = currentStoreDomain.Directory }))",
+        "WebInformation_UpdateSocialInfo": "@(Url.Action("UpdateSocialInfo", "WebInformation", new { parameters = currentStoreDomain.Directory }))",
+        "WebInformation_LoadViewCount": "@(Url.Action("LoadViewCount", "WebInformation", new { parameters = currentStoreDomain.Directory }))",
+        "WebInformation_UpdateViewCount": "@(Url.Action("UpdateViewCount", "WebInformation", new { parameters = currentStoreDomain.Directory }))",
+        "BlogPostCollection_GetCollections": "@(Url.Action("GetCollections", "BlogPostCollection", new { parameters = currentStoreDomain.Directory }))",
+        "BlogPostCollection_ChangeCollectionStatus": "@(Url.Action("ChangeCollectionStatus", "BlogPostCollection", new { parameters = currentStoreDomain.Directory }))",
+        "BlogPostCollection_CollectionDetail": "@(Url.Action("CollectionDetail", "BlogPostCollection", new { parameters = currentStoreDomain.Directory }))",
+        "BlogPostCollection_LoadCollectionDetail": "@(Url.Action("LoadCollectionDetail", "BlogPostCollection", new { parameters = currentStoreDomain.Directory }))",
+        "BlogPostCollection_UpdateCollection": "@(Url.Action("UpdateCollection", "BlogPostCollection", new { parameters = currentStoreDomain.Directory }))",
+    }
+</script>

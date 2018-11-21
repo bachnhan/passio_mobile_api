@@ -1,0 +1,1201 @@
+﻿@model HmsService.ViewModels.PromotionEditViewModel
+@{
+    ViewBag.Title = "Report";
+}
+
+<style>
+    .overview-container .col-md-3 {
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    .overview-container h4 {
+        margin-bottom: 7px;
+        padding-bottom: 5px;
+    }
+
+        .overview-container h4 span {
+            text-align: center;
+        }
+
+    .overview-container h3 {
+        margin-top: 7px !important;
+        padding-top: 5px;
+    }
+
+    .hot-promotion-information {
+        height: 100px;
+        width: auto;
+    }
+
+    .invisible {
+        display: none;
+    }
+
+    .customize1-hotinfo-header {
+        height: 32px;
+        width: auto;
+    }
+
+    .customize2-hotinfo-icon {
+        float: left;
+        margin-left: 20px;
+    }
+
+    .customize3-hotinfo-detail {
+        margin-top: -6px;
+    }
+
+    .highcharts-tooltip span {
+        width: 340px;
+    }
+
+    .store-filter {
+        background: #C1A875;
+        color: white;
+        border-radius: 3px;
+    }
+
+    .font15 {
+        font-size: 15px;
+    }
+</style>
+
+<div>
+    @*<div id="overview-btn" class="overview-container">
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    <div id="1stPanel" class="bgm-amber" name="reportGroup" data-btn="hour" data-id="0" style="border-radius:5px; cursor:pointer">
+                        <div class="clearfix">
+                            <div id="active1" style="margin:5px;">
+                                <h3 id="info1" class="detailPanelTitle" style="text-align: center; font-weight:bold"> Giờ</h3>
+                                <h4 id="icon-hour" style="color:white;"><img src="/Content/frontend/img/dashboard-icon/icon-hour.png" style="width:50px; height:50px"><span id="hour-info" class="detailPanelInfo" style="font-size:14px; display:none;padding-right:30px"></span></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div id="2ndPanel" class="bgm-cyan" name="reportGroup" data-btn="week" data-id="0" style="border-radius:5px; cursor:pointer">
+                        <div class="clearfix">
+                            <div id="active2" style="margin:5px;">
+                                <h3 id="info2" class="detailPanelTitle" style="text-align: center; font-weight:bold"> Thứ</h3>
+                                <h4 id="icon-week" style="color:white"><img src="/Content/frontend/img/dashboard-icon/icon-week.png" style="width:50px; height:50px;"><span id="week-info" class="detailPanelInfo" style="font-size:14px; display:none;padding-right:30px"></span></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div id="3rdPanel" class="bgm-green" name="reportGroup" data-btn="day" data-id="0" style="border-radius:5px; cursor:pointer">
+                        <div class="clearfix">
+                            <div id="active3" style="margin:5px;">
+                                <h3 id="info3" class="detailPanelTitle" style="text-align: center; font-weight:bold"> Ngày</h3>
+                                <h4 id="icon-day" style="color:white"><img src="/Content/frontend/img/dashboard-icon/icon-day.png" style="width:50px; height:50px;"><span id="day-info" class="detailPanelInfo" style="font-size:14px; display:none;padding-right:30px"></span></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div id="4thPanel" name="reportGroup" data-btn="month" data-id="0" style="border-radius:5px; cursor:pointer; background-color:magenta">
+                        <div class="clearfix">
+                            <div id="active4" style="margin:5px;">
+                                <h3 id="info4" class="detailPanelTitle" style="text-align: center; font-weight:bold"> Tháng</h3>
+                                <h4 id="icon-month" style="color:white">
+                                <img src="~/Content/frontend/img/dashboard-icon/icon-month.png" style="width:50px; height:50px;"><span id="month-info" class="detailPanelInfo" style="font-size:14px; display:none;padding-right:30px"></span></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+
+
+    <div style="overflow:hidden; margin-top:20px;margin-bottom:20px;margin-left:-15px;">
+        <div class="col-md-3 text-center">
+            <div id="1stPanel" class="hot-promotion-information" name="reportGroup" data-id="0" style="border-radius:5px;background-color:#4FB0C6">
+                <div class="clearfix">
+                    <div id="active4" class="customize1-hotinfo-header" style="margin:5px;">
+                        <h3 id="info4" class="detailPanelTitle" style="text-align: center; font-weight:bold">Doanh thu trước giảm giá</h3>
+                    </div>
+                    <h4 id="icon" style="color:white">
+                        <i class="fa fa-usd fa-2x customize2-hotinfo-icon" aria-hidden="true"></i><span id="info" class="detailPanelInfo" style="font-size:14px;padding-right:30px"></span>
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 text-center">
+            <div id="2ndPanel" class="hot-promotion-information" name="reportGroup" data-id="0" style="border-radius:5px;background-color:#FFBC42">
+                <div class="clearfix">
+                    <div id="active4" class="customize1-hotinfo-header" style="margin:5px;">
+                        <h3 id="info4" class="detailPanelTitle" style="text-align: center; font-weight:bold">Doanh thu sau giảm giá</h3>
+                    </div>
+                    <h4 id="icon" style="color:white">
+                        <i class="fa fa-ticket fa-2x customize2-hotinfo-icon" aria-hidden="true"></i><span id="info" class="detailPanelInfo" style="font-size:14px;padding-right:30px"></span>
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 text-center">
+            <div id="3rdPanel" class="hot-promotion-information" name="reportGroup" data-id="0" style="border-radius:5px;background-color:#EF476F">
+                <div class="clearfix">
+                    <div id="active4" class="customize1-hotinfo-header" style="margin:5px;">
+                        <h3 id="info4" class="detailPanelTitle" style="text-align: center; font-weight:bold">Doanh thu cao nhất</h3>
+                    </div>
+                    <h4 id="icon" style="color:white">
+                        <i class="fa fa-money fa-2x customize2-hotinfo-icon" aria-hidden="true"></i><span id="info" class="detailPanelInfo" style="font-size:14px;padding-right:30px"></span>
+                    </h4>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 text-center">
+            <div id="4thPanel" class="hot-promotion-information" name="reportGroup" data-id="0" style="border-radius:5px; background-color:#81BF3E">
+                <div class="clearfix">
+                    <div id="active4" class="customize1-hotinfo-header" style="margin:5px;">
+                        <h3 id="info4" class="detailPanelTitle" style="text-align: center; font-weight:bold">Cửa hàng có doanh thu cao nhất</h3>
+                    </div>
+                    <h4 id="icon" style="color:white">
+                        <i class="fa fa-home fa-2x customize2-hotinfo-icon" aria-hidden="true"></i><span id="info" class="detailPanelInfo" style="font-size:14px;padding-right:30px"></span>
+                    </h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row" style="margin-bottom: -15px;">
+        <div class="col-md-3">
+            <select class="form-control store-filter" id="storeType-dropdownlist">
+                <option value="1">Tất cả cửa hàng</option>
+                <option value="2">Cửa hàng</option>
+                @*<option value="3">Nhóm cửa hàng</option>*@
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select class="form-control invisible store-filter" id="store-dropdownlist"></select>
+        </div>
+        <div class="col-md-5 pull-right">
+            <div class="col-md-12 pull-right" style="padding-right: 0px;">
+                <input id="date-string2" readonly class="form-control pull-right text-center store-filter" style="background-color:#C1A875;" />
+                <a class="myCelenderA" id="reportrange2" style="margin-right: 20px;"><i class="fa fa-calendar" style="color:#FFFFFF"></i></a>
+                <input type="hidden" id="FromDateStr2" />
+                <input type="hidden" id="ToDateStr2" />
+            </div>
+        </div>
+    </div>
+    <br />
+
+    <button class="btn btn-primary" id="show-chart-amount"><i class="fa fa-plus"></i> Biểu đồ tổng số hóa đơn</button>
+    <button class="btn btn-primary" id="show-chart-money"><i class="fa fa-plus"></i> Biểu đồ tổng doanh thu</button>
+    <div id="chart-amount" class="form-group">
+        @*<div style="width: 100%;" id="div-amount-canvas">
+            <canvas id="chart-amount-canvas" style="display:none;  "></canvas>
+        </div>*@
+        <div id="chart-amount-canvas" style="display: none;">
+
+        </div>
+        @*<table class="table table-bordered table-striped" id="table-amount" width="744">
+                <thead>
+                    <tr>
+                        <th><label>Ngày</label></th>
+                        <th><label>Tổng hóa đơn dùng khuyến mãi</label></th>
+                        <th><label>Tổng hóa đơn</label></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>*@
+    </div>
+    <div id="chart-money" class="form-group">
+        @*<div style="width: 100%;" id="div-money-canvas">
+            <canvas id="chart-money-canvas" style="display:none;"></canvas>
+        </div>*@
+        <div id="chart-money-canvas" style="display: none;">
+
+        </div>
+        @*<table class="table table-bordered table-striped" id="table-chart-money" width="744">
+                <thead>
+                    <tr>
+                        <th><label>Ngày</label></th>
+                        <th><label>Tổng doanh thu dùng khuyến mãi (VND)</label></th>
+                        <th><label>Tổng doanh thu (VND)</label></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>*@
+        <table class="table table-bordered table-striped" id="table-both">
+            <thead>
+                @*<tr>
+                    <th><label>Ngày</label></th>
+                    <th><label>Tổng hóa đơn dùng khuyến mãi</label></th>
+                    <th><label>Tổng hóa đơn</label></th>
+                    <th><label>Tổng doanh thu trước khuyến mãi (VND)</label></th>
+                    <th><label>Tổng doanh thu sau khuyến mãi (VND)</label></th>
+                    <th><label>Tổng doanh thu (VND)</label></th>
+                    <th><label>So sánh</label></th>
+                </tr>*@
+                <tr>
+                    <th rowspan="2" width="13%"><label>Ngày</label></th>
+                    <th colspan="3" width="50%"><label>Hóa đơn dùng khuyến mãi</label></th>
+                    <th colspan="2" width="30%"><label>Hóa đơn không dùng khuyến mãi</label></th>
+                    <th rowspan="2"><label>So sánh</label></th>
+                </tr>
+                <tr>
+                    <th class='font15' width="12%"><label>Số hóa đơn</label></th>
+                    <th class='font15'><label>Doanh thu trước khuyến mãi (VNĐ)</label></th>
+                    <th class='font15'><label>Doanh thu sau khuyến mãi (VNĐ)</label></th>
+                    <th class='font15' width="12%"><label>Số hóa đơn</label></th>
+                    <th class='font15'><label>Tổng doanh thu (VNĐ)</label></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<div class="modal fade " tabindex="-1" id="store-comparison-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="width: 1314px; margin-left: -198px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center">abc</h4>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+
+                    <!-- Chart -->
+                    <div class="col-md-9">
+                        <div id="comparison" style="width: 885px; height: auto; margin: 0 auto"></div>
+                    </div>
+
+                    <!-- Store list check box show here -->
+                    <div class="col-md-3">
+
+                        <!-- chart -->
+                        <div id="filter" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="row"></div>
+                        </div>
+
+                        <!-- select & unselect button -->
+                        <div id="filter-option" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 10px;">
+                            <button class="btn btn-primary btn-sm" id="filter-select-all">Chọn tất cả</button>
+                            <button class="btn btn-success btn-sm" id="filter-unselect-all">Hủy chọn tất cả</button>
+                        </div><!-- Select all and Unselect all -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/Chart.bundle.js"></script>
+<script src="~/Scripts/utils.js"></script>
+<script>
+
+    var toDate = '@( (DateTime.Now.CompareTo(Model.ToDate) < 0) ? Html.Raw(DateTime.Now.ToString("yyyy-MM-dd")) : Html.Raw(Model.ToDate.ToString("yyyy-MM-dd")) )' ;
+    var selectedStore = -1; // mới đầu chọn tất cả cửa hàng
+
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string2').val(label);
+        } else {
+            $("#date-string2").val(dateString);
+        }
+
+        $("#FromDateStr2").val(startTime);
+        $("#ToDateStr2").val(endTime);
+        //$("#dateRange").html(dateString);
+        ReloadData();
+    };
+
+    $(document).ready(function () {
+        $('#show-chart-amount').click(function(){
+            $('#chart-amount-canvas').stop().slideToggle();
+            $('#chart-money-canvas').hide(200);
+        });
+
+        $('#show-chart-money').click(function(){
+            $('#chart-money-canvas').stop().slideToggle();
+            $('#chart-amount-canvas').hide(200);
+        });
+
+        cb(moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek'), "Tuần này");
+
+        $('#date-string2').click(function () {
+            $('#reportrange2').click();
+        })
+
+        $('#reportrange2').daterangepicker({
+            "opens": "left",
+            "minDate": '@Html.Raw(Model.FromDateStr)',
+            "maxDate": '@Html.Raw(Model.ToDateStr)',
+            //"startDate": moment('@Html.Raw(Model.FromDateStr)', "DD/MM/YYYY"),
+            //"endDate": moment(toDate, "YYYY-MM-DD"),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+        }, cb);
+
+        // <---- Comparison Chart ----->
+        var Comparisondata = [];
+        $('#filter').on('change', function () {
+
+            var filterStoreList = [];
+            var filterTotalAmount = [];
+            var filterFinalAmount = [];
+            var filterDiscount = [];
+
+            $('.store-name-filter:checked').each(function () {
+                filterStoreList.push($(this).val());
+                filterTotalAmount.push($(this).data('total'));
+                filterFinalAmount.push($(this).data('final'));
+                filterDiscount.push($(this).data('discount'));
+            });
+
+            Comparisondata.storeList = filterStoreList;
+            Comparisondata.totalList = filterTotalAmount;
+            Comparisondata.finalList = filterFinalAmount;
+            Comparisondata.discountList = filterDiscount;
+
+            comparisonchart(Comparisondata);
+        });
+
+        // select & unselect click event
+        $('#filter-option').on('click', '#filter-select-all', function () {
+            $('.store-name-filter').prop('checked', 'checked');
+            $('#filter').trigger('change');
+        });
+
+        $('#filter-option').on('click', '#filter-unselect-all', function () {
+            $('.store-name-filter').removeAttr('checked');
+            $('#filter').trigger('change');
+        });
+
+        $(document).on('click', ".btnComparison", function () {
+            var time = $(this).data('time')
+            $('#filter .row').empty();
+
+            $.ajax({
+                url: '@this.Url.Action("PromotionDateReportComparison", "PromotionDetail")',
+                type: 'POST',
+                data: {
+                    'comparisonTime': time,
+                    'promotionId': @Html.Raw(Model.PromotionID),
+                    'applyLevel': @Html.Raw(Model.ApplyLevel),
+                },
+                success: function (rs) {
+                    Comparisondata = rs;
+                    comparisonchart(Comparisondata);
+
+                    var checkbox = function (index, val) {
+                        return $('<div/>', {
+                            'class': 'col-md-6',
+                            'html': [
+                                $('<input/>', {
+                                    'type': 'checkbox',
+                                    'value': val,
+                                    'class': 'nice-check nice-check-sm store-name-filter',
+                                    'id': 'filter-' + index,
+                                    'checked': 'checked'
+                                }),
+                                $('<label/>', {
+                                    'type': 'checkbox',
+                                    'for': 'filter-' + index,
+                                    'html': val
+                                }),
+                            ]
+                        });
+                    }
+
+                    $.each(Comparisondata.storeList, function (index, value) {
+                        $('#filter .row').append(checkbox(index, value));
+                    });
+
+                    var listCheckbox = $('.store-name-filter');
+                    $.each(Comparisondata.totalList, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-total', value);
+                    });
+
+                    $.each(Comparisondata.finalList, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-final', value);
+                    });
+
+                    $.each(Comparisondata.discountList, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-discount', value);
+                    });
+                }
+            });
+
+            $('#store-comparison-modal').modal('show');
+            $('.modal-title').html("Doanh thu cửa hàng sử dụng khuyến mãi ngày " + time);
+        });
+        // <---- End Script Comparison Chart ----->
+
+        GetStores();
+        loadEverything();
+    });
+
+    $('#storeType-dropdownlist').on('change', function(){
+        var choice = parseInt($('#storeType-dropdownlist').val());
+        if(choice == 1){ // chọn tất cả cửa hàng
+            $('#store-dropdownlist').addClass('invisible');
+            selectedStore = -1;
+        }else if(choice == 2){ // chọn cửa hàng
+            $('#store-dropdownlist').removeClass('invisible');
+            selectedStore = $('#store-dropdownlist').val();
+        }
+
+        ReloadData();
+    })
+    $('#store-dropdownlist').on('change', function(){
+        selectedStore = $('#store-dropdownlist').val();
+        ReloadData();
+    })
+
+    $('#btnSearch').click(function(){
+        loadEverything();
+    });
+
+    function loadEverything(){
+        LoadHotData();
+        ReloadData();
+    }
+
+    function GetStores() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("getStoreByPromotionId", "Promotion")',
+            data: {promotionId : @Html.Raw(Model.PromotionID)},
+            success: function(result){
+                var list = result.data;
+                for (var i = 0; i < list.length; i++) {
+                    $('#store-dropdownlist').append("<option value='" + list[i].Value + "'>" + list[i].Text + "</option>")
+                }
+            }
+        });
+    }
+
+    function LoadHotData() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("getHotInformationByPromotionId", "Promotion")',
+            data: {
+                promotionId: @Html.Raw(Model.PromotionID),
+                ApplyLevel: @Html.Raw(Model.ApplyLevel),
+                startDate: $('#FromDateStr2').val(),
+                endDate: $('#ToDateStr2').val()
+            },
+            success: function(result){
+                $('#1stPanel #info').html(toMoney(result.moneyWithoutPromotion, ",","")+"đ");
+                $('#2ndPanel #info').html(toMoney(result.moneyWithPromotion,",", "")+"đ");
+                if(result.highestMoneyinDay != null){
+                    var date = moment(result.highestMoneyinDay.Date).format('DD/MM/YYYY');
+                    $('#3rdPanel #info').html(date+ "<br/>" + toMoney(result.highestMoneyinDay.FinalAmount,",","") + "đ");
+                    $('#3rdPanel #info').addClass('customize3-hotinfo-detail');
+                }else{
+                    $('#3rdPanel #info').html('N/A');
+                    $('#3rdPanel #info').removeClass('customize3-hotinfo-detail');
+
+                }
+                if(result.topSellerStore != null){
+                    $('#4thPanel #info').html(result.topSellerStore.StoreName
+                        + "<br/>" + toMoney(result.topSellerStore.FinalAmount,",","") + "đ");
+                    $('#4thPanel #info').addClass('customize3-hotinfo-detail');
+
+                }else{
+                    $('#4thPanel #info').html('N/A');
+                    $('#4thPanel #info').removeClass('customize3-hotinfo-detail');
+                }
+
+            }
+        });
+    }
+
+    // chọn cửa hàng sẽ reload lại biểu đồ và bảng
+    function ReloadData(){
+        $.ajax({
+            url: '@Url.Action("GetOrderDataUsingPromotion", "Promotion")',
+            data: {
+                promotionId: @Html.Raw(Model.PromotionID),
+                seletedStoreId: selectedStore,
+                ApplyLevel: @Html.Raw(Model.ApplyLevel),
+                startDate: $("#FromDateStr2").val(),
+                endDate: $("#ToDateStr2").val()
+            },
+            success: function(result){
+                if (result.success) {
+                    initDatatable(result.datatable);
+                    drawAmountChart(result.amountChart);
+                    drawMoneyChart(result.moneyChart);
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            }
+
+        });
+
+        @*$.ajax({
+            url: '@Url.Action("GetOrderCountUsingPromotion", "Promotion")',
+            data: {
+                promotionId: @Html.Raw(Model.PromotionID),
+                seletedStoreId: selectedStore,
+                ApplyLevel: @Html.Raw(Model.ApplyLevel),
+                fromDate: fromDate,
+                toDate: toDate
+            },
+            success: function(result){
+                amount = result;
+                //drawAmountDataTable(result);
+                drawAmountChart(result);
+            }
+
+        }).done(function(){
+            $.ajax({
+                url: '@Url.Action("GetOrderMoneyUsingPromotion", "Promotion")',
+                data: {
+                    promotionId: @Html.Raw(Model.PromotionID),
+                    seletedStoreId: selectedStore,
+                    ApplyLevel: @Html.Raw(Model.ApplyLevel),
+                    fromDate: fromDate,
+                    toDate: toDate,
+                },
+                success: function(result){
+                    //drawMoneyDataTable(result);
+                    drawMoneyChart(result);
+                    $('#table-both').DataTable().destroy();
+                    //$('#table-both').empty();
+
+                    drawBothDataTable(amount, result, selectedStore == -1);
+                }
+
+            });
+        });*@
+        //$('#table-both').DataTable().ajax.reload();
+
+    };
+
+
+    // gộp 2 bảng làm 1 nên tạm thời comment code này
+
+    //function drawAmountDataTable(data){
+
+    //    //Kiểm tra dữ liệu khuyến mãi có bị rỗng hay không
+    //    if (data.orderWithPromotion.length == 0) {
+    //        $('table[id="table-amount"]').DataTable({
+    //            data: [],
+    //            serverSide: false,
+    //            "searching": false,
+    //            "paging": false,
+    //            "info": false,
+    //            "language": {
+    //                "emptyTable": "Không có dữ liệu"
+    //            }
+    //        });
+    //        $('#show-chart-amount').addClass('fade');
+    //        return;
+    //    }
+
+    //    //Vẽ dataTable
+    //    var dataOfDataTable = new Array();
+    //    for (var i = 0; i < data.order.length; i++) {
+    //        var d = new Date(parseInt(data.order[i].Date.substring(6, data.order[i].Date.length - 2)));
+    //        dataOfDataTable.push([d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear(),
+    //            toMoney(data.orderWithPromotion[i].Count, ',', ''),
+    //            toMoney(data.order[i].Count, ',', '')]);
+    //    }
+    //    $('table[id="table-amount"]').DataTable({
+    //        data: dataOfDataTable,
+    //        "aaSorting": [],
+    //        serverSide: false,
+    //        "oLanguage": {
+    //            "sSearch": "Tìm kiếm:",
+    //            "sZeroRecords": "Không có dữ liệu phù hợp",
+    //            "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+    //            "sEmptyTable": "Không có dữ liệu",
+    //            "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+    //            "sLengthMenu": "Hiển thị _MENU_ dòng",
+    //            "sProcessing": "Đang xử lý...",
+    //            "sInfoEmpty": "Không có dữ liệu",
+    //            "oPaginate": {
+    //                "sNext": "<i class='fa fa-chevron-right'></i>",
+    //                "sPrevious": "<i class='fa fa-chevron-left'></i>"
+    //            }
+    //        },
+    //    });
+    //}
+
+
+    //function drawAmountChart(data) {
+
+    //    var length = data.orderWithPromotion.length;
+    //    if (length == 0) {
+    //        return;
+    //    }
+
+    //    $('#show-chart-amount').addClass('in');
+    //    var yAxisPromotion = new Array();
+    //    var yAxis = new Array();
+    //    var xAxis = new Array();
+    //    for (var i = length - 1; i >= 0; i--) {
+    //        yAxisPromotion.push(data.orderWithPromotion[i].Count);
+    //        yAxis.push(data.order[i].Count);
+    //        var d = new Date(parseInt(data.order[i].Date.substring(6, data.order[i].Date.length - 2)));
+    //        xAxis.push(d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear());
+    //    }
+
+    //    var chartAmount = document.getElementById('chart-amount-canvas').getContext("2d");
+
+    //    var configAmount = {
+    //        type: 'line',
+    //        data: {
+    //            labels: xAxis,
+    //            datasets: [{
+    //                label: 'Order sử dụng khuyến mãi',
+    //                backgroundColor: "rgb(255, 99, 132)",
+    //                borderColor: "rgb(255, 99, 132)",
+    //                data: yAxisPromotion,
+    //                fill: false,
+    //            }, {
+    //                label: 'Tất cả order',
+    //                backgroundColor: "rgb(54, 162, 235)",
+    //                borderColor: "rgb(54, 162, 235)",
+    //                data: yAxis,
+    //                fill: false,
+    //            }]
+    //        },
+    //        options: {
+    //            responsive: true,
+    //            maintainAspectRatio: true,
+    //            onResize: function(){
+    //                //$('#chart-amount-canvas').width(900);
+    //                //$('#chart-amount-canvas').height(430);
+    //            },
+    //            title:{
+    //                display:true,
+    //                text:'Biểu đồ tổng số hóa đơn sử dụng chương trình khuyến mãi này',
+    //                position: 'top',
+    //                fontSize: 16,
+    //            },
+    //            tooltips: {
+    //                mode: 'single',
+    //                intersect: false,
+    //                callbacks: {
+    //                    label: function (tooltipItem, data){
+    //                        return data.datasets[tooltipItem.datasetIndex].label + ': ' + toMoney(tooltipItem.yLabel.toString(), ',', '');
+    //                    }
+    //                }
+    //            },
+    //            hover: {
+    //                mode: 'nearest',
+    //                intersect: true
+    //            },
+    //            scales: {
+    //                xAxes: [{
+    //                    display: true,
+    //                    scaleLabel: {
+    //                        display: true,
+    //                        labelString: 'Ngày'
+    //                    }
+    //                }],
+    //                yAxes: [{
+    //                    display: true,
+    //                    scaleLabel: {
+    //                        display: true,
+    //                        labelString: 'Số lượng'
+    //                    }
+    //                }]
+    //            }
+    //        },
+    //    }
+
+    //    window.myLine = new Chart(chartAmount, configAmount);
+    //}
+
+    function drawAmountChart(dataChart) {
+        var seriesOptions = [];
+        var title = "Biểu đồ tổng số hóa đơn sử dụng chương trình khuyến mãi";
+        var subTitle = "";
+
+        var orderLine = {
+            name: "Hóa đơn không dùng khuyến mãi",
+            data: dataChart.order,
+        };
+
+        var orderPromotionLine = {
+            name: "Hóa đơn dùng khuyến mãi",
+            data: dataChart.orderPromotion,
+        };
+
+        seriesOptions.push(orderLine);
+        seriesOptions.push(orderPromotionLine);
+
+        $('#chart-amount-canvas').highcharts({
+            chart: {
+                style: {
+                    fontFamily: 'Arial'
+                }
+            },
+            title: {
+                text: title,
+                x: -20
+            },
+            subtitle: {
+                text: subTitle,
+                x: -20
+            },
+            xAxis: {
+                categories: dataChart.dateList
+            },
+            yAxis: {
+                title: {
+                    text: 'Số lượng'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ''
+            },
+            legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'bottom',
+                borderWidth: 0
+            },
+            series: seriesOptions
+        });
+    };
+
+    function drawMoneyChart(dataChart) {
+        var seriesOptions = [];
+        var title = "Biểu đồ tổng doanh thu của chương trình khuyến mãi";
+        var subTitle = "";
+
+        var orderLine = {
+            name: "Hóa đơn không dùng khuyến mãi",
+            data: dataChart.orderFinal,
+        };
+
+        var orderPromotionLine = {
+            name: "Hóa đơn dùng khuyến mãi",
+            data: dataChart.orderPromotionFinal,
+        };
+
+        seriesOptions.push(orderLine);
+        seriesOptions.push(orderPromotionLine);
+
+        $('#chart-money-canvas').highcharts({
+            chart: {
+                style: {
+                    fontFamily: 'Arial'
+                }
+            },
+            title: {
+                text: title,
+                x: -20
+            },
+            subtitle: {
+                text: subTitle,
+                x: -20
+            },
+            xAxis: {
+                categories: dataChart.dateList
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh thu'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ' VNĐ'
+            },
+            legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'bottom',
+                borderWidth: 0
+            },
+            series: seriesOptions
+        });
+    };
+
+
+    // gộp 2 bảng làm 1 nên tạm thời comment code này
+
+    //function drawMoneyDataTable(data){
+    //    if (data.orderWithPromotion.length == 0) {
+    //        $('table[id="table-chart-money"]').DataTable({
+    //            data: [],
+    //            serverSide: false,
+    //            "searching": false,
+    //            "paging": false,
+    //            "info": false,
+    //            "language": {
+    //                "emptyTable": "Không có dữ liệu"
+    //            }
+    //        });
+    //        $('#show-chart-money').addClass('fade');
+    //        return;
+    //    }
+
+    //    var dataOfDataTable = new Array();
+
+    //    for (var i = 0; i < data.order.length; i++){
+    //        var d = new Date(parseInt(data.order[i].Date.substring(6, data.order[i].Date.length - 2)));
+    //        dataOfDataTable.push([d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear(),
+    //            toMoney(data.orderWithPromotion[i].Count, ',', ''),
+    //            toMoney(data.order[i].Count, ',', '')]);
+
+    //    }
+
+    //    $('table[id="table-chart-money"]').DataTable({
+    //        data: dataOfDataTable,
+    //        serverSide: false,
+    //        "aaSorting": [],
+    //        "oLanguage": {
+    //            "sSearch": "Tìm kiếm:",
+    //            "sZeroRecords": "Không có dữ liệu phù hợp",
+    //            "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+    //            "sEmptyTable": "Không có dữ liệu",
+    //            "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+    //            "sLengthMenu": "Hiển thị _MENU_ dòng",
+    //            "sProcessing": "Đang xử lý...",
+    //            "sInfoEmpty": "Không có dữ liệu",
+    //            "oPaginate": {
+    //                "sNext": "<i class='fa fa-chevron-right'></i>",
+    //                "sPrevious": "<i class='fa fa-chevron-left'></i>"
+    //            }
+    //        },
+    //    });
+    //}
+
+    //function drawMoneyChart(data){
+
+    //    var length = data.orderWithPromotion.length;
+    //    if (length == 0) {
+    //        return;
+    //    }
+
+    //    $('#show-chart-money').addClass('in');
+    //    var yAxisPromotion = new Array();
+    //    var yAxis = new Array();
+    //    var xAxis = new Array();
+
+    //    for (var i = length - 1; i >= 0; i--) {
+    //        yAxisPromotion.push(data.orderWithPromotion[i].Count);
+    //        yAxis.push(data.order[i].Count);
+    //        var d = new Date(parseInt(data.order[i].Date.substring(6, data.order[i].Date.length - 2)));
+    //        xAxis.push(d.getDate() + '-' + (d.getMonth() + 1) + '-' + d.getFullYear());
+
+    //    }
+
+    //    var chartMoney = $('canvas[id="chart-money-canvas"]');
+    //    var config = {
+    //        type: 'line',
+    //        data: {
+    //            labels: xAxis,
+    //            datasets: [{
+    //                label: 'Order sử dụng khuyến mãi',
+    //                backgroundColor: "rgb(255, 99, 132)",
+    //                borderColor: "rgb(255, 99, 132)",
+    //                data: yAxisPromotion,
+    //                fill: false,
+    //            }, {
+    //                label: 'Tất cả order',
+    //                backgroundColor: "rgb(54, 162, 235)",
+    //                borderColor: "rgb(54, 162, 235)",
+    //                data: yAxis,
+    //                fill: false,
+    //            }],
+    //        },
+    //        options: {
+    //            responsive: true,
+    //            maintainAspectRatio: true,
+    //            onResize: function(){
+    //                //$('#chart-amount-canvas').width(900);
+    //                //$('#chart-amount-canvas').height(430);
+    //            },
+    //            title:{
+    //                display:true,
+    //                text:'Biểu đồ tổng doanh thu từ chương trình khuyến mãi này',
+    //                position: 'top',
+    //                fontSize: 16,
+    //            },
+    //            tooltips: {
+    //                mode: 'single',
+    //                intersect: false,
+    //                callbacks: {
+    //                    label: function (tooltipItem, data){
+    //                        return data.datasets[tooltipItem.datasetIndex].label + ': ' + toMoney(tooltipItem.yLabel.toString(), ',', '');
+    //                    }
+    //                }
+    //            },
+    //            hover: {
+    //                mode: 'nearest',
+    //                intersect: true
+    //            },
+    //            scales: {
+    //                xAxes: [{
+    //                    display: true,
+    //                    scaleLabel: {
+    //                        display: true,
+    //                        labelString: 'Ngày'
+    //                    }
+    //                }],
+    //                yAxes: [{
+    //                    display: true,
+    //                    scaleLabel: {
+    //                        display: true,
+    //                        labelString: 'VND'
+    //                    }
+    //                }]
+    //            }
+    //        },
+    //    }
+
+    //    window.myLine = new Chart(chartMoney, config);
+    //    //$('#chart-money-canvas').width(900);
+    //    //$('#chart-money-canvas').height(430)
+    //}
+
+    function initDatatable(data) {
+        var isLoadAllStore = (selectedStore == -1);
+
+        var header = "<thead><tr>";
+        header += "<th rowspan='2' width='13%'><label>Ngày</label></th>";
+        header += "<th colspan='3' width='50%'><label>Hóa đơn dùng khuyến mãi</label></th>";
+        header += "<th colspan='2' width='30%'><label>Hóa đơn không dùng khuyến mãi</label></th>";
+        if (isLoadAllStore) { // Hiện nút so sánh khi chọn Filter Tất cả cửa hàng
+            header += "<th rowspan='2'><label>So sánh</label></th>";
+        }
+        header += "</tr><tr>"
+
+        header += "<th class='font15' width='12%'><label>Số hóa đơn</label></th>";
+        header += "<th class='font15'><label>Doanh thu trước khuyến mãi (VNĐ)</label></th>";
+        header += "<th class='font15'><label>Doanh thu sau khuyến mãi (VNĐ)</label></th>";
+        header += "<th class='font15' width='12%'><label>Số hóa đơn</label></th>";
+        header += "<th class='font15'><label>Tổng doanh thu (VNĐ)</label></th>";
+
+        header += "</tr></thead><tbody></tbody>";
+
+        $('#table-both').dataTable().fnDestroy();
+        $("#table-both").html(header);
+        $("#table-both").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            'data': data,
+            //"bProcessing": true,
+            "bPaginate": true,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm ",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [1, 2, 3, 4, 5],
+                    "mRender": function (data, type, o) {
+                        return toMoney(data, ',', '');
+                    },
+                },
+                {
+                    "aTargets": [6],
+                    "visible": isLoadAllStore,
+                    "mRender": function (data, type, o) {
+                        return '<a data-time="' + o[0] + '" class="btn btn-sm btn-info btnComparison"><span class="fa fa-tasks"></span></a>';
+                    },
+                }
+            ],
+            "bAutoWidth": false
+        });
+    };
+
+    //function drawBothDataTable(amountData, moneyData, isAllStore){
+    //    //Kiểm tra dữ liệu khuyến mãi có bị rỗng hay không
+    //    if (amountData.orderWithPromotion.length == 0) {
+    //        $('table[id="table-both"]').DataTable({
+    //            data: [],
+    //            serverSide: false,
+    //            "searching": false,
+    //            "paging": false,
+    //            "info": false,
+    //            "language": {
+    //                "emptyTable": "Không có hóa đơn nào sử dụng khuyến mãi này"
+    //            }
+    //        });
+    //        $('#show-chart-amount').addClass('hidden');
+    //        $('#show-chart-money').addClass('hidden');
+    //        return;
+
+    //    }
+    //    $('#show-chart-amount').removeClass('hidden');
+    //    $('#show-chart-money').removeClass('hidden');
+
+    //    //Vẽ dataTable
+    //    var dataOfDataTable = new Array();
+    //    for (var i = 0; i < amountData.order.length; i++) {
+    //        var d = new Date(parseInt(amountData.order[i].Date.substring(6, amountData.order[i].Date.length - 2)));
+    //        dataOfDataTable.push([d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear(),
+    //            toMoney(amountData.orderWithPromotion[i].Count, ',', ''),
+    //            toMoney(amountData.order[i].Count, ',', ''),
+    //            toMoney(moneyData.orderWithPromotion[i].Count, ',', ''),
+    //            toMoney(moneyData.orderWithPromotion[i].Count2, ',', ''),
+    //            toMoney(moneyData.order[i].Count, ',', '')
+    //        ]);
+    //    }
+    //    if (isAllStore) {
+    //        $('table[id="table-both"]').DataTable({
+    //            data: dataOfDataTable,
+    //            "aaSorting": [],
+    //            serverSide: false,
+    //            "oLanguage": {
+    //                "sSearch": "Tìm kiếm:",
+    //                "sZeroRecords": "Không có dữ liệu phù hợp",
+    //                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+    //                "sEmptyTable": "Không có dữ liệu",
+    //                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+    //                "sLengthMenu": "Hiển thị _MENU_ dòng",
+    //                "sProcessing": "Đang xử lý...",
+    //                "sInfoEmpty": "Không có dữ liệu",
+    //                "oPaginate": {
+    //                    "sNext": "<i class='fa fa-chevron-right'></i>",
+    //                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+    //                }
+    //            },
+    //            "aoColumnDefs": [
+    //                {
+    //                    'aTargets': [6],
+    //                    "visible": true,
+    //                    "mRender": function (data, type, o) {
+    //                        return '<a data-time="' + o[0] + '" class="btn btn-sm btn-info btnComparison""><span class="fa fa-tasks"></span></a>';
+    //                    },
+    //                }
+    //            ],
+    //            "drawCallback": function(setting){
+    //                detailClick();
+    //            }
+    //        });
+
+    //    } else {
+    //        $('table[id="table-both"]').DataTable({
+    //            data: dataOfDataTable,
+    //            "aaSorting": [],
+    //            serverSide: false,
+    //            "oLanguage": {
+    //                "sSearch": "Tìm kiếm:",
+    //                "sZeroRecords": "Không có dữ liệu phù hợp",
+    //                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+    //                "sEmptyTable": "Không có dữ liệu",
+    //                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+    //                "sLengthMenu": "Hiển thị _MENU_ dòng",
+    //                "sProcessing": "Đang xử lý...",
+    //                "sInfoEmpty": "Không có dữ liệu",
+    //                "oPaginate": {
+    //                    "sNext": "<i class='fa fa-chevron-right'></i>",
+    //                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+    //                }
+    //            },
+    //            "aoColumnDefs": [
+    //                {
+    //                    'aTargets': [6],
+    //                    "visible": false,
+    //                    "mRender": function (data, type, o) {
+    //                        return '';
+    //                    },
+    //                }
+    //            ],
+    //        });
+    //    }
+
+    //}
+
+    function comparisonchart(data) {
+
+        $('#comparison').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: '',
+                x: -20 //center
+            },
+            subtitle: {
+                text: '',
+                x: -20
+            },
+            xAxis: {
+                categories: data.storeList
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh thu'
+                },
+                min: 0,
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y}đ</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [
+                {
+                    name: 'Doanh thu trước giảm giá',
+                    data: data.totalList,
+                },
+                {
+                    name: 'Giảm giá',
+                    data: data.discountList,
+                },
+                {
+                    name: 'Doanh thu sau giảm giá',
+                    data: data.finalList,
+                }
+            ]
+        });
+    }
+
+</script>

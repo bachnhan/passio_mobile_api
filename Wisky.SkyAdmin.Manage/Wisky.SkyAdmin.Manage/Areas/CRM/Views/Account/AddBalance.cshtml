@@ -1,0 +1,79 @@
+﻿@model AccountViewModel
+
+
+@{
+    Layout = null;
+}
+
+<div class="modal-dialog">
+    @Html.ValidationSummary()
+    <form id="addBalance" method="post" action="@Url.Action("AddBalance")">
+
+        @Html.HiddenFor(q => q.AccountCode)
+        @Html.HiddenFor(q => q.AccountID)
+        @Html.HiddenFor(q => q.AccountName)
+        @Html.HiddenFor(q => q.AccountTypeId)
+        @Html.HiddenFor(q => q.Active)
+        @Html.HiddenFor(q => q.Balance)
+        @Html.HiddenFor(q => q.BrandId)
+        @Html.HiddenFor(q => q.Customer)
+        @Html.HiddenFor(q => q.FinishDate)
+        @Html.HiddenFor(q => q.Level_)
+        @Html.HiddenFor(q => q.MembershipCardId)
+        @Html.HiddenFor(q => q.ProductCode)
+        @Html.HiddenFor(q => q.StartDate)
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3>Thêm tiền vào tài khoản: @Model.AccountName</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px;">
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="Balance">Tài khoản hiện tại<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.Balance, new { id = "Balance", @class = "form-control fg-line", @readonly = "readonly" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px;">
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="addNum">Giá trị thêm vào<span style="color:red"></span></label>
+                            <div class="col-md-6">                                                      
+                                @Html.TextBoxFor(q => q.addBalanceValue, new { id = "addBalanceValue", @class = "form-control fg-line", @type = "number", @min=0 })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                <button type="submit" class="btn btn-success">Lưu</button>
+            </div>
+        </div>
+       
+</form>
+</div>
+<script>
+
+    $('#addBalance').on('submit', function (e) {
+
+        e.preventDefault();
+
+        $.ajax({
+            type: 'post',
+            url: '@Url.Action("AddBalance","Account")',
+            data: $('form').serialize(),
+            success: function () {
+                ShowAlert("Thêm thành công", 2);
+                $('#addBalanceModal').modal('hide');
+            }
+        });
+
+    });
+
+   
+    
+</script>
+

@@ -1,0 +1,172 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    var toURL = "";
+    var toProduct = "";
+    var toDate = "";
+    var storeId = ViewBag.storeId;
+    var storeName = ViewBag.storeName;
+    var brandId = ViewBag.brandId;
+    if (storeId == "0")
+    {
+        toURL = "SystemReport";
+        toProduct = "IndexProductCategoryReport";
+        toDate = "IndexProductLineReport";
+    }
+    else
+    {
+        toURL = "StoreReport";
+        toProduct = "StoreProductProgress";
+        toDate = "StoreProductDateProgress";
+    }
+    HmsService.Models.Entities.Store store = Utils.GetStore(Int32.Parse(storeId));
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .btn-xl {
+        border-radius:5px;
+        margin-bottom: 0px !important;
+    }
+    .btn-green {
+        background-color: green !important;
+        border-color: green;
+    }
+
+    .btn-green:hover,
+    .btn-green:active,
+    .btn-green:focus {
+        background-color: darkgreen !important;
+        border-color: green;
+        color: white;
+    }
+    .btn-orange {
+        background-color: #f58a07 !important;
+        border-color: #f58a07;
+    }
+
+    .btn-orange:hover,
+    .btn-orange:active,
+    .btn-orange:focus {
+        background-color: #af6307 !important;
+        border-color: #f58a07;
+        color: white;
+    }
+    .btn-red {
+        background-color: #bb0909 !important;
+        border-color: #bb0909;
+    }
+
+    .btn-red:hover,
+    .btn-red:active,
+    .btn-red:focus {
+        background-color: #5f0000 !important;
+        border-color: #bb0909;
+        color: white;
+    }
+     .btn-aqua {
+        background-color: #009688 !important;
+        border-color: #009688;
+    }
+
+    .btn-aqua:hover,
+    .btn-aqua:active,
+    .btn-aqua:focus {
+        background-color: #016b61 !important;
+        border-color: #009688;
+        color: white;
+    }
+    .text-in-btn{
+        margin-left:-75px;
+        position:absolute;
+        /*line-height:7;*/ 
+        float:left; 
+        font-size:26px;
+        font-weight:600;
+    }
+    .icon-for-DashBoard{
+        z-index: -1;
+        color:#1f3d5a;
+        font-size:122px;
+    }
+    
+    .icon-for-TimeReport{
+        z-index: -1;
+        color:#025202;
+        font-size:122px;
+    }
+    .icon-for-ProductReport{
+        z-index: -1;
+        color:#985606;
+        font-size:122px;
+    }
+    .icon-for-Date{
+        z-index: -1;
+        color:#710404;
+        font-size:122px;
+    }
+    .icon-for-Product{
+        z-index: -1;
+        color:#01675d;
+        font-size:122px;
+    }
+    .icon-for-Store{
+        z-index: -1;
+        color:#500633;
+        font-size:122px;
+    }
+</style>
+
+@if (store.Type != (int)StoreTypeEnum.Website)
+{
+    <div class="card skyplus-skin" id="page-wrapper">
+        <div class="card-header">
+            <h3 style="color:green">Các báo cáo</h3>
+            <hr />
+        </div>
+
+        <div class="card-header" style="height:300px;padding:5px;">
+            <div class="col-md-4 p-5 m-b-0">
+                <a class="btn btn-block btn-xl btn-success m-0" style="height:135px" href="@Url.Action("Index", "OverviewDateDashBoard")">
+                    <span class="pull-right" style="margin-top:-15px"><i class="fa fa-dashboard icon-for-DashBoard"></i></span>
+                    <span class="text-in-btn">Tổng quan</span>
+                </a>
+            </div>
+            <div class="col-md-4 p-5 m-b-0">
+                <a class="btn btn-block btn-xl btn-green m-0" style="height:135px" href="@Url.Action("Index", "TimeReport", new { @area = toURL})">
+                    <span class="pull-right" style="margin-top:-15px"><i class="fa fa-clock-o icon-for-TimeReport"></i>@*<img src="~/Content/frontend/img/dashboard-icon/icon-day.png" />*@</span>
+                    <span class="text-in-btn">Thời gian</span>
+                </a>
+            </div>
+            <div class="col-md-4 p-5 m-b-0">
+                <a class="btn btn-block btn-xl btn-orange m-0" style="height:135px" href="@Url.Action(toProduct, "ProductReport", new { @area = toURL})">
+                    <span class="pull-right" style="margin-top:-15px"><i class="fa fa-shopping-bag icon-for-ProductReport"></i>@*<img src="~/Content/frontend/img/dashboard-icon/icon-day.png" />*@</span>
+                    <span class="text-in-btn">Sản phẩm</span>
+                </a>
+            </div>
+            <div class="col-md-4 p-5 m-b-0">
+                <a class="btn btn-block btn-xl btn-red m-0" style="height:135px" href="@Url.Action(toDate, "ProductReport", new { @area = toURL})">
+                    <span class="pull-right" style="margin-top:-15px"><i class="fa fa-line-chart icon-for-Date"></i>@*<img src="~/Content/frontend/img/dashboard-icon/icon-day.png" />*@</span>
+                    <span class="text-in-btn">Diễn tiến ngày</span>
+                </a>
+            </div>
+            <div class="col-md-4 p-5 m-b-0">
+                <a class="btn btn-block btn-xl btn-aqua m-0" style="height:135px" href="@Url.Action(toDate, "ProductReport", new { @area = toURL})">
+                    <span class="pull-right" style="margin-top:-15px"><i class="fa fa-exchange icon-for-Product"></i>@*<img src="~/Content/frontend/img/dashboard-icon/icon-day.png" />*@</span>
+                    <span class="text-in-btn">So sánh sản phẩm</span>
+                </a>
+            </div>
+            @if (storeId == "0")
+            {
+            <div class="col-md-4 p-5 m-b-0">
+                <a class="btn btn-block btn-xl btn-dark-purple m-0" style="height:135px" href="@Url.Action(toDate, "ProductReport", new { @area = toURL })">
+                    <span class="pull-right" style="margin-top:-15px"><i class="fa fa-group icon-for-Store"></i>@*<img src="~/Content/frontend/img/dashboard-icon/icon-day.png" />*@</span>
+                    <span class="text-in-btn">So sánh doanh thu</span>
+                </a>
+            </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <h1>Chào mừng đến trang quản trị SkyAdmin!</h1>
+}

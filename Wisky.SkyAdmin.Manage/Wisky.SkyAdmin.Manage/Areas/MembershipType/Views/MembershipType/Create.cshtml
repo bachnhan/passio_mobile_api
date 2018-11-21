@@ -1,0 +1,67 @@
+﻿
+@model HmsService.ViewModels.MembershipTypeViewModel
+
+@{
+    ViewBag.Title = "Thêm loại thẻ thành viên";
+
+}
+<form id="createType" action="@Url.Action("Create")" method="POST">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4><strong>Thêm loại thẻ thành viên</strong></h4>
+    </div>
+
+    <div class="modal-body">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-4 control-label" for="TypeName">
+                    Loại thẻ thành viên
+                </label>
+                <div class="col-sm-8" tabindex="-1">                    
+                        @Html.TextBoxFor(model => model.TypeName, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.TypeName, "", new { @style = "color:red;font-size: 125%;padding-top: 0.5em;" })
+                </div>
+            </div>          
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" onclick="return validate(this)" class="btn btn-primary">Hoàn tất</button>
+    </div>
+</form>
+<script>
+
+    function validate(btn) {
+        hasValue = true;
+        if ($("input[name='TypeName']").val() == "") {
+            ShowMessage("Vui lòng nhập loại thẻ thành viên.", 3);
+            hasValue = false;
+        } else {
+            var rs = document.getElementById("TypeName").value;
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("ValidateType", "MembershipType"))",
+                "data": {
+                name: rs
+                },
+            success: function (result) {
+                if (result == "duplicated") {
+                    ShowMessage("Loại thẻ này đã tồn tại!", 3);
+                    hasValue = false;
+                } else {
+                    $("#createType").submit();
+                    ShowMessage('Thêm loại thẻ thành viên thành công', 2, '@Url.Action("Index")');
+
+                }
+            }
+        });
+        }
+
+
+
+        return hasValue;
+    }
+    @*$("#createType").submit(function (e) {
+        $("#createType").unbind('submit').submit();
+        ShowMessage('Thêm loại thẻ thành viên thành công', 2, '@Url.Action("Index")');
+    });*@
+</script>

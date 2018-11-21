@@ -1,0 +1,1054 @@
+﻿@model IEnumerable<HmsService.ViewModels.StoreViewModel>
+
+<style>
+    .highcharts-tooltip > span {
+        width: 340px;
+    }
+</style>
+
+<ul id="TabList" class="tab-nav tn-justified" style="overflow: hidden;width: 100%">
+    <li class="active waves-effect col-lg-6"><a data-toggle="tab" id="allTab" href="#menu1"><i class="fa fa-globe"></i> Hệ Thống</a></li>
+    <li class="waves-effect col-lg-6"><a data-toggle="tab" id="storeTab" href="#menu2"><i class="fa fa-home"></i> Cửa hàng</a></li>
+    <li class="waves-effect col-lg-6"><a data-toggle="tab" id="groupTab" href="#menu3"><i class="fa fa-users"></i> Nhóm cửa hàng</a></li>
+</ul>
+
+<div class="tab-content">
+
+    @*hệ thống*@
+    <div id="menu1" class="tab-pane fade in active">
+        @*date range picker*@
+        <div class="col-md-12">
+            <form id="form-create-session" class="form-inline">
+                <div class="input-group pull-right">
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange3">
+                                <input id="date-string3" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="input-group-btn FindButtonDateTime">
+                            <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch3" style="margin-top: -5px;">
+                                <i class="left-icon fa fa-search"></i> Tìm
+                            </a>
+                        </div>*@
+                </div>
+                <input type="text" id="sTime3" name="startTime3" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                <input type="text" id="eTime3" name="endTime3" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+            </form>
+        </div>
+
+        @*table và chart*@
+        <div class="style=" padding:25px;"">
+            <div>
+                <button type="submit" id="export3" class="width230 btn btn-primary btn-sm pull-right">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>
+                <button type="button" data-show="show" id="buttonChart3" class="btn btn-primary btn-sm" style="width:150px" onclick="ShowChart2()">
+                    <i class="fa fa-plus">
+                    </i> Hiển thị biểu đồ
+                </button>
+            </div>
+            <form class="hidden" id="formDateReportExcel3" action="@Url.Action("ExportDateAllReportToExcelFollowTemp","TimeReport")">
+                <input id="startTime3" name="startTime" />
+                <input id="endTime3" name="endTime" />
+            </form>
+            <div id="chartHeThong" style="min-width: 300px; height: 290px;" hidden="hidden"></div>
+            <div id="datatableHeThong" style="padding-top: 5px; overflow-x: scroll; cursor: grab; cursor :-o-grab; cursor :-moz-grab; cursor:-webkit-grab;" class="dragscroll">
+            </div>
+        </div>
+    </div>
+    @*cửa hàng*@
+    <div id="menu2" class="tab-pane fade">
+        @*dropdownlist và date range picker*@
+        <div class="row m-t-20">
+            <div class="col-md-12">
+                <form id="form-create-session" class="form-inline">
+                    @*dropdownlist*@
+                    <div class="input-group myGroupChooseWeek" style="display: inline-flex;">
+                        <label class="right-icon">Cửa hàng: &nbsp;</label>
+                        <div class="styled-select blue semi-square" style="width: 180px;">
+                            <select id="storeIdReport">
+                                @foreach (var item in Model)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    @*date range picker*@
+                    <div class="input-group pull-right">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line">
+                                <div id="reportrangee">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="input-group-btn FindButtonDateTime">
+                                <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                                    <i class="left-icon fa fa-search"></i> Tìm
+                                </a>
+                            </div>*@
+                    </div>
+                    <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                </form>
+            </div>
+        </div>
+
+        @*table và chart*@
+        <div class="style=" padding:25px;"">
+            <div>
+                <button type="submit" id="export" class="width230 btn btn-primary btn-sm pull-right">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>
+                <button type="button" data-show="show" id="buttonChart" class="btn btn-primary btn-sm" style="width:150px" onclick="ShowChart1()">
+                    <i class="fa fa-plus">
+                    </i> Hiển thị biểu đồ
+                </button>
+            </div>
+
+            <form class="hidden" id="formDateReportExcel" action="@Url.Action("ExportDateStoreReportToExcelFollowTemp","TimeReport")">
+                <input id="startTime" name="startTime" />
+                <input id="endTime" name="endTime" />
+                <input id="selectedStoreId" name="selectedStoreId" />
+            </form>
+
+            <div id="chartCuaHang" style="min-width: 300px; height: 290px;" hidden="hidden"></div>
+            <div id="datatableCuaHang" style="padding-top: 5px; overflow-x: scroll; cursor: grab; cursor :-o-grab; cursor :-moz-grab; cursor:-webkit-grab;" class="dragscroll">
+            </div>
+        </div>
+    </div>
+    @*nhóm*@
+    <div id="menu3" class="tab-pane fade">
+        @*dropdownlist và date range picker*@
+        <div class="col-md-12">
+            <form id="form-create-session" class="form-inline">
+                @*dropdownlist*@
+                <div class="input-group myGroupChooseWeek" style="display: inline-flex;">
+                    <label class="right-icon">Nhóm: &nbsp;</label>
+                    <div class="styled-select blue semi-square" style="width: 180px;">
+                        <select id="groupIdReport"></select>
+                    </div>
+                </div>
+                @*date range picker*@
+                <div class="input-group pull-right">
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange22">
+                                <input id="date-string2" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="input-group-btn FindButtonDateTime">
+                            <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch2" style="margin-top: -5px;">
+                                <i class="left-icon fa fa-search"></i> Tìm
+                            </a>
+                        </div>*@
+                </div>
+                <input type="text" id="sTime2" name="startTime2" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                <input type="text" id="eTime2" name="endTime2" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+            </form>
+        </div>
+
+        @*table và chart*@
+        <div class="style=" padding:25px;"">
+            <div>
+                <button type="submit" id="export2" class="width230 btn btn-primary btn-sm pull-right">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>
+                <button type="button" data-show="show" id="buttonChart2" class="btn btn-primary btn-sm" style="width:150px" onclick="ShowChart3()">
+                    <i class="fa fa-plus">
+                    </i> Hiển thị biểu đồ
+                </button>
+            </div>
+
+            <form class="hidden" id="formDateReportExcel2" action="@Url.Action("ExportDateGroupReportToExcelFollowTemp","TimeReport")">
+                <input id="startTime2" name="startTime" />
+                <input id="endTime2" name="endTime" />
+                <input id="groupIdd" name="groupIdd" />
+            </form>
+            <div id="chartNhom" style="min-width: 300px; height: 290px;" hidden="hidden"></div>
+            <div id="datatableNhom" style="padding-top: 5px; overflow: scroll; cursor: grab; cursor :-o-grab; cursor :-moz-grab; cursor:-webkit-grab;" class="dragscroll">
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade " tabindex="-1" id="store-comparison-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="width: 1314px; margin-left: -198px;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title text-center">abc</h4>
+            </div>
+            <!-- Modal body -->
+            <div class="modal-body">
+                <div class="row">
+
+                    <!-- Chart -->
+                    <div class="col-md-9">
+                        <div id="comparison" style="width: 885px; height: auto; margin: 0 auto"></div>
+                    </div>
+
+                    <!-- Store list check box show here -->
+                    <div class="col-md-3">
+
+                        <!-- chart -->
+                        <div id="filter" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="row"></div>
+                        </div>
+
+                        <!-- select & unselect button -->
+                        <div id="filter-option" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 10px;">
+                            <button class="btn btn-primary btn-sm" id="filter-select-all">Chọn tất cả</button>
+                            <button class="btn btn-success btn-sm" id="filter-unselect-all">Hủy chọn tất cả</button>
+                        </div><!-- Select all and Unselect all -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://cdn.rawgit.com/asvd/dragscroll/master/dragscroll.js"></script>
+<script>
+
+    $(document).ready(function () {
+        GetStoreGroupList();
+        $("#buttonChart").click(function () {
+            $("#chartCuaHang").stop().slideToggle();
+        });
+        $("#buttonChart2").click(function () {
+            $("#chartNhom").stop().slideToggle();
+        });
+        $("#buttonChart3").click(function () {
+            $("#chartHeThong").stop().slideToggle();
+        });
+
+        setupDaterangepicker();
+        setupDaterangepicker3();
+        ReportAll();
+
+         //comparison
+        var Comparisondata = [];
+        $('#filter').on('change', function () {
+
+            var filterStoreList = [];
+            var filterTotalAmount = [];
+            var filterFinalAmount = [];
+            var filterDiscount = [];
+
+            $('.store-name-filter:checked').each(function () {
+                filterStoreList.push($(this).val());
+                filterTotalAmount.push($(this).data('total'));
+                filterFinalAmount.push($(this).data('final'));
+                filterDiscount.push($(this).data('discount'));
+            });
+
+            Comparisondata.storeList = filterStoreList;
+            Comparisondata.totalList = filterTotalAmount;
+            Comparisondata.finalList = filterFinalAmount;
+            Comparisondata.discountList = filterDiscount;
+
+            comparisonchart(Comparisondata);
+        });
+
+        // select & unselect click event
+
+    });
+    $('#filter-option').on('click', '#filter-select-all', function () {
+        $('.store-name-filter').prop('checked', 'checked');
+        $('#filter').trigger('change');
+    });
+
+    $('#filter-option').on('click', '#filter-unselect-all', function () {
+        $('.store-name-filter').removeAttr('checked');
+        $('#filter').trigger('change');
+    });
+
+
+
+    $('#storeIdReport').on('change', function () {
+        ReportStores();
+    });
+
+    $('#groupIdReport').on('change', function () {
+        ReportGroup();
+    });
+
+    //day la load date range picker
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+
+        $("#sTime").val(startTime);
+        $("#eTime").val(endTime);
+        $("#dateRange").html(dateString);
+        ReportStores();
+    }
+    function cb2(start, end, label) {
+        var startTime2 = start.format("DD/MM/YYYY"),
+            endTime2 = end.format("DD/MM/YYYY"),
+            dateString2 = "(" + startTime2 + (startTime2 == endTime2 ? "" : " - " + endTime2) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string2').val(label);
+        } else {
+            $("#date-string2").val(dateString2);
+        }
+
+        $("#sTime2").val(startTime2);
+        $("#eTime2").val(endTime2);
+        $("#dateRange").html(dateString2);
+        ReportGroup();
+    }
+    function cb3(start, end, label) {
+        var startTime3 = start.format("DD/MM/YYYY"),
+            endTime3 = end.format("DD/MM/YYYY"),
+            dateString3 = "(" + startTime3 + (startTime3 == endTime3 ? "" : " - " + endTime3) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string3').val(label);
+        } else {
+            $("#date-string3").val(dateString3);
+        }
+
+        $("#sTime3").val(startTime3);
+        $("#eTime3").val(endTime3);
+        $("#dateRange").html(dateString3);
+        ReportAll();
+    }
+    function setupDaterangepicker() {
+        cb(moment().startOf('month'), moment(), "Tháng này");
+        $('#reportrangee span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        $('#reportrangee').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+    }
+    function setupDaterangepicker2() {
+        cb2(moment().startOf('month'), moment(), "Tháng này");
+        $('#reportrange22 span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        $('#reportrange22').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb2);
+    }
+    function setupDaterangepicker3() {
+        cb3(moment().startOf('month'), moment(), "Tháng này");
+        $('#reportrange3 span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        $('#reportrange3').daterangepicker({
+            startDate: moment().startOf('month'),
+            endDate: moment(),
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb3);
+    }
+    //list group
+    function GetStoreGroupList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStoreGroupList", "TimeReport")',
+            success: function (result) {
+                for (var i = 0; i < result.storeGroup.length; i++) {
+                    $('#groupIdReport').append('<option value="' + result.storeGroup[i].GroupID + '">' + result.storeGroup[i].GroupName + '</option>')
+                }
+                if ($('#groupIdReport').val() == null) {
+                    $('#groupTab').hide();
+                }
+            }
+
+        });
+    }
+    //chart
+    function ChartStore(dataChart) {
+        $('#chartCuaHang').highcharts({
+            chart: {
+                type: '',
+                style: {
+                    fontFamily: 'arial'
+                }
+            },
+            title: {
+                text: 'BIỂU ĐỒ HÓA ĐƠN',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Bộ lọc:',
+                align: 'right',
+                x: -330,
+                y: 42,
+            },
+            xAxis: {
+                categories: dataChart.DateName
+            },
+            yAxis: {
+                title: {
+                    text: 'Hóa đơn'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                headerFormat: '<b>{point.x}</b><br/>',
+                pointFormat: '{series.name}: {point.y} '
+            },
+            legend: {
+                align: 'right',
+                x: -30,
+                verticalAlign: 'top',
+                y: 25,
+                floating: true,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: false
+            },
+            series: [
+                 {
+                     name: 'Mang đi',
+                     data: dataChart.TakeAway,
+                 },
+                 {
+                     name: 'Tại cửa hàng',
+                     data: dataChart.AtStore,
+                 },
+                 {
+                     name: 'Giao hàng',
+                     data: dataChart.Delivery,
+                 }
+            ]
+        });
+    }
+    function ChartAll(dataChart) {
+        $('#chartHeThong').highcharts({
+            chart: {
+                type: '',
+                style: {
+                    fontFamily: 'arial'
+                }
+            },
+            title: {
+                text: 'BIỂU ĐỒ HÓA ĐƠN',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Bộ lọc:',
+                align: 'right',
+                x: -330,
+                y: 42,
+            },
+            xAxis: {
+                categories: dataChart.DateName
+            },
+            yAxis: {
+                title: {
+                    text: 'Hóa đơn'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                headerFormat: '<b>{point.x}</b><br/>',
+                pointFormat: '{series.name}: {point.y} '
+            },
+            legend: {
+                align: 'right',
+                x: -30,
+                verticalAlign: 'top',
+                y: 25,
+                floating: true,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: false
+            },
+            series: [
+                {
+                    name: 'Mang đi',
+                    data: dataChart.TakeAway,
+                },
+                {
+                    name: 'Tại cửa hàng',
+                    data: dataChart.AtStore,
+                },
+                {
+                    name: 'Giao hàng',
+                    data: dataChart.Delivery,
+                }
+            ]
+        });
+    }
+    function ChartGroup(dataChart) {
+        $('#chartNhom').highcharts({
+            chart: {
+                type: '',
+                style: {
+                    fontFamily: 'arial'
+                }
+            },
+            title: {
+                text: 'BIỂU ĐỒ HÓA ĐƠN',
+                x: -20 //center
+            },
+            subtitle: {
+                text: 'Bộ lọc:',
+                align: 'right',
+                x: -330,
+                y: 42,
+            },
+            xAxis: {
+                categories: dataChart.DateName
+            },
+            yAxis: {
+                title: {
+                    text: 'Hóa đơn'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                headerFormat: '<b>{point.x}</b><br/>',
+                pointFormat: '{series.name}: {point.y} '
+            },
+            legend: {
+                align: 'right',
+                x: -30,
+                verticalAlign: 'top',
+                y: 25,
+                floating: true,
+                backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                borderColor: '#CCC',
+                borderWidth: 1,
+                shadow: false
+            },
+            series: [
+                {
+                    name: 'Mang đi',
+                    data: dataChart.TakeAway,
+                },
+                {
+                    name: 'Tại cửa hàng',
+                    data: dataChart.AtStore,
+                },
+                {
+                    name: 'Giao hàng',
+                    data: dataChart.Delivery,
+                }
+            ]
+        });
+    }
+    //comparison chart
+    function comparisonchart(data) {
+
+        $('#comparison').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: '',
+                x: -20 //center
+            },
+            subtitle: {
+                text: '',
+                x: -20
+            },
+            xAxis: {
+                categories: data.storeList
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh thu'
+                },
+                min: 0,
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y}đ</b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: [
+                {
+                    name: 'Doanh thu trước giảm giá',
+                    data: data.totalList,
+                },
+                {
+                    name: 'Giảm giá',
+                    data: data.discountList,
+                },
+                {
+                    name: 'Doanh thu sau giảm giá',
+                    data: data.finalList,
+                }
+            ]
+        });
+    }
+    //datatable
+    function InitProDatatableStore(data) {
+        $('#datatableCuaHang').html('<table id="storeReportDatatable" class="table table-condensed table-striped table-bordered table-hover">'
+            + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+            + '<tr>'
+            + '<th rowspan="2">'
+            + '<label class="">STT</label>'
+            + '</th>'
+            + '<th rowspan="2">'
+            + '<label class="">Ngày</label>'
+            + '</th>'
+            + '<th colspan="2">'
+            + '<label class="">Mang đi</label>'
+            + '</th>'
+            + '<th colspan="2">'
+            + '<label class="">Tại store</label>'
+            + '</th>'
+            + '<th colspan="2">'
+            + '<label class="">Giao hàng</label>'
+            + '</th>'
+            + '<th rowspan="2">'
+            + '<label class="">Tổng số bill</label>'
+            + '</th>'
+            + '<th rowspan="2">'
+            + '<label class="">Tổng doanh thu</label>'
+            + '</th>'
+            + '<th rowspan="2">'
+            + '<label class="">Tiền giảm giá</label>'
+            + '</th>'
+            + '<th rowspan="2">'
+            + '<label class="">Tổng doanh thu sau giảm giá</label>'
+            + '</th>'
+            + '</tr>'
+            + '<tr>'
+            + '<th>'
+            + '<label class="">Số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Doanh thu</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Doanh thu</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Doanh thu</label>'
+            + '</th>'
+            + '</tr>'
+            + ' </thead>'
+            + '<tbody></tbody>'
+            + '</table>');
+
+        $("#storeReportDatatable").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                    "sClass": "text-center"
+                },
+                //{
+                //    'aTargets': [1, 2, 3],
+                //    "mRender": function (data, type, row) {
+                //        return toMoney(data, ',', 'đ');
+                //    }
+                //}
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    }
+    function ReportStores() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("DateReportTable", "TimeReport")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'storeIdd': $('#storeIdReport').val() },
+            success: function (result) {
+                InitProDatatableStore(result.dataList);
+                ChartStore(result.dataChart);
+            }
+        });
+    };
+    function InitProDatatableGroup(data) {
+
+        $('#datatableNhom').html('<table id="groupReportDatatable" class="table table-condensed table-striped table-bordered table-hover">'
+            + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+            + '<tr>'
+            + '<th rowspan="2">'
+            + '<label class="">STT</label>'
+            + '</th>'
+            + '<th rowspan="2">'
+            + '<label class="">Ngày</label>'
+            + '</th>'
+            + '<th colspan="2">'
+            + '<label class="">Mang đi</label>'
+            + '</th>'
+            + '<th colspan="2">'
+            + '<label class="">Tại store</label>'
+            + '</th>'
+            + '<th colspan="2">'
+            + '<label class="">Giao hàng</label>'
+            + '</th>'
+            + '<th rowspan="2">'
+            + '<label class="">Tổng số bill</label>'
+            + '</th>'
+            + '<th rowspan="2">'
+            + '<label class="">Tổng doanh thu</label>'
+            + '</th>'
+            + '<th rowspan="2">'
+            + '<label class="">Tiền giảm giá</label>'
+            + '</th>'
+            + '<th rowspan="2">'
+            + '<label class="">Tổng doanh thu sau giảm giá</label>'
+            + '</th>'
+            + '</tr>'
+            + '<tr>'
+            + '<th>'
+            + '<label class="">Số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Doanh thu</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Doanh thu</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Doanh thu</label>'
+            + '</th>'
+            + '</tr>'
+            + ' </thead>'
+            + '<tbody></tbody>'
+            + '</table>');
+
+        $("#groupReportDatatable").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                    "sClass": "text-center"
+                },
+                @*{
+                    'aTargets': [1, 2, 3],
+                    "mRender": function (data, type, row) {
+                        return toMoney(data, ',', 'đ');
+                    }
+                }*@
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    }
+    function ReportGroup() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("DateReportTableGroup", "TimeReport")',
+            data: { 'startTime': $('#sTime2').val(), 'endTime': $('#eTime2').val(), 'groupIdd': $('#groupIdReport').val() },
+            success: function (result) {
+                InitProDatatableGroup(result.dataList);
+                ChartGroup(result.dataChart);
+            }
+        });
+    }
+    function InitProDatatableAll(data) {
+
+        $('#datatableHeThong').html('<table id="allReportDatatable" class="table table-condensed table-striped table-bordered table-hover">'
+            + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+                + '<tr>'
+                    + '<th rowspan="2">'
+                    + '<label class="">STT</label>'
+                    + '</th>'
+                    + '<th rowspan="2">'
+                    + '<label class="">Ngày</label>'
+                    + '</th>'
+                    + '<th colspan="2">'
+                    + '<label class="">Mang đi</label>'
+                    + '</th>'
+                    + '<th colspan="2">'
+                    + '<label class="">Tại store</label>'
+                    + '</th>'
+                    + '<th colspan="2">'
+                    + '<label class="">Giao hàng</label>'
+                    + '</th>'
+                    + '<th rowspan="2">'
+                    + '<label class="">Tổng số bill</label>'
+                    + '</th>'
+                    + '<th rowspan="2">'
+                    + '<label class="">Tổng doanh thu</label>'
+                    + '</th>'
+                    + '<th rowspan="2">'
+                    + '<label class="">Tiền giảm giá</label>'
+                    + '</th>'
+                    + '<th rowspan="2">'
+                    + '<label class="">Tổng doanh thu sau giảm giá</label>'
+                    + '</th>'
+                    + '<th rowspan="2">'
+                    + '<label class="">So sánh</label>'
+                    + '</th>'
+                + '</tr>'
+                + '<tr>'
+                    + '<th>'
+                    + '<label class="">Số bill</label>'
+                    + '</th>'
+                    + '<th>'
+                    + '<label class="">Doanh thu</label>'
+                    + '</th>'
+                    + '<th>'
+                    + '<label class="">Số bill</label>'
+                    + '</th>'
+                    + '<th>'
+                    + '<label class="">Doanh thu</label>'
+                    + '</th>'
+                    + '<th>'
+                    + '<label class="">Số bill</label>'
+                    + '</th>'
+                    + '<th>'
+                    + '<label class="">Doanh thu</label>'
+                    + '</th>'
+                + '</tr>'
+            + ' </thead>'
+                    +'<tbody></tbody>'
+                + '</table>');
+
+        $("#allReportDatatable").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                    "sClass": "text-center"
+                },
+                //{
+                //    'aTargets': [1, 2, 3],
+                //    "mRender": function (data, type, row) {
+                //        return toMoney(data, ',', 'đ');
+                //    }
+                //},
+                {
+                    'aTargets': [12],
+                    "mRender": function (data, type, o) {
+                        return '<a data-time="' + o[1] + '" class="btn btn-sm btn-info btnComparison1""><span class="fa fa-tasks"></span></a>';
+                    }
+                }
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    }
+    function ReportAll() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("DateReportTableAll", "TimeReport")',
+            data: { 'startTime': $('#sTime3').val(), 'endTime': $('#eTime3').val(), 'groupId': $('groupId').val() },
+            success: function (result) {
+                InitProDatatableAll(result.dataList);
+                ChartAll(result.dataChart);
+            }
+        });
+    }
+    //search button
+    //$('#btnSearch').on('click', function () {
+    //    ReportStores();
+    //});
+    //$('#btnSearch2').on('click', function () {
+    //    ReportGroup();
+    //});
+    //$('#btnSearch3').on('click', function () {
+    //    ReportAll();
+    //});
+    //combobox change
+    function ShowChart2() {
+        var display = $('#buttonChart3').data('show');
+        if (display == "hide") {
+            $('#buttonChart3').data('show', 'show');
+            $('#buttonChart3').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+        }
+        else {
+            $('#buttonChart3').html(' <i class="fa fa-minus"></i> Ẩn biểu đồ');
+            $('#buttonChart3').data('show', 'hide');
+        }
+    }
+    function ShowChart1() {
+        var display = $('#buttonChart').data('show');
+        if (display == "hide") {
+            $('#buttonChart').data('show', 'show');
+            $('#buttonChart').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+        }
+        else {
+            $('#buttonChart').html(' <i class="fa fa-minus"></i> Ẩn biểu đồ');
+            $('#buttonChart').data('show', 'hide');
+        }
+    }
+    function ShowChart3() {
+        var display = $('#buttonChart2').data('show');
+        if (display == "hide") {
+            $('#buttonChart2').data('show', 'show');
+            $('#buttonChart2').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+        }
+        else {
+            $('#buttonChart2').html(' <i class="fa fa-minus"></i> Ẩn biểu đồ');
+            $('#buttonChart2').data('show', 'hide');
+        }
+    }
+
+    //export to exel
+    $(document).on('click', '#export', function () {
+        $('#startTime').val($('#sTime').val());
+        $('#endTime').val($('#eTime').val());
+        $("#selectedStoreId").val($('#storeIdReport').val());
+        $('#formDateReportExcel').submit();
+    });
+    $(document).on('click', '#export2', function () {
+        $('#startTime2').val($('#sTime2').val());
+        $('#endTime2').val($('#eTime2').val());
+        $("#groupIdd").val($('#groupIdReport').val());
+        $('#formDateReportExcel2').submit();
+    });
+    $(document).on('click', '#export3', function () {
+        $('#startTime3').val($('#sTime3').val());
+        $('#endTime3').val($('#eTime3').val());
+        $('#formDateReportExcel3').submit();
+    });
+    //may cai them them
+    $('#groupTab').one('click', function () {
+        setupDaterangepicker2();
+        ReportGroup();
+    });
+    $('#allTab').one('click', function () {
+
+    });
+    $('#storeTab').one('click', function () {
+        ReportStores();
+    });
+</script>
+
+<style>
+    .tab-pane > .col-md-12 {
+        margin-top: 19px;
+        padding-right: 0px;
+    }
+
+        .tab-pane > .col-md-12 form {
+            min-height: 33px;
+        }
+</style>

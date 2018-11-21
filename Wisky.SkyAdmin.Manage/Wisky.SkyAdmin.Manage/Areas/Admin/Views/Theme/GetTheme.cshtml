@@ -1,0 +1,115 @@
+﻿@using HmsService
+@{
+    ViewBag.Title = "ThemeDetail";
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var themeId = ViewBag.themeId;
+    var themeselected = ViewBag.themeselected as ThemeViewModel;
+    var apply = ViewBag.apply;
+}
+<link href="@Url.Content("~/Content/css/Galary.css")"
+      rel="stylesheet" type="text/css" />
+<div class="card">
+    <div class="card-header">
+        <input type="hidden" value="0" id="isError" />
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Chi tiết Theme @themeselected.ThemeName</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <ul class="actions">
+                    <li class="m-t-30">
+                        <a href="@this.Url.Action("Themes", new {parameters = currentStoreDomain.Directory})" class="btn btn-success myComeback">
+                            Quay lại
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="row">
+        <div class="col-md-6 p-l-45" style="min-height:400px;">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Giao diện theme</h2>
+                </div>
+                <div class="card-body">
+                    <div id="all">
+                        <div class="view view-first">
+                            <img src="@themeselected.ImageUrl" />
+                            <div class="mask">
+                                <h2>@themeselected.ThemeName</h2>
+                                <p>@themeselected.Description</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 p-r-45">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Giao diện theme</h2>
+                </div>
+                <div class="card-body">
+                    <h3>@themeselected.ThemeName</h3>
+                    <p>@themeselected.Description</p>
+                    <div id="buttonApply">
+                        @if (apply == 1)
+                        {
+                            <input type="button" value="Đã Apply" id="cancelApply" />
+                        }
+                        else
+                        {
+                            <input type="button" value="Apply" id="Apply" />
+                        }
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $("#buttonApply").on("click","#Apply", function () {
+            $.ajax({
+                type:'GET',
+                url: '@Url.Action("ApplyThemeToStore", "Theme")',
+                data: {'themeId': @themeId },
+                success: function (result) {
+                    if (result.success == true)
+                    {
+                        var htmltemp =  "<input type='button' value='Đã Apply' id='cancelApply' />";
+                        $("#buttonApply").html(htmltemp);
+                    }
+                },
+                error: function () {
+                    alert("có lỗi xảy ra");
+
+                }
+            });
+        });
+        $("#buttonApply").on("click","#cancelApply", function () {
+            $.ajax({
+                type:'GET',
+                url: '@Url.Action("CancelApply", "Theme")',
+                data: {'themeId': @themeId },
+                success: function (result) {
+                    if (result.success == true)
+                    {
+                        var htmltemp =  "<input type='button' value='Apply' id='Apply' />";
+                        $("#buttonApply").html(htmltemp);
+                    } else {
+                        alert(" có lỗi xảy ra");
+                    }
+                },
+                error: function () {
+                    alert(" có lỗi xảy ra");
+                }
+            });
+        });
+    });
+</script>

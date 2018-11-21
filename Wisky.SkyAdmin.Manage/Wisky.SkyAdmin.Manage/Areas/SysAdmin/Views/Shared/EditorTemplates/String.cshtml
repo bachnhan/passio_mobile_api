@@ -1,0 +1,36 @@
+﻿@model System.String
+
+@{
+    var isRequired = (ViewData.ModelMetadata).ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName).HasRequiredAttribute();
+
+    var useTextArea = this.ViewData["TextArea"] != null;
+    int row = 0;
+    if (useTextArea)
+    {
+        if (!int.TryParse(this.ViewData["Rows"]?.ToString(), out row))
+        {
+            row = 3;
+        }
+    }
+
+    var htmlAttributesRendered = Utils.RenderHtmlAttributes(this.ViewData["htmlAttributes"] as KeyValuePair<string, string>[]);
+    var additionalClasses = this.ViewData["AdditionalClasses"];
+}
+
+<div class="form-group">
+    <label class="col-sm-2 control-label" for="@this.Html.IdForModel()">@this.Html.DisplayNameForModel()</label>
+    <div class="col-sm-10">
+        @if (useTextArea)
+        {
+            <textarea type="text" name="@this.Html.NameForModel()" id="@this.Html.IdForModel()"
+                      class="form-control @(additionalClasses)" required="@(isRequired ? "" : null)" rows="@(row)" @(htmlAttributesRendered)>
+                @this.Html.ValueForModel()
+                </textarea>
+        }
+        else
+        {
+            <input type="text" name="@this.Html.NameForModel()" id="@this.Html.IdForModel()"
+                   class="form-control @(additionalClasses)" required="@(isRequired ? "" : null)" value="@this.Html.ValueForModel()" @(htmlAttributesRendered) />
+        }
+    </div>
+</div>

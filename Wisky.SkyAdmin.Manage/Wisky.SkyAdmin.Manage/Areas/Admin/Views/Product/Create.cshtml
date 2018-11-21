@@ -1,0 +1,379 @@
+﻿@model Wisky.SkyAdmin.Manage.Areas.Admin.Models.ViewModels.ProductEditViewModel
+
+@{
+    ViewBag.Title = "Create Product";
+}
+
+@this.Html.Partial("Editor", this.Model)
+
+
+@section scripts {
+
+    <link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/elfinder/css/theme.css" rel="stylesheet" />
+
+    <script src="~/Content/plugins/dropzone/dropzone.js"></script>
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#displayPriority").val(1000);
+
+           
+
+            $('.currency').ready(function () {
+                var data = $("#Product_Price_Tmp").val();
+
+                $("#Product_Price_Tmp").val(toMoney(data, ',', 'đ'));
+            });
+        })
+        $(document).ready(function () {
+            //SKYWEB.Admin.Product.addAdvanceSetting();
+        });
+        function initAssignDatatable() {
+            $("#assignDatatable").datatablevpn({
+                "bFilter": true,
+                "bSort": false,
+                "bRetrieve": true,
+                "bServerSide": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("GetStoreList")",
+                "bProcessing": true,
+                "aLengthMenu": [10, 20, 50],
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "productID", "value": document.getElementById('ProductId') });
+                },
+                "oLanguage": {
+                    "sSearch": "ID Hóa đơn:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sFirst": '<i class="fa fa-more"></i>',
+                        "sNext": '<i class="fa fa-chevron-right"></i>',
+                        "sPrevious": '<i class="fa fa-chevron-left"></i>',
+                        "sLast": '<i class="fa fa-more"></i>'
+                    }
+
+                },
+                "aoColumnDefs": [
+                    { "aTargets": [1] }
+                    ,
+                    {
+                        "aTargets": [0],
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [2],
+                        "fnRender": function (o) {
+                            var r = assignRecorder.getRecord(o.aData[5]);
+                            var value, disable;
+                            if (r != null) {
+                                disable = !r.IsChecked ? 'disabled' : '';
+                                value = r.Price;
+                            } else {
+                                disable = !o.aData[4] ? 'disabled' : '';
+                                value = o.aData[2];
+                            }
+                            var priceTxt = $('<input/>', {
+                                'type': 'number',
+                                'data-role': 'change-price-txt',
+                                'data-store-id': o.aData[5],
+                                'value': value
+                            });
+                            if (disable == '')
+                                return priceTxt[0].outerHTML;
+                            priceTxt.attr(disable, '');
+                            return priceTxt[0].outerHTML;
+                        },
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [3],
+                        "fnRender": function (o) {
+
+                            var r = assignRecorder.getRecord(o.aData[5]);
+                            var value, disable;
+                            if (r != null) {
+                                disable = !r.IsChecked ? 'disabled' : '';
+                                value = r.DiscountPercent;
+                            } else {
+                                disable = !o.aData[4] ? 'disabled' : '';
+                                value = o.aData[3];
+                            }
+                            var discountTxt = $('<input/>', {
+                                'type': 'number',
+                                'data-role': 'change-discount-txt',
+                                'data-store-id': o.aData[5],
+                                'value': value
+                            });
+                            if (disable == '')
+                                return discountTxt[0].outerHTML;
+                            discountTxt.attr(disable, '');
+                            return discountTxt[0].outerHTML;
+                        },
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [4],
+                        "fnRender": function (o) {
+                            var r = assignRecorder.getRecord(o.aData[5]);
+                            var disable;
+                            if (r != null) {
+                                disable = r.IsChecked ? 'checked' : '';
+                            } else {
+                                disable = o.aData[4] ? 'checked' : '';
+                            }
+                            var assignCbx = $('<input/>', {
+                                'type': 'checkbox',
+                                'data-role': 'change-price-chk',
+                                'data-price': $('#assignToStoreModal').data('price'),
+                                'data-store-id': o.aData[5]
+                            });
+                            if (disable == '')
+                                return assignCbx[0].outerHTML;
+                            assignCbx.attr(disable, '');
+                            return assignCbx[0].outerHTML;
+                        },
+                        "bSortable": false
+                    }
+                ],
+                "bAutoWidth": false
+
+            });
+        }
+        $('.currency').blur(function () {
+            var data = $(this).val();
+            $(this).val(toMoney(data, ',', 'đ'));
+        });
+        $(function () {
+            SKYWEB.Admin.Product.init();
+            SKYWEB.Admin.Product.addComboPairGroup();
+            //SKYWEB.Admin.General.setupElfinderToCkeditor('Description');
+
+            $('#btn-submit-product').click(function () {
+                for (var i = 1; i <= 10; i++) {
+                    if ($("#Att" + i).val() != null && $("#Att" + i).val().length != 0 && $("#nameAtt" + i).val() != null && $("#nameAtt" + i).val().length != 0) {
+                        var listAttr = $("#Att" + i).val();
+                        var attribute = $("#nameAtt" + i).val() + ':';
+                        attribute = attribute + listAttr.join(';');
+                        $("input[name='Att" + i + "']").val(attribute);
+                    }
+                }
+                var code = $('#Product_Code').val();
+                var seoName = $('#Product_SeoName').val();
+                var specNames = $('form').find("[name='Specifications.Name']");
+                var combos = $('form').find("[name='ComboProduct']");
+                var isComboSelected = ($('input[name=SelectedType]:checked').val() == "@Html.Raw((int)ProductTypeEnum.Combo)");
+                if (isComboSelected) {
+                    $.each($(combos), function (index, el) {
+                        var combo = $(el).val();
+                        var comboQty = $("input[name='ComboQty']").eq(index).val();
+                        if (combo && !comboQty) {
+                            ShowMessage("Vui lòng nhập tên sản phẩm trong combo", 1);
+                            return;
+                        } else if (!combo && comboQty) {
+                            ShowMessage("Vui lòng nhập số lượng sản phẩm trong combo", 1);
+                            return;
+                        } else if (combos.length <= 1 && !combo && !comboQty) {
+                            ShowMessage("Vui lòng nhập ít nhất 1 sản phẩm trong combo", 1);
+                            return;
+                        }
+                    });
+                } else {
+                    $("input[name='ComboProduct']").val("");
+                    $("input[name='ComboQty']").val("");
+                }
+                if (specNames.length > 0) {
+                    $.each($(specNames), function (index, el) {
+                        var specName = $(el).val();
+                        var specValue = $("[name='Specifications.Value']").eq(index).val();
+                        if (specName && !specValue) {
+                            ShowMessage("Vui lòng nhập tên thông số", 1);
+                            return;
+                        } else if (!specName && specValue) {
+                            ShowMessage("Vui lòng nhập nội dung thông số", 1);
+                            return;
+                        }
+                    });
+                }
+                if ($('#Product_ProductName').val() == '') {
+                    ShowMessage("Vui lòng nhập tên sản phẩm", 1);
+                    return;
+                }
+                else if ($('#Product_Code').val() == '') {
+                    ShowMessage("Vui lòng nhập mã sản phẩm", 1);
+                    return;
+                }
+                else if ($('#Product_SeoName').val().trim() == '') {
+                    ShowMessage("Vui lòng nhập tên đường dẫn Seo", 1);
+                    return;
+                }
+                else if ($("input[name='Product.Price']").val() <= 0) {
+                    ShowMessage("Giá sản phẩm phải lớn hơn 0", 1);
+                    return;
+                } else {
+                    var tmpProPrice = $("#Product_Price_Tmp").val();
+                    var number = Number(tmpProPrice.replace(/[^0-9\.]+/g, ""));
+                    $("#Product_Price").val(number);
+                    $("#Product_Price_Tmp").attr("disabled", "disabled");
+                }
+                if ($("#Product_CatID").val() == null && $('#selectedGeneralProduct').is(':checked') == false) {
+                    ShowMessage("Vui lòng chọn nhóm sản phẩm", 1);
+                    return;
+                } else if (isComboSelected && combos.length <= 1 && !combo && !comboQty) {
+                    ShowMessage("Vui lòng nhập ít nhất 1 sản phẩm trong combo", 1);
+                    return;
+                }
+
+
+                    //else if (parseInt($("input[name='Product.Price']").val()) <= parseInt(($("input[name='Product.DiscountPriceEdit']").val()))) {
+                    //    ShowMessage("Giá khuyến mãi không được lớn hơn giá sản phẩm", 3);
+                    //    return;
+                    //}
+                    //else if ($("textarea[name='Description']").val() == '')
+                    //{
+                    //    ShowMessage("Vui lòng nhập mô tả", 3);
+                    //    return;
+                    //}
+                else {
+                    $.ajax({
+                        url: '@Url.Action("CheckCode")',
+                        type: 'POST',
+                        data: {
+                            code: code,
+                            seoName: seoName
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                $("#Product_DiscountPercent").val($("#Product_DiscountPercent").val().replace(/[%]/g, ''));
+
+                                var $form = $('form');
+
+                                var specNames = $form.find("[name='Specifications.Name']");
+                                var specValues = $form.find("[name='Specifications.Value']");
+
+                                for (var i = 0; i < specNames.length; i++) {
+                                    var $specName = $(specNames[i]);
+                                    var $specValue = $(specValues[i]);
+
+                                    $specName.removeAttr('required');
+                                    $specValue.removeAttr('required');
+
+                                    var specName = $specName.val();
+                                    var specValue = $specValue.val();
+
+                                    if (specName && !specValue) {
+                                        $specValue.attr('required', 'required');
+                                        $form.find(':submit').click();
+                                    } else if (!specName && specValue) {
+                                        $specName.attr('required', 'required');
+                                        $form.find(':submit').click();
+                                    }
+                                }
+
+                                $form.find("[name='Specifications.Name']").each(function (i, e) {
+                                    $(e).attr("name", "Specifications[" + i + "].Name");
+                                });
+
+                                $form.find("[name='Specifications.Value']").each(function (i, e) {
+                                    $(e).attr("name", "Specifications[" + i + "].Value");
+                                });
+
+                                $form.find("[name='Atts']").each(function (i, e) {
+                                    $(e).attr("name", "Atts[" + i + "]");
+                                });
+
+                                $form.find("[name='ComboProduct']").each(function (i, e) {
+                                    var combo = $(e).val($(e).select2("val"));
+                                    if (combo.text()) {
+                                        $(e).attr("name", "ProductComboDetails[" + i + "].ProductID");
+                                    }
+                                });
+
+                                $form.find("[name='ComboQty']").each(function (i, e) {
+                                    if ($(e).val()) {
+                                        $(e).attr("name", "ProductComboDetails[" + i + "].Quantity");
+                                    }
+                                });
+
+                                $form.find(':submit').click();
+                                ShowMessage("Thêm sản phẩm mới thành công", 2);
+                                //$('#Code').focus();
+                            }
+                            else {
+                                ShowMessage(result.message, 1);
+                            }
+                        },
+                        error: function (error) {
+                            ShowMessage("Có lỗi xảy ra", 1);
+                        }
+                    });
+                }
+            });
+
+
+            @*var firstImage = true;
+            function sendFile(file) {
+                var formData = new FormData();
+                formData.append('file', $('#uploadImage')[0].files[0]);
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UploadImage", "File")',
+                    data: formData,
+                    success: function (result) {
+                        if (result.success) {
+                            var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                                '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                                '<div class="ratio-item"><div class="img-container"><img src="' + result.imageUrl + '"/></div>' +
+                            '<input type="hidden" name="SelectedImages" value="' + result.imageUrl + '"/>'
+                            + '<span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                            '</div></div></li>';
+                            if(firstImage){
+                                $("#avatar-preview").append(htmlInnerData);
+                                firstImage = false;
+                            }
+                            else {
+                                $('#images-preview').append(htmlInnerData);
+                            }
+                        }
+                    },
+                    processData: false,
+                    contentType: false,
+                    error: function () {
+                        ShowMessage("Có lỗi xảy ra!", 1);
+                    }
+                });
+            }*@
+
+
+
+            //$("#uploadImage").on('change', function () {
+
+            //    var file, img;
+            //    if ((file = this.files[0])) {
+            //        img = new Image();
+            //        img.onload = function () {
+            //            sendFile(file);
+            //        };
+            //        img.onerror = function () {
+            //            ShowMessage("Not a valid file:" + file.type, 1);
+            //        };
+            //        var _URL = window.URL || window.webkitURL;
+            //        img.src = _URL.createObjectURL(file);
+            //    }
+            //});
+
+        });
+
+        //$(window).scroll(function () {
+        //    if ($(this).scrollTop() > 70) {
+        //        $("#btn-submit-product").css("top", $(this).scrollTop() - 70);
+        //        $(".myComeback").css("top", $(this).scrollTop() - 70);
+        //    }
+        //});
+    </script>
+}

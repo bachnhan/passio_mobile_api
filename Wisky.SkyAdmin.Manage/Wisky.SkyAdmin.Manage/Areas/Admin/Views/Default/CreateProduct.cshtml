@@ -1,0 +1,325 @@
+﻿@{
+    ViewBag.Title = "About";
+}
+<div class="block-header">
+    <h2>Thêm mới sản phẩm</h2>
+    <ul class="actions">
+        <li class="m-r-10">
+            <button type="submit" class="btn btn-default">Quay lại</button>
+        </li>
+        <li>
+            <button type="submit" class="btn btn-primary" id="btn-submit-product">Hoàn tất</button>
+        </li>
+    </ul>
+</div>
+<form role="form">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card" hidden>
+                <div class="card-header">
+                    <h2>Thông tin chính</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label for="inputTitle" class="control-label">Tên sản phẩm</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" id="inputTitle">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDescription" class="control-label">Mô tả</label>
+                        <div class="fg-line">
+                            <textarea class="form-control" id="inputDescription" rows="6"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Phân nhóm</label>
+                        <div class="fg-line">
+                            <div class="select">
+                                <select class="form-control">
+                                    <option>Option 1</option>
+                                    <option>Option 2</option>
+                                    <option>Option 3</option>
+                                    <option>Option 4</option>
+                                    <option>Option 5</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="form-group">
+                            <label class="control-label">Hình đại diện</label>
+                                <div class="fileinput fileinput-new" data-provides="fileinput">
+                                    <div class="fileinput-preview thumbnail" data-trigger="fileinput"></div>
+                                    <div>
+                                        <span class="btn btn-info btn-file">
+                                            <span class="fileinput-new">Chọn hình</span>
+                                            <span class="fileinput-exists">Đổi hình</span>
+                                            <input type="file" name="...">
+                                        </span>
+                                        <a href="#" class="btn btn-danger fileinput-exists" data-dismiss="fileinput">Remove</a>
+                                    </div>
+                                </div>
+                        </div>*@
+                </div>
+            </div>
+            <!-- Card: Images -->
+            <div class="card" hidden>
+                <div class="card-header">
+                    <h2>Hình ảnh</h2>
+                </div>
+                <div class="card-body card-padding">
+                    @*<div id="dZUpload" class="dropzone custom-dropzone">
+                            <div class="dz-default dz-message">Kéo ảnh vào đây hoặc ấn vào đây để tải ảnh lên</div>
+                        </div>*@
+                    <div class="row sm-margin">
+                        <div class="col-md-4">
+                            <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                                @*<li><div class='ratio-wrapper ratio-wrapper-1-1'><div class='ratio-item'><div class='img-container placeHolder'></div></div></div></li>*@
+                            </ul>
+                        </div>
+                        <div class="col-md-8">
+                            <ul class="row sm-margin images-preview" id="images-preview"></ul>
+                        </div>
+                    </div>
+                    <div>
+                        <input type="hidden" id="PicURL" data-name="PicUrl" />
+                        <a href="javascrip:void(0)" id="GetElImage" class="btn btn-sm btn-success getimagefromelfinder">
+                            <i class="icon-upload"></i>Browse
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!-- Card: Pricing -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Bán hàng</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group" hidden>
+                        <label class="control-label">Vị trí máy POS</label>
+                        <div class="row">
+                            <div class="col-xs-5">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-xs-2">
+                                <div class="text-center">-</div>
+                            </div>
+                            <div class="col-xs-5">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <label class="control-label">Giá tiền</label>
+                                <div class="fg-line icon-tag">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <label class="control-label">Giảm giá</label>
+                                <div class="fg-line icon-tag">
+                                    <input type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Thêm phụ liệu / hương liệu</label>
+                        <div class="fg-line">
+                            <select class="form-control" id="selectExtra" multiple="multiple">
+                                <option value="">Extra Caramel</option>
+                                <option value="">Extra Hazenut</option>
+                                <option value="">Extra Bailey</option>
+                                <option value="">Extra Fruit</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-header">
+                    <h2>Tùy biến thuộc tính</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <div class="form-horizontal">
+                            <div class="form-group sm-margin">
+                                <div class="col-sm-4">
+                                    Tên thuộc tính
+                                </div>
+                                <div class="col-sm-7">
+                                    Giá trị
+                                </div>
+                            </div>
+                            <div class="variant-panel">
+                                @*<p class="empty-msg m-b-15"><i>Sản phẩm chưa có thuộc tính nào</i></p>*@
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-default btn-icon-text waves-effect" data-action="add-variant-group">
+                                        <i class="zmdi zmdi-plus"></i>Thêm thuộc tính
+                                    </button>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="mutant-panel"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @*<div class="card">
+                    <div class="card-header">
+                        <h2></h2>
+                    </div>
+                    <div class="card-body card-padding">
+
+                    </div>
+                </div>*@
+        </div>
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="">
+                                <i class="input-helper"></i>
+                                <b>Kích hoạt</b>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card: Pairs -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Thông số</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-horizontal">
+                        <div class="pair-panel"></div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-default btn-icon-text waves-effect" data-action="add-pair-group">
+                                    <i class="zmdi zmdi-plus"></i>Thêm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card: SEO -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>SEO</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label class="control-label">Từ khóa SEO</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Mô tả SEO</label>
+                        <div class="fg-line">
+                            <textarea class="form-control" rows="6"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Đường dẫn</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- #region Region: Templates -->
+<!-- Template Pair Group -->
+<template id="templatePairGroup">
+    <div class="pair-group form-group xs-margin">
+        <div class="col-sm-5">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="title" placeholder="Tên" />
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="content" placeholder="Nội dung" />
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <button type="button" class="btn btn-danger form-control" data-action="remove-pair-group">
+                <i class="zmdi zmdi-close"></i>
+            </button>
+        </div>
+    </div>
+</template>
+<!-- Template Variant Group -->
+<template id="templateVariantGroup">
+    <div class="variant-group form-group sm-margin">
+        <div class="col-sm-4">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="title" />
+            </div>
+        </div>
+        <div class="col-sm-7">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="content" />
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <button type="button" class="btn btn-danger form-control" data-action="remove-variant-group">
+                <i class="zmdi zmdi-close"></i>
+            </button>
+        </div>
+    </div>
+</template>
+<!-- Template Mutant Group -->
+<template id="templateMutantGroup">
+    <div class="mutant-group form-group sm-margin">
+        <div class="col-sm-5 mutant-label"></div>
+        <div class="col-sm-7">
+            <div class="fg-line icon-tag">
+                <input type="text" class="form-control" data-role="tagsinput">
+            </div>
+        </div>
+    </div>
+</template>
+<!-- Template Photo Block -->
+<template id="tmpPhotoBlock">
+    <li class="col-md-4 photo-item">
+        <div class="ratio-wrapper ratio-wrapper-1-1">
+            <div class="ratio-item">
+                <div class="img-container">
+                    <img />
+                </div>
+                <input type="hidden" name="MyPicture" value="" />
+            </div>
+        </div>
+    </li>
+</template>
+<!-- #endregion -->
+
+<link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+<link href="~/Content/plugins/elfinder/css/theme.css" rel="stylesheet" />
+
+@section scripts {
+    <script src="~/Content/plugins/dropzone/dropzone.js"></script>
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+    <script>
+        $(document).ready(function () {
+            SKYWEB.Admin.Product.init();
+            SKYWEB.Admin.General.setupElfinderToCkeditor('inputDescription');
+        });
+    </script>
+}

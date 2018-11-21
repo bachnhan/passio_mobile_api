@@ -1,0 +1,123 @@
+﻿@{
+    ViewBag.Title = "Index";
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách bài blog</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <a href="@this.Url.Action("Create", new { parameters = currentStoreDomain.Directory })" class="btn btn-primary btn-icon-text waves-effect">
+                    <i class="zmdi zmdi-plus"></i> Thêm bài blog
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <table id="lst-items" class="table table-striped table-vmiddle">
+            <thead>
+                <tr>
+                    <th data-column-id="Image" data-formatter="Picture" data-sortable="false">Hình ảnh</th>
+                    <th data-column-id="Title" data-formatter="Title">Tiêu đề</th>
+                    <th data-column-id="BlogCollectionName" data-formatter="BlogCollectionName" data-sortable="false">Chuyên mục</th>
+                    <th data-column-id="commands" data-formatter="Commands" data-sortable="false">Tùy chọn</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<template id="command-template" class="hidden">
+    <div>
+        <a class="btn btn-primary btn-sm"
+           data-toggle="tooltip" title="Edit">
+            <i class="glyphicon glyphicon-pencil"></i>
+        </a>
+        <button onclick="onDeleteButtonClick(this);" class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete">
+            <i class="glyphicon glyphicon-trash"></i>
+        </button>
+    </div>
+</template>
+
+@section scripts {
+    <script>
+        $(function () {
+            var commandTemplate = $("#command-template").html();
+
+            $("#lst-items").bootgrid({
+                rowCount: [10, 20, 50, ],
+
+                ajax: true,
+                url: "@this.Url.Action("IndexList", new { parameters = currentStoreDomain.Directory })",
+                labels: {
+                    noResults: "Không có dữ liệu",
+                    search: "Tìm kiếm",
+                    infos: "Hiển thị {{ctx.start}} tới {{ctx.end}} của {{ctx.total}} dòng",
+                    refresh: "Làm mới",
+                    loading: "Đang tải"
+                },
+                formatters: {
+                    "Picture": function (column, row) {
+                        return "<img class='img-responsive' src='" + (row.BlogPost.Image || "") + "' />";
+                    },
+                    "Title": function (column, row) {
+                        return row.BlogPost.Title;
+                    },
+                    "Commands": function (column, row) {
+                        var template = $(commandTemplate);
+
+                        template.find("[title=Edit]").attr("href", "@(this.Url.Action("Edit", new { parameters = currentStoreDomain.Directory }))/" + row.BlogPost.Id);
+                        template.find("[title=Delete]").attr("data-id", row.BlogPost.Id);
+
+                        return template[0].outerHTML;
+                    },
+                    "BlogCollectionName": function (column, row) {
+                        var stringResult = "";
+                        if (row.BlogPostCollections && row.BlogPostCollections.length > 0) {
+                            for (var i = 0; i < row.BlogPostCollections.length; i++) {
+                                stringResult += row.BlogPostCollections[i].Name;
+                                if (row.BlogPostCollections.length > i + 1) {
+                                    stringResult += ", ";
+                                }
+                            }
+                        }
+                        return stringResult;
+                    },
+                    "Categories": function (column, row) {
+                        var result = "";
+
+                        for (var i = 0; i < row.BlogPostCollections.length; i++) {
+                            result += (i > 0 ? ", " : "") + row.BlogPostCollections[i].Name;
+                        }
+
+                        return result;
+                    },
+
+                    "Title": function (column, row) {
+                        return row.BlogPost.Title;
+                    },
+
+                    "Check": function (column, row) {
+                        var icon = row[column.id] ? "fa-check" : "fa-remove";
+
+                        return "<i class='fa " + icon + "'></i>";
+                    }
+                },
+            });
+        });
+
+        function onDeleteButtonClick(btn) {
+            if (confirm("Bạn có chắc là mình muốn xóa bài viết này không?")) {
+                var id = $(btn).attr("data-id");
+                window.location.href = "@this.Url.Action("Delete", new { parameters = currentStoreDomain.Directory })/" + id;
+            }
+        }
+
+    </script>
+}

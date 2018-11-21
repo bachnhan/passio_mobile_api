@@ -1,0 +1,651 @@
+﻿
+@{
+    ViewBag.Title = "CreateReceipt";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var user = HttpContext.Current.User.Identity.Name;
+    var storeId = 0;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+    var brandId = 0;
+    if (ViewContext.RouteData.Values["brandId"] != null)
+    {
+        brandId = int.Parse(ViewContext.RouteData.Values["brandId"]?.ToString());
+    }
+}
+
+<style>
+    .table > thead:first-child > tr:first-child > th {
+        background: #00AA41 !important;
+        color: white;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Phiếu thu
+                </h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <a href="@Url.Action("CostManagement", "CostManage", new { area = "CostManager" })" class="btn btn-sm btn-success">Quay lại</a>
+                <button class="btn btn-primary" id="btnSubmit">
+                    Lưu lại
+                </button>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="well well-success">
+                    <div class="row">
+                        <div class="col-sm-6 m-b-17">
+                            <div class="form-group fg-line">
+                                <label class="control-label">Loại thu</label>
+                                <select class="form-control" id="CostType">
+                                    <option value="@((int)ReceiveCostTypeEnum.Normal)">Bình thường</option>
+                                    <option value="@((int)ReceiveCostTypeEnum.PayDebt)">Trả nợ</option>
+                                    <option value="@((int)ReceiveCostTypeEnum.Other)">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 m-b-17">
+                            <div class="form-group fg-line">
+                                <a href="#" id="btn-choose-order" class="btn btn-sm btn-success waves-effect" style="margin-top:25px;display:none">Chọn hóa đơn</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 m-b-17" id="div-amount">
+                            <div class="form-group fg-line">
+                                <label class="control-label">Số tiền nộp</label>
+                                <input class="form-control" id="Amount" type="number" step="1000" value="0" onchange="changeAmount()" />
+                            </div>
+                        </div>
+                        <div class="col-sm-6 m-b-17">
+                            <div class="form-group fg-line">
+                                <label class="control-label">Danh mục thu</label>
+                                <select class="form-control" id="CatId">
+                                    @foreach (var item in ViewBag.CostCategory)
+                                    {
+                                        <option value="@item.CatID+@item.Type">@item.CatName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6 m-b-17">
+                            <div class="form-group fg-line">
+                                <label class="control-label">Người nộp</label>
+                                <input class="form-control" id="PaidPerson" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 m-b-17">
+                            <div class="form-group fg-line">
+                                <label class="control-label">Người nhận</label>
+                                <select class="form-control" id="LoggedPerson">
+                                    <option value="@user">@user</option>
+                                    @foreach (var item in ViewBag.Creators)
+                                    {
+                                        <option value="@item.UserName">@item.FullName (@item.UserName)</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="form-group">
+                            <label class="control-label">Ghi chú</label>
+                            <textarea id="costDescription" class="form-control" cols="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="well well-success">
+                    <div class="row small-margin">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Số phiếu thu
+                                </label>
+                                <input class="form-control" placeholder="Số phiếu thu" id="CostCode" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row small-margin" style="display:none">
+
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Ngày thu tiền
+                                </label>
+                                <div id="date" class="pull-right" style="background: #fff; cursor: pointer; padding: 8px 10px; border: 1px solid #ccc; width: 100%">
+                                    <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+                                    <span></span> <b class="caret"></b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-sm-12">
+                <table id="listPaymentTable" class="table table-bordered table-striped table-fixed-header m-b-20">
+                    <thead>
+                        <tr>
+                            <th>Khoản thu</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot>
+                        <tr>
+                            <th style="text-align:left" class="text-center" colspan="1">Tổng cộng:</th>
+                            <th id="totalPrice" colspan="1" style="text-align:right">0</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="myModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Danh sách hóa đơn</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-sm-4 m-b-17">
+                                <div class="form-group fg-line">
+                                    <label class="control-label">Khách hàng</label>
+                                    <select class="form-control selectpicker" data-live-search="true" multiple data-selected-text-format="count" id="customerList">
+                                        <option value="0" selected>Tất cả</option>
+                                        @foreach (var item in ViewBag.CustomerList)
+                                        {
+                                            <option value="@item.customerId">@item.customerName</option>
+                                        }
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="col-sm-4 m-b-17">
+                                <div class="form-group fg-line">
+                                    <label class="control-label">Ngày thu</label>
+                                    <div id="date-receipt" class="pull-right" style="background: #fff; cursor: pointer; padding: 8px 10px; border: 1px solid #ccc; width: 100%">
+                                        <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+                                        <span></span> <b class="caret"></b>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 m-b-17">
+                                <div class="form-group fg-line">
+                                    <a href="#" id="btn-search-customer" class="btn btn-sm btn-success waves-effect" style="margin-top:25px">Lấy dữ liệu</a>
+                                </div>
+                            </div>
+                            <div class="col-sm-4 m-b-17">
+                                <div class="form-group fg-line" hidden>
+                                    <label class="control-label">Số thu</label>
+                                    <input class="form-control" type="number" min="0" step="1000" id="TotalInputAmount" placeholder="Nhập số tiền thu" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <table id="list-order" class="table table-bordered table-striped table-fixed-header">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Ngày tạo</th>
+                            <th>Mã hóa đơn</th>
+                            <th>Tổng tiền</th>
+                            <th>Nợ cần thu</th>
+                            <th>Số thu</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot>
+                        <tr>
+                            <th style="text-align:left" class="text-center" colspan="4">Tổng cộng:</th>
+                            <th id="totalPriceOrder" colspan="1" style="text-align:right">0</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="discardListOrder" class="btn btn-danger pull-left" data-dismiss="modal">Hủy</button>
+                <button type="button" id="chooseListOrder" class="btn btn-success" data-dismiss="modal">Chọn</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $('#btnSubmit').on('click', function () {
+                if ($('#Amount').val().length == 0 || $('#Amount').val()==0) {
+                    ShowMessage("Vui lòng nhập số tiền cần chi", 1);
+                } else if ($('#PaidPerson').val().length == 0) {
+                    ShowMessage("Vui lòng nhập tên người nộp", 1);
+                } else if ($('#CostCode').val().length == 0) {
+                    ShowMessage("Vui lòng nhập mã phiếu", 1);
+                }else{
+                    var cost = {
+                        CostCode: $('#CostCode').val(),
+                        CatID: $('#CatId').val().split("+")[0],
+                        CostCategoryType: $('#CatId').val().split("+")[1],
+                        CostDescription: $('#costDescription').val(),
+                        //CostDate: $('#date span').text(),
+                        Amount: $('#Amount').val(),
+                        PaidPerson: $('#PaidPerson').val(),
+                        LoggedPerson: $('#LoggedPerson').val(),
+                        StoreId: @storeId,
+                        listPayment: listPayment
+                    }
+                    console.log(cost);
+                    $.ajax({
+                        url: "@Url.Action("CreateReceipt")",
+                        dataType: 'JSON',
+                        type: 'POST',
+                        data: {
+                            model: JSON.stringify(cost)
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                ShowMessage("Tạo phiếu thành công", 2);
+                            location.href = '@Url.Action("CostManagement", "CostManage", new { area = "CostManager" })'
+                            } else {
+                                ShowMessage("Không lấy được dữ liệu!", 1);
+                            }
+
+                        },
+                        error: function (data) {
+                            ShowMessage("Không lấy được dữ liệu!", 1);
+                        }
+                })
+                }
+
+
+            })
+
+        });
+
+        var listPayment = [];
+        var listOrderTable;
+        var listPaymentTable;
+
+        $('#discardListOrder').on('click', function () {
+            listPayment = [];
+            if ($.fn.DataTable.isDataTable('#list-order')) {
+                listOrderTable.fnClearTable();
+            }
+            $('#totalPriceOrder').text(formatVND(0));
+            $('#Amount').val(0);
+            $('#TotalInputAmount').val(0);
+            if ($.fn.DataTable.isDataTable('#listPaymentTable')) {
+                listPaymentTable.fnDestroy();
+            }
+            InitListPaymentDatatable(listPayment);
+        })
+
+        $('#chooseListOrder').on('click', function () {
+            if ($.fn.DataTable.isDataTable('#listPaymentTable')) {
+                listPaymentTable.fnDestroy();
+            }
+            InitListPaymentDatatable(listPayment);
+        })
+
+        var changeAmount = function () {
+            var data = [{ invoiceId: "Phiếu thu", amount: $('#Amount').val() }];
+            if ($.fn.DataTable.isDataTable('#listPaymentTable')) {
+                listPaymentTable.fnDestroy();
+            }
+            InitListPaymentDatatable(data);
+        }
+
+        function cb(date) {
+            $('#date span').html(date.format('DD/MM/YYYY'));
+            $('#date-receipt span').html(date.format('DD/MM/YYYY'));
+
+        }
+        cb(moment());
+        //Daterange picker
+        $('#date').daterangepicker({
+            singleDatePicker: true,
+            startDate: '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")',
+            maxDate: '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")',
+            showDropdowns: true,
+            locale: { format: 'DD/MM/YYYY' }
+        }, cb);
+        $('#date-receipt').daterangepicker({
+            singleDatePicker: true,
+            startDate: '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")',
+            maxDate: '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")',
+            showDropdowns: true,
+            locale: { format: 'DD/MM/YYYY' }
+        }, cb);
+
+        $('#CostType').on('change', function () {
+            listPayment = [];
+            var costTypeDebt = @((int)ReceiveCostTypeEnum.PayDebt);
+            if ($.fn.DataTable.isDataTable('#list-order')) {
+                listOrderTable.fnClearTable();
+            }
+            $('#totalPriceOrder').text(formatVND(0));
+            $('#Amount').val(0);
+            $('#TotalInputAmount').val(0);
+            $('#totalPrice').text(formatVND(0));
+            if ($.fn.DataTable.isDataTable('#listPaymentTable')) {
+                listPaymentTable.fnClearTable();
+                listPaymentTable.fnDestroy();
+            };
+            if($('#CostType').val() == costTypeDebt){
+                $('#Amount').attr('disabled', 'disabled');
+                $('#btn-choose-order').show();
+            }else{
+                $('#Amount').prop('disabled', false);
+                $('#btn-choose-order').hide();
+            }
+        })
+
+        $('#btn-choose-order').on('click', function () {
+            $('#myModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            })
+        })
+        $('#btn-search-customer').on('click', function () {
+            listPayment = [];
+            var customerId = $('#customerList').val();
+            if (customerId == null || customerId[0] == 0) {
+                customerId = 0;
+            }
+            var date = $('#date-receipt span').text();
+            if ($.fn.DataTable.isDataTable('#list-order')) {
+                listOrderTable.fnDestroy();
+            }
+            loadDebtOrderByCustomer(customerId, date);
+        })
+        $('#customerList').selectpicker('render');
+
+        function loadDebtOrderByCustomer(customerId, date) {
+            $.ajax({
+                url: "@Url.Action("LoadDebtOrderPayment")",
+                dataType: 'JSON',
+                type: 'POST',
+                data: {
+                    brandId: @brandId,
+                    customerId: customerId,
+                    payDate: date
+                },
+                success: function (result) {
+                    InitListOrderDatatable(result.listOrder);
+                },
+                error: function (data) {
+                    ShowMessage("Không lấy được dữ liệu!", 1);
+                }
+            })
+        }
+
+        function InitListOrderDatatable(data) {
+            listOrderTable = $("#list-order").dataTable({
+                "bFilter": true,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bFilter": true,
+                "bDestoy":true,
+                "aaData": data,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfo": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sInfoEmpty": "Hiển thị 0 từ 0 của 0 dòng",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [3, 4, 5],
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [1,2],
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [0],
+                        "mData": function (data){
+                            return "<label class='checkbox checkbox-inline'><input type='checkbox'" +
+                                "onclick = \'addToPaymentList(this," + data.RentId + ",\"" + data.InvoiceId + "\"," + data.ReceivablesAmount + "," + data.PaymentID + ")'" +
+                                "/><i class='input-helper'></i></label>";
+                        }
+                    },
+                    {
+                        "aTargets": [1],
+                        "mData": 'CheckInDate'
+                    },
+                    {
+                        "aTargets": [2],
+                        "mData": 'InvoiceId'
+                    },
+                    {
+                        "aTargets": [3],
+                        "mData": function (data) {
+                            return formatVND(data.TotalAmount);
+                        }
+                    },
+                    {
+                        "aTargets": [4],
+                        "mData": function (data) {
+                            return formatVND(data.ReceivablesAmount);
+                        }
+                    },
+                    {
+                        "aTargets": [5],
+                        "mData": function (data) {
+                            return "<input type='number' value='0' min='0' max='" + data.ReceivablesAmount + "' step='1000' id='" + data.PaymentID + "' class='form-control'" +
+                                "onchange = \'returnDefaultAmount(this," + data.RentId + ",\"" + data.InvoiceId + "\"," + data.ReceivablesAmount + "," + data.PaymentID + ")' />";
+                        }
+                    }
+                ],
+                "bAutoWidth": false,
+            }).fnSetFilteringDelay(delaySearch);
+        }
+
+        function InitListPaymentDatatable(data) {
+            listPaymentTable = $("#listPaymentTable").dataTable({
+                "bFilter": true,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bFilter": true,
+                "bDestoy": true,
+                "aaData": data,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfo": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sInfoEmpty": "Hiển thị 0 từ 0 của 0 dòng",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1],
+                        "bSortable": false,
+                    },
+
+                    {
+                        "aTargets": [0],
+                        "mData": 'invoiceId'
+                    },
+                    {
+                        "aTargets": [1],
+                        "mData": function(data){
+                            return formatVND(data.amount);
+                        }
+                    }
+                ],
+                "bAutoWidth": false,
+            }).fnSetFilteringDelay(delaySearch);
+            var sum = 0;
+            var i;
+            for (i = 0; i < data.length; i++) {
+                sum = sum + parseInt(data[i].amount);
+            }
+            $('#totalPrice').text(formatVND(sum));
+        }
+
+        var addToPaymentList = function (element, rentId, invoiceId, receivablesAmount, paymentId) {
+            var amount = $(element).parent().parent().parent().find("td:nth-child(6) input");
+            if ($(element).is(":checked")) {
+                if (amount.val() > receivablesAmount && amount.val() < 0) {
+                    amount.val('0');
+                } else {
+                    amount.val(receivablesAmount);
+                    var payment = {
+                        rentId: rentId,
+                        invoiceId: invoiceId,
+                        receivablesAmount: receivablesAmount,
+                        amount: amount.val(),
+                        paymentId : paymentId
+                    };
+                    var index = containsObject(payment, listPayment);
+                    if (index == -1) {
+                        listPayment.push(payment);
+                    } else {
+                        listPayment[index].amount = payment.amount;
+                    }
+                    var sum = 0;
+                    var i;
+                    for (i = 0; i < listPayment.length; i++) {
+                        sum = sum + parseInt(listPayment[i].amount);
+                    }
+                    $('#totalPriceOrder').text(formatVND(sum));
+                    $('#Amount').val(sum);
+                    $('#TotalInputAmount').val(sum);
+                }
+            } else {
+                amount.val('0');
+                var payment = {
+                    rentId: rentId,
+                    invoiceId: invoiceId,
+                    receivablesAmount: receivablesAmount,
+                    amount: amount.val(),
+                };
+                var index = containsObject(payment, listPayment);
+                if (index != -1) {
+                    listPayment.splice(index, 1);
+                }
+                var sum = 0;
+                var i;
+                for (i = 0; i < listPayment.length; i++) {
+                    sum = sum + parseInt(listPayment[i].amount);
+                }
+                $('#totalPriceOrder').text(formatVND(sum));
+                $('#Amount').val(sum);
+                $('#TotalInputAmount').val(sum);
+            }
+
+
+        }
+
+        var returnDefaultAmount = function (element, rentId, invoiceId, receivablesAmount, paymentId) {
+            if ($(element).val() > receivablesAmount) {
+                $(element).val('0');
+            } else if ($(element).val() != 0) {
+                var payment = {
+                    rentId : rentId,
+                    invoiceId : invoiceId,
+                    receivablesAmount : receivablesAmount,
+                    amount: $(element).val(),
+                    paymentId: paymentId
+                };
+                var index = containsObject(payment, listPayment);
+                if (index==-1) {
+                    listPayment.push(payment);
+                } else {
+                    listPayment[index].amount = payment.amount;
+                }
+                var sum = 0;
+                var i;
+                for (i = 0; i < listPayment.length; i++) {
+                    sum = sum + parseInt(listPayment[i].amount);
+                }
+                $('#totalPriceOrder').text(formatVND(sum));
+                $('#Amount').val(sum);
+                $('#TotalInputAmount').val(sum);
+                $(element).parent().parent().find("td label input").attr('checked', 'checked');
+
+            } else {
+                var payment = {
+                    rentId: rentId,
+                    invoiceId: invoiceId,
+                    receivablesAmount: receivablesAmount,
+                    amount: $(element).val(),
+                    paymentId: paymentId
+                };
+                var index = containsObject(payment, listPayment);
+                if (index != -1) {
+                    listPayment.splice(index, 1);
+                }
+                var sum = 0;
+                var i;
+                for (i = 0; i < listPayment.length; i++) {
+                    sum = sum + parseInt(listPayment[i].amount);
+                }
+                $('#totalPriceOrder').text(formatVND(sum));
+                $('#Amount').val(sum);
+                $('#TotalInputAmount').val(sum);
+                $(element).parent().parent().find("td label input").prop('checked', false);
+            }
+        }
+
+        var formatVND = function (x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        };
+        function containsObject(obj, list) {
+            var x;
+            for (x = 0; x < list.length;x++) {
+                if (list[x].rentId == obj.rentId) {
+                    return x;
+                }
+            }
+            return -1;
+        }
+    </script>
+}
+

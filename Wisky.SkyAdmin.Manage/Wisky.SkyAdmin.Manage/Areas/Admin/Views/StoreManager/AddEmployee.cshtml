@@ -1,0 +1,166 @@
+﻿@model IEnumerable<AspNetUserViewModel>
+@{
+    ViewBag.Title = "AddEmployee";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Thêm nhân viên vào cửa hàng</h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <a id="btn-comeback" class="btn btn-success" href="@Url.Action("Index","StoreManager")">
+                    Quay lại
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="allcust">
+                <!-- Datatable -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <table id="UserDatatable" class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <label class="">Số thứ tự</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Tên đăng nhập</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Tên nhân viên</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Tùy chọn</label>
+
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Customer Table -->
+
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            InitUserDatatable();
+
+            $('#btn-comeback').fixedScroll(70);
+        });
+
+        function InitUserDatatable() {
+            $("#UserDatatable").dataTable({
+                "bFilter": true,
+                "bRetrieve": true,
+                "bServerSide": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("LoadBrandEmployee")",
+                "bProcessing": true,
+                "bFilter": true,
+                "fnServerParams": function (aoData) {
+                    aoData.push(
+                        //{ "name": "storeId", "value": $('#storeId').val() },
+                        { "name": "filterId", "value": $('#filterId').val() },
+                        { "name": "customerTypeId", "value": $('#customerTypeId').val() }
+
+                    );
+                },
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Tên đăng nhập",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfo": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sInfoEmpty": "Hiển thị 0 từ 0 của 0 dòng",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2],
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [3],
+                        "mRender": function (data, type, row) {
+                            var data = row[3];
+                            var add = "<a class='btn btn-primary' title='Thêm nhân viên vào cửa hàng' onClick='addEmp(\"" + data + "\")'><i class='zmdi zmdi-plus'></i></a>";
+                            return add;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    }
+
+                ],
+                "bAutoWidth": false,
+            }).fnSetFilteringDelay(delaySearch);
+        }
+        //redraw datatable without reload
+        function reDrawDatatable(id) {
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+        }
+
+        //user datatable
+        function RefreshTable() {
+            reDrawDatatable("#UserDatatable");
+        }
+
+        function addEmp(data) {
+            if (confirm("Đồng ý thêm nhân viên này vào cửa hàng ?")) {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("AddEmp")',
+                    data: { id: data },
+                    success: function (result) {
+                        if (result.success) {
+                            ShowMessage("Thêm thành công", 2);
+                            RefreshTable();
+                        } else {
+                            ShowMessage("Thêm thất bại", 1);
+                        }
+                    },
+                    error: function (error) {
+                        ShowMessage("ErrorOccured", 1);
+                    }
+                });
+            }
+        }
+
+    </script>
+}

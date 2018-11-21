@@ -1,0 +1,1343 @@
+﻿@model Wisky.SkyAdmin.Manage.Areas.Admin.Models.ViewModels.ProductEditViewModel
+
+@{
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    //    var discountPriceName = Constants.DiscountPriceSpecificationName;
+    var productSpecifications = this.Model.ProductSpecifications;
+    var firstImage = true;
+    //var checkValue = true;
+    //if (this.Model.Product.ProductType == (int)ProductTypeEnum.CardPayment)
+    //{
+    //    checkValue = false;
+    //} else
+    //{
+    //    checkValue = true;
+    //}
+}
+<script src="http://cdn.ckeditor.com/4.6.2/standard-all/ckeditor.js"></script>
+<style>
+    .pair-group.btn,
+    .variant-group.btn {
+        font-weight: 500 !important;
+        padding-left: 13px !important;
+    }
+
+    .col-md-4 {
+        padding-top: 10px;
+    }
+
+    .width-100 {
+        width: 100%;
+    }
+
+    .select2-container.select2-choice {
+        display: block;
+        height: 35px;
+        padding: 0 0 0 8px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #e0e0e0 !important;
+        white-space: nowrap;
+        line-height: 35px;
+        color: #444;
+        text-decoration: none;
+        border-radius: 0px;
+        user-select: none;
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #fff));
+    }
+
+    .select2-arrow {
+        opacity: 1;
+    }
+
+    .select2-container.select2-choice.select2-arrow {
+        display: inline-block;
+        width: 18px;
+        height: 100%;
+        position: absolute;
+        right: 0;
+        top: 3px;
+        border-left: 0px;
+        border-radius: 0px;
+        background-clip: padding-box;
+        /* background: #ccc; */
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #fff));
+        background-image: -webkit-linear-gradient(center bottom, #fff 0%, #fff 60%);
+        background-image: -moz-linear-gradient(center bottom, #fff 0%, #fff 60%);
+    }
+</style>
+
+<div class="card">
+
+    <form role="form" method="post">
+
+        @this.Html.AntiForgeryToken()
+        @*@this.Html.HiddenFor(q => q.ProductID)
+            @this.Html.HiddenFor(q => q.Active)*@
+        @this.Html.HiddenFor(q => q.Product.ProductID)
+        @this.Html.HiddenFor(q => q.Product.GeneralProductId)
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    @if (this.Model.ProductName == null)
+                    {
+                        <h3 class="margin-bottom30">Thêm mới sản phẩm</h3>
+                    }
+                    else
+                    {
+                        <h3 class="margin-bottom30">Chỉnh sửa sản phẩm: <strong>@this.Model.ProductName</strong></h3>
+                    }
+                </div>
+                <div class="col-md-6 text-right">
+                    <ul class="actions">
+                        <li class="m-r-10">
+                            <a href="@this.Url.Action("Index", new { parameters = currentStoreDomain.Directory })" class="btn btn-success myComeback">Quay lại</a>
+                        </li>
+                        <li>
+                            <button type="button" class="btn btn-primary" id="btn-submit-product">Hoàn tất</button>
+                            <button type="submit" class="btn btn-success" style="display: none"></button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+
+
+        @if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+        {
+            <div class="card">
+                <div class="card-body card-padding text-danger">
+                    @this.Html.ValidationSummary()
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="card-body card-padding">
+                <!--Thông tin chính-->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin chính</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+                        <div class="col-md-6">
+                            <div class="form-group  row">
+                                <label for="Product_Code" class="control-label col-md-4">Mã sản phẩm</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.Code, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group  row">
+                                <label for="Product_ProductName" class="control-label col-md-4">Tên sản phẩm</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @*@Html.TextBoxFor(q => q.Product.ProductName, new { @class = "form-control" })*@
+                                        <input class="form-control seo-source" data-seo-target="#Product_SeoName" value="@this.Model.Product.ProductName" id="@(Html.IdFor(q => q.Product.ProductName))" name="@(Html.NameFor(q => q.Product.ProductName))" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group  row">
+                                <label for="Product_ProductType" class="control-label col-md-4">Loại sản phẩm</label>
+                                <div class="col-md-8 p-l-10">
+                                    <div class="group-radio-buttons myGroup-radio-buttons">
+                                        <div class="col-md-4 p-l-0 p-t-0">
+                                            @Html.RadioButtonFor(q => q.SelectedType, (int)ProductTypeEnum.Single, new { @class = "nice-check", id = "filter-type0" })
+                                            <label for="filter-type0"><span>SP đơn</span></label>
+                                        </div>
+                                        <div class="col-md-4 p-l-0 p-t-0">
+                                            @Html.RadioButtonFor(q => q.SelectedType, (int)ProductTypeEnum.Extra, new { @class = "nice-check", id = "filter-type2" })
+                                            @*< input type="radio" name="filter-type" value="False" class="nice-check" id="filter-type2" />*@
+                                            <label for="filter-type2"><span>Extra</span></label>
+                                        </div>
+                                        <div class="col-md-4 p-l-0 p-t-0">
+                                            @Html.RadioButtonFor(q => q.SelectedType, (int)ProductTypeEnum.Combo, new { @class = "nice-check", id = "filter-type1" })
+                                            <label for="filter-type1"><span>Combo</span></label>
+                                        </div>
+                                        <div class="col-md-4 p-l-0 p-t-0">
+                                            @Html.RadioButtonFor(q => q.SelectedType, (int)ProductTypeEnum.CardPayment, new { @class = "nice-check", id = "filter-type3" })
+                                            <label for="filter-type3"><span>Thẻ</span></label>
+                                        </div>
+                                    </div>
+                                    @*<div class="fg-line">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" id="Product_HasExtra" name="Product.HasExtra" @((this.Model.Product.HasExtra) ? "checked" : null) value="true" />
+                                                    <i class="input-helper"></i>
+                                                </label>
+                                            </div>
+                                        </div>*@
+                                </div>
+                            </div>
+                            <div class="form-group row" id="listCateMember">
+                                <label for="Product_CatID" class="control-label col-md-4">Nhóm sản phẩm</label>
+                                <div class="col-md-8" hidden id="AvailableCategoriesMemberCard">
+                                    @Html.DropDownListFor(q => q.Product.MaxExtra, this.Model.AvailableCategoriesMemberCard, new { @class = "selectpicker form-controll width-100" })
+                                </div>
+                                <div class="col-md-8" id="AvailableCategories">
+                                    @Html.DropDownListFor(q => q.Product.CatID, this.Model.AvailableCategories, new { @class = "selectpicker form-controll width-100" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4">Bộ sưu tập</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        <select class="selectpicker form-control" name="@this.Html.NameFor(q => q.SelectedProductCollections)" multiple data-live-search="true" data-size="7">
+                                            @foreach (var item in this.Model.AvailableCollections)
+                                            {
+                                                <option value="@(item.Value)" selected="@(item.Selected ? "" : null)">@(item.Text)</option>
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="form-group row" id="AvailableCategoriesCode">
+                                    <label for="Product_CatID" class="control-label col-md-4">Nhóm sản phẩm</label>
+                                    @if (this.Model.Product.ProductType == (int)ProductTypeEnum.CardPayment)
+                                    {
+                                        <div class="col-md-8">
+                                            @Html.DropDownListFor(q => q.Product.CatID, this.Model.AvailableCategoriesMemberCard, new { @class = "selectpicker form-controll width-100" })
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                    <div class="col-md-8">
+                                            @Html.DropDownListFor(q => q.Product.CatID, this.Model.AvailableCategories, new { @class = "selectpicker form-controll width-100" })
+                                        </div>
+                                    }
+                                </div>*@
+                            @*<div class="form-group row" id="listCateMember">
+                                    <label for="Product_CatID" class="control-label col-md-4">Nhóm sản phẩm</label>
+                                    <div class="col-md-8" hidden id="AvailableCategoriesMemberCard">
+                                        @Html.DropDownListFor(q => q.Product.MaxExtra, this.Model.AvailableCategoriesMemberCard, new { @class = "selectpicker form-controll width-100" })
+                                    </div>
+                                    <div class="col-md-8" id="AvailableCategories">
+                                        @Html.DropDownListFor(q => q.Product.CatID, this.Model.AvailableCategories, new { @class = "selectpicker form-controll width-100"})
+                                    </div>
+                                </div>*@
+                            @*pha cho nay*@
+                            <div class="form-group row">
+                                <label for="Product_Price" class="control-label col-md-4">Giá sản phẩm</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @*@Html.TextBoxFor(q => q.Product.Price, new { @class = "form-control number" })*@
+                                        @this.Html.HiddenFor(q => q.Product.Price)
+                                        <input type="text" value="@Model.Product.Price" id="Product_Price_Tmp" class="form-control currency number" />
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="form-group  row" id="Product_DiscountPercentShow">
+                                <label for="Product_DiscountPercent" class="control-label col-md-4">Giảm giá (%)</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.DiscountPercent, new { @class = "form-control number" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            @*<div class="form-group row">
+                                    <label for="Product_ProductType" class="control-label col-md-4">Thường dùng </label>
+                                    <div class="col-md-4">
+                                        <div class="fg-line">
+                                            <div class="checkbox">
+                                                <label>
+                                                    <input type="checkbox" id="Product_IsMostOrdered" name="Product.IsMostOrdered" @((this.Model.Product.IsMostOrdered) ? "checked" : null) value="true" />
+                                                    <i class="input-helper"></i>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>*@
+
+                        </div>
+                        <div class="col-md-6">
+                            <div>
+                                <input type="hidden" id="PicURL" data-name="@this.Html.NameFor(q => q.SelectedImages)" />
+                                <div style="display: none">
+                                    <input type="file" hidden id="uploadImage" accept="image/gif, image/jpeg, image/png" class="btn btn-sm btn-success uploadImageToBlob" multiple />
+                                </div>
+                                <button type="button" id="btnUploadImage" class="btn btn-sm btn-success">
+                                    <i class="fa fa-cloud-upload"></i> Thêm Hình Ảnh
+                                </button>
+                            </div>
+                            <div class="row sm-margin">
+                                <div class="col-md-4">
+                                    <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                                        @if (this.Model.ProductImages != null && this.Model.ProductImages.Count() > 0 && !string.IsNullOrEmpty(this.Model.ProductImages.First().ImageUrl))
+                                        {
+                                            var url = this.Model.ProductImages.First().ImageUrl;
+
+                                            <li class="col-md-4 photo-item removeable">
+                                                <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                    <div class="ratio-item">
+                                                        <div class="img-container">
+                                                            <img src="@(url)" />
+                                                        </div>
+                                                        <input type="hidden" name="@this.Html.NameFor(q => q.SelectedImages)" value="@(url)" />
+                                                        <span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                        else
+                                        {
+                                            <li class="col-md-4 photo-item removeable">
+                                                <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                    <div class="ratio-item">
+                                                        <div class="img-container">
+                                                            <img id="imgName" src="/Content/images/Default_product_img.jpg" />
+                                                        </div>
+                                                        <input type="hidden" id="imgValue" name="@this.Html.NameFor(q => q.SelectedImages)" />
+                                                        <span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
+                                <div class="col-md-8">
+                                    <ul class="row sm-margin images-preview" id="images-preview">
+                                        @if (this.Model.ProductImages != null && this.Model.ProductImages.Count() > 1)
+                                        {
+                                            foreach (var image in this.Model.ProductImages)
+                                            {
+                                                if (firstImage)
+                                                {
+                                                    firstImage = false;
+                                                    continue;
+                                                }
+
+                                                var url = image.ImageUrl;
+
+                                                <li class="col-md-4 photo-item removeable">
+                                                    <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                        <div class="ratio-item">
+                                                            <div class="img-container">
+                                                                <img src="@(url)" />
+                                                            </div>
+                                                            <input type="hidden" name="@this.Html.NameFor(q => q.SelectedImages)" value="@(url)" />
+                                                            <span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="form-group  row">
+                                <label for="Product_IsAvailable" class="control-label col-md-4">Kích hoạt</label>
+                                <div class="col-md-4 p-t-0">
+                                    <div class="fg-line">
+                                        <div class="checkbox">
+                                            <label>
+                                                <input type="checkbox" id="Product_IsAvailable" name="Product.IsAvailable" @(ViewBag.Mode == "Create" || this.Model.Product.IsAvailable ? "checked" : null) value="true" />
+                                                <i class="input-helper"></i>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group ">
+                                <label for="inputDescription" class="control-label">Mô tả</label>
+                                <div class="fg-line" style="float:none">
+                                    @this.Html.EditorFor(q => q.Product.Description, new
+                               {
+                                   TextArea = true,
+                                   Rows = 5,
+                               })
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--./Thông tin chính-->
+                <!--Combo-->
+                <div class="card" id="combo-container" style="display:none">
+                    <div class="card-header">
+                        <h2>Combo</h2>
+                    </div>
+                    <div id="combo-details" class="card-body card-padding">
+                        <div class="form-horizontal">
+                            @*@Html.DropDownList("ProductComboDetails.ProductID", this.Model.AvailableComboProducts, new { @class = "selectpicker", title = "Sản phẩm" })*@
+                            <div class="combo-pair-panel">
+                                @if (Model.ProductComboDetails != null)
+                                {
+                                    foreach (var product in Model.ProductComboDetails)
+                                    {
+                                        <div class="combo-pair-group form-group xs-margin">
+                                            <div class="col-sm-4">
+                                                <div class="fg-line">
+                                                    <input type="text" name="ComboProduct" placeholder="Chọn Sản phẩm" class="col-md-12 p-r-0 p-l-0" />
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="fg-line">
+                                                    <input type="number" min="1" name="ComboQty" class="form-control" value="@product.Quantity" data-id="" placeholder="Số lượng" />
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <button type="button" class="btn btn-danger form-control myForm" data-action="remove-pair-group">
+                                                    <i class="glyphicon glyphicon-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-default btn-icon-text waves-effect" data-action="add-combo-pair-group">
+                                        <i class="zmdi zmdi-plus"></i>Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--./Combo-->
+                <!--General Product-->
+                @if (this.Model.Product.GeneralProductId != null || String.IsNullOrEmpty(this.Model.Product.ProductName))
+                {
+                    <div class="card" id="Product_types">
+                        <div class="card-header">
+                            <h2>Dòng sản phẩm</h2>
+                        </div>
+                        <div class="card-body card-padding row">
+                            @if (this.Model.Product.GeneralProductId == null)
+                            {
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-12 m-b-15">
+                                            <div class="toggle-switch" data-ts-color="green">
+                                                <label for="selectedGeneralProduct" class="ts-label">Thuộc dòng sản phẩm?</label>
+                                                <input name="selectedGeneralProduct" id="selectedGeneralProduct" type="checkbox" onchange="onChangeGeneralProduct()" value="true" hidden />
+                                                <label for="selectedGeneralProduct" class="ts-helper"></label>
+                                            </div>
+                                        </div>
+
+                                        <div id="ddlGeneralProduct" hidden>
+                                            <div class="col-md-4">
+                                                Dòng sản phẩm
+                                            </div>
+                                            <div class="col-md-8">
+                                                <input name="ddlProduct" id="ddlProduct" style="width: 80%; margin-top: 7px;" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6" style="margin-top: -10px;">
+                                    <div id="listAtt">
+
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <h4>&nbsp; &nbsp;@(this.Model.GeneralProduct.ProductName)</h4>
+                                if (!String.IsNullOrEmpty(this.Model.GeneralProduct.Att1))
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label for="Product_SeoKeyWords" class="control-label col-md-4">@(this.Model.GeneralProduct.Att1)</label>
+                                            <div class="col-md-8">
+                                                <div class="fg-line">
+                                                    <input class="form-control" name="Atts" value="@(this.Model.Product.Att1)" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                if (!String.IsNullOrEmpty(this.Model.GeneralProduct.Att2))
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="control-label col-md-4">@(this.Model.GeneralProduct.Att2)</label>
+                                            <div class="col-md-8">
+                                                <div class="fg-line">
+                                                    <input class="form-control" name="Atts" value="@(this.Model.Product.Att2)" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                                if (!String.IsNullOrEmpty(this.Model.GeneralProduct.Att3))
+                                {
+                                    <div class="col-md-6">
+                                        <div class="form-group row">
+                                            <label class="control-label col-md-4">@(this.Model.GeneralProduct.Att3)</label>
+                                            <div class="col-md-8">
+                                                <div class="fg-line">
+                                                    <input class="form-control" name="Atts" value="&nbsp;@(this.Model.Product.Att3)" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                }
+                            }
+
+
+
+                            <div class="col-md-4" id="list-header"></div>
+                        </div>
+
+
+                    </div>
+                }
+                <!--./General Product-->
+                <!--10 thuộc tính-->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thuộc tính sản phẩm</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <label>Tên</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <label>Giá trị thuộc tính</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <input type="text" class="form-control" readonly id="nameAtt1" placeholder="Thuộc tính 1" value="@(!String.IsNullOrEmpty(Model.Product.Att1)?Model.Product.Att1.Split(':')[0]:"")">
+                                    <input type="hidden" name="Att1" />
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <select class="form-control selectpicker" id="Att1" multiple></select>
+                                    @*<input type="text" class="form-control" id="Att1" value="@(!String.IsNullOrEmpty(Model.Product.Att1)?@Model.Product.Att1.Split(':')[1]:"")">*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <input type="text" class="form-control" readonly id="nameAtt2" placeholder="Thuộc tính 2" value="@(!String.IsNullOrEmpty(Model.Product.Att2)?@Model.Product.Att2.Split(':')[0]:"")">
+                                    <input type="hidden" name="Att2" />
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <select class="form-control selectpicker" id="Att2" multiple></select>
+                                    @*<input type="text" class="form-control" id="Att2" value="@(!String.IsNullOrEmpty(Model.Product.Att2)?@Model.Product.Att2.Split(':')[1]:"")">*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <input type="text" class="form-control" readonly id="nameAtt3" placeholder="Thuộc tính 3" value="@(!String.IsNullOrEmpty(Model.Product.Att3)?@Model.Product.Att3.Split(':')[0]:"")">
+                                    <input type="hidden" name="Att3" />
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <select class="form-control selectpicker" id="Att3" multiple></select>
+                                    @*<input type="text" class="form-control" id="Att3" value="@(!String.IsNullOrEmpty(Model.Product.Att3)?@Model.Product.Att3.Split(':')[1]:"")">*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <input type="text" class="form-control" readonly id="nameAtt4" placeholder="Thuộc tính 4" value="@(!String.IsNullOrEmpty(Model.Product.Att4)?@Model.Product.Att4.Split(':')[0]:"")">
+                                    <input type="hidden" name="Att4" />
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <select class="form-control selectpicker" id="Att4" multiple></select>
+                                    @*<input type="text" class="form-control" id="Att4" value="@(!String.IsNullOrEmpty(Model.Product.Att4)?@Model.Product.Att4.Split(':')[1]:"")">*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <input type="text" class="form-control" readonly id="nameAtt5" placeholder="Thuộc tính 5" value="@(!String.IsNullOrEmpty(Model.Product.Att5)?@Model.Product.Att5.Split(':')[0]:"")">
+                                    <input type="hidden" name="Att5" />
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <select class="form-control selectpicker" id="Att5" multiple></select>
+                                    @*<input type="text" class="form-control" id="Att5" value="@(!String.IsNullOrEmpty(Model.Product.Att5)?@Model.Product.Att5.Split(':')[1]:"")">*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <input type="text" class="form-control" readonly id="nameAtt6" placeholder="Thuộc tính 6" value="@(!String.IsNullOrEmpty(Model.Product.Att6)?@Model.Product.Att6.Split(':')[0]:"")">
+                                    <input type="hidden" name="Att6" />
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <select class="form-control selectpicker" id="Att6" multiple></select>
+                                    @*<input type="text" class="form-control" id="Att6" value="@(!String.IsNullOrEmpty(Model.Product.Att6)?@Model.Product.Att6.Split(':')[1]:"")">*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <input type="text" class="form-control" readonly id="nameAtt7" placeholder="Thuộc tính 7" value="@(!String.IsNullOrEmpty(Model.Product.Att7)?@Model.Product.Att7.Split(':')[0]:"")">
+                                    <input type="hidden" name="Att7" />
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <select class="form-control selectpicker" id="Att7" multiple></select>
+                                    @*<input type="text" class="form-control" id="Att7" value="@(!String.IsNullOrEmpty(Model.Product.Att7)?@Model.Product.Att7.Split(':')[1]:"")">*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <input type="text" class="form-control" readonly id="nameAtt8" placeholder="Thuộc tính 8" value="@(!String.IsNullOrEmpty(Model.Product.Att8)?@Model.Product.Att8.Split(':')[0]:"")">
+                                    <input type="hidden" name="Att8" />
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <select class="form-control selectpicker" id="Att8" multiple></select>
+                                    @*<input type="text" class="form-control" id="Att8" value="@(!String.IsNullOrEmpty(Model.Product.Att8)?@Model.Product.Att8.Split(':')[1]:"")">*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <input type="text" class="form-control" readonly id="nameAtt9" placeholder="Thuộc tính 9" value="@(!String.IsNullOrEmpty(Model.Product.Att9)?@Model.Product.Att9.Split(':')[0]:"")">
+                                    <input type="hidden" name="Att9" />
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <select class="form-control selectpicker" id="Att9" multiple></select>
+                                    @*<input type="text" class="form-control" id="Att9" value="@(!String.IsNullOrEmpty(Model.Product.Att9)?@Model.Product.Att9.Split(':')[1]:"")">*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="col-sm-4 m-b-5">
+                                <div class="form-group fg-line">
+                                    <input type="text" class="form-control" readonly id="nameAtt10" placeholder="Thuộc tính 10" value="@(!String.IsNullOrEmpty(Model.Product.Att10)?@Model.Product.Att10.Split(':')[0]:"")">
+                                    <input type="hidden" name="Att10" />
+                                </div>
+                            </div>
+                            <div class="col-sm-8 m-b-5">
+                                <div class="form-group fg-line">
+                                    <select class="form-control selectpicker" id="Att10" multiple></select>
+                                    @*<input type="text" class="form-control" id="Att10" value="@(!String.IsNullOrEmpty(Model.Product.Att10)?@Model.Product.Att10.Split(':')[1]:"")">*@
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <!--./10 thuộc tính-->
+                <!--Từ khóa SEO-->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Seo</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="Product_SeoKeyWords" class="control-label col-md-4">Từ khóa SEO</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.SeoKeyWords, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="Product_SeoDescription" class="control-label col-md-4">Mô tả SEO</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.SeoDescription, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label for="Product_SeoName" class="control-label col-md-4">Đường dẫn SEO</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Product.SeoName, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--./Từ khóa SEO-->
+                <!--Thông số-->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông số</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="form-horizontal">
+                            <div class="pair-panel">
+                                @if (productSpecifications != null)
+                                {
+                                    foreach (var spec in productSpecifications)
+                                    {
+                                        <div class="pair-group form-group xs-margin">
+                                            <div class="col-sm-4">
+                                                <div class="fg-line">
+                                                    <input type="text" class="form-control" name="Specifications.Name" placeholder="Tên" value="@(spec.Name)">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="fg-line">
+                                                    <input type="text" class="form-control" name="Specifications.Value" placeholder="Nội dung" value="@(spec.Value)">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-2">
+                                                <button type="button" class="btn btn-danger form-control myForm" data-action="remove-pair-group">
+                                                    <i class="glyphicon glyphicon-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-12">
+                                    <button type="button" class="btn btn-default btn-icon-text waves-effect" data-action="add-pair-group">
+                                        <i class="zmdi zmdi-plus"></i>Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--./Thông số-->
+                <!--Cấu hình POS-->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Cấu hình POS</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+                        <div class="form-horizontal">
+                            <div class="Advance-Setting-panel">
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <div class="col-sm-12">
+                                        <button type="button" class="btn btn-default btn-icon-text waves-effect" data-action="add-adv-setting">
+                                            <i class="zmdi zmdi-settings"></i>Cài đặt nâng cao
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="advPanel" class="group-append">
+                                    <div class="card-header">
+                                        <h2>Cài đặt nâng cao</h2>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="Ưu tiên hiển thị" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                <input type="number" class="form-control" id="displayPriority" name="@(Html.NameFor(a => a.Product.Position))" value="@(Model.Product.Position)" placeholder="Ưu tiên hiển thị" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="Thứ tự xuất hiện" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                <input type="number" class="form-control" id="displayOrder" name="@(Html.NameFor(a => a.Product.DisplayOrder))" value="@(Model.Product.DisplayOrder)" placeholder="Vị trí xuất hiện" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="X" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                <input type="number" class="form-control" id="txtX" name="@(Html.NameFor(a => a.Product.PosX))" value="@(Model.Product.PosX)" placeholder="X" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="Y" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                <input type="number" class="form-control" id="txtY" name="@(Html.NameFor(a => a.Product.PosY))" value="@(Model.Product.PosY)" placeholder="Y" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="Nhóm màu" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                @Html.EnumDropDownListFor(q => q.ProductColorGroup, new { @class = "selectpicker" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="Nhóm" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                @Html.EnumDropDownListFor(q => q.ProductGroup, new { @class = "selectpicker" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-5">
+
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" readonly placeholder="Thường dùng" />
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-7">
+                                            <div class="fg-line">
+                                                <div class="checkbox">
+                                                    <label>
+                                                        <input type="checkbox" id="Product_IsMostOrdered" name="Product.IsMostOrdered" @((this.Model.Product.IsMostOrdered) ? "checked" : null) value="true" />
+                                                        <i class="input-helper"></i>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-12">
+                                            <button type="button" class="btn btn-default btn-icon-text waves-effect" data-action="remove-advSet">
+                                                <i class="zmdi zmdi-replay"></i>Ẩn cài đặt
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--./Cấu hình POS-->
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<!-- Template Combo Pair Group -->
+<template id="templateComboPairGroup">
+    <div class="combo-pair-group form-group xs-margin">
+        <div class="col-sm-4">
+            <div class="fg-line">
+                <input type="text" name="ComboProduct" placeholder="Chọn Sản phẩm" class="col-md-12 p-r-0 p-l-0" />
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="fg-line">
+                <input type="number" min="1" name="ComboQty" class="form-control" data-id="" placeholder="Số lượng" />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <button type="button" class="btn btn-danger form-control myForm" data-action="remove-pair-group">
+                <i class="glyphicon glyphicon-trash"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Template Pair Group -->
+<template id="templatePairGroup">
+    <div class="pair-group form-group xs-margin">
+        <div class="col-sm-4">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="Specifications.Name" placeholder="Tên" />
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="Specifications.Value" placeholder="Nội dung" />
+            </div>
+        </div>
+        <div class="col-sm-2" style="align-items:center">
+            <button type="button" class="btn btn-danger form-control myForm" data-action="remove-pair-group">
+                <i class="glyphicon glyphicon-trash" style="margin-right: 12px;"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Template Photo Block -->
+<template id="tmpPhotoBlock">
+    <li class="col-md-4 photo-item removeable">
+        <div class="ratio-wrapper ratio-wrapper-1-1">
+            <div class="ratio-item">
+                <div class="img-container">
+                    <img />
+                </div>
+                <input type="hidden" name="@this.Html.NameFor(q => q.SelectedImages)" value="" />
+            </div>
+        </div>
+    </li>
+</template>
+
+<script>
+    var firstImage = '@firstImage'.toLowerCase() === 'true';
+    var comboProducts = [];
+
+    var att1 = "@Html.Raw(Model.Product.Att1)";
+    var att2 = "@Html.Raw(Model.Product.Att2)";
+    var att3 = "@Html.Raw(Model.Product.Att3)";
+    var att4 = "@Html.Raw(Model.Product.Att4)";
+    var att5 = "@Html.Raw(Model.Product.Att5)";
+    var att6 = "@Html.Raw(Model.Product.Att6)";
+    var att7 = "@Html.Raw(Model.Product.Att7)";
+    var att8 = "@Html.Raw(Model.Product.Att8)";
+    var att9 = "@Html.Raw(Model.Product.Att9)";
+    var att10 = "@Html.Raw(Model.Product.Att10)";
+
+    function onChangeGeneralProduct() {
+        $('#ddlGeneralProduct').slideToggle(100);
+    }
+    $('#Product_ProductType').on('change', function () {
+        if ($('#Product_ProductType').is(':checked')) {
+            $('#Product_types').hide();
+        } else {
+            $('#Product_types').show();
+        }
+    });
+
+    $('input[name=SelectedType]').on('change', function () {
+        if ($('input[name=SelectedType]:checked').val() == "@Html.Raw((int)ProductTypeEnum.Combo)") {
+            $("#combo-container").show();
+            $('#Product_types').hide();
+            $("#Product_DiscountPercentShow").show();
+            $("#AvailableCategoriesMemberCard").hide();
+            $("#AvailableCategories").show();
+            //checkValue = true;
+            //$("#AvailableCategoriesCode").reload(location.href + " #AvailableCategoriesCode");
+            //changeCategory();
+            loadComboProductddl();
+        } else if ($('input[name=SelectedType]:checked').val() == "@Html.Raw((int)ProductTypeEnum.CardPayment)") {
+            $("#Product_DiscountPercentShow").hide();
+            $("#combo-container").hide();
+            $('#Product_types').hide();
+            //changeCategory();
+            //checkValue = false;
+            $("#AvailableCategoriesMemberCard").show();
+            $("#AvailableCategories").hide();
+            //$("#AvailableCategoriesCode").reload(location.href + " #AvailableCategoriesCode");
+
+        }
+        else {
+            $("#Product_DiscountPercentShow").show();
+            $("#combo-container").hide();
+            $('#Product_types').show();
+            //changeCategory();
+            $("#AvailableCategoriesMemberCard").hide();
+            $("#AvailableCategories").show();
+            //checkValue = true;
+            //$("#AvailableCategoriesCode").reload(location.href + " #AvailableCategoriesCode");
+        }
+        //$("#AvailableCategoriesCode").load(location.href + " #AvailableCategoriesCode");
+
+    });
+
+    $("#Product_CatID").attr('data-live-search', true);
+
+    $("#Product_CatID").on('change', function () {
+        if ($('#Product_CatID').val().length != 0) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("LoadParentCategoryAttribute", "ProductCategory")',
+                data: { "Id": $('#Product_CatID').val() },
+                success: function (result) {
+                    if (result.success) {
+                        for (var i = 1; i <= 10; i++) {
+                            $("#nameAtt" + i).val('');
+                            $("#Att" + i).empty();
+                        }
+                        for (var i = 0; i < 10; i++) {
+                            if (result.result[i] != null && result.result[i] != "") {
+                                $("#nameAtt" + (i + 1)).val(result.result[i].split(':')[0]);
+                                var listAtt = result.result[i].split(':')[1].trim().split(';');
+                                for (var a = 0; a < listAtt.length; a++) {
+                                    if (listAtt[a].length>0) {
+                                        $("#Att" + (i + 1)).append("<option value='" + listAtt[a] + "'>" + listAtt[a] + "</option>");
+                                    }
+                                }
+                            }
+                        }
+                        if (att1 != null && att1.length != 0) {
+                            $("#Att1").selectpicker('val',att1.split(':')[1].split(';'));
+                        }
+                        if (att2 != null && att2.length != 0) {
+                            $("#Att2").selectpicker('val', att2.split(':')[1].split(';'));
+                        }
+                        if (att3 != null && att3.length != 0) {
+                            $("#Att3").selectpicker('val', att3.split(':')[1].split(';'));
+                        }
+                        if (att4 != null && att4.length != 0) {
+                            $("#Att4").selectpicker('val', att4.split(':')[1].split(';'));
+                        }
+                        if (att5 != null && att5.length != 0) {
+                            $("#Att5").selectpicker('val', att5.split(':')[1].split(';'));
+                        }
+                        if (att6 != null && att6.length != 0) {
+                            $("#Att6").selectpicker('val', att6.split(':')[1].split(';'));
+                        }
+                        if (att7 != null && att7.length != 0) {
+                            $("#Att7").selectpicker('val', att7.split(':')[1].split(';'));
+                        }
+                        if (att8 != null && att8.length != 0) {
+                            $("#Att8").selectpicker('val', att8.split(':')[1].split(';'));
+                        }
+                        if (att9 != null && att9.length != 0) {
+                            $("#Att9").selectpicker('val', att9.split(':')[1].split(';'));
+                        }
+                        if (att10 != null && att10.length != 0) {
+                            $("#Att10").selectpicker('val', att10.split(':')[1].split(';'));
+                        }
+                        $('.selectpicker').selectpicker('refresh');
+                    } else {
+                        ShowMessage("Có lỗi xảy ra!", 1);
+                    }
+                },
+                error: function () {
+                    ShowMessage("Có lỗi xảy ra!", 1);
+                }
+            });
+        } else {
+
+        }
+    });
+
+    function loadComboProductddl(){
+        $('input[name=ComboProduct]').select2({
+            placeholder: "Chọn sản phẩm",
+            closeOnSelect: true,
+            data: comboProducts,
+            formatSearching: function () {
+                return "Tìm kiếm...";
+            },
+            formatNoMatches: function (term) {
+                return "Không tìm thấy sản phẩm '" + term + "'";
+            },
+        }).on('change', function(e){
+            var index = $('input[name=ComboProduct]').index($(e.target));
+            var id = e.added.id;
+            //var indexInCombo = comboProducts.indexOf(e.added);
+            //if(indexInCombo > -1 ){
+            //    comboProducts.splice(indexInCombo, 1);
+            //}
+            //$.each($('input[name=ComboProduct]'), function(index, el){
+            //    var indexInArr = comboProducts.indexOf()
+            //});
+            if(e.removed != null){
+                e.removed.disabled = false;
+            }
+            $('input[name=ComboProduct]').eq(index).select2("data").disabled = true;
+            $('input[name=ComboQty]').eq(index).data("id",id);
+        });;
+    }
+
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+        $("#Product_CatID").change();
+        var re = /^((0|[1-9]\d?)(\.\d{1,2})?|100(\.00?)?)$/;
+        $("#Product_DiscountPercent").val("@(this.Model.Product.DiscountPercent + "%")");
+        $("#Product_DiscountPercent").blur(function () {
+            var data = $(this).val();
+            if (re.test(data)) {
+                data = data + "%";
+                $(this).val(data);
+            } else {
+                var y = parseFloat(data);
+                if (re.test(y)) {
+                    y = y + "%";
+                    $(this).val(y);
+                } else {
+                    $(this).val("@(this.Model.Product.DiscountPercent + "%")");
+                }
+            }
+        });
+
+        $('#Product_Price_Tmp').blur(function()
+        {
+            var str = $(this).val() + "";
+            var data = str.replace(/[,.đ]/g,'');
+            $("input[name='Product.Price']").val(data);
+        });
+
+        windowWidth = $(window).width();
+
+        @*if("@Model.Product" != null){
+             $('input[name=SelectedType][value=' + @Model.Product.ProductType +']').prop('checked', 'checked');
+        }*@
+        @*if ($('input[name=SelectedType]:checked').val() == "@Html.Raw((int)ProductTypeEnum.Combo)") {
+            $("#combo-container").show();
+            $('#Product_types').hide();
+            loadComboProductddl();
+        }*@
+
+        $.each(@Html.Raw(Json.Encode(Model.AvailableComboProducts)), function(index, el){
+            comboProducts.push({
+                id: el.Value,
+                text: el.Text,
+                disabled: el.Selected,
+            });
+        });
+
+        // validate number
+        $(".number").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+        $('#Product_types').show();
+        //CKEDITOR.replace('#Product.Description');
+        //SKYWEB.Admin.General.setupElfinderToCkeditor('Product_Description');
+        //$("#Product_Description").summernote({
+        //    height: 150,
+        //});
+        //SKYWEB.Admin.Product.addPairGroup();
+        //var target = $(this).parents('.group-append');
+        $('#advPanel').hide();
+
+
+
+        $('#selectedGeneralProduct').on('change', function () {
+            if ($('#selectedGeneralProduct').is(':checked')) {
+                //$('#Product_CatID').prop('disabled', 'disabled');
+                $('#Product_CatID').val(0).change();//reset value
+                $.ajax({
+                    url: "@Url.Action("GetListGeneralProduct")",
+                    type: 'POST',
+                    success: function (data) {
+                        if (data.success) {
+                            window['general-prouduct-list'] = data.data;
+                            $('#ddlProduct').select2({
+                                formatResult: formatSelect2,
+                                formatSelection: formatSelectedSelect2,
+                                data: getListProduct,
+                                matcher: filterFunction,
+                                allowClear: true,
+                            });
+                        }
+                    }
+                });
+
+                function filterFunction(term, text, ele) {
+                    return term === '' || ele.text.toLowerCase().indexOf(term.toLowerCase()) > -1;
+                }
+
+                function getListProduct() {
+                    var term = '';
+                    if (event.target.tagName === 'INPUT') {
+                        term = $(event.target).val().toLowerCase();
+                    }
+                    var count = 0;
+                    var tmp = window['general-prouduct-list'].filter(function (ele) {
+                        if (ele.text != null) {
+                            var text = ele.text.toLowerCase()
+                            if (text == undefined)
+                                return false;
+                            else {
+                                return term === '' || text.indexOf(term) > -1;
+                            }
+                        }
+                    });
+                    return {
+                        text: 'id',
+                        results: tmp.slice(0, 100)
+                    };
+                }
+
+
+
+                function formatSelect2(state) {
+                    var markup = state.text;
+                    return markup;
+                }
+                function formatSelectedSelect2(state) {
+                    loadCategory(state.id);
+                    return state.text;
+                }
+                function loadCategory(id) {
+                    $.ajax({
+                        url: '@Url.Action("GetGeneralProduct")',
+                        type: 'POST',
+                        data: {
+                            'id': id
+                        },
+                        success: function (data) {
+                            if (data.success) {
+                                $('#Product_CatID').val(data.categoryId).change();
+                            }
+                            $('#listAtt').html("");
+                            $('#list-header').html('<div class="card-header"><h2>Thuộc tính</h2></div>');
+                            data.Atts.forEach(function (item) {
+                                $('#listAtt').append('<div class="form-group row"><div class="col-md-4" style="padding-top: 7px;"><label class="control-label">' + item + '</label></div><div class="col-md-8"><input name="Atts" class="form-control"></div></div>');
+                            });
+                        },
+                        error: function (e) {
+                            ShowMessage('Có lỗi xảy ra. Vui lòng liên hệ admin', 1);
+                        }
+                    });
+                }
+            }
+            else {
+                $('#Product_CatID').prop('disabled', false);
+                //$('#Product_CatID').val(1).change();//reset value
+            }
+        })
+
+        $("#btnUploadImage").on('click', function () {
+            $('#uploadImage').click();
+        });
+
+        $("#uploadImage").on('change', function () {
+            var files = this.files;
+
+            // Kiểm tra file extension hợp lệ hay không
+            for (var i = 0; i < files.length; ++i) {
+                var exType = files[i].type;
+                if (exType != "image/gif" && exType != "image/png" && exType != "image/jpeg") {
+                    ShowMessage("Sai định dạng hình, xin hãy chọn hình .png, .jpg hoặc .gif", 3);
+                    return;
+                }
+            }
+
+            // Kiểm tra ảnh đại diện có hay không
+            if (!$.trim($("#avatar-preview").html())) {
+                firstImage = true;
+            }
+
+            if (files) {
+                sendFiles(files);
+            }
+        });
+
+        //$('#btn-submit-product').parent().parent().css('z-index', '6');
+        //$('.myComeback').parent().fixedScroll(70);
+        //$('#btn-submit-product').parent().fixedScroll(70);
+
+        $('#btn-submit-product').parent().parent().css('z-index', '6');
+        $('.myComeback').fixedScroll(70);
+        $('#btn-submit-product').fixedScroll(70);
+
+        //$(window).resize(function () {
+        //    if (windowWidth != $(window).width()) {
+        //        $('#btn-submit-product').parent().removeAttr('style');
+        //        $('.myComeback').parent().removeAttr('style');
+        //        $('.myComeback').parent().fixedScroll(70);
+        //        $('#btn-submit-product').parent().fixedScroll(70);
+        //        windowWidth = $(window).width();
+        //    }
+        //});
+
+        //$(window).bind('resize', function () {
+        //    if (windowWidth != $(window).width()) {
+        //        $('.myComeback').parent().removeAttr('style');
+        //        $('#btn-submit-product').parent().removeAttr('style');
+        //        $('.myComeback').parent().delay(100).fixedScroll(70);
+        //        $('#btn-submit-product').parent().fixedScroll(70);
+        //    }
+        //});
+    });
+
+    function sendFiles(files) {
+        var formData = new FormData();
+        if (files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                formData.append('file-' + i, files[i]);
+            }
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("UploadImages", "File")',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    for (var i = 0; i < result.imagesUrl.length; ++i) {
+                        var htmlInnerData = '<li class="col-md-4 photo-item removeable">' +
+                        '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                        '<div class="ratio-item"><div class="img-container"><img src="' + result.imagesUrl[i] + '"/></div>' +
+                    '<input type="hidden" name="SelectedImages" value="' + result.imagesUrl[i] + '"/>'
+                    + '<span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                    '</div></div></li>';
+                        if (firstImage) {
+                            $("#avatar-preview").html(htmlInnerData);
+                            firstImage = false;
+                        }
+                        else {
+                            $('#images-preview').append(htmlInnerData);
+                        }
+                    }
+                }
+            },
+            processData: false,
+            contentType: false,
+            error: function () {
+                ShowMessage("Có lỗi xảy ra!", 1);
+            }
+        });
+    }
+</script>

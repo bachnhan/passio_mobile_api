@@ -1,0 +1,170 @@
+﻿@model HmsService.ViewModels.PromotionDetailViewModel
+@{
+    Layout = null;
+}
+@this.Html.Partial("Editor", this.Model)
+<input id="isMember" hidden value="@Model.isMember" />
+<input hidden value="@ViewBag.Promo.PromotionCode" id="promoCode" />
+<script type="text/javascript">
+
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    }
+    function confirmSubmit(btn) {
+        var min = $('#MinBuyQuantity').val();
+        var max = $('#MaxBuyQuantity').val();
+        var minOr = $('#MinOrderAmount').val();
+        var maxOr = $('#MaxOrderAmount').val();
+
+        $('#GiftProductCode').val($('#giftApplyList').val());
+        $('#BuyProductCode').val($('#productApplyList').val());      
+        $('#PromotionCode').val($('#promoCode').val());
+        var isValidPromo = promoValidator();
+        if (isValidPromo) {
+            createDetail();
+        }
+
+    }
+    function createDetail() {
+        //var formData = $('#promotionDetailForm').serialize();
+
+        var formData = new FormData($('#promotionDetailForm')[0]);
+
+        if('@ViewBag.Promo.IsForMember' == "True")
+            formData.append('GroupCode',$('#group-membership-code').val());
+        formData.append('isAppliedOnce', '@ViewBag.Promo.IsApplyOnce' === 'True')
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("CreateDetail")',
+            dataType: 'JSON',
+            data: formData,
+            processData: false,
+            contentType:false,
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage(result.message,2)
+                    $('#createDetailModal').modal('hide');
+                    RefreshTable();
+                    //location.reload();
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+        });
+    }
+
+    //Test
+    function loadAllProductCreate() {
+        $.ajax({
+            url: '@Url.Action("LoadAllProducts","PromotionDetail")',
+            type: 'POST',
+            success: function (data) {
+                if (data.success) {
+                    //$('#productApplyList').myOwnSelect2({
+                    //    data: data.data,
+                    //    allowClear: true,
+                    //});
+                    myOwnSelect2.call($('#productApplyList'),{
+                        data: data.data,
+                        allowClear: true,
+                    });
+                    //$('#giftApplyList').select2({
+                    //    data: data.data,
+                    //    allowClear: true,
+                    //});
+                    myOwnSelect2.call($('#giftApplyList'),{
+                        data: data.data,
+                        allowClear: true,
+                    });
+                    //window['productApplyList'] = data.data;
+                    //console.log(data.data);
+                    //$('#productApplyList').select2({
+                    //    data: data.data,
+                    //    matcher: filterFunction,
+                    //    allowClear: true,
+                    //});
+                    //window['giftApplyList'] = data.data;
+                    //$('#giftApplyList').select2({
+                    //    data: data.data,
+                    //    matcher: filterFunction,
+                    //    allowClear: true,
+                    //});
+                }
+            }
+        });
+    }
+    function getListProduct() {
+        var term = '';
+        if (event.target.tagName === 'INPUT') {
+            term = $(event.target).val().toLowerCase();
+        }
+        //if (term.length < 2) return false;
+        //delay(function () {
+        //    alert("Really?");
+        //}, 5000);
+        var count = 0;
+        var tmp = window['productApplyList'].filter(function (ele) {
+            if (ele.text != null) {
+                var text = ele.text.toLowerCase();
+                if (text == undefined)
+                    return false;
+                else {
+                    return term === '' || text.indexOf(term) > -1;
+                }
+            }
+        });
+        return {
+            text: 'text',
+            results: tmp.slice(0,100)
+        };
+    }
+    function getGiftProduct() {
+        var term = '';
+        if (event.target.tagName === 'INPUT') {
+            term = $(event.target).val().toLowerCase();
+        }
+        //if (term.length < 2) return false;
+        //delay(function () {
+        //    alert("Really?");
+        //}, 5000);
+        var count = 0;
+        var tmp = window['giftApplyList'].filter(function (ele) {
+            if (ele.text != null) {
+                var text = ele.text.toLowerCase();
+                if (text == undefined)
+                    return false;
+                else {
+                    return term === '' || text.indexOf(term) > -1;
+                }
+            }
+        });
+        return {
+            text: 'text',
+            results: tmp.slice(0,100)
+        };
+    }
+    function filterFunction(term, text, ele) {
+        return term === '' || ele.text.toLowerCase().indexOf(term.toLowerCase()) > -1;
+    }
+    function formatSelect2(state) {
+        var markup =
+            '<div class="row">' +
+            '<div class="col-xs-7" style="white-space: nowrap">' + state.text + '</div>' +
+            '</div>';
+        markup += '</div>';
+        return markup;
+    }
+
+
+    //$('#modal-dialog').on('click','#s2id_productApplyList',function(){
+    //    alert('1');
+    //    $("#select2-drop").css('top', $("#select2-drop").position().top - 7 + "px");
+    //    $("#select2-drop").css('left', $("#select2-drop").position().left + 8 + "px");
+    //    $("#select2-drop").css('width', $("#select2-drop").width() - 14 + "px");
+    //});
+
+</script>

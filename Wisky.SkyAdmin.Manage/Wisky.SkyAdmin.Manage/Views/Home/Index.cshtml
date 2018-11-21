@@ -1,0 +1,190 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+    var storeId = ViewBag.storeId;
+    var storeName = ViewBag.storeName;
+    var brandId = ViewBag.brandId;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card" id="page-wrapper">
+    <div class="card-header" hidden>
+        <h1>Welcome to Hotel CMS</h1>
+        <p class="text-right"><i>Designed by WiSky Team</i></p>
+    </div>
+    <!-- Tổng quan -->
+    <div id="tongquan">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Tổng quan</h3>
+                </div>
+            </div>
+            <hr />    
+        </div>
+        <div class="card-padding">
+            <div class="row">
+                <!-- Theo ngày -->
+                <div class="col-sm-3 col-xs-12">
+                    <a class="btn btn-block btn-xl btn-success" href="~/@brandId/DashBoard/@storeId/DateDashBoard/Index">
+                        <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-day.png" /></span>
+                        Tổng quan ngày
+                    </a>
+                </div> <!-- /.Theo ngày -->
+                <!--Theo tháng-->
+                @if (@storeId != "0" && @storeId != "45")
+            {
+                    <div class="col-sm-3 col-xs-12">
+                        <a class="btn btn-block btn-xl btn-success" href="/DashBoard/@storeId/@storeName/MonthDashBoard/Index">
+                            <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-month.png" /></span>
+                            Tổng quan tháng
+                        </a>
+                    </div>
+                }
+                <!-- /.Theo tháng -->
+            </div> <!-- /.class:row -->
+        </div>
+    </div> <!-- /.Tổng quan -->
+    <!-- Bán hàng -->
+    <br />
+    <div id="banhang">
+        <div class="card-header">
+            <h3>Bán hàng</h3>
+        </div>
+        <div class="row">
+            <!-- Theo giờ -->
+            @if (@storeId != "45")
+            {
+                <div class="col-sm-3 col-xs-12">
+                    <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/StoreReport/StoreHourReport">
+                        <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-hour.png" /></span>
+                        Theo giờ
+                    </a>
+                </div>
+            } <!-- /.Theo giờ -->
+            <!-- Theo ngày -->
+            <div class="col-sm-3 col-xs-12">
+                <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/StoreReport/StoreRevenueReport">
+                    <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-day.png" /></span>
+                    Theo ngày
+                </a>
+            </div> <!-- /.Theo ngày -->
+            <!-- Theo thứ -->
+            <div class="col-sm-3 col-xs-12">
+                <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/StoreReport/DayOfWeekReport">
+                    <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-week.png" /></span>
+                    Theo thứ
+                </a>
+            </div> <!-- /.Theo thứ -->
+            <!--Theo tháng-->
+            <div class="col-sm-3 col-xs-12">
+                <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/StoreReport/MonthReport">
+                    <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-month.png" /></span>
+                    Theo tháng
+                </a>
+            </div> <!-- /.Theo tháng -->
+
+            @if (@storeId != "45")
+            {
+            <!-- Theo loại hình thanh toán -->
+                <div class="col-sm-3 col-xs-12">
+                    <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/StoreReport/PaymentTypeReport">
+                        <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-month.png" /></span>
+                        <small>Loại hình thanh toán</small>
+                    </a>
+                </div><!-- /.Theo loai hinh thanh toan -->
+
+            <!-- Theo Ca -->
+                <div class="col-sm-3 col-xs-12">
+                    <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/StoreReport/storeShiftReport">
+                        <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-month.png" /></span>
+                        Theo ca
+                    </a>
+                </div> <!-- /.Theo Ca -->
+            }
+
+            @if (@storeId == "45")
+            {
+                <!-- Báo cáo dịch vụ  -->
+                <div class="col-sm-3 col-xs-12">
+                    <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/HotelReport/HotelServices">
+                        <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-month.png" /></span>
+                        Báo cáo dịch vụ
+                    </a>
+                </div> <!-- /.Báo cáo dịch vụ  -->
+                <!--Hóa đơn -->
+                <div class="col-sm-3 col-xs-12">
+                    <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/HotelReport/BillInDay">
+                        <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-month.png" /></span>
+                        Hóa đơn
+                    </a>
+                </div> <!-- /.Hóa đơn -->
+
+            }
+            @*<!-- Theo khung giờ -->
+                <div class="col-sm-3 col-xs-12">
+                    <a class="btn btn-block btn-xl btn-info" href="#">
+                        Theo khung giờ
+                    </a>
+                </div> <!-- /.Theo khung giờ -->*@
+        </div> <!-- /.class:row -->
+        <br />
+        <div class="row" hidden>
+            <!-- Theo kênh bán hàng -->
+            <div class="col-sm-3 col-xs-12">
+                <a class="btn btn-block btn-xl btn-warning" href="#">
+                    Theo kênh bán hàng
+                </a>
+            </div> <!-- /.Theo kênh bán hàng -->
+            <!-- Theo hình thức giao hàng -->
+            <div class="col-sm-3 col-xs-12">
+                <a class="btn btn-block btn-xl btn-warning" href="#">
+                    Theo hình thức giao hàng
+                </a>
+            </div> <!-- /.Theo hình thức giao hàng -->
+            <!-- Theo nhân viên -->
+            <div class="col-sm-3 col-xs-12">
+                <a class="btn btn-block btn-xl btn-warning" href="#">
+                    Theo nhân viên
+                </a>
+            </div> <!-- /.Theo nhân viên -->
+        </div> <!-- /.class:row -->
+        <br />
+        <div class="row" hidden>
+            <!-- Theo kênh bán hàng -->
+            <div class="col-sm-6 col-xs-12">
+                <a class="btn btn-block btn-xl btn-danger" href="#">
+                    Theo hình thức thanh toán
+                </a>
+            </div> <!-- /.Theo kênh bán hàng -->
+        </div> <!-- /.class:row -->
+    </div><!-- ./Bán hàng -->
+    <!-- Sản phẩm -->
+    <div id="sanpham">
+        <div class="page-header">
+            <h1>Sản phẩm</h1>
+        </div>
+        <div class="row">
+            <!-- Báo cáo theo sản phẩm -->
+            <div class="col-sm-3 col-xs-12">
+                <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/StoreReport/StoreProductCategoryReport">
+                    <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-day.png" /></span>
+                    Theo sản phẩm
+                </a>
+            </div> <!-- /.Báo cáo theo sản phẩm -->
+            <!-- Báo cáo theo ngành hàng -->
+            <div class="col-sm-3 col-xs-12">
+                <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/StoreReport/StoreCategoryReport">
+                    <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-day.png" /></span>
+                    Theo ngành hàng
+                </a>
+            </div> <!-- /.Báo cáo theo ngành hàng -->
+            <!-- Diễn tiến sản phẩm theo ngày -->
+            <div class="col-sm-3 col-xs-12">
+                <a class="btn btn-block btn-xl btn-dark-purple" href="/Report/@storeId/@storeName/StoreReport/StoreProductDateProgress">
+                    <span class="btn-icon"><img src="~/Content/frontend/img/dashboard-icon/icon-day.png" /></span>
+                    Diễn tiến ngày
+                </a>
+            </div> <!-- /.Diễn tiến sản phẩm theo ngày -->
+        </div>
+    </div><!-- /.Sản phẩm -->
+</div>

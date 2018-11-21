@@ -1,0 +1,455 @@
+﻿@model ProductItemEditViewModel
+@{
+    var currentStore = HmsService.Models.Utils.GetStore();
+    var storeId = currentStore?.ID;
+    var storeName = currentStore?.ShortName;
+
+    ViewBag.Title = "Thêm nguyên liệu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Thêm nguyên liệu</h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <a id="btn-comeback" href="@Url.Action("Index")" class="btn btn-success">Quay lại</a>
+                <button id="btn-submit" onclick="Create()" type="button" class="btn btn-primary">Hoàn tất</button>
+            </div>
+        </div>
+        <hr />
+    </div>
+    @this.Html.Partial("Editor", this.Model)
+   
+
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('#btn-comeback').fixedScroll(70);
+        $('#btn-submit').fixedScroll(70);
+    });
+    
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    }
+    function Create() {
+        $(".error-message").html("");
+        $("#FormError").hide();
+        $("#FormError").html("");
+        $("#FormSuccess").hide();
+        $("#FormSuccess").html("");
+
+        var hasError = false;
+
+        // validating
+        if ($("input[name='ItemName']").val() == "") {
+            ShowMessage("Tên nguyên liệu không được bỏ trống", 3);
+            return;
+        }
+
+        var type = $("input[name='Unit']").val();
+        if (type == "") {
+            ShowMessage("Vui lòng nhập đơn vị.", 3);
+            return;
+        }
+
+        if ($("input[name='Unit2']").val() != "") {
+
+            if ($("input[name='UnitRate']").val() == "") {
+                $("input[name='UnitRate']").attr("required", true);
+                ShowMessage("Vui lòng nhập tỉ lệ qui đổi.", 3);
+                $("input[name='UnitRate']").focus();
+                return;
+            }
+        } else if ($("input[name='Unit2']").val() == "") {
+            if ($("input[name='UnitRate']").val() != "") {
+                $("input[name='UnitRate']").attr("required", true);
+                ShowMessage("Vui lòng nhập đơn vị 2.", 3);
+                $("input[name='Unit2']").focus();
+                return;
+            }
+        }
+
+        //if ($("input[name='UnitRate']").val() == "") {
+        //    ShowMessage("Vui lòng nhập tỉ lệ quy đổi.", 3);
+        //    return;
+        //}
+
+        if ($("input[name='ItemCode']").val() == "") {
+            ShowMessage("Vui lòng nhập mã nguyên liệu.", 3);
+            return;
+        }
+        if (parseInt($("select[name='ProductItemType']").val()) == 0) {
+            ShowMessage("Vui lòng chọn kiểu nguyên liệu.", 3);
+            return;
+        }
+        if ($("input[name='Price']").val() == "") {
+            ShowMessage("Vui lòng nhập giá.", 3);
+            return;
+        }
+        if ($("input[name='Price']").val() <= 0) {
+            ShowMessage("Giá nguyên liệu không âm", 3);
+            return;
+        }
+        if ($("input[name='UnitRate']").val() < 0) {
+            ShowMessage("Tỉ giá không âm", 3);
+            return;
+        }
+        if ($("input[name='IndexPriority']").val() == "") {
+            $("input[name='IndexPriority']").val(1000);
+        }
+        if (providerList.length < 1) {
+            ShowMessage("Vui lòng thêm nhà cung cấp.", 3);
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("checkItemCode")',
+            method: 'POST',
+            data: { code: $("#ItemCode").val() },
+            success: function (result) {
+                if (result.success) {
+                    var formData = new FormData($('#editProductItemForm')[0]);
+                    for (var i = 0; i < providerList.length; i++)
+                        formData.append("SelectedProviders[]", providerList[i])
+
+
+                    $.ajax({
+                        url: "@this.Url.Action("Create")",
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (result) {
+                            if (result) {
+                                ShowAlert(result.message, 2);
+                                window.location.href = '@Url.Action("Index")';
+                            } else {
+                                ShowAlert(result.message, 2);
+                            }
+                            $("#createItemName").val("");
+                            $("#createItemUnit").val("");
+                            $("#PicURL").val("");
+                            $("#Images").html("");
+                        }
+                    });
+                } else {
+                    ShowMessage("Mã nguyên liệu đã tồn tại", 3);
+                    return;
+                }
+            },
+            error: function (error) {
+                ShowMessage("Đã có lỗi xảy ra, vui lòng kiểm tra lại", 3);
+                return;
+            }
+        });
+        //} else {
+        //    if (!/^[0-9 ]+$/.test(type) || type.length > 15) {
+        //        $("span[data-valmsg-for='Type']").html("Phân loại danh mục không hợp lệ.");
+        //        hasError = true;
+        //    }
+        //}
+
+
+        // submit
+        //if (!hasError) {
+
+
+        //}
+        //var formData = $('#createProductItemForm').serialize();
+    }
+
+    $(document).ready(function () {
+
+        $('#IndexPriority').val(1000);
+
+        $('.btn-danger').fixedScroll(70);
+        $('#btn-done').fixedScroll(70);
+        //upload image with elfinder
+        $('.getimagefromelfinder').on('click', function () {
+            //get id
+            var id = $(this).parent().find('input')[0].id;
+            // set id to controller
+            //window.open('/Admin/@storeId/@storeName/File/GetImageFromElfinder?elementId=' + id + '', 'GetImageFromElfinder', 'height=' + (window.screen.height - 100));
+            window.open('#');
+        });
+
+        $('#btn-comeback').fixedScroll(70);
+        $('#btn-submit').fixedScroll(70);
+    });
+    var providerList = [];
+    var count = 1;
+    var isFirstLoad = true;
+
+    $('#addProviderModal').on('click', function () {
+        var option = $('#providerListModal option:selected');
+        for (var i = 0; i < providerList.length; i++) {
+            if (providerList[i] == option[0].value) {
+                ShowMessage("Đã tồn tại nhà cung cấp này!", 1);
+                return;
+            }
+        }
+        var table = document.getElementById("providerListTable");
+        var row = table.insertRow(count);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        cell1.innerHTML = count;
+        cell2.innerHTML = option[0].text;
+        cell3.innerHTML = $("<button>", {
+            //'type': 'button',
+            'id': option[0].value,
+            'class': 'btn btn-danger btn-md glyphicon glyphicon-trash',
+            'onclick': 'removeProvider(this,' + option[0].value + ')',
+        })[0].outerHTML;
+        providerList.push(option[0].value);
+        count++;
+    });
+
+    function removeProvider($btn, providerId) {
+        $($btn).closest('tr').remove();
+        count--;
+        for (var i = 0; i < providerList.length; i++) {
+            if (providerList[i] == providerId) {
+                providerList.splice(i, 1);
+            }
+        }
+        var table = document.getElementById("providerListTable");
+        var countCurrentRow = 0;
+        for (var i = 1; i < table.rows.length; i++) {
+            table.rows[i].cells[0].innerHTML = ++countCurrentRow;
+        }
+    }
+
+    @*$(document).ready(function () {
+        $.ajax({
+            url: '@this.Url.Action("GetProvidersByBrand")',
+            type: 'GET',
+            data: {
+
+            },
+            dataType: 'json',
+            success: function (result) {
+                //console.log(result.data);
+                $('#providerList option').remove();
+                if (result.data) {
+                    $.each(result.data, function (i, provider) {
+                        $("#providerListModal").append($("<option>", {
+                            value: provider.Id,
+                            text: provider.Name,
+                        }));
+                    });
+                    //if ($("#item-categories").find('option').length) {
+                    //    $("#item-categories").trigger('change');
+                    //}
+                }
+            },
+            error: function () {
+                ShowMessage('Có lỗi xẩy ra, vui lòng thử lại');
+            }
+        });
+
+    });*@
+
+    function UploadImage() {
+        $("#ImgForm").submit();
+    }
+
+    function UploadImage_Complete() {
+        //Check to see if this is the first load of the iFrame
+        if (isFirstLoad == true) {
+            isFirstLoad = false;
+            return;
+        }
+
+        //Reset the image form so the file won't get uploaded again
+        document.getElementById("ImgForm").reset();
+
+        //Grab the content of the textarea we named jsonResult .  This shold be loaded into
+        //the hidden iFrame.
+        var newImg = $.parseJSON($("#UploadTarget").contents().find("#jsonResult")[0].innerHTML);
+
+        //If there was an error, display it to the user
+        if (newImg.IsValid == false) {
+            ShowMessage(newImg.Message, 3);
+            return;
+        }
+
+        //Create a new image and insert it into the Images div.  Just to be fancy,
+        //we're going to use a "FadeIn" effect from jQuery
+        var img = new Image();
+        img.src = newImg.ImagePath;
+        img.style.height = '50px';
+        img.style.width = '50px';
+        img.class = 'img-rounded';
+
+        //Hide the image before adding to the DOM
+        $(img).hide();
+        $("#Images").html(img);
+        //Now fade the image in
+        $(img).fadeIn(500, null);
+
+        //var imageName = newImg.ImagePath.split("/");
+        $("#PicURL").val(newImg.ImagePath);
+    }
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    };
+
+    @*function sendFile(file) {
+
+        var formData = new FormData();
+        formData.append('file', $('#uploadImage')[0].files[0]);
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("UploadImage", "File")',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    $("#avatar-preview").html("");
+                    var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                        '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                        '<div class="ratio-item"><div class="img-container"><img src="' + result.imageUrl + '"/></div>' +
+                    '<input type="hidden" name="SelectedImage" value="' + result.imageUrl + '"/>'
+                    + '<span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                    '</div></div></li>';
+
+                    $("#avatar-preview").append(htmlInnerData);
+                }
+            },
+            processData: false,
+            contentType: false,
+            error: function () {
+                ShowMessage("Có lỗi xảy ra!", 1);
+            }
+        });
+    }*@
+
+    //function loadImageClientSide(file) {
+    //    $("#avatar-preview").html("");
+    //    var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+    //        '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+    //        '<div class="ratio-item"><div class="img-container"><img src="' + result.imageUrl + '"/></div>' +
+    //    '<input type="hidden" name="SelectedImage" value="' + result.imageUrl + '"/>'
+    //    + '<span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>' +
+    //                    '</div></div></li>';
+
+    //    $("#avatar-preview").append(htmlInnerData);
+    //}
+
+    //$("#btnUploadImage").on('click', function () {
+    //    $('#uploadImage').click();
+
+    //});
+
+    //$('#uploadImage').onchange(function (){
+    
+    //readURL(this);
+    //});
+
+    //function readURL(input) {
+    //    if (input.files && input.files[0]) {
+    //        var reader = new FileReader();
+
+    //        reader.onload = function (e) {
+    //            $('#imageUpload')
+    //                .attr('src', e.target.result)
+    //                .width(317)
+    //                .height(310);
+    //        };
+
+    //        reader.readAsDataURL(input.files[0]);
+    //    }
+    //}
+
+
+    //$("#uploadImage").on('change', function () {
+
+    //    var file, img;
+    //    if ((file = this.files[0])) {
+    //        img = new Image();
+    //        img.onload = function () {
+    //            sendFile(file);
+    //            //loadImageClientSide(file);
+    //        };
+    //        img.onerror = function () {
+    //            ShowMessage("Not a valid file:" + file.type, 1);
+    //        };
+    //        var _URL = window.URL || window.webkitURL;
+    //        img.src = _URL.createObjectURL(file);
+    //    }
+    //});
+    function sendFile(file) {
+
+        var formData = new FormData();
+        formData.append('file', $('#uploadImage')[0].files[0]);
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("UploadImage", "File")',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    $("#avatar-preview").html("");
+                    var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                        '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                        '<div class="ratio-item"><div class="img-container"><img id="imgName" src="' + result.imageUrl + '"/></div>' +
+                    '<input id="imgValue" type="hidden" name="SelectedImage" value="' + result.imageUrl + '"/>'
+                    + '<span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                    '</div></div></li>';
+
+                    $("#avatar-preview").append(htmlInnerData);
+                }
+            },
+            processData: false,
+            contentType: false,
+            error: function () {
+                ShowMessage("Có lỗi xảy ra!", 1);
+            }
+        });
+    }
+
+    $("#btnUploadImage").on('click', function () {
+        $('#uploadImage').click();
+    });
+
+    $("#uploadImage").on('change', function () {
+        var file, img;
+        file = this.files[0];
+
+        if (file.type != "image/gif" && file.type != "image/png" && file.type != "image/jpeg") {
+            ShowMessage("Sai định dạng hình, xin hãy chọn hình .png, .jpg hoặc .gif", 3);
+            return;
+        }
+
+        if (file) {
+            img = new Image();
+            img.onload = function () {
+                sendFile(file);
+            };
+            img.onerror = function () {
+                ShowMessage("Not a valid file:" + file.type, 1);
+            };
+            var _URL = window.URL || window.webkitURL;
+            img.src = _URL.createObjectURL(file);
+        }
+    });
+</script>

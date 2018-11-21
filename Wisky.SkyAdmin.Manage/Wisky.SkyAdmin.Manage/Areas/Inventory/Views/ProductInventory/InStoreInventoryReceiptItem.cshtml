@@ -1,0 +1,233 @@
+﻿@model HmsService.ViewModels.InventoryReceiptEditViewModel
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var total = 0;
+    var info = System.Globalization.CultureInfo.GetCultureInfo("vi-VN");
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Chi tiết đơn hàng
+                    <span class="info">(Chuyển kho đến)</span>
+                </h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <a href="@Url.Action("ListGetTransferInventory","ProductInventory")" class="btn btn-success">Trở lại</a>
+                @if (Model.Status == 0 && Model.CreateDate?.ToString("dd/MM/yyyy") == Utils.GetCurrentDateTime().ToString("dd/MM/yyyy"))
+                {
+                    <a class="btn btn-danger btn-sm pull-right InventoryStatusBtn" onclick="CancelReceipt(@Model.ReceiptID)">
+                        Hủy
+                    </a>
+                    <a class="btn btn-success btn-sm pull-right InventoryStatusBtn" onclick="AcceptReceipt(@Model.ReceiptID,@Model.ReceiptType,@Model.OutStoreId)">
+                        Duyệt
+                    </a>
+                }
+                else if (Model.Status == 1 && Model.CreateDate?.ToString("dd/MM/yyyy") == Utils.GetCurrentDateTime().ToString("dd/MM/yyyy"))
+                {
+                    <a class="btn btn-danger btn-sm pull-right InventoryStatusBtn" onclick="RequestCancel(@Model.ReceiptID)">
+                        Yêu cầu hủy
+                    </a>
+                }
+                else if (Model.Status == 5 && Model.ReceiptType == 2 && Model.CreateDate?.ToString("dd/MM/yyyy") == Utils.GetCurrentDateTime().ToString("dd/MM/yyyy"))
+                {
+                    <a class="btn btn-danger btn-sm pull-right InventoryStatusBtn" onclick="CancelReceipt(@Model.ReceiptID)">
+                        Đồng ý hủy
+                    </a>
+                }
+            </div>
+
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row">
+            <div class="col-md-6 text-right">
+                <div class="form-group" style="padding-left: 20px">
+                    <label> Tên đơn hàng: @Model.Name</label>
+                </div>
+                <div class="form-group" style="padding-left: 20px">
+                    <label>  Mã đơn hàng: @Model.InvoiceNumber</label>
+                </div>
+                <div class="form-group" style="padding-left: 20px">
+                    <label>  Người phụ trách: @Model.Creator</label>
+                </div>
+                <div class="form-group" style="padding-left: 20px">
+                    <label> Trạng thái:</label>
+                    @if (Model.Status == 0)
+                    {
+                        <span style='color:red; font-weight: bold'>Chưa duyệt</span>
+                    }
+                    else if (Model.Status == 1)
+                    {
+                        <span style='color:green; font-weight: bold'>Đã duyệt</span>
+                    }
+                    else if (Model.Status == 2)
+                    {
+                        <span style='color:red; font-weight: bold'>Đã hủy</span>
+                    }
+                    else if (Model.Status == 3)
+                    {
+                        <span style='color:red; font-weight: bold'>Đã từ chối</span>
+                    }
+                    else if (Model.Status == 4)
+                    {
+                        <span style='color:red; font-weight: bold'>Đã đóng</span>
+                    }
+                    else if (Model.Status == 6)
+                    {
+                        <span style='color:yellow; font-weight: bold'>Chờ xác nhận yêu cầu hủy</span>
+                    }
+                    else if (Model.Status == 5)
+                    {
+                        <span style='color:red; font-weight: bold'>@(Model.OutStoreName) yêu cầu hủy </span>
+                    }
+                </div>
+
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label> Ngày tạo: @Model.CreateDate</label>
+                </div>
+                <div class="form-group">
+                    <label> Ngày chuyển hàng: @Model.ChangeDate</label>
+                </div>
+                @if (Model.ReceiptType == 2)
+                {
+                    <div class="form-group">
+                        <label> Cửa hàng chuyển: @Model.OutStoreName</label>
+                    </div>
+                }
+            </div>
+        </div>
+        <table id="inventoryReceiptItemTable" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr class="gray">
+                    <th><label>Tên hàng</label></th>
+                    <th><label>Đơn vị</label></th>
+                    <th><label>Số lượng</label></th>
+                    <th><label>Đơn giá</label></th>
+                    <th><label>Thành tiền</label></th>
+                    <th><label>Ngày hết hạn</label></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.InventoryReceiptItem)
+                {
+                    total = total + ((int)item.Quantity * (int)item.Price);
+                    <tr>
+                        <td>@item.ProductItem.ItemName</td>
+                        <td class="text-center">@item.ProductItem.Unit</td>
+                        <td>@item.Quantity</td>
+                        <td>@string.Format(info, "{0:0,0}", @item.Price)</td>
+                        <td>@string.Format(info, "{0:0,0}", ((int)item.Quantity * (int)item.Price))</td>
+                        <td>@item.DateExpired</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="4" style="text-align:left">Tổng cộng</td>
+                    <td id="totalPrice" style="text-align:right">@string.Format(info, "{0:0,0}", @total)</td>
+                    <td style="text-align:left">VNĐ</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<script>
+    
+    $(document).ready(function () {
+        $('#inventoryReceiptItemTable').dataTable(
+            {
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " ",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [2],
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [3, 4],
+                        "sClass": "text-right"
+                    },
+                ],
+            }
+        ).fnSetFilteringDelay(delaySearch);;
+    });
+    function RequestCancel(id) {
+        ShowConfirm("Yêu cầu hủy đơn hàng này?", function () {
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("OutStoreCancelRequest", "ProductInventory"))",
+                "data": {
+                    id: parseInt(id)
+                },
+                success: function (result) {
+                    ShowAlert("Yêu cầu hủy thành công!", 2);
+                    setTimeout(function () {
+                        location.reload();
+                    }, 2000);
+                }
+            });
+        });
+    }
+    function AcceptReceipt(id, receiptType, otherId) {
+        ShowConfirm("Xác nhận duyệt đơn hàng này?", function () {
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("AcceptReceipt","ProductInventory"))",
+                "data": {
+                    id: parseInt(id),
+                    receiptType: receiptType,
+                    otherStoreId: parseInt(otherId)
+                },
+                success: function (result) {
+                    ShowAlert("Duyệt đơn hàng thành công!", 2);
+                    setTimeout(function () {
+                        location.reload();
+                        //location.href = "(Url.Action("InStoreInventoryReceiptItem", "ProductInventory"))";
+                    }, 2000);
+                }
+            });
+        });
+    }
+    function CancelReceipt(id) {
+        ShowConfirm("Xác nhận hủy đơn hàng này?", function () {
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("CancelReceipt","ProductInventory"))",
+                "data": {
+                    id: parseInt(id)
+                },
+                success: function (result) {
+                    ShowAlert("Hủy đơn hàng thành công!", 2);
+                    setTimeout(function () {
+                        location.reload();
+                        //location.href = "(Url.Action("InStoreInventoryReceiptItem", "ProductInventory"))";
+                    }, 2000);
+                }
+            });
+        });
+    }
+
+    var formatVND = function (x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+</script>

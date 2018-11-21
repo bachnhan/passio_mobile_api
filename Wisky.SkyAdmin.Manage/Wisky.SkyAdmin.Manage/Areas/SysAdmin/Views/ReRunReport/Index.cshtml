@@ -1,0 +1,208 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 id="date">Kiểm Tra Báo Cáo</h3>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row" style="margin-top:-10px;margin-bottom:10px">
+            <div class="col-md-4 pull-right">
+                <div class="input-group">
+                    <div class="input-group date" id="datetimepicker" style="float: right">
+                        <input id="date-time" type="text" class="input-group-addon form-control myInputCelender" style="padding-left: 0px !important;height: 37px; margin-top: -1px;" />
+                        <span class="input-group-addon myCerlenderSpan">
+                            <span class="fa fa-calendar"></span>
+                        </span>
+                    </div>
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>     Tìm
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 pull-left">
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" id="btnReRun">
+                            <i class="left-icon fa fa-play"></i>     Chạy Lại Báo Cáo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <table id="tblDateReport" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <label class="">STT</label>
+                    </th>
+                    <th>
+                        <label class="">Cửa Hàng</label>
+                    </th>
+                    <th>
+                        <label class="">Hóa Đơn</label>
+                    </th>
+                    <th>
+                        <label class="">Doanh Thu</label>
+                    </th>
+                    <th>
+                        <label class="">Trước Giảm Giá</label>
+                    </th>
+                    <th>
+                        <label class="">Giảm Giá</label>
+                    </th>
+                    <th>
+                        <label class="">Giảm Giá Detail</label>
+                    </th>
+                    <th>
+                        <label class="">Total Cash</label>
+                    </th>
+                    <th>
+                        <label class="">Trạng Thái</label>
+                    </th>
+                    <th>
+                        <label class="">Tùy Chọn</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+
+    <script>
+        // Initial DateTimePicker
+        $(function () {
+            $('#datetimepicker').datetimepicker({
+                'maxDate': moment(),
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+        });
+
+        function reDrawDatatable(id, data) {
+            $(id).dataTable()._fnPageChange(0);
+            $(id).dataTable().fnDraw();
+        }
+        function RefreshTable() {
+            reDrawDatatable("#tblDateReport");
+        }
+
+        //Event Get List Report
+        $('#btnSearch').click(function () {
+            //Initital DataTable
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("LoadReport")',
+                data: {
+                    '_date': $('#date-time').val()
+                },
+                success: function (data) {
+                    if (data.success == true) {
+                        var dataTable = $("#tblDateReport").dataTable();
+                        if (dataTable != null) {
+                            dataTable.fnDestroy();
+                            initDatatable(data.listResult);
+                            RefreshTable();
+                        }
+                    } else {
+                        ShowMessage("có lỗi xảy ra", 1);
+                    }
+                },
+                error: function () {
+                    ShowMessage("Có lỗi trong quá trình xử lý", 1);
+                }
+            });
+        });
+
+        $('#btnReRun').click(function () {
+            //Initital DataTable
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("ReRunReportByDate")',
+                data: {
+                    '_date': $('#date-time').val()
+                },
+                success: function (data) {
+                    if (data.success == true) {
+                        swal("Thành công!", "Chạy report thành công", "success");
+                    } else {
+                        ShowMessage("có lỗi xảy ra", 1);
+                    }
+                },
+                error: function () {
+                    ShowMessage("Có lỗi trong quá trình xử lý", 1);
+                }
+            });
+        });
+
+
+        function initDatatable(data) {
+            $("#tblDateReport").dataTable({
+                "bFilter": false,
+                "bSort": false,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bLengthChange": false,
+                "data": data,
+                //"iDisplayLength": 50,
+                //"aLengthMenu": [50, 150],
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                        "sClass": "text-center"
+                    }
+                ],
+                "bAutoWidth": true,
+                "order": [[1, 'asc']],
+            });
+        }
+
+
+
+
+        @*$(document).ready(function () {
+        if (@ViewBag.storeId == 0) {
+            GetStoreList();
+        } else {
+            $('#listStore').hide();
+            $('.card  .card-padding .col-md-4').addClass('col-md-6').removeClass('col-md-4');
+            $("#listStoreId option:first").val(@ViewBag.storeId);
+        }
+        InitOrderDatatable();
+        $('[name="report-filter-status"]').change(function (e) {
+            RefreshTableFilter("#tblOrderDetail", true);
+
+        });
+        $('[name="report-filter-type"]').change(function (e) {
+            RefreshTableFilter("#tblOrderDetail", true);
+        });
+    });*@
+
+    </script>
+
+}

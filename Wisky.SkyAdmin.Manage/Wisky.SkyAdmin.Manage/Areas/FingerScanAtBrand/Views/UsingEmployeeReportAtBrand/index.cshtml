@@ -1,0 +1,358 @@
+﻿@using HmsService.Models
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .tableDiv-responsive {
+        overflow-x: scroll !important;
+    }
+
+    .table > tbody > tr:last-child > td, .table > tfoot > tr:last-child > td {
+        padding-bottom: 0px !important;
+        padding-top: 0px !important;
+    }
+
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+
+    .relativeColl label {
+        position: relative;
+    }
+
+    .fixedClassNo {
+        position: absolute;
+        width: 45px;
+        height: 45px !important;
+        display: flex;
+        align-items: center;
+        background-color: white;
+        left: 0px;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+        z-index: 100;
+    }
+
+    thead > tr > th.fixedClassNo {
+        height: 35px !important;
+    }
+
+    thead > tr > th.fixedClassName {
+        height: 35px !important;
+    }
+
+    .fixedClassName {
+        position: absolute;
+        width: 241px;
+        height: 45px !important;
+        display: flex;
+        align-items: center;
+        background-color: white;
+        left: 64px;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+        z-index: 100;
+    }
+
+    #shift-table tr td {
+        height: 47px;
+    }
+
+    .table-wrapper {
+        position: relative;
+    }
+
+    body {
+        position: relative !important;
+    }
+
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+
+    .funkyradio div {
+        /*margin: 0 50px;*/
+        overflow: hidden;
+    }
+
+    .funkyradio label {
+        /*min-width: 400px;*/
+        width: 100%;
+        border-radius: 3px;
+        border: 1px solid #D1D3D4;
+        font-weight: normal;
+    }
+
+    .funkyradio input[type="radio"]:empty, .funkyradio input[type="checkbox"]:empty {
+        display: none;
+    }
+
+        .funkyradio input[type="radio"]:empty ~ label, .funkyradio input[type="checkbox"]:empty ~ label {
+            position: relative;
+            line-height: 2.5em;
+            text-indent: 3.25em;
+            margin-top: 0em;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+            .funkyradio input[type="radio"]:empty ~ label:before, .funkyradio input[type="checkbox"]:empty ~ label:before {
+                position: absolute;
+                display: block;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                content: '';
+                width: 2.5em;
+                background: #D1D3D4;
+                border-radius: 3px 0 0 3px;
+            }
+
+    .funkyradio input[type="radio"]:hover:not(:checked) ~ label:before, .funkyradio input[type="checkbox"]:hover:not(:checked) ~ label:before {
+        content: '\2714';
+        text-indent: .9em;
+        color: #C2C2C2;
+    }
+
+    .funkyradio input[type="radio"]:hover:not(:checked) ~ label, .funkyradio input[type="checkbox"]:hover:not(:checked) ~ label {
+        color: #888;
+    }
+
+    .funkyradio input[type="radio"]:checked ~ label:before, .funkyradio input[type="checkbox"]:checked ~ label:before {
+        content: '\2714';
+        text-indent: .9em;
+        color: #333;
+        background-color: #ccc;
+    }
+
+    .funkyradio input[type="radio"]:checked ~ label, .funkyradio input[type="checkbox"]:checked ~ label {
+        color: #777;
+    }
+
+    .funkyradio input[type="radio"]:focus ~ label:before, .funkyradio input[type="checkbox"]:focus ~ label:before {
+        box-shadow: 0 0 0 3px #999;
+    }
+
+    .funkyradio-default input[type="radio"]:checked ~ label:before, .funkyradio-default input[type="checkbox"]:checked ~ label:before {
+        color: #333;
+        background-color: #ccc;
+    }
+
+    .funkyradio-primary input[type="radio"]:checked ~ label:before, .funkyradio-primary input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #337ab7;
+    }
+
+    .funkyradio-success input[type="radio"]:checked ~ label:before, .funkyradio-success input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5cb85c;
+    }
+
+    .funkyradio-danger input[type="radio"]:checked ~ label:before, .funkyradio-danger input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #d9534f;
+    }
+
+    .funkyradio-warning input[type="radio"]:checked ~ label:before, .funkyradio-warning input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #f0ad4e;
+    }
+
+    .funkyradio-info input[type="radio"]:checked ~ label:before, .funkyradio-info input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5bc0de;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <div class="box-header p-b-0">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3>Báo cáo sử dụng nhân lực</h3>
+                    <h5 class="smallDate" data-role="small-date" id="monthRange"></h5>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-5 p-t-10" style="z-index: 1000">
+                @*<label class="right-icon pull-left" style="line-height: 25px;">Cửa hàng: &nbsp;</label>
+                    <div class="col-md-6">
+                        <div class="fg-line">
+                            <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7" onchange="reloadStoreData()"></select>
+                        </div>
+                    </div>*@
+            </div>
+            <div class="col-md-7 pull-right text-right p-0">
+                <div class="col-md-6 pull-right p-0">
+                    <div class="col-lg-4 pull-right col-md-4 col-xs-4 month-header" style="padding-top:17px;">
+                        <div class="input-group pull-right">
+                            <div class="dateTime width230 pull-right">
+                                <div class="fg-line">
+                                    <div id="dateRange">
+                                        <input id="date-string" readonly class="form-control text-center">
+                                        <a class="myCelenderA" id="date-time"><i class="fa fa-calendar"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-group-btn">
+                                <a class="btn btn-primary btn-sm" id="btnSearch">
+                                    <i class="left-icon fa fa-search"></i>     Tìm
+                                </a>
+                            </div>
+                            <input type="hidden" id="sTime" />
+                            <input type="hidden" id="eTime" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 p-r-0 p-t-5">
+                    @*<button type="submit" id="exportOneStore" class="width230 btn btn-primary btn-sm">
+                            <i class="fa fa-download"></i>
+                            Xuất ra file Excel
+                        </button>*@
+                </div>
+            </div>
+        </div>
+        <div class="card-padding p-0">
+            <div class="row">
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="allcust">
+                        <!-- Datatable -->
+                        <div class="col-md-12 table-wrapper" id="datatable_initial">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-body card-padding tab-pane fade in">
+        <div class="row m-t-0 p-t-20">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+                <table id="storeReportDatatable" class="table table-condensed table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <label class="">STT</label>
+                            </th>
+                            <th>
+                                <label class="">Cửa hàng</label>
+                            </th>
+                            <th>
+                                <label class="">Nhân viên làm việc</label>
+                            </th>
+                            <th>
+                                <label class="">Tổng giờ công</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>  
+<input type="hidden" id="startDate" />
+<input type="hidden" id="endDate" />
+<input type="hidden" id="modeReport" value="0" />
+<script>
+    function SetupDaterangePicker() {
+        cb(moment(), moment(), "Hôm nay");
+        $('#dateRange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+    }
+   
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+
+        $("#sTime").val(startTime);
+        $("#eTime").val(endTime);
+        $('[data-role=small-date]').html(dateString);
+    }
+
+    $(document).ready(function () {
+        SetupDaterangePicker();
+        initStoreDatatable();
+    });
+
+    $('#btnSearch').on('click', function () {
+        // LoadTopReportStore();
+        initStoreDatatable();
+    })
+
+
+    var initStoreDatatable = function () {
+        $("#storeReportDatatable").dataTable().fnDestroy();
+            $("#storeReportDatatable").dataTable({
+                "bSort": true,
+                "bRetrieve": true,
+                "bDestroy": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("GetDataStore", "UsingEmployeeReportAtBrand")",
+                "bProcessing": true,
+                "iDisplayLength": 50,
+                "aLengthMenu": [50],
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "startTime", "value": $('#sTime').val() });
+                    aoData.push({ "name": "endTime", "value": $('#eTime').val() });
+                },
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                    "sSearchPlaceholder": "Tên cửa hàng"
+
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1,2,3],
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [0, 1],
+                        "bSortable": false
+                    },
+                    ],
+                "bAutoWidth": false
+            });
+        }
+
+</script>

@@ -1,0 +1,512 @@
+﻿@model IEnumerable<HmsService.ViewModels.StoreViewModel>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .tab-nav.tn-justified > li {
+        width: 33% !important;
+        padding: 0px;
+    }
+
+    .overview-container .col-md-3 {
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    .overview-container h4 {
+        margin-bottom: 7px;
+        padding-bottom: 5px;
+    }
+
+        .overview-container h4 span {
+            text-align: center;
+        }
+
+    .overview-container h3 {
+        margin-top: 7px !important;
+        padding-top: 5px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 id="reportTitle">Báo cáo doanh thu theo ngày</h3>
+                <h5 data-role="small-date" id="dateRange"></h5>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-body">
+        @*<div class="col-md-12">
+                <div class="col-md-2">
+                    <input type="radio" name="reportGroup" value="hour" /> Giờ
+                </div>
+                <div class="col-md-2">
+                    <input type="radio" name="reportGroup" value="date" /> Thứ
+                </div>
+                <div class="col-md-2">
+                    <input type="radio" name="reportGroup" checked value="day" /> Ngày
+                </div>
+                <div class="col-md-2">
+                    <input type="radio" name="reportGroup" value="month" /> Tháng
+                </div>
+            </div>*@
+        <div id="overview-btn" class="overview-container">
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    <div id="1stPanel" class="bgm-amber" name="reportGroup" data-btn="hour" data-id="0" style="border-radius:5px; cursor:pointer">
+                        <div class="clearfix">
+                            <div id="active1" style="margin:5px;">
+                                <h3 id="info1" class="detailPanelTitle" style="text-align: center; font-weight:bold">Giờ</h3>
+                                <h4 id="icon-hour" style="color:white;"><img src="/Content/frontend/img/dashboard-icon/icon-hour.png" style="width:50px; height:50px"><span id="hour-info" class="detailPanelInfo" style="font-size:14px; display:none;padding-right:30px"></span></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div id="2ndPanel" class="bgm-cyan" name="reportGroup" data-btn="week" data-id="0" style="border-radius:5px; cursor:pointer">
+                        <div class="clearfix">
+                            <div id="active2" style="margin:5px;">
+                                <h3 id="info2" class="detailPanelTitle" style="text-align: center; font-weight:bold">Thứ</h3>
+                                <h4 id="icon-week" style="color:white"><img src="/Content/frontend/img/dashboard-icon/icon-week.png" style="width:50px; height:50px;"><span id="week-info" class="detailPanelInfo" style="font-size:14px; display:none;padding-right:30px"></span></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div id="3rdPanel" class="bgm-green" name="reportGroup" data-btn="day" data-id="0" style="border-radius:5px; cursor:pointer">
+                        <div class="clearfix">
+                            <div id="active3" style="margin:5px;">
+                                <h3 id="info3" class="detailPanelTitle" style="text-align: center; font-weight:bold">Ngày</h3>
+                                <h4 id="icon-day" style="color:white"><img src="/Content/frontend/img/dashboard-icon/icon-day.png" style="width:50px; height:50px;"><span id="day-info" class="detailPanelInfo" style="font-size:14px; display:none;padding-right:30px">></span></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div id="4thPanel" name="reportGroup" data-btn="month" data-id="0" style="border-radius:5px; cursor:pointer; background-color:magenta">
+                        <div class="clearfix">
+                            <div id="active4" style="margin:5px;">
+                                <h3 id="info4" class="detailPanelTitle" style="text-align: center; font-weight:bold"> Tháng</h3>
+                                <h4 id="icon-month" style="color:white"><img src="~/Content/frontend/img/dashboard-icon/icon-month.png" style="width:50px; height:50px;"><span id="month-info" class="detailPanelInfo" style="font-size:14px; display:none;padding-right:30px">></span></h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card m-t-20">
+            <div class="card-body" id="report-container">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var overviewData = null;
+        loadDayReport();
+        getAllReportData();
+        $(document).on('click', ".btnComparison2", function () {
+            title = $(this).data('time');
+            starTime = title.substring(6, title.length);
+            $('#filter2 .row').empty();
+            
+            $.ajax({
+                url: '@Url.Action("LoadMonthComparisonReport", "TimeReport")',
+                type: 'GET',
+                data: { 'startTime': $('#sTime1').val(), 'endTime': $('#eTime1').val(), 'selectedMonth': starTime },
+                success: function (rs) {
+
+                    Comparisondata2 = rs.dataChart;
+                    comparisonchart2(Comparisondata2);
+
+                    var checkbox = function (index, val) {
+                        return $('<div/>', {
+                            'class': 'col-md-6',
+                            'html': [
+                                $('<input/>', {
+                                    'type': 'checkbox',
+                                    'value': val,
+                                    'class': 'nice-check nice-check-sm store-name-filter2',
+                                    'id': 'filter2-' + index,
+                                    'checked': 'checked'
+                                }),
+                                $('<label/>', {
+                                    'type': 'checkbox',
+                                    'for': 'filter2-' + index,
+                                    'html': val
+                                }),
+                            ]
+                        });
+                    }
+
+                    $.each(Comparisondata2.StoreName, function (index, value) {
+                        $('#filter2 .row').append(checkbox(index, value));
+                    });
+
+                    var listCheckbox = $('.store-name-filter2');
+                    $.each(Comparisondata2.TotalAmount, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-totalamount', value);
+                    });
+
+                    $.each(Comparisondata2.Discount, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-discount', value);
+                    });
+
+                    $.each(Comparisondata2.FinalAmount, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-finalamount', value);
+                    });
+                }
+            });
+
+            $('#store-comparison-modal2').modal('show');
+            $('.modal-title').html("Doanh thu cửa hàng "+title);
+        });
+        $(document).on('click', ".btnComparison1", function () {
+            var time = $(this).data('time')
+            $('#filter .row').empty();
+
+            $.ajax({
+                url: '@this.Url.Action("DateReportAllComparison")',
+                type: 'GET',
+                data: { 'comparisonTime': time },
+                success: function (rs) {
+                    Comparisondata = rs;
+                    comparisonchart(Comparisondata);
+
+                    var checkbox = function (index, val) {
+                        return $('<div/>', {
+                            'class': 'col-md-6',
+                            'html': [
+                                $('<input/>', {
+                                    'type': 'checkbox',
+                                    'value': val,
+                                    'class': 'nice-check nice-check-sm store-name-filter',
+                                    'id': 'filter-' + index,
+                                    'checked': 'checked'
+                                }),
+                                $('<label/>', {
+                                    'type': 'checkbox',
+                                    'for': 'filter-' + index,
+                                    'html': val
+                                }),
+                            ]
+                        });
+                    }
+
+                    $.each(Comparisondata.storeList, function (index, value) {
+                        $('#filter .row').append(checkbox(index, value));
+                    });
+
+                    var listCheckbox = $('.store-name-filter');
+                    $.each(Comparisondata.totalList, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-total', value);
+                    });
+
+                    $.each(Comparisondata.finalList, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-final', value);
+                    });
+
+                    $.each(Comparisondata.discountList, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-discount', value);
+                    });
+                }
+            });
+
+            $('#store-comparison-modal').modal('show');
+            $('.modal-title').html("Doanh thu cửa hàng ngày " + time);
+        });
+
+    });
+
+    //Hover tab
+    $('#1stPanel').hover(function () {
+        if ($('#1stPanel').data('id') == 0 && (typeof overviewData) !== 'undefined' && overviewData != null) {
+            clearTimeout($(this).data('timeout'));
+            $('#info1').css('position', 'relative').animate({ left: 22 }, 150);
+            $('#info1').html('Giờ:   Doanh thu cao nhất').animate(150);
+            //$('#icon-hour').css('position', 'relative').animate({ right: 1 });
+            if (overviewData.hourData.MaxAmount.Text != "N/A") {
+                $('#hour-info').html(overviewData.hourData.MaxAmount.Text + ":00~" + (parseInt(overviewData.hourData.MaxAmount.Text, 10) + 1) + ":00</br>" + toMoney(overviewData.hourData.MaxAmount.Amount, ',', 'đ'));
+            }
+            else {
+                $('#hour-info').html(overviewData.hourData.MaxAmount.Text + "</br>" + toMoney(overviewData.hourData.MaxAmount.Amount, ',', 'đ'));
+            }
+            $('#hour-info').show('slow');
+        }
+    }, function () {
+        var t = setTimeout(function () {
+            if ($('#1stPanel').data('id') == 0) {
+                $('#info1').animate({ left: 0 });
+                $('#icon-hour').animate({ right: 0 });
+                $('#hour-info').hide('slow');
+                $('#info1').html('Giờ').animate(150);
+            }
+        }, 500);
+        $(this).data('timeout', t);
+    });
+    $('#2ndPanel').hover(function () {
+        if ($('#2ndPanel').data('id') == 0 && (typeof overviewData) !== 'undefined' && overviewData != null) {
+            clearTimeout($(this).data('timeout'));
+            $('#info2').css('position', 'relative').animate({ left: 22 }, 150);
+            $('#info2').html('Thứ:   Doanh thu cao nhất').animate(150);
+            // $('#icon-week').css('position', 'relative').animate({ right: 1 });
+            $('#week-info').html(overviewData.dayOfWeekData.MaxAmount.Text + "</br>" + toMoney(overviewData.dayOfWeekData.MaxAmount.Amount, ',', 'đ'));
+            $('#week-info').show('slow');
+        }
+    }, function () {
+        var t = setTimeout(function () {
+            if ($('#2ndPanel').data('id') == 0) {
+                $('#info2').animate({ left: 0 });
+                $('#week-info').hide('slow');
+                $('#icon-week').animate({ right: 0 });
+                $('#info2').html('Thứ').animate(150);
+            }
+        }, 500);
+        $(this).data('timeout', t);
+    });
+    $('#3rdPanel').hover(function () {
+        if ($('#3rdPanel').data('id') == 0 && (typeof overviewData) !== 'undefined' && overviewData != null) {
+            clearTimeout($(this).data('timeout'));
+            $('#info3').css('position', 'relative').animate({ left: 20 }, 150);
+            $('#info3').html('Ngày:   Doanh thu cao nhất').animate(150);
+            //$('#icon-day').css('position', 'relative').animate({ right: 1 });
+            $('#day-info').html(overviewData.dayData.MaxAmount.Text + "</br>" + toMoney(overviewData.dayData.MaxAmount.Amount, ',', 'đ'));
+            $('#day-info').show('slow');
+        }
+    }, function () {
+        var t = setTimeout(function () {
+            if ($('#3rdPanel').data('id') == 0) {
+                $('#info3').animate({ left: 0 });
+                $('#day-info').hide('slow');
+                $('#icon-day').animate({ right: 0 });
+                $('#info3').html('Ngày').animate(150);
+            }
+        }, 500);
+        $(this).data('timeout', t);
+    });
+    $('#4thPanel').hover(function () {
+        if ($('#4thPanel').data('id') == 0 && (typeof overviewData) !== 'undefined' && overviewData != null) {
+            clearTimeout($(this).data('timeout'));
+            $('#info4').css('position', 'relative').animate({ left: 18 }, 150);
+            $('#info4').html('Tháng:   Doanh thu cao nhất').animate(150);
+            //$('#icon-month').css('position', 'relative').animate({ right: 1 });
+            $('#month-info').html(overviewData.monthData.MaxAmount.Text + "</br>" + toMoney(overviewData.monthData.MaxAmount.Amount, ',', 'đ'));
+            $('#month-info').show('slow');
+        }
+    }, function () {
+        var t = setTimeout(function () {
+            if ($('#4thPanel').data('id') == 0) {
+                $('#info4').animate({ left: 0 });
+                $('#month-info').hide('slow');
+                $('#icon-month').animate({ right: 0 });
+                $('#info4').html('Tháng').animate(150);
+            }
+        }, 500);
+        $(this).data('timeout', t);
+    });
+
+    //Click tab
+    $('#1stPanel').on('click', function () {
+        if ($('#1stPanel').data('id') == 0 && (typeof overviewData) !== 'undefined' && overviewData != null) {
+            $('#reportTitle').html('Báo cáo doanh thu theo giờ').delay(800);
+            $('#active1').css('background-color', 'darkorange');
+            $('#1stPanel').data('id', 1);
+            $('#info1').css('position', 'relative').animate({ left: 30 });
+            //$('#icon-hour').css('position', 'relative').animate({ right: 8 });
+            if (overviewData.hourData.MaxAmount.Text != "N/A") {
+                $('#hour-info').html(overviewData.hourData.MaxAmount.Text + ":00~" + (parseInt(overviewData.hourData.MaxAmount.Text, 10) + 1) + ":00</br>" + toMoney(overviewData.hourData.MaxAmount.Amount, ',', 'đ'));
+            }
+            else {
+                $('#hour-info').html(overviewData.hourData.MaxAmount.Text + "</br>" + toMoney(overviewData.hourData.MaxAmount.Amount, ',', 'đ'));
+            }
+            $('#hour-info').show('slow');
+            deactiveTab2();
+            deactiveTab3();
+            deactiveTab4();
+            return
+        }
+        //if ($('#1stPanel').data('id') == 1) {
+        //    deactiveTab1();
+        //    return
+        //}
+    });
+    $('#2ndPanel').on('click', function () {
+        if ($('#2ndPanel').data('id') == 0 && (typeof overviewData) !== 'undefined' && overviewData != null) {
+            $('#reportTitle').html('Báo cáo doanh thu theo thứ').delay(800);
+            $('#active2').css('background-color', 'darkcyan');
+            $('#2ndPanel').data('id', 1);
+            $('#info2').css('position', 'relative').animate({ left: 30 });
+            //$('#icon-hour').css('position', 'relative').animate({ right: 8 });
+            $('#week-info').html(overviewData.dayOfWeekData.MaxAmount.Text + "</br>" + toMoney(overviewData.dayOfWeekData.MaxAmount.Amount, ',', 'đ'));
+            $('#week-info').show('slow');
+            deactiveTab1();
+            deactiveTab3();
+            deactiveTab4();
+            return
+        }
+        //if ($('#2ndPanel').data('id') == 1) {
+
+        //    deactiveTab2();
+        //    return
+        //}
+    });
+    $('#3rdPanel').on('click', function () {
+        if ($('#3rdPanel').data('id') == 0 && (typeof overviewData) !== 'undefined' && overviewData != null) {
+            $('#reportTitle').html('Báo cáo doanh thu theo ngày').delay(800);
+            $('#active3').css('background-color', 'darkgreen');
+            $('#3rdPanel').data('id', 1);
+            $('#info3').css('position', 'relative').animate({ left: 25 });
+            //$('#icon-hour').css('position', 'relative').animate({ right: 8 });
+            $('#day-info').html(overviewData.dayData.MaxAmount.Text + "</br>" + toMoney(overviewData.dayData.MaxAmount.Amount, ',', 'đ'));
+            $('#day-info').show('slow');
+            deactiveTab1();
+            deactiveTab2();
+            deactiveTab4();
+            return
+        }
+        //if ($('#3rdPanel').data('id') == 1) {
+        //    deactiveTab3();
+        //    return
+        //}
+    });
+    $('#4thPanel').on('click', function () {
+        if ($('#4thPanel').data('id') == 0 && (typeof overviewData) !== 'undefined' && overviewData != null) {
+            $('#reportTitle').html('Báo cáo doanh thu theo tháng').delay(800);
+            $('#active4').css('background-color', 'darkmagenta');
+            $('#4thPanel').data('id', 1);
+            $('#info4').css('position', 'relative').animate({ left: 22 });
+            //$('#icon-hour').css('position', 'relative').animate({ right: 8 });
+            $('#month-info').html(overviewData.monthData.MaxAmount.Text + "</br>" + toMoney(overviewData.monthData.MaxAmount.Amount, ',', 'đ'));
+            $('#month-info').show('slow');
+            deactiveTab1();
+            deactiveTab2();
+            deactiveTab3();
+            return
+        }
+        //if ($('#4thPanel').data('id') == 1) {
+        //    deactiveTab4();
+        //    return
+        //}
+
+    });
+    function deactiveTab1() {
+        $('#active1').css('background-color', 'inherit');
+        $('#1stPanel').data('id', 0);
+        $('#info1').animate({ left: 0 });
+        $('#hour-info').hide('slow');
+        $('#icon-hour').animate({ right: 0 });
+        $('#info1').html('Giờ').animate(150);
+    }
+    function deactiveTab2() {
+        $('#active2').css('background-color', 'inherit');
+        $('#2ndPanel').data('id', 0);
+        $('#info2').animate({ left: 0 });
+        $('#week-info').hide('slow');
+        $('#icon-week').animate({ right: 0 });
+        $('#info2').html('Thứ').animate(150);
+    }
+    function deactiveTab3() {
+        $('#active3').css('background-color', 'inherit');
+        $('#3rdPanel').data('id', 0);
+        $('#info3').animate({ left: 0 });
+        $('#day-info').hide('slow');
+        $('#icon-day').animate({ right: 0 });
+        $('#info3').html('Ngày').animate(150);
+    }
+    function deactiveTab4() {
+        $('#active4').css('background-color', 'inherit');
+        $('#4thPanel').data('id', 0);
+        $('#info4').animate({ left: 0 });
+        $('#month-info').hide('slow');
+        $('#icon-month').animate({ right: 0 });
+        $('#info4').html('Tháng').animate(150);
+    }
+    $('[name="reportGroup"]').click(function () {
+        if ($(this).data('btn') == 'hour') {
+            loadHourReport();
+        }
+        else if ($(this).data('btn') == 'week') {
+            loadDayOfWeekReport();
+        }
+        else if ($(this).data('btn') == 'day') {
+            loadDayReport();
+        }
+        else if ($(this).data('btn') == 'month') {
+            loadMonthReport();
+        }
+    });
+
+    function loadHourReport() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("HourReport", "TimeReport")',
+            success: function (result) {
+                $('#report-container').html(result);
+            }
+        });
+    }
+
+    function loadDayReport() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("DayReport", "TimeReport")',
+            success: function (result) {
+                $('#report-container').html(result);
+            }
+        });
+    }
+
+    function loadDayOfWeekReport() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("DayOfWeekReport", "TimeReport")',
+            success: function (result) {
+                $('#report-container').html(result);
+            }
+        });
+    }
+
+    function loadMonthReport() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("MonthReport", "TimeReport")',
+            success: function (result) {
+                $('#report-container').html(result);
+            }
+        });
+    }
+
+    function getAllReportData() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GetAllReportData", "TimeReport")',
+            success: function (result) {
+                if (result.success) {
+                    overviewData = result;
+                    $('#active3').css('background-color', 'darkgreen');
+                    $('#3rdPanel').data('id', 1);
+                    $('#info3').css('position', 'relative').animate({ left: 25 });
+                    //$('#icon-hour').css('position', 'relative').animate({ right: 8 });
+                    $('#day-info').html(result.dayData.MaxAmount.Text + "</br>" + toMoney(result.dayData.MaxAmount.Amount, ',', 'đ'));
+                    $('#day-info').show('slow');
+                    $('#info3').html('Ngày:  Doanh thu cao nhất');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            }
+        });
+    }
+</script>

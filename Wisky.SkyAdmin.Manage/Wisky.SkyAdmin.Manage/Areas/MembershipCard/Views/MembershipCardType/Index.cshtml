@@ -1,0 +1,368 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Quản lý loại thẻ thành viên</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <button id="addType" class="btn btn-primary"><i class="left-icon fa fa-plus"></i> Thêm loại thẻ</button>
+            </div>
+        </div>
+        <hr />
+        <div class="card-body card-padding row">
+            <div class="row">
+                <div class="col-md-12">
+                    @*<div class="col-md-6">
+                            <button id="all-cart" class="btn btn-primary"><i class="left-icon fa fa-plus"></i> All Cart </button>
+                            <button id="active-cart" class="btn btn-primary"><i class="left-icon fa fa-plus"></i> Active Cart </button>
+                            <button id="inactive-cart" class="btn btn-primary"><i class="left-icon fa fa-plus"></i> InActive Cart </button>
+                        </div>*@
+
+                    <div class="group-radio-buttons m-t-5">
+                        <div>
+                            <input type="radio" name="report-filter" value="3" class="nice-check" id="all-cart" checked>
+                            <label for="all-cart"><span>Tất cả</span></label>
+                        </div>
+                        <div>
+                            <input type="radio" name="report-filter" value="1" class="nice-check" id="active-cart">
+                            <label for="active-cart"><span>Đang hoạt động</span></label>
+                        </div>
+                        <div>
+                            <input type="radio" name="report-filter" value="2" class="nice-check" id="inactive-cart">
+                            <label for="inactive-cart"><span>Đã dừng</span></label>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-md-12 p-t-10">
+                    <table id="typeTable" class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label>STT</label>
+                                </th>
+                                <th>
+                                    <label>Tên loại thẻ</label>
+                                </th>
+                                <th>
+                                    <label>Mã</label>
+                                </th>
+                                <th>
+                                    <label>Tùy chọn</label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="createTypeModal" class="modal fade" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width: 700px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4>Tạo loại thẻ</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-md-4 text-right control-label">Tên loại thẻ</label>
+                        <div class="col-md-8">
+                            <input id="typeName" class="form-control" maxlength="30" type="text" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 text-right control-label">Mã loại thẻ</label>
+                        <div class="col-md-8">
+                            <input id="typeCode" class="form-control" maxlength="5" type="text" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnCreateType">Tạo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="editTypeModal" class="modal fade" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" style="width: 700px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4>Cập nhập loại thẻ</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <input id="editTypeID" class="form-control" type="hidden" />
+                    <div class="form-group">
+                        <label class="col-md-4 text-right control-label">Tên loại thẻ</label>
+                        <div class="col-md-8">
+                            <input id="editTypeName" class="form-control" maxlength="30" type="text" required />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 text-right control-label">Mã loại thẻ</label>
+                        <div class="col-md-8">
+                            <input id="editTypeCode" class="form-control" maxlength="5" type="text" required />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnEditType">Cập nhập</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .group-radio-buttons > div {
+        display: inline-block;
+    }
+
+        /*.group-radio-buttons > div:first-child {
+            margin-left: -7%;
+        }*/
+
+        .group-radio-buttons > div:nth-child(-n + 2) {
+            margin-bottom: 15px;
+            width: 200px;
+        }
+</style>
+<script>
+    $(document).ready(function () {
+        GetDataForTable();
+    });
+    function GetDataForTable() {
+        $.ajax({
+            type: 'POST',
+            url: "@Url.Action("GetMembershipTypes", "MembershipCardType")",
+            success: function (result) {
+                var typeList = result.typeList;
+                initTable(typeList);
+            }
+        });
+    }
+
+    $("#addType").on('click', function () {
+        $('#createTypeModal').modal('show');
+    })
+
+    $('#createTypeModal').on('hidden.bs.modal', function () {
+        $('#typeName').val("");
+        $('#typeCode').val("");
+    })
+
+    $('#editTypeModal').on('hidden.bs.modal', function () {
+        $('#editTypeName').val("");
+        $('#editTypeCode').val("");
+    })
+
+    function initTable(data) {
+        $("#typeTable").dataTable().fnDestroy();
+        $("#typeTable").dataTable({
+            "bFilter": true,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "bProcessing": true,
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Tên thẻ",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3],
+                    "bSortable": false,
+                },
+                {
+                    "aTargets": [0, 2, 3],
+                    "sClass": "text-center",
+                    "bSearchable": false,
+                },
+                {
+                    "aTargets": [1],
+                    "bSearchable": true,
+                },
+                {
+                    "aTargets": [3],
+                    "mRender": function (data, type, row) {
+                        var Id = row[3];
+                        var active = row[4];
+                        var DeactiveCardType = "";
+                        var UpdateBtn = "<button  class='btn btn-primary' data-id='" + Id
+                            + "' data-typename='" + row[1] + "' data-typecode='" + row[2]
+                            + "' style='height:32px' onclick='openEdit(this)'><i class='glyphicon  glyphicon-pencil'></i></button>"
+                        if (active)
+                            DeactiveCardType = "<a class='btn btn-danger' data-id='" + Id + "' data-status='" + true + "' onclick='deActive(this)'> Khóa</a>";
+                        else
+                            DeactiveCardType = "<a class='btn btn-success' data-id='" + Id + "' data-status='" + false + "' onclick='deActive(this)'> Kích hoạt</a>";
+                        return UpdateBtn + " " + DeactiveCardType;
+
+
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                }
+
+            ],
+            "bAutoWidth": false,
+        });
+    };
+
+    $('#btnCreateType').on('click', function () {
+        if ($('#typeName').val() == "") {
+            ShowMessage("Tên loại thẻ không được bỏ trống", 1);
+            return;
+        }
+
+        if ($('#typeCode').val() == "") {
+            ShowMessage("Mã loại thẻ không được bỏ trống", 1);
+            return;
+        }
+
+        createMembershipCardType();
+    });
+
+    function createMembershipCardType() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("CreateMembershipCardType", "MembershipCardType")',
+            data: {
+                'typeName': $('#typeName').val(),
+                'appendCode': $('#typeCode').val()
+            },
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage('Tạo loại thẻ thành công.', 2);
+
+                    GetDataForTable()
+                    $('#createTypeModal').modal('hide');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            }
+        });
+    }
+
+    function deActive(input) {
+        var id = $(input).data('id');
+        var active = $(input).data('status');
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ChangeMembershipCardTypeActivation","MembershipCardType")',
+            data: {
+                "cardTypeId": id,
+                "active": !active,
+            },
+            success: function (result) {
+                if (result.success) {
+                    if (active) {
+                        $(input).data('status', false);
+                        $(input).removeClass('btn-danger');
+                        $(input).addClass('btn-success');
+                        $(input).html("Kích hoạt");
+                    }
+                    else {
+                        $(input).data('status', true);
+                        $(input).removeClass('btn-success');
+                        $(input).addClass('btn-danger');
+                        $(input).html("Khóa");
+                    }
+                }
+                else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+        });
+    };
+    function openEdit(input) {
+        $('#editTypeID').val($(input).data('id'));
+        $('#editTypeName').val($(input).data('typename'));
+        $('#editTypeCode').val($(input).data('typecode'));
+        $('#editTypeModal').modal('show');
+    }
+    $('#btnEditType').on('click', function () {
+        if ($('#editTypeName').val() == "") {
+            ShowMessage("Tên loại thẻ không được bỏ trống", 1);
+            return;
+        }
+
+        if ($('#editTypeCode').val() == "") {
+            ShowMessage("Mã loại thẻ không được bỏ trống", 1);
+            return;
+        }
+
+        editMembershipCardType();
+    });
+
+    function editMembershipCardType() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("EditMembershipCardType", "MembershipCardType")',
+            data: {
+                "cardTypeId": $('#editTypeID').val(),
+                "newTypeName": $('#editTypeName').val(),
+                "newCode": $('#editTypeCode').val(),
+            },
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage('Cập nhập loại thẻ thành công.', 2);
+
+                    GetDataForTable()
+                    $('#editTypeModal').modal('hide');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            }
+        });
+    }
+
+    // Filter cart by status
+    $('#active-cart').on('click', function () {
+        FilterCartTypeByStatus(true, false);
+    });
+
+    $('#inactive-cart').on('click', function () {
+        FilterCartTypeByStatus(false, false);
+    });
+
+    $('#all-cart').on('click', function () {
+        FilterCartTypeByStatus(true, true);
+    });
+
+    function FilterCartTypeByStatus(showActive, showAll) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("FilterMembershipTypesByStatus")',
+            data: { isActive: showActive, allData: showAll },
+            success: function (result) {
+                if (result.success) {
+                    initTable(result.typeList);
+                }
+            },
+            error: function (error) {
+                console.log("An error occur.");
+            }
+        });
+    }
+</script>

@@ -1,0 +1,114 @@
+﻿@model HmsService.ViewModels.OrderViewModel
+
+@{
+    Layout = null;
+}
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Chi tiết hóa đơn</h4>
+        </div>
+        <div class="modal-body">
+            <div class="clearfix">
+                <div class="col-md-6 p-0">
+                    <div class="col-md-12 p-0">
+                        <label class="control-label text-left text-bold col-md-4 p-0">Tên khách hàng:</label>
+                        <label class="control-label text-left col-md-8 p-0" data-role="customer-name"> @(this.Model.CustomerName != null ? this.Model.CustomerName : this.Model.DeliveryReceiver + " (Chưa đăng kí)")</label>
+                    </div>
+                    <div class="col-md-12 p-0">
+                        <label class="control-label text-left text-bold col-md-4 p-0">Địa chỉ giao hàng:</label>
+                        <label class="control-label text-left col-md-8 p-0" data-role="delivery-address"> @(!String.IsNullOrEmpty(this.Model.DeliveryAddress) ? this.Model.DeliveryAddress : "Chưa có địa chỉ")</label>
+                    </div>
+                    <div class="col-md-12 p-0">
+                        <label class="control-label text-left text-bold col-md-4 p-0">Điện thoại:</label>
+                        <label class="control-label text-left col-md-8 p-0" data-role="customer-phone"> @(this.Model.Customer != null ? this.Model.Customer.Phone : this.Model.DeliveryPhone + " (Chưa đăng kí)")</label>
+                    </div>
+                </div>
+                <div class="col-md-6 p-0">
+                    <div class="col-md-12 p-0">
+                        <label class="control-label text-left text-bold col-md-4 p-0">Thời gian đặt hàng:</label>
+                        <label class="control-label text-left col-md-8 p-0" data-role="order-time"> @(this.Model.CheckInDate.HasValue ? this.Model.CheckInDate.Value.ToString("dd/MM/yyyy H:mm:ss") : "N/A")</label>
+                    </div>
+                    <div class="col-md-12 p-0">
+                        <label class="control-label text-left text-bold col-md-4 p-0">Cửa hàng:</label>
+
+                        @*<label id="store" class="control-label text-left col-md-6" data-role="storeId-name"> </label>*@
+                        @*<div class="fg-line col-md-6 myOrderDetail">
+                                <div class="select">
+                                    <select id="store-list" class="control-label text-left form-control valid ">
+                                        @foreach (var item in this.Model.AvailableStore)
+                                        {
+                                            <option value="@item.Value" @(item.Selected ? "selected" : null)>@item.Text</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>*@
+                        <label class="control-label text-left col-md-8 p-0" data-role="store-assign">
+                            @*@( !String.IsNullOrEmpty(this.Model.Store.ShortName) ? this.Model.Store.Name : "N/A")*@
+                            @Html.DropDownListFor(q => Model.Store.ID, (IEnumerable<SelectListItem>)ViewBag.listStore, new { id = "store-list", @class = "form-control col-sm-6" })
+                        </label>
+                    </div>
+                    <div class="col-md-12 p-0">
+                        <label class="control-label col-md-4 p-0">Trạng thái:</label>
+                        <div class="col-md-8 p-0">
+                            <label class="control-label" data-role="status"> </label>
+                            <span class="lbl middle"></span>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="col-md-6 p-0">
+                    <div class="col-md-12 p-0">
+                        <label class="control-label text-left text-bold col-md-4 p-0">Mã khuyến mãi</label>
+                        <label class="control-label text-left col-md-8 p-0"> @ViewBag.promotion. </label>
+                    </div>
+                    <div class="col-md-12 p-0">
+                        <label class="control-label text-left text-bold col-md-4 p-0">Tổng giảm giá:</label>
+                        <label class="control-label text-left col-md-8 p-0"> @(this.Model.Discount + this.Model.DiscountOrderDetail)</label>
+                    </div>
+                    <div class="col-md-12 p-0">
+                        <label class="control-label text-left text-bold col-md-4 p-0">Sau giảm giá:</label>
+                        <label class="control-label text-left col-md-8 p-0"> @(this.Model.FinalAmount)</label>
+                    </div>
+                </div>*@
+            </div>
+            @*<div id="Item-order">
+
+                </div>*@
+            <table class="table table-bordered table-hover" id="order-detail-table">
+                <thead>
+                    <tr>
+                        <th><label>STT</label> </th>
+                        <th><label>Tên sản phẩm</label> </th>
+                        <th><label>Giá sản phẩm</label> </th>
+                        <th><label>Số lượng</label> </th>
+                        <th><label>Giảm giá</label> </th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th colspan="2" class="text-right">Tổng tiền: </th>
+                        <th>@(Utils.ToMoney(this.Model.TotalAmount))</th>
+                        <th></th>
+                        <th class="text-center" style="padding-right:10px!important">@(this.Model.DiscountOrderDetail)</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="text-right">Giảm giá trên toàn đơn hàng</th>
+                        <th colspan="3" class="text-right" style="padding-right:10px!important">@(Utils.ToMoney(this.Model.Discount))</th>
+                    </tr>
+                    <tr>
+                        <th colspan="2" class="text-right">Tổng đơn hàng (sau giảm giá)</th>
+                        <th colspan="3" class="text-right" style="padding-right:10px!important">@(Utils.ToMoney(this.Model.FinalAmount))</th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <a class="btn btn-success" data-dismiss="modal" aria-label="Close">Thoát</a>
+            <a class="btn btn-primary" id="order-detail-submit">Xác nhận</a>
+        </div>
+    </div>
+</div>

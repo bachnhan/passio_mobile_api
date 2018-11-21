@@ -1,0 +1,136 @@
+﻿
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <div class="row">
+        <div class="col-md-6">
+            <h4 class="modal-title" id="myModalLabel">Chi tiết</h4>
+        </div>
+        <div class="col-md-6 m-t-25">
+            <div class="pull-right text-right myDatetimePicker">
+                <div class="input-group">
+                    <div class="dateTime pull-right width230">
+                        <div class="fg-line m-t-5">
+                            <input id="date-stringde" readonly class="btn-datetime form-control text-center">
+                            <a class="myCelenderA" id="reportrangede"><i class="fa fa-calendar"></i></a>
+                        </div>
+                        @*<div class="fg-line m-t-5">
+                            <div id="reportrange" class="btn-datetime form-control">
+                                <i class="fa fa-calendar" id="date-string" readonly></i>
+                                <span></span> <b class="caret"></b>
+                            </div>
+                        </div>*@
+                    </div>
+                    <div class="input-group-btn FindButtonDateTime">
+                        <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" onClick="divFunctionSearch()">
+                            <i class="left-icon fa fa-search"></i>   Tìm
+                        </a>
+                    </div>
+                </div>
+            </div>
+            @*<div class="input-group text-right">
+                    <div class="date-picker">
+                        <input class="CerlenderPadding" type="text" id="date-string" readonly />
+                        <a id="reportrange"><i class="fa fa-calendar CerlenderDetail"></i></a>
+                    </div>
+
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" id="btnSearch" onClick="divFunctionSearch()">
+                            <i class="left-icon fa fa-search"></i>Lọc
+                        </a>
+                    </div>
+                </div>*@
+        </div>
+    </div>
+</div>
+<div class="modal-body">
+
+    <form id="form-create-session" class="form-inline" style="display:none">
+        <input type="text" id="sTimede" name="startTime" placeholder="Chọn giờ bắt đầu" />
+        <input type="text" id="eTimede" name="endTime" placeholder="Chọn giờ kết thúc" />
+    </form>
+    <div id="detail-Item">
+
+    </div>
+</div>
+<div class="modal-footer">
+</div>
+<script src="/Content/ace/assets/js/jquery.dataTables.min.js"></script>
+<script src="/Content/ace/assets/js/jquery.dataTables.bootstrap.js"></script>
+<script>
+    $(document).ready(function () {
+        //console.log("0");
+        function cb(start, end, label) {
+            var startTime = start.format('DD/MM/YYYY'),
+                endTime = end.format('DD/MM/YYYY');
+            var dateRange = startTime + (startTime == endTime? "":" - " + endTime);
+
+            if (label != "Tùy chọn") {
+                $('#date-stringde').val(label);
+            } else {
+                $('#date-stringde').val(dateRange);
+            }
+
+            //Store data of start time and end time
+            $('#sTimede').val(startTime);
+            $('#eTimede').val(endTime);
+        }
+        //show day in input bar
+        cb(moment().subtract(1, 'days'), moment().subtract(1, 'days'), 'Hôm qua');
+
+        $('#reportrangede').daterangepicker({
+            maxDate: moment().subtract(1, 'days'),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                //'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+        //console.log("1");
+        detailItemTest();
+    });
+    // $('#btnSearch').on('click', function () {
+    //$('#btnSearch').click(function(){
+    //    //console.log('Loc');
+    //    if ($("#eTime").val().length > 16 || $("#sTime").val().length > 16) {
+    //        ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+    //        return;
+    //    }
+    //    else {
+    //        detailItemTest();
+    //    }
+    //});
+
+    function divFunctionSearch()
+    {
+        //console.log('Loc');
+        if ($("#eTimede").val().length > 16 || $("#sTimede").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            detailItemTest();
+        }
+    };
+    //var detailItem = function () {
+    function detailItemTest(){
+        //console.log("2");
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadDTCheckDetailItem", "Inventory")',
+            data: {@*'storeId': @ViewBag.storeID,*@ 'itemId': @ViewBag.ItemId, 'startTime': $('#sTimede').val(), 'endTime': $('#eTimede').val()},
+            success: function (result) {
+                //console.log("3");
+                $('#detail-Item').html(result);
+            }
+        });
+    };
+</script>
+
+
+

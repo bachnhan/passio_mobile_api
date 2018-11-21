@@ -1,0 +1,1437 @@
+﻿@model HmsService.ViewModels.MembershipCardEditViewModel
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var brandId = int.Parse(ViewContext.RouteData.Values["brandId"]?.ToString());
+    var storeId = @ViewBag.storeId;
+    var data = Model.ListType;
+}
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&key=AIzaSyDwJA7jUX5F9KR44NAKvfJsxn-9cjQwzZk"></script>
+<head>
+    <style>
+        .select2-container .select2-choice {
+            background-image: none !important;
+            border: 1px solid #e0e0e0;
+            border-radius: 0px;
+            height: 30px;
+        }
+
+        .select2-container-active .select2-choice,
+        .select2-container-active .select2-choices {
+            background-image: none !important;
+            border: 1px solid #e0e0e0;
+            border-radius: 0px;
+            height: 30px;
+        }
+
+        .form-group {
+            margin-top: 12px !important;
+            margin-bottom: 12px !important;
+        }
+
+        .action {
+            position: relative;
+            bottom: -32px;
+            margin: auto;
+        }
+
+
+        a.select2-choice {
+            height: 30px;
+        }
+
+        .form-group {
+            margin-top: 25px;
+        }
+
+
+        div > h4 {
+            color: #28587B;
+        }
+
+
+
+        label.control-label {
+            font-weight: bold;
+        }
+
+        .txt-editable {
+            margin-top: 5px;
+            height: 30px;
+            width: 263px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!--Card header-->
+        <div class="card-header">
+            <div role="tabpanel">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active">
+                        <a id="orderTab" href="#createCard" role="tab" data-toggle="tab">Tạo thẻ</a>
+                    </li>
+                    <li role="presentation">
+                        <a id="rechargeTab" href="#rechargeCard" role="tab" data-toggle="tab">Nạp tiền</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!--./Card header-->
+        <div class="card-body card-padding">
+            <!-- Tab panes -->
+            <div class="tab-content" style="padding-top:0px !important">
+                <!--tab Tạo thẻ-->
+                <div role="tabpanel" class="tab-pane fade in active" id="createCard">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3>
+                                Tạo Thẻ Thành Viên
+                            </h3>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <button type="button" class="btn btn-primary waves-effect" id="btn-submit" onclick="submitform()">Hoàn tất</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="form-horizontal p-b-20">
+                        <div class="row">
+                            <div class="col-md-12 p-b-15">
+                                <div class="col-md-6">
+                                    <div class="form-group  row">
+                                        <label for="MembershipCard_Code" class="control-label col-md-4">Mã Thẻ <label style="color:red">* </label></label>
+                                        <div class="col-md-6 ">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control col-md-6" name="MembershipCard_Code" id="MembershipCard-Code" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1 p-0">
+                                            <button class="btn btn-info" id="btnCheckMembershipCard">Check</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="Card_TypeName" class="control-label col-md-4">Mẫu Thẻ:</label>
+                                        <div class="col-md-6">
+                                            <div class="fg-line">
+                                                <select id="Card_TypeName" @*title=""*@ class="selectpicker" data-live-search="true"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label for="MembershipCard_Code" class="control-label col-md-4"> SĐT/Email </label>
+                                        <div class="col-md-6 ">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control col-md-6" name="custName" id="emai-sdt" />
+                                                <input type="hidden" value="" id="customers-id" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1 p-0">
+                                            <button class="btn btn-info center" id="btnCheckCustomer">Check</button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <label class="control-label col-md-4">
+                                            Hoặc
+                                        </label>
+                                        <div class="col-md-8">
+                                            <a id="btnCreate" role="button" class="btn btn-success" data-toggle="modal" data-target="#modalCreateCustomer" href="#">Thêm khách hàng mới</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group  row">
+                                        <table id="MemberCardDatatable" class="table table-striped table-bordered table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <label class="">Loại tài khoản</label>
+                                                    </th>
+                                                    <th>
+                                                        <label class="">Số dư mặc định</label>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 card">
+                                    <div class="card-header row col-md-12">
+                                        <div class="col-md-8 p-b-10">
+                                            <h3 style="color:green"><i class="fa fa-user-plus"></i> Thông tin khách hàng</h3>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                            <button type="button" id="btnSubmit" class="btn btn-primary" style="display:none">Thêm khách hàng</button>
+                                        </div>
+                                    </div>
+                                    <form id="CreateForm">
+                                        <div class="card-body">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4">
+                                                        Tên khách hàng:<span style="color:red">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <div class="fg-line">
+                                                            @*<input class="form-control" id="customer-name" type="text" readonly />*@
+                                                            <input class="col-sm-12 form-control" id="customer-name" name="Name" type="text" value="" readonly>
+                                                            @Html.ValidationMessage("Name", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.Label("Giới tính", htmlAttributes: new { @class = "col-md-4" })
+                                                    <div class="col-md-8">
+                                                        <div class="fg-line">
+                                                            <input class="col-sm-12 form-control" id="customer-gender" type="text" value="" readonly>
+                                                            <div id="gender-div" class="hidden">
+                                                                @Html.DropDownList("Gender", new SelectList(Model.Customer.AvailableGender, "Value", "Text"), new { @class = "selectpicker ", data_live_search = "false" })
+                                                                @Html.ValidationMessage("Gender", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4">
+                                                        Ngày sinh:
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" id="customer-birthday" name="birthDayString" type="text" readonly />
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4">
+                                                        Điện thoại:<span style="color:red">*</span>
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        @*<input class="form-control" id="customer-phone" type="text" readonly />*@
+                                                        <input class="col-sm-8 form-control" id="customer-phone" name="Phone" type="text" value="" placeholder="vd: 000-00-0000000" maxlength="12" autocomplete="off" readonly>
+                                                        @Html.ValidationMessage("Phone", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4">
+                                                        Email:
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" id="customer-email" name="Email" type="text" readonly />
+                                                        @Html.ValidationMessage("Email", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4">
+                                                        Địa chỉ:
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        @*<input class="form-control" id="customer-address" type="text" readonly />*@
+                                                        <input class="col-sm-12 form-control" id="customer-address" name="Address" type="text" value="" readonly>
+                                                        @Html.ValidationMessage("Address", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    @Html.Label("Loại", htmlAttributes: new { @class = "col-md-4" })
+                                                    <div class="col-md-8">
+                                                        <div class="fg-line">
+                                                            <input class="col-sm-12 form-control" id="customer-type" type="text" value="" readonly>
+                                                            <div id="type-div" class="hidden">
+                                                                @Html.DropDownList("CustomerTypeId", new SelectList(Model.Customer.AvailableType, "Value", "Text"), new { @class = "selectpicker", data_live_search = "true" })
+                                                                @Html.ValidationMessage("CustomerTypeId", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4">
+                                                        CMND:
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" id="customer-idcard" name="IDCard" type="text" readonly />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="col-md-4">
+                                                        Quận:
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" id="customer-district" name="District" type="text" readonly />
+                                                        @Html.ValidationMessage("District", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-md-4">
+                                                        Thành phố:
+                                                    </label>
+                                                    <div class="col-md-8">
+                                                        <input class="form-control" id="customer-city" name="City" type="text" readonly />
+                                                        @Html.ValidationMessage("City", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                                    </div>
+                                                </div>
+                                                <div class="form-group" id="map">
+                                                    <div class="col-md-10">
+                                                        <input type="text" id="txt-newstore-address" class="form-control" placeholder="Nhập để tìm địa chỉ" readonly>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <button type="button" class="btn btn-primary btn-sm pull-right" style="width:75px; height:35px" onclick="locationSearch()" id="btn-search-address">
+                                                            <i class="left-icon fa fa-search"></i> Tìm
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-md-12">
+                                                        <div id="map-canvas" style="height: 220px;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--tab Nạp tiền-->
+                <div role="tabpanel" class="tab-pane fade in" id="rechargeCard">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3>
+                                Nạp tiền vào thẻ thành viên
+                            </h3>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <button id="btn-charge" role="button" class="btn btn-primary btn-sm pull-right">
+                                <i class="left-icon fa fa-check"></i> Nạp
+                            </button>
+                        </div>
+                    </div>
+                    <hr>
+                    <!--Customer infor-->
+                    <div class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="control-label col-md-4">Mã thẻ</label>
+                                    <div class="col-md-8">
+                                        <div class="fg-line">
+                                            <input id="search-card-number" name="search-card-number" class="form-control" style="width:100%;" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <div class="col-md-8 col-md-offset-4">
+                                        <button class="btn btn-info btn-sm btn-block" data-status="existed" id="btnSearchCard">
+                                            <i class="zmdi zmdi-search"></i>Tìm kiếm
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Tên KH</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="cust-name" type="text" disabled />
+                                        <input id="cust-id" type="hidden" disabled />
+                                        @*<input id="customers-list" name="custName" type="hidden" disabled />*@
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Địa chỉ</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="cust-address" type="text" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Ghi chú</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="notes" type="text" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Điện thoại</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="cust-phone" type="text" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Email</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="cust-email" type="text" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Số dư</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control" id="cust-balance" type="text" disabled />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--./Customer infor-->
+
+                    <div>
+                        <!--tab Order-->
+                        <div role="tabpanel" class="tab-pane fade in active" id="order">
+                            <div class="row">
+                                <!--Menu-->
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="form-group">
+                                            <div class="col-md-5">
+                                                <select class="form-control" id="category-menu" data-filter="category"></select>
+                                            </div>
+                                            <div class="col-md-7">
+                                                <input class="form-control" data-filter="name" placeholder="Tìm theo tên" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12" style="height:580px ;width:100%; margin-top: 30px;">
+                                            @*<div id="forScroll" class="row small-margin" style="height:590px; overflow-y: auto; overflow: hidden; outline:none ;padding: 0">
+                                                    <ul class="row small-margin" data-role="service-container" id="iso-container" style="width:100%; list-style-type: none"></ul>
+                                                </div>*@
+                                            <div id="forScroll" class="row small-margin" style="height:590px; overflow-y: auto; overflow: hidden; outline:none ;padding: 0">
+                                                <ul class="row" data-role="service-container" id="iso-container" style="width:100%; list-style-type: none"></ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--./Menu-->
+                                <!--Table cart-->
+                                <div class="col-md-6">
+                                    <table id="orderItemDatatable" class="table table-striped table-bordered table-hover">
+                                        <thead style="white-space: nowrap;">
+                                            <tr>
+                                                <th>
+                                                    <label class="">Tên</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Đơn giá</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">SL</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Giảm giá (%)</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Tổng cộng</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Xóa</label>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                    <label id="total-Item" class="pull-right text-bold"></label>
+                                </div>
+                                <!--./Table cart-->
+                            </div>
+                        </div>
+
+                        <!--Template items in menu-->
+                        <template id="tmpServiceItem">
+                            <li class="col-md-3">
+                                <div class="service-item service-item-sm no-border">
+                                    <div class="ratio-wrapper ratio-wrapper-1-1">
+                                        <div class="ratio-item">
+                                            <a class="img-container" data-spinner="plus">
+                                                <img src="/Content/images/Default_product_img.jpg"
+                                                     onerror="window.HMS.ServiceItemHandler.resetDefaultImage(this)">
+                                                <div class="price">
+                                                    <label data-role="price"></label>
+                                                </div>
+                                                <div class="title">
+                                                    <label data-role="name"></label>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="ace-spinner touch-spinner">
+                                        <div class="input-group">
+                                            <div class="spinner-buttons input-group-btn spinner-left" data-spinner="minus">
+                                                <button class="btn btn-danger btn-minus btn-xs">
+                                                    <i class="fa fa-minus smaller-75"></i>
+                                                </button>
+                                            </div>
+                                            <input type="text" class="input-sm input-quantity form-control" value="1" maxlength="4" onkeyup="this.value = checkDigit(this.value)">
+                                            <div class="spinner-buttons input-group-btn spinner-right">
+                                                <button class="btn btn-success btn-order btn-xs" data-action="order-item" data-type="spinner">
+                                                    <i class="fa fa-check smaller-75"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </template>
+                        <!--./Template items in menu-->
+                        <!--Tempalte Item in cart-->
+                        <template id="tmpServiceItemRow">
+                            <tr>
+                                <td data-role="name"></td>
+                                <td data-role="price"></td>
+                                <td data-role="quantity"></td>
+                                <td data-role="discount"></td>
+                                <td data-role="total"></td>
+                                <td>
+                                    <button class="btn btn-xs btn-danger" data-action="delete-ordered-item"><i class="glyphicon glyphicon-trash"></i></button>
+                                </td>
+                            </tr>
+                        </template>
+                        <!--./Tempalte Item in row-->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <input type="hidden" id="id_CardSample" value="" />
+    <input type="hidden" id="lati" value="" />
+    <input type="hidden" id="long" value="" />
+    <input type="hidden" id="hiddenStoreId" value="@ViewBag.storeId" />
+    <input type="hidden" id="hiddenBrandId" value="@ViewBag.brandId" />
+    @*<script src="~/Scripts/accounting.min.js"></script>*@
+    <script src="~/Content/frontend/js/common.js"></script>
+    <script src="~/Content/Delivery/delivery.js"></script>
+    <script src="~/Content/frontend/js/skyplus-delivery.js"></script>
+    <script src="~/Content/Delivery/delivery.dom.object.init.js"></script>
+</body>
+<script>
+    var datatmp;
+    var firstpicker = false;
+    var listAccounts = [];
+    var listAccountTmps = [];
+    function formatSelect2(state) {
+        var markup = state.text + " - " + state.phone;
+        return markup;
+    }
+
+    @*function getSampleCard() {
+        $.ajax({
+            url: '@Url.Action("ActiveMembershipCard")',
+            type: 'POST',
+            data: {
+                cardCode: '@Model.MembershipCardCode',
+                customerId: $('#customers-id').val(),
+            },
+            success: function (result) {
+                if (result.success) {
+                    ShowAlert("Kích hoạt thành công", 2, '@Url.Action("Index")');
+                } else {
+                    ShowMessage("Có lỗi xảy ra", 1);
+                }
+            }
+        });
+    }*@
+
+    function getAccountMembershipCard() {
+
+        var dataTable = $("#MemberCardDatatable").dataTable();
+
+        if (dataTable != null) {
+            dataTable.fnDestroy();
+            initDatatable(listAccounts);
+            RefreshTable();
+        } else {
+            initDatatable(listAccounts);
+        }
+    }
+
+    function initDatatable(data) {
+        $("#MemberCardDatatable").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "bLengthChange": false,
+            "data": data,
+            //"iDisplayLength": 50,
+            //"aLengthMenu": [50, 150],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [0],
+                    "mRender": function (data, type, row) {
+                        var type = row[0];
+                        var str = "";
+                        switch (type) {
+                            case 1: str = "Tài khoản thanh thoán"; break;
+                            case 2: str = "Tài khoản sản phẩm"; break;
+                            case 3: str = "Tài khoản tích điểm"; break;
+                        }
+                        return str;
+                    }
+                },
+                {
+                    "aTargets": [1],
+                    "mRender": function (data, type, row) {
+                        var type = row[0];
+                        var str = "";
+                        switch (type) {
+                            case 1: str = toMoney(Math.round(row[1]), ',', ' VNĐ'); break;
+                            case 2: str = toMoney(Math.round(row[1]), ',', " " + row[2]); break;
+                            case 3: str = toMoney(Math.round(row[1]), ',', ' Point'); break;
+                        }
+
+                        return str;
+                    },
+                },
+            ],
+            "bAutoWidth": true,
+            "order": [[1, 'asc']],
+        });
+    };
+
+    function reDrawDatatable(id, data) {
+        $(id).dataTable()._fnPageChange(0);
+        $(id).dataTable().fnDraw();
+    }
+    function RefreshTable() {
+        reDrawDatatable("#MemberCardDatatable");
+    }
+
+    $(document).ready(function () {
+
+        $(function () {
+            //$("#map-canvas").width('100%').height(300);
+            google.maps.event.addDomListener(window, 'load', initialize);
+        });
+
+        autocomplete = new google.maps.places.Autocomplete((document.getElementById('txt-newstore-address')), { types: ['geocode'] });
+
+        google.maps.event.addListener(autocomplete, 'place_changed', function () {
+            fillInAddress();
+        });
+
+        $('input[name="birthDayString"]').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+        });
+        $('input[name="birthDayString"]').val("");
+
+        $('#Card_TypeName').on('change', function () {
+            var selected = $(this).val();
+            $("#id_CardSample").val(selected);
+            if (selected != '') {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("LoadAccountSample","MembershipCard")',
+                    dataType: 'JSON',
+                    data: {
+                        'cardId': selected
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            var dataTable = $("#MemberCardDatatable").dataTable();
+
+                            if (dataTable != null) {
+                                dataTable.fnDestroy();
+                                initDatatable(result.listAccount);
+                                RefreshTable();
+                            }
+                        } else {
+                            ShowMessage(result.message, 2);
+                        }
+                    },
+                    error: function (error) {
+                        ShowMessage("@Resources.Message_VI_Resources.ErrorOccured", 1);
+                    }
+                });
+            } else {
+                var dataTable = $("#MemberCardDatatable").dataTable();
+                dataTable.fnDestroy();
+                initDatatable(null);
+                RefreshTable();
+            }
+        });
+
+        //setTimeout(setTimeout(function(){
+        //loadAllCustomer();
+        //}, 200))
+        /// Get Customer
+        @*-------------------------------------------------------------------------------------------*@
+
+
+
+        //$('#btn-comeback').fixedScroll(70);
+        //$('#btn-submit').fixedScroll(70);
+
+        $("#forScroll").niceScroll({
+            cursorcolor: "black",
+            cursoropacitymin: 0.3,
+            background: "#bbb",
+            cursorborder: "1",
+            autohidemode: true,
+            cursorfixedheight: 100
+        });
+
+        $('#ascrail2000').show();
+        loadCardPaymentCategory();
+        window.HMS.Delivery.init();
+        window.OnlineOrder = new DeliveryOrder(@ViewBag.storeId,
+            '@Url.Action("CreateOrderBuyMembershipCardAsync")');
+
+
+
+    });
+
+    function setSubmitUrl() {
+        window.OnlineOrder.setSubmitUrl('@Url.Action("CreateOrderBuyMembershipCardAsync")')
+    }
+
+
+    /*Bản đồ*/
+    var map;
+    var mapOptions;
+    var listStore = new Array();
+    function initialize() {
+        var styles = [{ featureType: "road.highway", stylers: [{ visibility: "off" }] }, { featureType: "landscape", stylers: [{ visibility: "off" }] }, { featureType: "transit", stylers: [{ visibility: "off" }] }, { featureType: "poi", stylers: [{ visibility: "off" }] }, { featureType: "poi.park", stylers: [{ visibility: "on" }] }, { featureType: "poi.park", elementType: "labels", stylers: [{ visibility: "off" }] }, { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#d3d3d3" }, { visibility: "on" }] }, { featureType: "poi.medical", stylers: [{ visibility: "off" }] }, { featureType: "poi.medical", stylers: [{ visibility: "off" }] }, { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#cccccc" }] }, { featureType: "water", elementType: "geometry.fill", stylers: [{ visibility: "on" }, { color: "#cecece" }] }, { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#808080" }] }, { featureType: "administrative", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#808080" }] }, { featureType: "road", elementType: "geometry.fill", stylers: [{ visibility: "on" }, { color: "#fdfdfd" }] }, { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }, { featureType: "water", elementType: "labels", stylers: [{ visibility: "off" }] }, { featureType: "poi", elementType: "geometry.fill", stylers: [{ color: "#d2d2d2" }] }];
+
+        // Create a new StyledMapType object, passing it the array of styles,
+        // as well as the name to be displayed on the map type control.
+        var styledMap = new google.maps.StyledMapType(styles,
+        { name: "Styled Map" });
+
+        mapOptions = {
+            center: new google.maps.LatLng(10.789886817455374, 106.6787300934875),
+            zoom: 14,
+            mapTypeControlOptions: {
+                mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+            }
+        };
+
+        map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+        map.mapTypes.set('map_style', styledMap);
+        map.setMapTypeId('map_style');
+        //setPositionTerminal();
+        //setPositionUser();
+
+        //$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        //    google.maps.event.trigger(map, 'resize');
+        //});
+
+
+        //$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        //    google.maps.event.trigger(MAP_OBJECT, "resize");
+        //})
+
+        window.map = map;
+        window.geocoder = new google.maps.Geocoder();
+        if ($('#lati').val() != "" && $('#long').val() != "") {
+            $('#txt-newstore-address').val($('#addr').val());
+            var img = "/Content/images/m_terminal.png";
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng($('#lati').val(), $('#long').val()),
+                map: window.map,
+                title: $('#Name').val(),
+                icon: img
+            })
+            window.map.setCenter(marker.getPosition());
+            getDistrictviaGeocoder($('#lati').val(), $('#long').val());
+
+
+        }
+
+    }
+    function fillInAddress() {
+        // Get the place details from the autocomplete object.
+        var place = autocomplete.getPlace();
+        $('#btn-search-address').trigger('click');
+    }
+
+    var resultMarker = null;
+    //$("#btn-search-address").on('click',
+    function locationSearch() {
+        var address = $("#txt-newstore-address").val();
+
+        window.geocoder.geocode({ 'address': address }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                map.setCenter(results[0].geometry.location);
+                if (resultMarker != null) {
+                    resultMarker.setMap(null);
+                }
+                $('#customer-address').val(address);
+                var latitude = results[0].geometry.location.lat();
+                var longitude = results[0].geometry.location.lng();
+                getDistrictviaGeocoder(latitude, longitude);
+                $('#long').val(longitude);
+                $('#lati').val(latitude);
+                resultMarker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+            } else {
+                ShowMessage("Geocode không thành công vì: " + status, 1);
+            }
+        });
+
+    };
+    function getDistrictviaGeocoder(lati, long) {
+        var geocoder = new google.maps.Geocoder();
+        var latLng = new google.maps.LatLng(lati, long);
+        geocoder.geocode({
+            latLng: latLng
+        },
+        function (responses) {
+            if (responses && responses.length > 0) {
+                var addrComp = responses[0].address_components;
+                $.each(addrComp, function (i, address_component) {
+                    var flagcity = false; var flagDistrict = false;
+                    if (address_component.types[0] == "administrative_area_level_2") {
+                        var district = address_component.long_name
+                        if (district == null) {
+                            $('#customer-district').val('Không rõ');
+                        }
+                        $('#customer-district').val(district);
+                        flagDistrict = true;
+                    }
+                    if (address_component.types[0] == "administrative_area_level_1") {
+                        var district = address_component.long_name
+                        if (district == null) {
+                            $('#customer-city').val('Không rõ');
+                        }
+                        $('#customer-city').val(district);
+                        flagcity = true;
+                    }
+                    if (flagcity && flagDistrict) {
+                        return;
+                    }
+                });
+            }
+            else {
+                alert('Không tìm được quận! Xin chọn địa chỉ phù hợp!');
+            }
+        });
+
+    }
+
+
+    //autocorrect phone field
+    $("#btnCreate").click(function () {
+        $('#btnSubmit').slideDown();
+        $('#customers-id').val("");
+        $('#customer-name').val("");
+        $('#customer-address').val("");
+        $('#customer-phone').val("");
+        $('#customer-email').val("");
+        $('#customer-type').hide();
+        $('#customer-idcard').val("");
+        $('#customer-birthday').val("");
+        $('#customer-city').val("");
+        $('#customer-district').val("");
+        $('#customer-gender').hide();
+        $('#customer-type').hide();
+        $('#gender-div').removeClass("hidden");
+        $('#type-div').removeClass("hidden");
+        $("#customer-birthday").attr("disabled", false);
+        $("#customer-name").attr("readonly", false);
+        //$("#customer-address").attr("readonly", false);
+        $('#txt-newstore-address').val("");
+        $("#txt-newstore-address").attr("readonly", false);
+        $("#customer-phone").attr("readonly", false);
+        $("#customer-email").attr("readonly", false);
+        $('#customer-idcard').attr("readonly", false);
+        $('#customer-birthday').attr("readonly", false);
+        //$('#customer-city').attr("readonly", false);
+        //$('#customer-district').attr("readonly", false);
+        var gender = $('select[name=Gender] option:first').val();
+        $('select[name=Gender]').val(gender);
+        // Force a refresh.
+        $('select[name=Gender]').selectpicker('refresh')
+
+        var type = $('select[name=CustomerTypeId] option:first').val();
+        $('select[name=CustomerTypeId]').val(type);
+        // Force a refresh.
+        $('select[name=CustomerTypeId]').selectpicker('refresh')
+    });
+
+    $("#btnSubmit").click(function () {
+        // clear error
+        $(".error-message").html("");
+        $("#FormError").hide();
+        $("#FormError").html("");
+        $("#FormSuccess").hide();
+        $("#FormSuccess").html("");
+
+        var hasError = false;
+
+        // validating
+        if ($("input[name='Name']").val() == "") {
+            $("span[data-valmsg-for='Name']").html("Tên khách hàng không được bỏ trống");
+            hasError = true;
+        }
+
+        var phoneNumber = $("input[name='Phone']").val();
+        if (phoneNumber == "") {
+            $("span[data-valmsg-for='Phone']").html("Số điện thoại không được bỏ trống");
+            hasError = true;
+        }
+
+        if (!phoneNumber.match(/^([0-9]{10,12})$/)) {
+            $("span[data-valmsg-for='Phone']").html("Số điện thoại không không hợp lệ");
+            hasError = true;
+        }
+
+        var Email = $("input[name='Email']").val();
+        var re = /^(([^<>()[\]\\.,;:\s@@\"]+(\.[^<>()[\]\\.,;:\s@@\"]+)*)|(\".+\"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        //if (Email == "") {
+        //    $("span[data-valmsg-for='Email']").html("Email không được bỏ trống");
+        //    hasError = true;
+        //}
+        if (Email != "") {
+            if (!Email.match(re)) {
+                $("span[data-valmsg-for='Email']").html("Email không hợp lệ");
+                hasError = true;
+            }
+        }
+
+
+        //if ($("input[name='Address']").val() == "") {
+        //    $("span[data-valmsg-for='Address']").html("Địa chỉ không được bỏ trống");
+        //    hasError = true;
+        //}
+        //if ($("input[name='District']").val() == "") {
+        //    $("span[data-valmsg-for='District']").html("Quận không được bỏ trống");
+        //    hasError = true;
+        //}
+        //if ($("input[name='City']").val() == "") {
+        //    $("span[data-valmsg-for='City']").html("Thành phố không được bỏ trống");
+        //    hasError = true;
+        //}
+
+        // submit
+        if (!hasError) {
+            createCustomer();
+
+        }
+    });
+
+    // Button close on modal form
+    $("#btnModalClose").click(function () {
+        $("#Modal-addNewCategory").modal("hide");
+        if (modalModified) location.reload();
+    });
+
+
+    function Save() {
+        if ($('#customers-id').val() == "" || $('#customers-id').val() == null) {
+            ShowMessage("Xin chọn một khách hàng hoặc thêm khách hàng.", 2);
+        }
+        else {
+            $.ajax({
+                url: '@Url.Action("ActiveMembershipCard")',
+                type: 'POST',
+                data: {
+                    cardCode: '@Model.MembershipCardCode',
+                    customerId: $('#customers-id').val(),
+                },
+                success: function (result) {
+                    if (result.success) {
+                        ShowAlert("Kích hoạt thành công", 2, '@Url.Action("Index")');
+                    } else {
+                        ShowMessage("Có lỗi xảy ra", 1);
+                    }
+                }
+            });
+        }
+    }
+
+
+    // check phone number | email
+
+    $('#btnCheckCustomer').click(function () {
+        $(".error-message").html("");
+        $("#FormError").hide();
+        $("#FormError").html("");
+        $("#FormSuccess").hide();
+        $("#FormSuccess").html("");
+        if ($('#emai-sdt').val() == "") {
+            ShowMessage("vui lòng nhập SĐT hoặc Email", 2, 1);
+            $('#emai-sdt').focus();
+            return;
+        }
+        clickBtnCheckCustomer();
+    })
+
+
+    $('#btnCheckMembershipCard').click(function () {
+        if ($('#MembershipCard-Code').val() == "") {
+            ShowMessage("Vui lòng nhập mã thẻ !", 2, 1);
+            $('#MembershipCard-Code').focus();
+            return;
+        }
+        clickBtnCheck();
+    })
+
+
+    function clickBtnCheckCustomer() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CheckCustomer")',
+            data: {
+                "keyData": $('#emai-sdt').val().trim(),
+            },
+            success: function (data) {
+                if (data.success == true) {
+                    $('#customer-name').val(data.customer.Name);
+                    $('#customer-gender').val(data.customer.Gender);
+                    $('#customer-type').val(data.customer.Type);
+                    $('#customer-address').val(data.customer.Address);
+                    $('#customer-phone').val(data.customer.Phone);
+                    $('#customer-email').val(data.customer.Email);
+                    $('#customer-idcard').val(data.customer.CMND);
+                    $('#customer-birthday').val(data.customer.Date);
+                    $('#customer-city').val(data.customer.City);
+                    $('#customer-district').val(data.customer.District);
+                    $('#customer-type').show();
+                    $('#customer-gender').show();
+                    $('#gender-div').addClass("hidden");
+                    $('#type-div').addClass("hidden");
+                    $("#customer-birthday").attr("disabled", true);
+                    $("#customer-name").attr("readonly", true);
+                    $('#txt-newstore-address').val("");
+                    $("#txt-newstore-address").attr("readonly", true);
+                    //$("#customer-address").attr("readonly", true);
+                    $("#customer-phone").attr("readonly", true);
+                    $("#customer-email").attr("readonly", true);
+                    $('#customer-idcard').attr("readonly", true);
+                    //$('#customer-city').attr("readonly", true);
+                    //$('#customer-district').attr("readonly", true);
+                    $('#btnSubmit').slideUp();
+                    $('#customers-id').val(data.customer.id)
+
+                } else {
+                    $('#customer-name').val("");
+                    $('#customer-gender').val('');
+                    $('#customer-type').val('');
+                    $('#customer-address').val('');
+                    $('#customer-phone').val('');
+                    $('#customer-email').val('');
+                    $('#customer-idcard').val('');
+                    $('#customer-birthday').val('');
+                    $('#customer-city').val('');
+                    $('#customer-district').val('');
+                    $('#customer-type').show();
+                    $('#customer-gender').show();
+                    $('#gender-div').addClass("hidden");
+                    $('#type-div').addClass("hidden");
+                    $("#customer-birthday").attr("disabled", true);
+                    $("#customer-name").attr("readonly", true);
+                    //$("#customer-address").attr("readonly", true);
+                    $('#txt-newstore-address').val("");
+                    $("#txt-newstore-address").attr("readonly", true);
+                    $("#customer-phone").attr("readonly", true);
+                    $("#customer-email").attr("readonly", true);
+                    $('#customer-idcard').attr("readonly", true);
+                    //$('#customer-city').attr("readonly", true);
+                    //$('#customer-district').attr("readonly", true);
+                    $('#btnSubmit').slideUp();
+                    $('#customers-id').val('');
+                    ShowMessage(data.message, 2);
+                }
+            },
+            error: function () {
+                ShowMessage("Có lỗi trong quá trình xử lý", 1);
+            }
+        });
+    }
+
+    function clickBtnCheck() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CheckMembershipCard")',
+            data: {
+                "membershipCardCode": $('#MembershipCard-Code').val(),
+            },
+            success: function (data) {
+                if (data.checkCard == true) {
+                    $("#membershipCardStatus").text(data.message);
+                    if (parseInt(data.customerId) > 0) {
+                        ShowMessage(data.message, 2);
+                    } else {
+                        ShowMessage(data.message, 2);
+                    }
+                    $("#Card_TypeName").html("");
+                    $("#Card_TypeName").selectpicker('refresh');
+                } else {
+                    ShowMessage(data.message, 2);
+                    getListCardSample();
+                }
+
+            },
+            error: function () {
+                ShowMessage("Có lỗi trong quá trình xử lý", 1);
+            }
+        });
+        var dataTable = $("#MemberCardDatatable").dataTable();
+        dataTable.fnDestroy();
+        initDatatable(null);
+        RefreshTable();
+    }
+
+    function getListCardSample() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetListCardSample")',
+            success: function (data) {
+                if (data.success == true) {
+                    firstpicker = true;
+                    var content = "";
+                    content += "<option value=''>" + "Chọn mẫu thẻ" + "</option>";
+                    for (var i = 0; i < data.listCard.length; ++i) {
+                        content += "<option value='" + data.listCard[i].Id + "'>" + data.listCard[i].Code + "</option>";
+                    }
+                    $("#Card_TypeName").html(content);
+                    $("#Card_TypeName").selectpicker('refresh');
+
+                } else {
+                    ShowMessage("có lỗi xảy ra", 1);
+                }
+            },
+            error: function () {
+                ShowMessage("Có lỗi trong quá trình xử lý", 1);
+            }
+        });
+    }
+
+    function correctPhone() {
+        var phoneNum = $('#customer-phone').val().replace(/[^\d]/g, '');
+        phoneNum = phoneNum.replace(/^00/, '0');
+
+        $('#customer-phone').val(phoneNum);
+    }
+
+    function toDate(selector) {
+        var from = $(selector).val().split("/");
+        return new Date(from[2], from[1] - 1, from[0]);
+    }
+
+    function createCustomer() {
+        correctPhone();
+        var formData = $('#CreateForm').serialize();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("CreateCustomer")',
+            dataType: 'JSON',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage(result.message, 2);
+                    var idCustomer = result.customer.id;
+                    $('#customers-id').val(idCustomer);
+
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("GetCustomerById","MembershipCard")',
+                        dataType: 'JSON',
+                        data: {
+                            'id': result.customer.id
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                $('#customer-name').val(result.customer.Name);
+                                $('#customer-gender').val(result.customer.Gender);
+                                $('#customer-type').val(result.customer.Type);
+                                $('#customer-address').val(result.customer.Address);
+                                $('#customer-phone').val(result.customer.Phone);
+                                $('#customer-email').val(result.customer.Email);
+                                $('#customer-idcard').val(result.customer.CMND);
+                                $('#customer-birthday').val(result.customer.Date);
+                                $('#customer-city').val(result.customer.City);
+                                $('#customer-district').val(result.customer.District);
+                                $('#customer-type').show();
+                                $('#customer-gender').show();
+                                $('#gender-div').addClass("hidden");
+                                $('#type-div').addClass("hidden");
+                                $("#customer-birthday").attr("disabled", true);
+                                $("#customer-name").attr("readonly", true);
+                                //$("#customer-address").attr("readonly", true);
+                                $("#customer-phone").attr("readonly", true);
+                                $("#customer-email").attr("readonly", true);
+                                $('#customer-idcard').attr("readonly", true);
+                                //$('#customer-city').attr("readonly", true);
+                                //$('#customer-district').attr("readonly", true);
+                                $('#txt-newstore-address').val("");
+                                $("#txt-newstore-address").attr("readonly", true);
+                                $('#emai-sdt').val(result.customer.Phone);
+                                $('#btnSubmit').slideUp();
+                            } else {
+                                ShowMessage(result.message, 1);
+                            }
+
+                        },
+
+                        error: function (error) {
+                            ShowMessage("@Resources.Message_VI_Resources.ErrorOccured", 1);
+                        }
+                    });
+                } else {
+                    if (result.message == "Email đã tồn tại") {
+                        $("span[data-valmsg-for='Email']").html("Email đã tồn tại");
+                    }
+                    if (result.message == "SĐT đã tồn tại") {
+                        $("span[data-valmsg-for='Phone']").html("SĐT đã tồn tại");
+                    }
+                    ShowMessage(result.message, 1);
+                }
+                $("#modalCreateCustomer").modal("hide");
+            },
+
+            error: function (error) {
+                ShowMessage("@Resources.Message_VI_Resources.ErrorOccured", 1);
+            }
+        });
+    }
+
+    function resetallform() {
+        $("#MembershipCard-Code").val("");
+        $('#customers-id').val("");
+        $('#MembershipCard-Code').val("");
+        $('#emai-sdt').val("");
+        $('#id_CardSample').val("");
+        $('#customer-name').val("");
+        $('#customer-gender').val('');
+        $('#customer-type').val('');
+        $('#customer-address').val('');
+        $('#customer-phone').val('');
+        $('#customer-email').val('');
+        $('#customer-idcard').val('');
+        $('#customer-birthday').val('');
+        $('#customer-city').val('');
+        $('#customer-district').val('');
+        $('#customer-type').show();
+        $('#customer-gender').show();
+        $('#gender-div').addClass("hidden");
+        $('#type-div').addClass("hidden");
+        $("#customer-birthday").attr("disabled", true);
+        $("#customer-name").attr("readonly", true);
+        //$("#customer-address").attr("readonly", true);
+        $("#customer-phone").attr("readonly", true);
+        $("#customer-email").attr("readonly", true);
+        $('#customer-idcard').attr("readonly", true);
+        $('#txt-newstore-address').val("");
+        $("#txt-newstore-address").attr("readonly", true);
+        //$('#customer-city').attr("readonly", true);
+        //$('#customer-district').attr("readonly", true);
+        var dataTable = $("#MemberCardDatatable").dataTable();
+        dataTable.fnDestroy();
+        initDatatable(null);
+        RefreshTable();
+        $("#Card_TypeName").html("");
+        $("#Card_TypeName").selectpicker('refresh');
+    }
+    function submitform() {
+        var cardCode = $("#MembershipCard-Code").val().trim();
+        var customerId = $('#customers-id').val().trim();
+        var cardSampleId = $('#id_CardSample').val().trim();
+        if (cardCode == "") {
+            ShowMessage("Vui lòng nhập mã thẻ !", 2, 1);
+            $('#MembershipCard-Code').focus();
+            return;
+        }
+
+        if (customerId == "") {
+            ShowMessage("Vui lòng chọn khách hàng", 2, 1);
+            return;
+        }
+        if (cardSampleId == "") {
+            ShowMessage("Vui lòng chọn loại thẻ", 2, 1);
+            return;
+        }
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("CreateMembershipCardAtStore","MembershipCard")',
+            dataType: 'JSON',
+            data: {
+                'userName':'@HttpContext.Current.User.Identity.Name',
+                'cardCode': cardCode,
+                'customerId': customerId,
+                'cardSampleId': cardSampleId
+            },
+            success: function (result) {
+                if (result.success == true) {
+                    var title = "Thành Công";
+                    var message = result.message;
+                    var style = "success";
+                    swal(title, message, style);
+                    resetallform();
+                } else {
+                    var title = "Lỗi";
+                    var message = result.message;
+                    var style = "error";
+                    swal(title, message, style);
+                }
+            },
+            error: function (error) {
+                ShowMessage("@Resources.Message_VI_Resources.ErrorOccured", 1);
+            }
+        });
+    }
+
+    function loadCustomer(id) {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("GetCustomerById","MembershipCard")',
+            dataType: 'JSON',
+            data: {
+                'id': id
+            },
+            success: function (result) {
+                if (result.success) {
+                    $('#customer-name').val(result.customer.Name);
+                    $('#customer-gender').val(result.customer.Gender);
+                    $('#customer-type').val(result.customer.Type);
+                    $('#customer-address').val(result.customer.Address);
+                    $('#customer-phone').val(result.customer.Phone);
+                    $('#customer-email').val(result.customer.Email);
+                    $('#customer-idcard').val(result.customer.CMND);
+                    $('#customer-birthday').val(result.customer.Date);
+                    $('#customer-city').val(result.customer.City);
+                    $('#customer-district').val(result.customer.District);
+                    $('#customer-type').show();
+                    $('#customer-gender').show();
+                    $('#gender-div').addClass("hidden");
+                    $('#type-div').addClass("hidden");
+                    $("#customer-birthday").attr("disabled", true);
+                    $("#customer-name").attr("readonly", true);
+                    //$("#customer-address").attr("readonly", true);
+                    $("#customer-phone").attr("readonly", true);
+                    $("#customer-email").attr("readonly", true);
+                    $('#customer-idcard').attr("readonly", true);
+                    $('#txt-newstore-address').val("");
+                    $("#txt-newstore-address").attr("readonly", true);
+                    //$('#customer-city').attr("readonly", true);
+                    //$('#customer-district').attr("readonly", true);
+                    $('#btnSubmit').slideUp();
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+
+            error: function (error) {
+                ShowMessage("@Resources.Message_VI_Resources.ErrorOccured", 1);
+            }
+        });
+    }
+
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    }
+
+    var echo = 0, MAX_VALUE = 500, MIN_VALUE = 1;
+    function loadCardPaymentCategory() {
+        $.ajax({
+            url: '@Url.Action("LoadCardPaymentCategory", "Delivery", new { @area="Delivery"})',
+            type: "POST",
+            async: false,
+            success: function (result) {
+                if (result != null && result.length > 0) {
+                    //render to store dropdown
+                    $('#category-menu').html();
+                    for (var i = 0; i < result.length; i++) {
+                        $('#category-menu').append("<option value=\'" + result[i].CategoryId + "\'>" + result[i].Name + "</option>");
+                    }
+                }
+            },
+            error: function (error) {
+                ShowMessage("Có lỗi xảy ra, vui lòng thử lại. Nếu lỗi tiếp tục tiếp diễn xin vui lòng liên hệ admin",1);
+            }
+        });
+    }
+
+    //Find membership card by card num
+    $('#btnSearchCard').click(function () {
+        if ($('#search-card-number').val() == "") {
+            ShowMessage("Vui lòng nhập mã thẻ !", 2, 1);
+            $('#search-card-number').focus();
+            return;
+        }
+        clickBtnCheckExistCard();
+    })
+
+    //
+    function clickBtnCheckExistCard() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("SearchMemberShipCard")',
+            data: {
+                "membershipCardCode": $('#search-card-number').val().trim(),
+            },
+            success: function (data) {
+                if (data.checkCard == true) {
+                    if (parseInt(data.customerId) > 0) {
+                        ShowMessage(data.message, 2);
+                        fillChargCardCustomerInfo(data.customerId, data.customerName, data.phone, data.address, data.email, data.balance);
+                    } else {
+                        ShowMessage(data.message, 2);
+                        fillChargCardCustomerInfo();
+                    }
+                } else {
+                    ShowMessage(data.message, 2);
+                    fillChargCardCustomerInfo();
+                }
+            },
+            error: function () {
+                ShowMessage("Có lỗi trong quá trình xử lý", 1);
+                fillChargCardCustomerInfo();
+            }
+        });
+    }
+
+    function fillChargCardCustomerInfo(id, name, phone, address, email, balance) {
+        $('#cust-id').val(id);
+        $('#cust-name').val(name);
+        $('#cust-phone').val(phone);
+        $('#cust-address').val(address);
+        $('#cust-email').val(email);
+        $('#cust-balance').val(toMoney(balance, ',', ' VNĐ'));
+    }
+
+    function clearAllFieldChargeCard() {
+        $('#search-card-number').val('');
+        $('#cust-id').val('');
+        $('#cust-name').val('');
+        $('#cust-phone').val('');
+        $('#cust-address').val('');
+        $('#cust-email').val('');
+        $('#cust-balance').val('');
+        $('#orderItemDatatable').find("tbody").empty();
+        $('#total-Item').empty()
+    }
+
+</script>

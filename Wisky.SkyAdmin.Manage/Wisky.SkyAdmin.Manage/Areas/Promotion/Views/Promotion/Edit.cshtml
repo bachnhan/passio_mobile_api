@@ -1,0 +1,302 @@
+﻿@model  HmsService.ViewModels.PromotionEditViewModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+}
+
+<div class="card">
+    <form id="editPromotionForm" method="post" enctype="multipart/form-data">
+
+        @Html.HiddenFor(q => q.PromotionID)
+        @Html.HiddenFor(q => q.PromotionCode)
+        @Html.HiddenFor(q => q.PromotionClassName)
+        @Html.HiddenFor(q => q.ApplyLevel)
+        @Html.HiddenFor(q => q.GiftType)
+        @Html.HiddenFor(q => q.Active)
+        @Html.HiddenFor(q => q.IsForMember)
+        @Html.HiddenFor(q => q.ImageUrl)
+
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Cập nhật khuyến mãi</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="@Url.Action("IndexPromotion")" class="btn btn-danger">Huỷ</a>
+                    <button type="button" onclick="confirmSubmit()" class="btn btn-success">Hoàn tất</button>
+                </div>
+            </div>
+            <hr />
+        </div>
+        <div class="card-padding">
+            <div class="modal-body">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px; margin-top:12px; padding-top:20px; padding-bottom:22px;">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Tên khuyến mãi<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.PromotionName, new { id = "PromotionName", @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+                                    <label class="control-label col-md-4" for="Name">Biểu tượng</label>
+                                    <div class="col-md-6">
+                                        <div class="fg-line">
+                                            <div class="select" name="ImageCss">
+                                                @Html.EnumDropDownListFor(model => model.ImageCssEnum, new { @class = "form-control iconoption", @style = "font-family: 'FontAwesome', Helvetica;" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>*@
+                            @Html.HiddenFor(q => q.ImageCssEnum)
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Mô tả</label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextAreaFor(q => q.Description, new { id = "Description", @class = "form-control", style = " height:86px;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Ảnh</label>
+                                <div class="col-md-4">
+                                    <div class="fg-line">
+
+                                        <div style="display: none">
+
+                                            <input type='file' style="" id="imageUpload" name="imageUpload" onchange="readURL(this);" />
+                                        </div>
+                                        <div class="photo-item removeable" style="margin-bottom:15px">
+                                            <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                <div id="ShowImg" class="ratio-item">
+                                                    @if (Model.ImageUrl != null)
+                                                    {
+                                                        <img id="image" width="200" height="150" src="@Model.ImageUrl" alt="your image" />
+                                                        <span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>
+                                                    }
+                                                </div>
+                                                </div>
+                                            </div>
+
+                                                <button type="button" id="btnUploadImage" class="btn btn-sm btn-success uploadImageToBlob">
+                                                    <i class="icon-upload"></i>Browse
+                                                </button>
+
+
+
+                                            </div>
+                                        </div>
+                                    </div>
+                        </div>
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Thời gian khuyến mãi</label>
+                                <div class="col-md-6 dateTime">
+                                    <div class="dateTime">
+                                        <div class="fg-line m-t-5">
+                                            <input id="date-string" readonly class="form-control pull-right text-center">
+                                            <a class="myCelenderA" id="reportrange"><i class="fa fa-calendar"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    @Html.HiddenFor(q => q.FromDateStr, new { id = "FromDateStr" })
+                                    @Html.HiddenFor(q => q.ToDateStr, new { id = "ToDateStr" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Nhóm</label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        <div class="select">
+                                            @Html.DropDownListFor(q => q.AvailableGroup, this.Model.AvailableGroup, new { @class = "form-control" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Khung giờ áp dụng</label>
+                                <div class="col-md-6" style="margin-left:-13px;">
+                                    <div class="col-md-2" style="margin-top:9px"><span>Từ</span></div>
+                                    <div class="col-md-3">
+                                        <div class="fg-line">
+                                            <select name="FromTime" style="width:65px;">
+                                                @for (int i = 0; i <= 24; i++)
+                                                {
+                                                    <option value="@i">@i</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-2 col-md-offset-1" style="margin-top:9px"><span>Đến</span></div>
+                                    <div class="col-md-4 no-p-r">
+                                        <div class="fg-line">
+                                            <select name="ToTime" style="width:65px;">
+                                                @for (int i = 0; i <= 24; i++)
+                                                {
+                                                    <option value="@i">@i</option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        @Html.HiddenFor(q => q.ApplyFromTime)
+                                        @Html.HiddenFor(q => q.ApplyToTime)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <label class="control-label col-md-4" for="Name">Cửa hàng</label>
+                                <select name="storeSelect" class="js-example-basic-multiple col-md-6"  id="storeSelect" multiple="multiple">
+                                    @foreach (var item in Model.AvailableStore)
+                                    {
+                                        <option value="@item.Value" @(item.Selected == true ? "selected" : "")>@item.Text</option>
+
+                                    }
+
+                                </select>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<input hidden value="@Model.ApplyFromTime" />
+<script>
+    $(document).ready(function () {
+        $('select[name=FromTime]').select2();
+        $('select[name=ToTime]').select2();
+        $('#storeSelect').select2();
+
+        $('select[name=FromTime]').val(@Model.ApplyFromTime).trigger("change");
+        $('select[name=ToTime]').val(@Model.ApplyToTime).trigger("change");
+
+
+
+        moment.locale('vi');
+        //$('select[name=FromTime]').val(Model.ApplyFromTime);
+        //$('select[name=ToTime]').val(Model.ApplyToTime);
+        //$('')
+        var firstStartDate = '@this.Model.FromDate.ToString("dd/MM/yyyy")';
+        var firstToDate = '@this.Model.ToDate.ToString("dd/MM/yyyy")';
+        $('#date-string').val(firstStartDate + (firstStartDate == firstToDate ? '' : ' - ' + firstToDate));
+        $('#FromDateStr').val('@this.Model.FromDate.ToString("dd/MM/yyyy")');
+        $('#ToDateStr').val('@this.Model.ToDate.ToString("dd/MM/yyyy")');
+        loadIcon();
+        $('select[name=FromTime]').val(@Model.ApplyFromTime);
+        $('select[name=ToTime]').val(@Model.ApplyToTime);
+
+        function cb(start, end, label) {
+
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format('DD/MM/YYYY');
+
+            var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(dateRange);
+            } else {
+                $('#date-string').val(dateRange);
+            }
+            $('#FromDateStr').val(startTime);
+            $('#ToDateStr').val(endTime);
+        }
+
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "minDate": '01/01/2012',
+            "maxDate": '31/12/2100',
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                '14 ngày': [moment(), moment().add(14, 'days')],
+                'Một tháng': [moment(), moment().add(1, 'month')],
+            }
+        }, cb);
+
+    });
+
+    function loadIcon() {
+        $(".iconoption option").each(function () {
+            var note = $(this).text();
+            $(this).html($(this).text());
+        });
+    }
+    function confirmSubmit() {
+        if ($("input[name='PromotionName']").val() == "") {
+            ShowMessage("Vui lòng nhập tên khuyến mãi.", 3);
+            return;
+        }
+        else if (parseInt($('select[name = ToTime]').val()) <= parseInt($('select[name = FromTime]').val())) {
+            ShowMessage("Khung giờ áp dụng không hợp lệ", 2);
+            return;
+        }
+        else {
+
+            $('#ApplyFromTime').val($('select[name=FromTime]').val());
+            $('#ApplyToTime').val($('select[name=ToTime]').val());
+
+            editPromotion();
+        }
+
+    }
+
+    function editPromotion() {
+        var formData = new FormData($('#editPromotionForm')[0]);
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("EditPromotion")',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result.success) {
+                    ShowAlert(result.message, 2, '@Url.Action("IndexPromotion")');
+                }
+            },
+        });
+    }
+
+    $('#btnUploadImage').click(function () {
+        $('#imageUpload').click();
+
+    });
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            $('#ShowImg').html('');
+            $('#ShowImg').append('<img id="image" src="#" alt="your image" /><span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>');
+            reader.onload = function (e) {
+                $('#image')
+                    .attr('src', e.target.result)
+                    .width(200)
+                    .height(150);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    function delImg() {
+
+        $('#ShowImg').html('');
+        $("#imageUpload").val("")
+
+    }
+
+
+</script>

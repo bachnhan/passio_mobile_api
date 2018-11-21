@@ -1,0 +1,189 @@
+﻿@using HmsService.Models
+@using HmsService.Models.Entities
+@model IEnumerable<ProductViewModel>
+
+@{
+    ProductViewModel general = ViewBag.ProductGeneral;
+}
+@*<div class="row">
+
+    <div class="col-md-5">
+        <h5>Danh sách sản phẩm tại quán</h5>
+    </div>
+    <select id="AtStoreChildProductDropdown" class="col-md-7" data-action="changeDefaultChildProduct">
+        @foreach (var childProduct in Model)
+        {
+            if (childProduct.IsDefaultChildProduct == (int)SaleTypeEnum.DefaultAtStore)
+            {
+                <option value=@childProduct.ProductID selected>@childProduct.ProductName</option>
+            }
+            else
+            {
+                <option value=@childProduct.ProductID>@childProduct.ProductName</option>
+            }
+        }
+    </select>
+</div>
+
+<div class="row">
+    <div class="col-md-5">
+        <h5>Danh sách sản phẩm mang đi</h5>
+    </div>
+    <select id="TakeAwayChildProductDropdown" class="col-md-7" data-action="changeDefaultProductChildTakeAway">
+        @foreach (var childProduct in Model)
+        {
+            if (childProduct.IsDefaultChildProduct == (int)SaleTypeEnum.DefaultTakeAway)
+            {
+                <option value=@childProduct.ProductID selected>@childProduct.ProductName</option>
+            }
+            else
+            {
+                <option value=@childProduct.ProductID>@childProduct.ProductName</option>
+            }
+        }
+    </select>
+
+</div>*@
+<div class="slim-scroll" data-height="400">
+    <table class="table table-striped table-hover" id="tableChooseGeneral">
+        <thead>
+            <tr>
+                <td>
+                    Tên
+                </td>
+                <td>Mã</td>
+                @if (!string.IsNullOrWhiteSpace(@general.Att1))
+                {
+                    <td>
+                        @general.Att1
+                    </td>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(@general.Att2))
+                {
+                    <td>
+                        @general.Att2
+                    </td>
+                }
+                @if (!string.IsNullOrWhiteSpace(@general.Att3))
+                {
+                    <td>
+                        @general.Att3
+                    </td>
+                }
+                <td>
+                    Giá
+                </td>
+                <td>
+                    Giảm giá
+                </td>
+                <td>
+                    Loại
+                </td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @item.ProductName
+                    </td>
+                    <td>
+                        @item.Code
+                    </td>
+                    @if (!string.IsNullOrWhiteSpace(@general.Att1))
+                    {
+                        <td data-role="1">
+                            @item.Att1
+                        </td>
+                    }
+
+                    @if (!string.IsNullOrWhiteSpace(@general.Att2))
+                    {
+                        <td data-role="2">
+                            @item.Att2
+                        </td>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(@general.Att3))
+                    {
+                        <td data-role="3">
+                            @item.Att3
+                        </td>
+                    }
+                    <td>
+                        @item.Price
+                    </td>
+                    <td>
+                        @item.DiscountPercent
+                    </td>
+                    
+                        @if (item.SaleType == (int)SaleTypeEnum.DefaultAtStore)
+                        {
+                            <td><select id="selectType" disabled><option value="1">Tại quán</option><option value="2">Mang đi</option></select></td>
+                        }
+                        else
+                        {
+                            <td><select id="selectType" disabled><option value="1">Tại quán</option><option value="2" selected="selected">Mang đi</option></select></td>
+
+                        }
+                    <td data-role="handler">
+                        <button class="fa fa-pencil btn btn-sm btn-info" type="button"
+                                data-action="edit-child-general"
+                                data-status="0"
+                                data-id="@item.ProductID">
+                            Sửa
+                        </button>
+                        <button class="fa fa-trash btn btn-sm btn-danger" type="button"
+                                data-action="remove-child-general" data-id="@item.ProductID">
+                            Xóa
+                        </button>
+                        @*<button class="btn btn-inverse btn-minier" type="button"
+                                data-action="changeDefaultChildProduct" data-id="@item.ProductID">
+                            Ưu tiên
+                        </button>*@
+                        @if (item.SaleType == (int)SaleTypeEnum.DefaultAtStore && item.IsDefaultChildProduct == (int)SaleTypeEnum.DefaultNothing)
+                        {
+                            <button class="fa fa-thumbs-up btn btn-sm btn-primary" type="button"
+                                    data-action="changeDefaultChildProduct" data-id="@item.ProductID">
+                                Ưu tiên
+                            </button>
+                        }
+                        else if (item.SaleType == (int)SaleTypeEnum.DefaultTakeAway && item.IsDefaultChildProduct == (int)SaleTypeEnum.DefaultNothing)
+                        {
+                            <button class="fa fa-thumbs-up btn btn-sm btn-primary" type="button"
+                                    data-action="changeDefaultProductChildTakeAway" data-id="@item.ProductID">
+                                Ưu tiên
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="fa fa-thumbs-up btn btn-sm btn-success" type="button" disabled>
+                                Đã ưu tiên
+                            </button>
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<input type="hidden" value=@general.ProductID id="input-hidden-productId" />
+<script>
+    @*$(document).ready(function () {
+        $('#ChildProductDropdown').on('change', function () {
+            var childProductId = $('#ChildProductDropdown option:selected').val();
+            $.ajax({
+                url: '/Product/ChangeDefaultProductChild',
+                type: "POST",
+                data: { generalProductId : @general.ProductID, childProductId: childProductId},
+                success: function (result) {
+                    ShowMessage(result.message,2);
+                },
+            })
+        });
+    });*@
+
+</script>

@@ -1,0 +1,75 @@
+﻿<div class="block-header">
+    <h2>Thư viện hình ảnh</h2>
+    <ul class="actions">
+        <li class="m-r-10">
+            <button type="submit" class="btn btn-default">Quay lại</button>
+        </li>
+        <li>
+            <button type="submit" class="btn btn-primary" id="btn-submit-product">Hoàn tất</button>
+        </li>
+    </ul>
+</div>
+<div class="card">
+    <div class="card-header"></div>
+    <div class="card-body card-padding">
+        <div class="row" id="galleryContainer">
+            @*<div class="col-md-3" data-placeholder="true">
+                <div class="gallery-item removeable placeHolder">
+                    <div class="ratio-wrapper ratio-wrapper-4-3">
+                        <div class="ratio-item">
+                            <div class="img-container">
+                                <img class="img-responsive" src="~/Content/images/default_product.jpg" />
+                            </div>
+
+                        </div>
+                    </div>
+                    <a class="btn-remove" href="#"><i class="fa fa-times"></i></a>
+                    <div class="caption">
+                        <input class="form-control" placeholder="Chú thích" />
+                    </div>
+                </div>
+            </div>*@
+            <!-- Gallery item -->
+            <div class="col-md-3">
+                <div class="gallery-item plus-item">
+                    <div class="ratio-wrapper ratio-wrapper-4-3">
+                        <div class="ratio-item">
+                            <a data-action="add-gallery-item" href="#"><i class="fa fa-plus"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end Gallery item-->
+        </div>
+    </div>
+</div>
+<!-- Gallery item used for Gallery pages-->
+<template id="tmpGalleryItem">
+    <div class="col-md-3">
+        <div class="removeable">
+            <div class="gallery-item">
+                <div class="ratio-wrapper ratio-wrapper-4-3">
+                    <div class="ratio-item">
+                        <div class="img-container">
+                            <img class="img-responsive" src="~/Content/images/default_product.jpg" />
+                        </div>
+
+                    </div>
+                </div>
+                <div class="caption">
+                    <input class="form-control" placeholder="Chú thích" />
+                </div>
+            </div>
+            <a class="btn-remove" href="#"><i class="fa fa-times"></i></a>
+        </div>
+    </div>
+</template>
+
+@section scripts {
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script>
+        $(function () {
+            SKYWEB.Admin.Gallery.init();
+        });
+    </script>
+}

@@ -1,0 +1,94 @@
+﻿@{
+
+}
+<!-- Sản phẩm -->
+<div class="box box-success">
+    <div class="box-header with-border">
+        <h3 class="box-title">Sản phẩm</h3>
+        <div class="box-tools pull-right">
+            <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+        </div>
+    </div>
+    <!-- Danh sách sản phẩm -->
+    <div class="box-body">
+        <table id="tblProduct" class="table table-striped table-bordered table-hover" style="width: 100% !important;">
+            <thead style="white-space: nowrap;">
+                <tr>
+                    <th rowspan="2">
+                        <label class="">STT</label>
+                    </th>
+                    <th rowspan="2">
+                        <label class="">Tên sản phẩm</label>
+                    </th>
+                    <th rowspan="2">
+                        <label class="">Số lượng bán ra</label>
+                    </th>
+                    <th colspan="2">
+                        <label class="">Doanh thu</label>
+                    </th>
+                </tr>
+                <tr>
+                    <th><small>Trước giảm giá</small></th>
+                    <th><small>Sau giảm giá</small></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        InitProductDatatable();
+    });
+
+    $('#btnSearch').click(function () {
+        RefreshProductTable();
+    });
+
+    function RefreshProductTable() {
+        var oTable = $("#tblProduct").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+
+    function InitProductDatatable() {
+        $("#tblProduct").datatablevpn({
+
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("ProductData")",
+            "bProcessing": true,
+            "iDisplayLength": 5,
+            "aLengthMenu": [5, 10, 30, 50],
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "_startDate", "value": $('#startDate').val() });
+                aoData.push({ "name": "_endDate", "value": $('#endDate').val() });
+                aoData.push({ "name": "storeId", "value": '@ViewBag.storeId' });
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4],
+                    "bSortable": false
+                }
+            ],
+            "bAutoWidth": true
+        });
+    }
+</script>

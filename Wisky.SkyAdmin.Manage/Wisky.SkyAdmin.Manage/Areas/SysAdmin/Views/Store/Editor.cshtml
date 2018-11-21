@@ -1,0 +1,372 @@
+﻿@model StoreEditViewModel
+@{
+    ViewBag.Title = "Editor";
+}
+@helper RenderSelectedMenu(IEnumerable<SelectedMenuItem> menuItems)
+{
+    foreach (var item in menuItems)
+    {
+        bool containChildren = item.ChildrenMenus.Any();
+
+            <li>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" @(item.Selected ? "checked" : "") name="featureChk" value="@item.MenuFeatureCode" />
+                        <i class="input-helper"></i>
+                        @item.Name
+                    </label>
+                    @if (containChildren)
+                    {
+                        <ul style="list-style-type:none">
+                            @RenderSelectedMenu(item.ChildrenMenus)
+                        </ul>
+                    }
+                </div>
+            </li>
+    }
+
+}
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&key=AIzaSyDwJA7jUX5F9KR44NAKvfJsxn-9cjQwzZk"></script>
+<div class="card">
+    <form role="form" id="storeForm" method="post">
+        @this.Html.AntiForgeryToken()
+        @this.Html.HiddenFor(q => q.ID)
+        @this.Html.HiddenFor(q => q.BrandId)
+
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-8">
+                    @if (this.Model.Name == null)
+                    {
+                        <h3 class="margin-bottom30">Thêm mới cửa hàng</h3>
+                    }
+                    else
+                    {
+                        <h3 class="margin-bottom30">Chỉnh sửa cửa hàng: <strong>@this.Model.Name</strong></h3>
+                    }
+                </div>
+                <div class="col-md-4 text-right">
+                    <ul class="actions">
+                        <li class="m-r-10">
+                            <a href="@this.Url.Action("Detail", "Brand", new { Id = this.Model.BrandId })" class="btn btn-success myComeback">Quay lại</a>
+                        </li>
+                        <li>
+                            <button type="button" class="btn btn-primary" id="btn-submit-store">Hoàn tất</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+
+
+        @if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+            {
+            <div class="card">
+                <div class="card-body card-padding text-danger">
+                    @this.Html.ValidationSummary()
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-6 p-l-45">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin chính</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="form-group">
+                            <label for="Name" class="control-label">Tên cửa hàng</label><span style="color:red">*</span>
+                            <br>
+                            <div class="fg-line">
+                                @*<input type="text" name="Name" id="Name" class="form-control" required="" value="@Model.Name">*@
+                                @Html.TextBoxFor(q => q.Name, new { id = "Name", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ShortName" class="control-label">Tên viết tắt</label><span style="color:red">*</span>
+                            <br>
+                            <div class="fg-line">
+                                @Html.TextBoxFor(q => q.ShortName, new { id = "ShortName", @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Address" class="control-label">Địa chỉ</label><span style="color:red">*</span>
+                            <br>
+                            <div class="fg-line">
+                                @this.Html.TextBoxFor(q => q.Address, new { id = "addr", @class = "form-control", @readonly = "readonly" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Quận" class="control-label">Quận</label>
+                            <br>
+                            <div class="fg-line">
+                                <input type="text" class="form-control" id="districtCity" readonly />
+                            </div>
+                        </div>
+                        @this.Html.HiddenFor(q => q.Lon, new { id = "long" })
+                        @*<div class="form-group">
+                            <label for="Lat" class="control-label">Vĩ độ</label>
+                            <div class="fg-line">
+                                @this.Html.TextBoxFor(q => q.Lat, new  {id="lati",@class = "form-control", @readonly = "readonly" })*@
+                        @this.Html.HiddenFor(q => q.Lat, new { id = "lati" })
+                        @*</div>
+                            </div>*@
+                        <div class="form-group">
+                            <label for="Email" class="control-label">Email</label><span style="color:red">*</span>
+                            <br>
+                            <div class="fg-line">
+                                @this.Html.TextBoxFor(q => q.Email, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Phone" class="control-label">Số điện thoại</label><span style="color:red">*</span>
+                            <br>
+                            <div class="fg-line">
+                                @this.Html.TextBoxFor(q => q.Phone, new { @class = "form-control", maxlength = "12", oninput = "correctPhoneAndFax(this)" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Fax" class="control-label">Fax</label>
+                            <br>
+                            <div class="fg-line">
+                                @this.Html.TextBoxFor(q => q.Fax, new { @class = "form-control", maxlength = "12", oninput = "correctPhoneAndFax(this)" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 p-r-45">
+                <div class="card">
+                    @*<div class="card-header">
+                            <h2>Thông tin bổ sung</h2>
+                        </div>*@
+                    <div class="card-body card-padding">
+
+                        <div class="form-group">
+                            <label class="control-label" for="StoreTypeEnum">Loại cửa hàng</label>
+                            <br>
+                            <div class="fg-line">
+                                <div class="select">
+                                    @this.Html.EnumDropDownListFor(q => q.StoreTypeEnum, new { @class = "form-control", })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="OpenTime">Thời gian mở cửa</label><span style="color:red">*</span>
+                            <br>
+                            <div class='input-group date' id='OpenTime'>
+                                <input type='text' class="form-control" name="OpenTime" id="InputOpenTime" readonly style="background-color:#ffffff; color:#000000;" value="@(this.Model.OpenTime.HasValue?this.Model.OpenTime.Value.ToString("dd/MM/yyyy") : "")" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-time"></i>
+                                    <span></span> <b class="caret"></b>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label" for="CloseTime">Thời gian đóng cửa</label><span style="color:red">*</span>
+                            <br>
+                            <div class='input-group date' id='CloseTime'>
+                                <input type='text' class="form-control" name="CloseTime" id="InputCloseTime" readonly style="background-color:#ffffff; color:#000000;" value="@(this.Model.CloseTime.HasValue?this.Model.CloseTime.Value.ToString("dd/MM/yyyy") : "")" />
+                                <span class="input-group-addon">
+                                    <i class="glyphicon glyphicon-time"></i>
+                                    <span></span> <b class="caret"></b>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" @(@Model.isAvailable.HasValue ? (Model.isAvailable.Value ? "checked" : "") : "") name="result" value="TRUE" />
+                                <i class="input-helper"></i>
+                                Hoạt động
+                            </label>
+                            <input type="hidden" id="checkboxHidden" name="@Html.NameFor(q=>q.isAvailable)" value="" />
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" @(@Model.RunReport.HasValue ? (Model.RunReport.Value ? "checked" : "") : "") name="resultReport" value="TRUE" />
+                                <i class="input-helper"></i>
+                                Chạy báo cáo
+                            </label>
+                            <input type="hidden" id="checkboxHiddenReport" name="@Html.NameFor(q=>q.RunReport)" value="" />
+                        </div>
+
+                        <div class="card-header">
+                            <h2>Nhập địa chỉ cửa hàng</h2>
+                        </div>
+                        <div class="form-group" id="map">
+                            <div class="row" style="padding-bottom:5px;">
+                                <div class="col-md-10">
+                                    <input type="text" id="txt-newstore-address" class="form-control" placeholder="Nhập để tìm địa chỉ">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-primary btn-sm pull-left" style="margin-left:-30px; width:75px" onclick="locationSearch()" id="btn-search-address">
+                                        <i class="left-icon fa fa-search"></i> Tìm
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="map-canvas" style="width: 100%; height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 p-r-45 p-l-45">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Cấu hình menu</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                            <ul class="main-menu">
+                                @RenderSelectedMenu(Model.SelectedMenu)
+                            </ul>
+                        </div>
+                </div>
+            </div>
+        </div>
+        @Html.HiddenFor(q => q.StoreFeatureFilter)
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(function () {
+            //$("#map-canvas").width('100%').height(300);
+            google.maps.event.addDomListener(window, 'load', initialize);
+        });
+
+        autocomplete = new google.maps.places.Autocomplete((document.getElementById('txt-newstore-address')), { types: ['geocode'] });
+
+        google.maps.event.addListener(autocomplete, 'place_changed', function () {
+            fillInAddress();
+        });
+
+    });
+
+    /*Bản đồ*/
+    var map;
+    var mapOptions;
+    var listStore = new Array();
+    function initialize() {
+        var styles = [{ featureType: "road.highway", stylers: [{ visibility: "off" }] }, { featureType: "landscape", stylers: [{ visibility: "off" }] }, { featureType: "transit", stylers: [{ visibility: "off" }] }, { featureType: "poi", stylers: [{ visibility: "off" }] }, { featureType: "poi.park", stylers: [{ visibility: "on" }] }, { featureType: "poi.park", elementType: "labels", stylers: [{ visibility: "off" }] }, { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#d3d3d3" }, { visibility: "on" }] }, { featureType: "poi.medical", stylers: [{ visibility: "off" }] }, { featureType: "poi.medical", stylers: [{ visibility: "off" }] }, { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#cccccc" }] }, { featureType: "water", elementType: "geometry.fill", stylers: [{ visibility: "on" }, { color: "#cecece" }] }, { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#808080" }] }, { featureType: "administrative", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#808080" }] }, { featureType: "road", elementType: "geometry.fill", stylers: [{ visibility: "on" }, { color: "#fdfdfd" }] }, { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }, { featureType: "water", elementType: "labels", stylers: [{ visibility: "off" }] }, { featureType: "poi", elementType: "geometry.fill", stylers: [{ color: "#d2d2d2" }] }];
+
+        // Create a new StyledMapType object, passing it the array of styles,
+        // as well as the name to be displayed on the map type control.
+        var styledMap = new google.maps.StyledMapType(styles,
+        { name: "Styled Map" });
+
+        mapOptions = {
+            center: new google.maps.LatLng(10.789886817455374, 106.6787300934875),
+            zoom: 14,
+            mapTypeControlOptions: {
+                mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+            }
+        };
+
+        map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+        map.mapTypes.set('map_style', styledMap);
+        map.setMapTypeId('map_style');
+        //setPositionTerminal();
+        //setPositionUser();
+
+        //$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        //    google.maps.event.trigger(map, 'resize');
+        //});
+
+
+        //$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        //    google.maps.event.trigger(MAP_OBJECT, "resize");
+        //})
+
+        window.map = map;
+        window.geocoder = new google.maps.Geocoder();
+        if ($('#lati').val() != "" && $('#long').val() != "") {
+            $('#txt-newstore-address').val($('#addr').val());
+            var img = "/Content/images/m_terminal.png";
+            var marker = new google.maps.Marker({
+                position: new google.maps.LatLng($('#lati').val(), $('#long').val()),
+                map: window.map,
+                title: $('#Name').val(),
+                icon: img
+            })
+            window.map.setCenter(marker.getPosition());
+            getDistrictviaGeocoder($('#lati').val(), $('#long').val());
+
+
+        }
+
+    }
+    function fillInAddress() {
+        // Get the place details from the autocomplete object.
+        var place = autocomplete.getPlace();
+        $('#btn-search-address').trigger('click');
+    }
+
+    var resultMarker = null;
+    //$("#btn-search-address").on('click',
+    function locationSearch() {
+        var address = $("#txt-newstore-address").val();
+
+        window.geocoder.geocode({ 'address': address }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                map.setCenter(results[0].geometry.location);
+                if (resultMarker != null) {
+                    resultMarker.setMap(null);
+                }
+                $('#addr').val(address);
+                var latitude = results[0].geometry.location.lat();
+                var longitude = results[0].geometry.location.lng();
+                getDistrictviaGeocoder(latitude, longitude);
+                $('#long').val(longitude);
+                $('#lati').val(latitude);
+                resultMarker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+            } else {
+                ShowMessage("Geocode không thành công vì: " + status, 1);
+            }
+        });
+
+    };
+    function getDistrictviaGeocoder(lati, long) {
+        var geocoder = new google.maps.Geocoder();
+        var latLng = new google.maps.LatLng(lati, long);
+        geocoder.geocode({
+            latLng: latLng
+        },
+        function (responses) {
+            if (responses && responses.length > 0) {
+                var addrComp = responses[0].address_components;
+                $.each(addrComp, function (i, address_component) {
+                    if (address_component.types[0] == "administrative_area_level_2") {
+                        var district = address_component.long_name
+                        if (district == null) {
+                            $('#districtCity').val('Không rõ');
+                        }
+                        $('#districtCity').val(district);
+                        return;
+                    }
+
+                });
+            }
+            else {
+                alert('Không tìm được quận! Xin chọn địa chỉ phù hợp!');
+            }
+        });
+
+    }
+
+    //autocorrect phone, fax number field
+    function correctPhoneAndFax(input) {
+        var num = $(input).val().replace(/[^\d]/g, '');
+        num = num.replace(/^00/, '0');
+
+        $(input).val(num);
+    }
+</script>

@@ -1,0 +1,1321 @@
+﻿@{
+    ViewBag.Title = "Báo cáo theo giờ";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .tab-nav.tn-justified > li {
+        width: 33% !important;
+        padding: 0px;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Báo cáo theo giờ</h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div>
+        </div>
+        <hr />
+        <ul id="TabList" class="tab-nav tn-justified" style="overflow: hidden;width: 100%">
+            <li class="active waves-effect col-lg-6"><a data-toggle="tab" id="buildTabAll" href="#all"><i class="fa fa-globe"></i> Hệ Thống</a></li>
+            <li class="waves-effect col-lg-6"><a data-toggle="tab" id="buildTabStore" href="#storesTab"><i class="fa fa-home"></i> Cửa hàng</a></li>
+            <li class="waves-effect col-lg-6"><a data-toggle="tab" id="buildTabGroup" href="#storesGroupTab"><i class="fa fa-users"></i> Nhóm cửa hàng</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="all" class="tab-pane fade in active">
+                <div class="row">
+                    <div class="col-md-12" style="margin-top: 19px;">
+                        <div class="input-group" style="margin-left: -15px;">
+                            <!-- Daterange picker -->
+                            <div class="dateTime width230 pull-right">
+                                <div class="fg-line m-t-5">
+                                    <div id="reportrange1" class="height-fix">
+                                        <input id="startYear1" size="23" readonly class="form-control text-center pull-right">
+                                        <a class="myCelenderA" id=""> <i class="fa fa-calendar"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-group-btn FindButtonDateTime">
+                                <a class="btn btn-primary FindDateTime" id="btnSearch1" style="height: 35px;">
+                                    <i class="left-icon fa fa-search"></i> Tìm
+                                </a>
+                            </div>
+                            <form id="form-create-session" class="form-inline" style="display:none">
+                                <input type="text" id="sTime1" name="startTime1" placeholder="Chọn giờ bắt đầu" />
+                                <input type="text" id="eTime1" name="endTime1" placeholder="Chọn giờ kết thúc" />
+                            </form>
+                            <form id="form-create-session" class="form-inline" style="display:none">
+                                <input type="text" id="sTime2" name="startTime2" placeholder="Chọn giờ bắt đầu" />
+                                <input type="text" id="eTime2" name="endTime2" placeholder="Chọn giờ kết thúc" />
+                            </form>
+                            <form id="form-create-session" class="form-inline" style="display:none">
+                                <input type="text" id="sTime3" name="startTime3" placeholder="Chọn giờ bắt đầu" />
+                                <input type="text" id="eTime3" name="endTime3" placeholder="Chọn giờ kết thúc" />
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div>
+                    <!-- LINE CHART -->
+                    <button type="button" data-show="show" id="btnChart1" class="btn btn-primary btn-sm" style="width:150px" onclick="ShowChart1()">
+                        <i class="fa fa-plus">
+                        </i> Hiển thị biểu đồ
+                    </button>
+                    <!-- export to excel -->
+                    <button type="submit" id="export1" class="btn btn-primary btn-sm pull-right">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+                @*<div id="container1" data-show="show" style="min-width: 310px; height: 300px; display:none;padding:7px;"></div>
+                    <div id="containerpie1" data-show="show" style="min-width: 310px; height: 300px;padding:7px;"></div>*@
+                <div id="containerCol1" style="min-width: 310px;height:400px;padding:7px;display:none;transition: visibility 0s, opacity 0.5s linear;"></div>
+
+                <div id="datatable1" style="padding-top:5px;">
+
+                </div>
+                <form class="hidden" id="formMonthReportExcel1" action="@Url.Action("ExportHourTableToExcel","TimeReport")">
+                    <input id="startTime1" name="startTime" />
+                    <input id="endTime1" name="endTime" />
+                    <input id="selectedStoreId1" name="selectedStoreId" value="0" />
+                </form>
+
+            </div>
+            <div id="storesTab" class="tab-pane fade in">
+                <div class="row">
+                    <div class="col-md-12" style="margin-top: 19px;">
+                        <label>Cửa hàng: </label>
+                        <div class="input-group" style="margin-left: -15px;">
+                            <div class="col-md-3">
+                                <select class="selectpicker" id="storeCombobox"></select>
+                            </div>
+                            <!-- Daterange picker -->
+                            <div class="dateTime width230 pull-right">
+                                <div class="fg-line m-t-5">
+                                    <div id="reportrange2" class="height-fix">
+                                        <input id="startYear2" size="23" readonly class="form-control text-center pull-right">
+                                        <a class="myCelenderA" id=""> <i class="fa fa-calendar"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-group-btn FindButtonDateTime">
+                                <a class="btn btn-primary FindDateTime" id="btnSearch2" style="height: 35px;">
+                                    <i class="left-icon fa fa-search"></i> Tìm
+                                </a>
+                            </div>
+                            @*<form id="form-create-session" class="form-inline" style="display:none">
+                                    <input type="text" id="sTime2" name="startTime2" placeholder="Chọn giờ bắt đầu" />
+                                    <input type="text" id="eTime2" name="endTime2" placeholder="Chọn giờ kết thúc" />
+                                </form>*@
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- LINE CHART -->
+                <div>
+                    <button type="button" data-show="show" id="btnChart2" class="btn btn-primary btn-sm" style="width:150px" onclick="ShowChart2()">
+                        <i class="fa fa-plus">
+                        </i> Hiển thị biểu đồ
+                    </button>
+                    <!-- export to excel -->
+                    <button type="submit" id="export2" class="btn btn-primary btn-sm pull-right">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+                @*<div id="container2" data-show="show" style="min-width: 150px; height: 300px; display:none;padding:7px;"></div>*@
+                <div id="containerCol2" style="min-width: 310px;height:400px;padding:7px;display:none;transition: visibility 0s, opacity 0.5s linear;"></div>
+                <div id="datatable2" style="padding-top:5px;">
+
+                </div>
+                <form class="hidden" id="formMonthReportExcel2" action="@Url.Action("ExportHourTableToExcel","TimeReport")">
+                    <input id="startTime2" name="startTime" />
+                    <input id="endTime2" name="endTime" />
+                    <input id="selectedStoreId2" name="selectedStoreId" />
+                </form>
+
+            </div>
+            <div id="storesGroupTab" class="tab-pane fade in">
+                <div class="row">
+                    <div class="col-md-12" style="margin-top: 19px;">
+                        <label>Nhóm cửa hàng: </label>
+                        <div class="input-group" style="margin-left: -15px;">
+                            <div class="col-md-3">
+                                <select class="selectpicker" id="storeGroupCombobox"></select>
+                            </div>
+                            <!-- Daterange picker -->
+                            <div class="dateTime width230 pull-right">
+                                <div class="fg-line m-t-5">
+                                    <div id="reportrange3" class="height-fix">
+                                        <input id="startYear3" size="23" readonly class="form-control text-center pull-right">
+                                        <a class="myCelenderA" id=""> <i class="fa fa-calendar"></i></a>
+                                    </div>
+                                    @*<a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>*@
+                                </div>
+                            </div>
+                            <div class="input-group-btn FindButtonDateTime">
+                                <a class="btn btn-primary FindDateTime" id="btnSearch3" style="height: 35px;">
+                                    <i class="left-icon fa fa-search"></i> Tìm
+                                </a>
+                            </div>
+                            @*<form id="form-create-session" class="form-inline" style="display:none">
+                                    <input type="text" id="sTime3" name="startTime3" placeholder="Chọn giờ bắt đầu" />
+                                    <input type="text" id="eTime3" name="endTime3" placeholder="Chọn giờ kết thúc" />
+                                </form>*@
+                        </div>
+
+                    </div>
+                </div>
+
+                <div>
+                    <!-- LINE CHART -->
+                    <button type="button" data-show="show" id="btnChart3" class="btn btn-primary btn-sm" style="width:150px" onclick="ShowChart3()">
+                        <i class="fa fa-plus">
+                        </i> Hiển thị biểu đồ
+                    </button>
+                    <!-- export to excel -->
+                    <button type="submit" id="export3" class="btn btn-primary btn-sm pull-right">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+                @*<div id="container3" data-show="show" style="min-width: 310px; height: 300px; display:none;padding:7px;"></div>*@
+                <div id="containerCol3" style="min-width: 310px;height:400px;padding:7px;display:none;transition: visibility 0s, opacity 0.5s linear;"></div>
+
+                <div id="datatable3" style="padding-top:5px;">
+
+                </div>
+                <form class="hidden" id="formMonthReportExcel3" action="@Url.Action("ExportHourTableToExcelForGroup","TimeReport")">
+                    <input id="startTime3" name="startTime" />
+                    <input id="endTime3" name="endTime" />
+                    <input id="selectedGroupId" name="selectedGroupId" />
+                </form>
+
+            </div>
+        </div>
+
+        @*<form class="hidden" id="formMonthReportExcelTest" action="@Url.Action("ExportMonthTableToExceltest","TimeReport")">
+                <input id="startTime1" name="startTime" />
+                <input id="endTime1" name="endTime" />
+                <input id="storeId1" name="storeId" />
+            </form>*@
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+                GetStoreList();
+                GetStoreGroupList();
+                setupDaterangerpicker1();
+
+                hourReportAll();
+            });
+                function cb(start, end, label) {
+                    //console.log(start.toISOString(), end.toISOString(), label);
+
+                    //Prepare start time and end time format
+                    var startTime = start.format("DD/MM/YYYY"),
+                        endTime = end.format("DD/MM/YYYY"),
+                        dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+                    if (label != "Tùy chọn") {
+                        $('#startYear1').val(label);
+                    } else {
+                        $('#startYear1').val(dateString);
+                    }
+
+                    $('#sTime1').val(startTime);
+                    $('#eTime1').val(endTime);
+
+                    //Chage date at page header
+                    $('[data-role=small-date]').html(dateString);
+
+                    $('#startYear1 span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+                };
+            function setupDaterangerpicker1() {
+                cb(moment(), moment(), "Hôm nay");
+                $('#reportrange1').daterangepicker({
+                   
+                    startDate: moment(),
+                    endDate: moment(),
+                    minDate: '01/01/2012',
+                    maxDate: moment(),
+                    dateLimit: { days: 365 },
+                    showDropdowns: true,
+                    showWeekNumbers: true,
+                    timePicker: false,
+                    timePickerIncrement: 1,
+                    timePicker12Hour: true,
+                    //parentEl: '.modal-body',
+                    ranges: {
+                        'Hôm nay':[moment(),moment()],
+                        'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                        'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                        'Tháng này': [moment().add(0, 'month').startOf('month'), moment().add(0, 'month').endOf('month')],
+                        'Tháng trước': [moment().add(-1, 'month').startOf('month'), moment().add(-1, 'month').endOf('month')]
+                    },
+                    opens: 'left',
+                    drops: 'down',
+                    buttonClasses: ['btn', 'btn-sm'],
+                    applyClass: 'btn-primary',
+                    cancelClass: 'btn-success',
+                    separator: ' to ',
+                    locale: {
+                        format: 'DD/MM/YYYY',
+                        applyLabel: 'Chọn',
+                        cancelLabel: 'Hủy',
+                        fromLabel: 'Từ',
+                        toLabel: 'Đến',
+                        customRangeLabel: 'Tùy chọn',
+                        daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                        monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                        firstDay: 1
+                    }
+                }, cb);
+
+                //$('#startYear1').on('apply.daterangepicker', function (ev, picker) {
+                //    hourReportAll();
+                //});
+            }
+            function setupDaterangerpicker2() {
+                function cb(start, end, label) {
+                    //console.log(start.toISOString(), end.toISOString(), label);
+
+                    //Prepare start time and end time format
+                    var startTime = start.format("DD/MM/YYYY"),
+                        endTime = end.format("DD/MM/YYYY"),
+                        dateString = "(" + startTime + (startTime!=endTime ? "" : " - " + endTime) + ")";
+
+                    if (label != "Tùy chọn") {
+                        $('#startYear2').val(label);
+                    } else {
+                        $('#startYear2').val(dateString);
+                    }
+
+                    $('#sTime2').val(startTime);
+                    $('#eTime2').val(endTime);
+
+                    //Chage date at page header
+                    $('[data-role=small-date]').html(dateString);
+
+                    $('#startYear2 span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+                };
+                cb(moment(), moment(), "Hôm nay");
+                $('#reportrange2').daterangepicker({
+                    startDate: moment(),
+                    endDate: moment(),
+                    minDate: '01/01/2012',
+                    maxDate: moment(),
+                    dateLimit: { days: 365 },
+                    showDropdowns: true,
+                    showWeekNumbers: true,
+                    timePicker: false,
+                    timePickerIncrement: 1,
+                    timePicker12Hour: true,
+                    //parentEl: '.modal-body',
+                    ranges: {
+                        'Hôm nay': [moment(), moment()],
+                        'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                        'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                        'Tháng này': [moment().add(0, 'month').startOf('month'), moment().add(0, 'month').endOf('month')],
+                        'Tháng trước': [moment().add(-1, 'month').startOf('month'), moment().add(-1, 'month').endOf('month')]
+                    },
+                    opens: 'left',
+                    drops: 'down',
+                    buttonClasses: ['btn', 'btn-sm'],
+                    applyClass: 'btn-primary',
+                    cancelClass: 'btn-success',
+                    separator: ' to ',
+                    locale: {
+                        format: 'DD/MM/YYYY',
+                        applyLabel: 'Chọn',
+                        cancelLabel: 'Hủy',
+                        fromLabel: 'Từ',
+                        toLabel: 'Đến',
+                        customRangeLabel: 'Tùy chọn',
+                        daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                        monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                        firstDay: 1
+                    }
+                }, cb);
+
+                //$('#startYear2').on('apply.daterangepicker', function (ev, picker) {
+                //    hourReportStores();
+                //});
+            }
+            function setupDaterangerpicker3() {
+                function cb(start, end, label) {
+                    //console.log(start.toISOString(), end.toISOString(), label);
+
+                    //Prepare start time and end time format
+                    var startTime = start.format("DD/MM/YYYY"),
+                        endTime = end.format("DD/MM/YYYY"),
+                        dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+                    if (label != "Tùy chọn") {
+                        $('#startYear3').val(label);
+                    } else {
+                        $('#startYear3').val(dateString);
+                    }
+
+                    $('#sTime3').val(startTime);
+                    $('#eTime3').val(endTime);
+
+                    //Chage date at page header
+                    $('[data-role=small-date]').html(dateString);
+
+                    $('#startYear3 span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+                };
+                cb(moment(), moment(), "Hôm nay");
+                $('#reportrange3').daterangepicker({
+                    startDate: moment(),
+                    endDate: moment(),
+                    minDate: '01/01/2012',
+                    maxDate: moment(),
+                    dateLimit: { days: 365 },
+                    showDropdowns: true,
+                    showWeekNumbers: true,
+                    timePicker: false,
+                    timePickerIncrement: 1,
+                    timePicker12Hour: true,
+                    //parentEl: '.modal-body',
+                    ranges: {
+                        'Hôm nay': [moment(), moment()],
+                        'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                        'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                        'Tháng này': [moment().add(0, 'month').startOf('month'), moment().add(0, 'month').endOf('month')],
+                        'Tháng trước': [moment().add(-1, 'month').startOf('month'), moment().add(-1, 'month').endOf('month')]
+                    },
+                    opens: 'left',
+                    drops: 'down',
+                    buttonClasses: ['btn', 'btn-sm'],
+                    applyClass: 'btn-primary',
+                    cancelClass: 'btn-success',
+                    separator: ' to ',
+                    locale: {
+                        format: 'DD/MM/YYYY',
+                        applyLabel: 'Chọn',
+                        cancelLabel: 'Hủy',
+                        fromLabel: 'Từ',
+                        toLabel: 'Đến',
+                        customRangeLabel: 'Tùy chọn',
+                        daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                        monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                        firstDay: 1
+                    }
+                }, cb);
+
+                //$('#startYear3').on('apply.daterangepicker', function (ev, picker) {
+                //    hourReportGroup();
+                //});
+            }
+            //function SetDateForForm1() {
+            //    $("#eTime1").val("31/12/" + $("#startYear1").val());
+            //    $("#sTime1").val("01/01/" + $("#startYear1").val());
+            //}
+            //function SetDateForForm2() {
+            //    $("#eTime2").val("31/12/" + $("#startYear2").val());
+            //    $("#sTime2").val("01/01/" + $("#startYear2").val());
+            //}
+            //function SetDateForForm3() {
+            //    $("#eTime3").val("31/12/" + $("#startYear3").val());
+            //    $("#sTime3").val("01/01/" + $("#startYear3").val());
+            //}
+            function RefreshTable() {
+                var oTable = $("#monthRReport").dataTable();
+                oTable._fnPageChange(0);
+                oTable._fnAjaxUpdate();
+            };
+            function GetStoreList() {
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("LoadStoreList", "TimeReport")',
+                    success: function (result) {
+                        for (var i = 0; i < result.store.length; i++) {
+                            $('#storeCombobox').append('<option value="' + result.store[i].ID + '">' + result.store[i].Name + '</option>')
+                        }
+                            $('#storeCombobox').selectpicker('refresh');
+                    }
+
+                });
+            }
+            function GetStoreGroupList() {
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("LoadStoreGroupList", "TimeReport")',
+                    success: function (result) {
+                        if (result.storeGroup.length == 0) {
+                            $('#buildTabGroup').hide();
+                        }
+                        else{
+                        for (var i = 0; i < result.storeGroup.length; i++) {
+                            $('#storeGroupCombobox').append('<option value="' + result.storeGroup[i].GroupID + '">' + result.storeGroup[i].GroupName + '</option>')
+                        }
+                            $('#storeGroupCombobox').selectpicker('refresh');
+                        }
+                    }
+
+                });
+            }
+            var InitProDatatable1 = function (data) {
+                $('#datatable1').html('<table id="monthRReportAll" class="table table-condensed table-striped table-bordered table-hover">'
+                            +'<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+        +'<tr>'
+          +  '<th>'
+             +   '<label class="">STT</label>'
+           + '</th>'
+            +'<th>'
+          +'      <label class="">Khoảng thời gian</label>'
+          +'  </th>'
+          +'  <th>'
+           +'     <label class="">Số lượng(Mang đi)</label>'
+           +' </th>'
+           +' <th>'
+            +'    <label class="">Thành tiền</label>'
+           +' </th>'
+           +' <th>'
+           +'     <label class="">Số lượng(Tại store)</label>'
+           +' </th>'
+           +' <th>'
+           +'     <label class="">Thành tiền</label>'
+           +' </th>'
+           +' <th>'
+           +'     <label class="">Số lượng(Giao hàng)</label>'
+           +' </th>'
+            +'<th>'
+            +'    <label class="">Thành tiền</label>'
+            +'</th>'
+            +'<th>'
+            +'    <label class="">Tổng cộng</label>'
+            +'</th>'
+           +' <th>'
+            +'    <label class="">Thành tiền</label>'
+           +' </th>'
+        +'</tr>'
+   +' </thead>'
+                            + '<tbody></tbody>'
+                            + '</table');
+
+                $("#monthRReportAll").dataTable({
+                    "bFilter": false,
+                    "bSort": false,
+                    "bRetrieve": true,
+                    "bScrollCollapse": true,
+                    'data': data,
+                    "bProcessing": true,
+                    "bPaginate": false,
+                    "iDisplayLength": 50,
+                    "aLengthMenu": [50, 100],
+                    "oLanguage": {
+                        "sSearch": "Tìm kiếm:",
+                        "sZeroRecords": "Không có dữ liệu phù hợp",
+                        "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                        "sEmptyTable": "Không có dữ liệu",
+                        "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                        "sLengthMenu": "Hiển thị _MENU_ dòng",
+                        "sProcessing": "Đang xử lý...",
+                        "oPaginate": {
+                            "sNext": "<i class='fa fa-chevron-right'></i>",
+                            "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                        }
+                    },
+                    "aoColumnDefs": [
+                        {
+                            "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                            "bSortable": false,
+                            "sClass": "text-center"
+                        },
+                    ],
+                    "bAutoWidth": false
+                }).fnSetFilteringDelay(delaySearch);
+                $('table').wrap('<div class="tableDiv-responsive" />');
+            };
+            var InitProDatatable2 = function (data) {
+                $('#datatable2').html('<table id="monthRReportStores" class="table table-condensed table-striped table-bordered table-hover">'
+                                    + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+        + '<tr>'
+          + '<th>'
+             + '<label class="">STT</label>'
+           + '</th>'
+            + '<th>'
+          + '      <label class="">Khoảng thời gian</label>'
+          + '  </th>'
+          + '  <th>'
+           + '     <label class="">Số lượng(Mang đi)</label>'
+           + ' </th>'
+           + ' <th>'
+            + '    <label class="">Thành tiền</label>'
+           + ' </th>'
+           + ' <th>'
+           + '     <label class="">Số lượng(Tại store)</label>'
+           + ' </th>'
+           + ' <th>'
+           + '     <label class="">Thành tiền</label>'
+           + ' </th>'
+           + ' <th>'
+           + '     <label class="">Số lượng(Giao hàng)</label>'
+           + ' </th>'
+            + '<th>'
+            + '    <label class="">Thành tiền</label>'
+            + '</th>'
+            + '<th>'
+            + '    <label class="">Tổng cộng</label>'
+            + '</th>'
+           + ' <th>'
+            + '    <label class="">Thành tiền</label>'
+           + ' </th>'
+        + '</tr>'
+   + ' </thead>'
+                            + '<tbody></tbody>'
+                            + '</table');
+
+                $("#monthRReportStores").dataTable({
+                    "bFilter": false,
+                    "bSort": false,
+                    "bRetrieve": true,
+                    "bScrollCollapse": true,
+                    'data': data,
+                    "bProcessing": true,
+                    "bPaginate": false,
+                    "iDisplayLength": 50,
+                    "aLengthMenu": [50, 100],
+                    "oLanguage": {
+                        "sSearch": "Tìm kiếm:",
+                        "sZeroRecords": "Không có dữ liệu phù hợp",
+                        "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                        "sEmptyTable": "Không có dữ liệu",
+                        "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                        "sLengthMenu": "Hiển thị _MENU_ dòng",
+                        "sProcessing": "Đang xử lý...",
+                        "oPaginate": {
+                            "sNext": "<i class='fa fa-chevron-right'></i>",
+                            "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                        }
+                    },
+                    "aoColumnDefs": [
+                        {
+                            "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                            "bSortable": false,
+                            "sClass": "text-center"
+                        },
+                    ],
+                    "bAutoWidth": false
+                }).fnSetFilteringDelay(delaySearch);
+                $('table').wrap('<div class="tableDiv-responsive" />');
+            };
+            var InitProDatatable3 = function (data) {
+                $('#datatable3').html('<table id="monthRReportGroup" class="table table-condensed table-striped table-bordered table-hover">'
+                                   + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+        + '<tr>'
+          + '<th>'
+             + '<label class="">STT</label>'
+           + '</th>'
+            + '<th>'
+          + '      <label class="">Khoảng thời gian</label>'
+          + '  </th>'
+          + '  <th>'
+           + '     <label class="">Số lượng(Mang đi)</label>'
+           + ' </th>'
+           + ' <th>'
+            + '    <label class="">Thành tiền</label>'
+           + ' </th>'
+           + ' <th>'
+           + '     <label class="">Số lượng(Tại store)</label>'
+           + ' </th>'
+           + ' <th>'
+           + '     <label class="">Thành tiền</label>'
+           + ' </th>'
+           + ' <th>'
+           + '     <label class="">Số lượng(Giao hàng)</label>'
+           + ' </th>'
+            + '<th>'
+            + '    <label class="">Thành tiền</label>'
+            + '</th>'
+            + '<th>'
+            + '    <label class="">Tổng cộng</label>'
+            + '</th>'
+           + ' <th>'
+            + '    <label class="">Thành tiền</label>'
+           + ' </th>'
+        + '</tr>'
+   + ' </thead>'
+                            + '<tbody></tbody>'
+                            + '</table');
+
+                $("#monthRReportGroup").dataTable({
+                    "bFilter": false,
+                    "bSort": false,
+                    "bRetrieve": true,
+                    "bScrollCollapse": true,
+                    'data': data,
+                    "bProcessing": true,
+                    "bPaginate": false,
+                    "iDisplayLength": 50,
+                    "aLengthMenu": [50, 100],
+                    "oLanguage": {
+                        "sSearch": "Tìm kiếm:",
+                        "sZeroRecords": "Không có dữ liệu phù hợp",
+                        "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                        "sEmptyTable": "Không có dữ liệu",
+                        "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                        "sLengthMenu": "Hiển thị _MENU_ dòng",
+                        "sProcessing": "Đang xử lý...",
+                        "oPaginate": {
+                            "sNext": "<i class='fa fa-chevron-right'></i>",
+                            "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                        }
+                    },
+                    "aoColumnDefs": [
+                        {
+                            "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                            "bSortable": false,
+                            "sClass": "text-center"
+                        }
+                    ],
+                    "bAutoWidth": false
+                }).fnSetFilteringDelay(delaySearch);
+                $('table').wrap('<div class="tableDiv-responsive" />');
+            };
+            //seach button + store on change
+            $('#btnSearch1').on('click', function () {
+                if ($("#eTime1").val().length > 16 || $("#sTime1").val().length > 16) {
+                    ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                    return;
+                }
+                else {
+                    $('#selectedStoreId').val($('#allStores').val());
+                    hourReportAll();
+                }
+            });
+            $('#btnSearch2').on('click', function () {
+                if ($("#eTime2").val().length > 16 || $("#sTime2").val().length > 16) {
+                    ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                    return;
+                }
+                else {
+                    $('#selectedStoreId').val($('#storeCombobox').val());
+                    hourReportStores();
+                }
+            });
+            $('#btnSearch3').on('click', function () {
+                if ($("#eTime3").val().length > 16 || $("#sTime3").val().length > 16) {
+                    ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                    return;
+                }
+                else {
+                    $('#selectedStoreId').val($('#storeGroupCombobox').val());
+                    hourReportGroup();
+                }
+            });
+            $('#storeCombobox').on('change', function () {
+                if ($("#eTime2").val().length > 16 || $("#sTime2").val().length > 16) {
+                    ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                    return;
+                }
+                else {
+                    $('#selectedStoreId').val($('#storeCombobox').val());
+                    hourReportStores();
+                }
+            });
+            $('#storeGroupCombobox').on('change', function () {
+                if ($("#eTime3").val().length > 16 || $("#sTime3").val().length > 16) {
+                    ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                    return;
+                }
+                else {
+                    $('#selectedStoreId').val($('#storeGroupCombobox').val());
+                    hourReportGroup();
+                }
+            });
+
+            //search report
+            var hourReportAll = function () {
+
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("LoadHourReport", "TimeReport")',
+                    data: { 'startTime': $('#sTime1').val(), 'endTime': $('#eTime1').val(), 'selectedStoreId': 0, },
+                    success: function (result) {
+                        var startTime = $('#sTime1').val();
+                        var endTime = $('#eTime1').val();
+                        //var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                        //if (dateRange != "") {
+
+                        //    $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                        //}
+                        //else {
+                        //    $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                        //}
+                        InitProDatatable1(result.datatable);
+
+                        DoanhThuChart1(result.dataChart, result.dataPie);
+                    }
+                });
+            };
+            var hourReportStores = function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("LoadHourReport", "TimeReport")',
+                    data: { 'startTime': $('#sTime2').val(), 'endTime': $('#eTime2').val(), 'selectedStoreId': $('#storeCombobox').val(), },
+                    success: function (result) {
+                        var startTime = $('#sTime2').val();
+                        var endTime = $('#eTime2').val();
+                        var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                        if (dateRange != "") {
+
+                            $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                        }
+                        else {
+                            $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                        }
+                        InitProDatatable2(result.datatable);
+                        DoanhThuChart2(result.dataChart);
+                    }
+                });
+            };
+            var hourReportGroup = function () {
+
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("LoadHourReportForGroup", "TimeReport")',
+                    data: { 'startTime': $('#sTime3').val(), 'endTime': $('#eTime3').val(), 'selectedGroupId': $('#storeGroupCombobox').val(), },
+                    success: function (result) {
+                        var startTime = $('#sTime3').val();
+                        var endTime = $('#eTime3').val();
+                        var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                        if (dateRange != "") {
+
+                            $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                        }
+                        else {
+                            $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                        }
+                        InitProDatatable3(result.datatable);
+                        DoanhThuChart3(result.dataChart);
+                    }
+                });
+            };
+
+            //-------------
+            //- LINE CHART -
+            //--------------
+            function DoanhThuChart1(dataChart, dataPie) {
+                $('#container1').highcharts({
+                    title: {
+                        text: 'BIỂU ĐỒ HÓA ĐƠN',
+                        x: -20 //center
+                    },
+                    subtitle: {
+                        text: '',
+                        x: -20
+                    },
+                    xAxis: {
+                        categories: dataChart.Time
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Hóa Đơn'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    tooltip: {
+                        valueSuffix: ' Hóa Đơn'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [
+                        {
+                            name: 'TakeAway',
+                            data: dataChart.TakeAway,
+                        },
+                        {
+                            name: 'AtStore',
+                            data: dataChart.AtStore,
+                        },
+                        {
+                            name: 'Delivery',
+                            data: dataChart.Delivery,
+                        }
+                    ]
+                });
+                $('#containerpie1').highcharts({
+                    chart: {
+                        plotBackgroundColor: null,
+                        plotBorderWidth: null,
+                        plotShadow: false,
+                        type: 'pie'
+                    },
+                    title: {
+                        text: 'Browser market shares January, 2015 to May, 2015'
+                    },
+                    tooltip: {
+                        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                    },
+                    plotOptions: {
+                        pie: {
+                            allowPointSelect: true,
+                            cursor: 'pointer',
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                style: {
+                                    color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                }
+                            }
+                        }
+                    },
+                series: [{
+                    name: 'Brands',
+                    colorByPoint: true,
+                    data: dataPie
+                }]
+
+                });
+                $('#containerCol1').highcharts({
+                    chart: {
+                        type: '',
+                        style:{
+                            fontFamily: 'arial'
+                        }
+                    },
+                    title: {
+                        text: 'BIỂU ĐỒ HÓA ĐƠN'
+                    },
+                    subtitle: {
+                        text: 'Bộ lọc:',
+                        align: 'right',
+                        x: -310,
+                        y: 42,
+                    },
+                    xAxis: {
+                        categories: dataChart.Time
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Hóa Đơn'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    legend: {
+                        align: 'right',
+                        x: -30,
+                        verticalAlign: 'top',
+                        y: 25,
+                        floating: true,
+                        backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                        borderColor: '#CCC',
+                        borderWidth: 1,
+                        shadow: false
+                    },
+                    tooltip: {
+                        headerFormat: '<b>{point.x}</b><br/>',
+                        pointFormat: '{series.name}: {point.y} '
+                    },
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: true,
+                                color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'TakeAway',
+                            data: dataChart.TakeAway,
+                        },
+                        {
+                            name: 'AtStore',
+                            data: dataChart.AtStore,
+                        },
+                        {
+                            name: 'Delivery',
+                            data: dataChart.Delivery,
+                        }
+                    ]
+                });
+            };
+            function DoanhThuChart2(dataChart) {
+                $('#container2').highcharts({
+                    title: {
+                        text: 'BIỂU ĐỒ HÓA ĐƠN',
+                        x: -20 //center
+                    },
+                    subtitle: {
+                        text: '',
+                        x: -20
+                    },
+                    xAxis: {
+                        categories: dataChart.Time
+                    },
+                    yAxis: {
+                        title: {
+                            text: 'Hóa Đơn'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    tooltip: {
+                        valueSuffix: ' Hóa Đơn'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [
+                        {
+                            name: 'TakeAway',
+                            data: dataChart.TakeAway,
+                        },
+                        {
+                            name: 'AtStore',
+                            data: dataChart.AtStore,
+                        },
+                        {
+                            name: 'Delivery',
+                            data: dataChart.Delivery,
+                        }
+                    ]
+                });
+                $('#containerCol2').highcharts({
+                    chart: {
+                        type: '',
+                        style: {
+                            fontFamily: 'arial'
+                        }
+                    },
+                    title: {
+                        text: 'BIỂU ĐỒ HÓA ĐƠN'
+                    },
+                    subtitle: {
+                        text: 'Bộ lọc:',
+                        align: 'right',
+                        x: -310,
+                        y: 42,
+                    },
+                    xAxis: {
+                        categories: dataChart.Time
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Hóa Đơn'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    legend: {
+                        align: 'right',
+                        x: -30,
+                        verticalAlign: 'top',
+                        y: 25,
+                        floating: true,
+                        backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                        borderColor: '#CCC',
+                        borderWidth: 1,
+                        shadow: false
+                    },
+                    tooltip: {
+                        headerFormat: '<b>{point.x}</b><br/>',
+                        pointFormat: '{series.name}: {point.y} '
+                    },
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: true,
+                                color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'TakeAway',
+                            data: dataChart.TakeAway,
+                        },
+                        {
+                            name: 'AtStore',
+                            data: dataChart.AtStore,
+                        },
+                        {
+                            name: 'Delivery',
+                            data: dataChart.Delivery,
+                        }
+                    ]
+                });
+            };
+            function DoanhThuChart3(dataChart) {
+                $('#container3').highcharts({
+                    title: {
+                        text: 'BIỂU ĐỒ HÓA ĐƠN',
+                        x: -20 //center
+                    },
+                    subtitle: {
+                        text: '',
+                        x: -20
+                    },
+                    xAxis: {
+                        categories: dataChart.Time
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Hóa Đơn'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    tooltip: {
+                        valueSuffix: ' Hóa Đơn'
+                    },
+                    legend: {
+                        layout: 'vertical',
+                        align: 'right',
+                        verticalAlign: 'middle',
+                        borderWidth: 0
+                    },
+                    series: [
+                        {
+                            name: 'TakeAway',
+                            data: dataChart.TakeAway,
+                        },
+                        {
+                            name: 'AtStore',
+                            data: dataChart.AtStore,
+                        },
+                        {
+                            name: 'Delivery',
+                            data: dataChart.Delivery,
+                        }
+                    ]
+                });
+                $('#containerCol3').highcharts({
+                    chart: {
+                        type: '',
+                        style: {
+                            fontFamily: 'arial'
+                        }
+                    },
+                    title: {
+                        text: 'BIỂU ĐỒ HÓA ĐƠN'
+                    },
+                    subtitle: {
+                        text: 'Bộ lọc:',
+                        align: 'right',
+                        x: -310,
+                        y: 42,
+                    },
+                    xAxis: {
+                        categories: dataChart.Time
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: 'Hóa Đơn'
+                        },
+                        plotLines: [{
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
+                    },
+                    legend: {
+                        align: 'right',
+                        x: -30,
+                        verticalAlign: 'top',
+                        y: 25,
+                        floating: true,
+                        backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                        borderColor: '#CCC',
+                        borderWidth: 1,
+                        shadow: false
+                    },
+                    tooltip: {
+                        headerFormat: '<b>{point.x}</b><br/>',
+                        pointFormat: '{series.name}: {point.y} '
+                    },
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: true,
+                                color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white'
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'TakeAway',
+                            data: dataChart.TakeAway,
+                        },
+                        {
+                            name: 'AtStore',
+                            data: dataChart.AtStore,
+                        },
+                        {
+                            name: 'Delivery',
+                            data: dataChart.Delivery,
+                        }
+                    ]
+                });
+            };
+
+            // export to excel
+            $(document).on('click', '#export1', function () {
+                $('#startTime1').val($('#sTime1').val());
+                $('#endTime1').val($('#eTime1').val());
+                //$('#storeId').val(ViewBag.storeId);
+                $('#formMonthReportExcel1').submit();
+            });
+            $(document).on('click', '#export2', function () {
+                $('#startTime2').val($('#sTime2').val());
+                $('#endTime2').val($('#eTime2').val());
+                //$('#storeId').val(ViewBag.storeId);
+                $("#selectedStoreId2").val($('#storeCombobox').val());
+                $('#formMonthReportExcel2').submit();
+            });
+            $(document).on('click', '#export3', function () {
+                $('#startTime3').val($('#sTime3').val());
+                $('#endTime3').val($('#eTime3').val());
+                //$('#storeId').val(ViewBag.storeId);
+                $('#selectedGroupId').val($('#storeGroupCombobox').val());
+                $('#formMonthReportExcel3').submit();
+            });
+
+
+            @*$(document).on('click', '#exporttest', function () {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("ExportMonthTableToExceltest","TimeReportController")',
+                    data: {
+                        'selectedStoreId': $('#storeCombobox').val()
+                    },
+                });
+            });*@
+            function ShowChart1() {
+                var display = $('#btnChart1').data('show');
+                if (display == "hide") {
+                    $('#btnChart1').data('show', 'show');
+                    $('#btnChart1').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                }
+                else {
+                    $('#btnChart1').html(' <i class="fa fa-minus"></i> Ẩn biểu đồ');
+                    $('#btnChart1').data('show', 'hide');
+                }
+                $('#containerCol1').toggle('show');
+            }
+            function ShowChart2() {
+                var display = $('#btnChart2').data('show');
+                if (display == "hide") {
+                    $('#btnChart2').data('show', 'show');
+                    $('#btnChart2').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                }
+                else {
+                    $('#btnChart2').html(' <i class="fa fa-minus"></i> Ẩn biểu đồ');
+                    $('#btnChart2').data('show', 'hide');
+                }
+                $('#containerCol2').toggle('show');
+            }
+            function ShowChart3() {
+                var display = $('#btnChart3').data('show');
+                if (display == "hide") {
+                    $('#btnChart3').data('show', 'show');
+                    $('#btnChart3').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                }
+                else {
+                    $('#btnChart3').html(' <i class="fa fa-minus"></i> Ẩn biểu đồ');
+                    $('#btnChart3').data('show', 'hide');
+                }
+                $('#containerCol3').toggle('show');
+            }
+            $('#buildTabStore').one('click', function (e) {
+                setupDaterangerpicker2();
+                hourReportStores();
+            });
+            $('#buildTabGroup').one('click', function (e) {
+                setupDaterangerpicker3();
+                hourReportGroup();
+            });
+            $('#buildTabStore').on('click', function (e) {
+                $('#btnChart1').data('show', 'show');
+                $('#btnChart1').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                $('#containerCol1').hide();
+                $('#btnChart3').data('show', 'show');
+                $('#btnChart3').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                $('#containerCol3').hide();
+                var startTime = $('#sTime2').val();
+                var endTime = $('#eTime2').val();
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                if (dateRange != "") {
+
+                    $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                }
+                else {
+                    $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                }
+            });
+            $('#buildTabAll').on('click', function (e) {
+                $('#btnChart2').data('show', 'show');
+                $('#btnChart2').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                $('#containerCol2').hide();
+                $('#btnChart3').data('show', 'show');
+                $('#btnChart3').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                $('#containerCol3').hide();
+                var startTime = $('#sTime1').val();
+                var endTime = $('#eTime1').val();
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                if (dateRange != "") {
+
+                    $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                }
+                else {
+                    $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                }
+            });
+            $('#buildTabGroup').on('click', function (e) {
+                $('#btnChart1').data('show', 'show');
+                $('#btnChart1').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                $('#containerCol1').hide();
+                $('#btnChart2').data('show', 'show');
+                $('#btnChart2').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                $('#containerCol2').hide();
+                var startTime = $('#sTime3').val();
+                var endTime = $('#eTime3').val();
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                if (dateRange != "") {
+
+                    $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                }
+                else {
+                    $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                }
+            });
+</script>

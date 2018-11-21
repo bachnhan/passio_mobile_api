@@ -1,0 +1,43 @@
+﻿@model int
+
+<input type="hidden" value="@Model" id="hiddenCategoryId" />
+
+<table class="table table-bordered table-striped table-fixed-header" id="listProductGeneralTable">
+    <thead>
+        <tr>
+            <th>
+                STT
+            </th>
+            <th>
+                Mã sản phẩm
+            </th>
+            <th>
+                Hình ảnh
+            </th>
+            <th>
+                Tên sản phẩm
+            </th>
+            <th>
+                Giá tiền
+            </th>
+            <th>
+                Danh mục
+            </th>
+            <th>
+                Loại sản phẩm
+            </th>
+            <th>
+                Product Detail
+            </th>
+            <th>
+                
+            </th>
+            <th>
+                Cấu hình giá
+            </th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@Html.Partial("_AssignToStore")

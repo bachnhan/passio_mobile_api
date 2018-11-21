@@ -1,0 +1,72 @@
+﻿.skyplus-skin {
+  /*========================== COMMON ==========================*/
+  /*.pagination > li {
+        a {
+            color: @color-main;
+
+            &:hover {
+                background-color: @color-theme-1;
+                border-color: @color-theme-2;
+            }
+        }
+
+        &.active > a,
+        &.active > a:hover {
+            background-color: @color-main;
+            border-color: @color-main;
+            color: #fff;
+        }
+    }*/
+}
+.skyplus-skin a:hover {
+  text-decoration: none;
+  color: #FFF;
+}
+.skyplus-skin .btn-primary,
+.skyplus-skin .btn-primary:focus {
+  background-color: #97b22b !important;
+  border-color: #97b22b;
+}
+.skyplus-skin .btn-primary:hover {
+  background-color: #748921 !important;
+}
+.skyplus-skin .btn-primary.disabled,
+.skyplus-skin .btn-primary:disabled {
+  background-color: #b4d13f !important;
+  border-color: #b4d13f;
+}
+.skyplus-skin .btn-success,
+.skyplus-skin .btn-success:focus {
+  background-color: #325d88 !important;
+  border-color: #325d88;
+}
+.skyplus-skin .btn-success:hover {
+  background-color: #244363 !important;
+  border-color: #325d88;
+}
+.skyplus-skin .btn-danger,
+.skyplus-skin .btn-danger:focus {
+  background-color: #d9534f !important;
+  border-color: #d9534f;
+}
+.skyplus-skin .btn-danger:hover {
+  background-color: #c9302c !important;
+}
+/* Sidebar icon */
+[class*="img-icon-"] {
+  display: inline-block;
+  width: 100%;
+  height: 25px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: auto 80%;
+  -moz-transition: all .2s;
+  -o-transition: all .2s;
+  -webkit-transition: all .2s;
+  transition: all .2s;
+}
+.transition {
+  -moz-transition: all .2s;
+  -o-transition: all .2s;
+  -webkit-transition: all .2s;
+  transition: all .2s;

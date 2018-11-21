@@ -1,0 +1,608 @@
+﻿
+    @using HmsService.Models    @model HmsService.ViewModels.AttendanceEditViewModel
+<style>
+    /*.pair-group.btn,
+    .variant-group.btn {
+        font-weight: 500 !important;
+        padding-left: 13px !important;
+    }*/
+
+
+    /*.select2-container.select2-choice {
+        display: block;
+        height: 35px;
+        padding: 0 0 0 8px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #e0e0e0 !important;
+        white-space: nowrap;
+        line-height: 35px;
+        color: #444;
+        text-decoration: none;
+        border-radius: 0px;
+        user-select: none;
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #fff));
+    }*/
+
+    /*.select2-arrow {
+        opacity: 1;
+    }*/
+
+    /*.select2-container.select2-choice.select2-arrow {
+        display: inline-block;
+        width: 18px;
+        height: 100%;
+        position: absolute;
+        right: 0;
+        top: 3px;
+        border-left: 0px;
+        border-radius: 0px;
+        background-clip: padding-box;
+        background: #ccc; 
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #fff));
+        background-image: -webkit-linear-gradient(center bottom, #fff 0%, #fff 60%);
+        background-image: -moz-linear-gradient(center bottom, #fff 0%, #fff 60%);
+    }*/
+
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+
+    .mtab_content {
+        display: none;
+    }
+
+    .funkyradio div {
+        /*margin: 0 50px;*/
+        overflow: hidden;
+    }
+
+    .funkyradio label {
+        /*min-width: 400px;*/
+        width: 100%;
+        border-radius: 3px;
+        border: 1px solid #D1D3D4;
+        font-weight: normal;
+    }
+
+    .funkyradio input[type="radio"]:empty, .funkyradio input[type="checkbox"]:empty {
+        display: none;
+    }
+
+    .funkyradio input[type="radio"]:empty ~ label, .funkyradio input[type="checkbox"]:empty ~ label {
+        position: relative;
+        line-height: 2.5em;
+        text-indent: 3.25em;
+        margin-top: 0em;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .funkyradio input[type="radio"]:empty ~ label:before, .funkyradio input[type="checkbox"]:empty ~ label:before {
+        position: absolute;
+        display: block;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        content: '';
+        width: 2.5em;
+        background: #D1D3D4;
+        border-radius: 3px 0 0 3px;
+    }
+
+    .funkyradio input[type="radio"]:hover:not(:checked) ~ label:before, .funkyradio input[type="checkbox"]:hover:not(:checked) ~ label:before {
+        content: '\2714';
+        text-indent: .9em;
+        color: #C2C2C2;
+    }
+
+    .funkyradio input[type="radio"]:hover:not(:checked) ~ label, .funkyradio input[type="checkbox"]:hover:not(:checked) ~ label {
+        color: #888;
+    }
+
+    .funkyradio input[type="radio"]:checked ~ label:before, .funkyradio input[type="checkbox"]:checked ~ label:before {
+        content: '\2714';
+        text-indent: .9em;
+        color: #333;
+        background-color: #ccc;
+    }
+
+    .funkyradio input[type="radio"]:checked ~ label, .funkyradio input[type="checkbox"]:checked ~ label {
+        color: #777;
+    }
+
+    .funkyradio input[type="radio"]:focus ~ label:before, .funkyradio input[type="checkbox"]:focus ~ label:before {
+        box-shadow: 0 0 0 3px #999;
+    }
+
+    .funkyradio-default input[type="radio"]:checked ~ label:before, .funkyradio-default input[type="checkbox"]:checked ~ label:before {
+        color: #333;
+        background-color: #ccc;
+    }
+
+    .funkyradio-primary input[type="radio"]:checked ~ label:before, .funkyradio-primary input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #337ab7;
+    }
+
+    .funkyradio-success input[type="radio"]:checked ~ label:before, .funkyradio-success input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5cb85c;
+    }
+
+    .funkyradio-danger input[type="radio"]:checked ~ label:before, .funkyradio-danger input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #d9534f;
+    }
+
+    .funkyradio-warning input[type="radio"]:checked ~ label:before, .funkyradio-warning input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #f0ad4e;
+    }
+
+    .funkyradio-info input[type="radio"]:checked ~ label:before, .funkyradio-info input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5bc0de;
+    }
+
+    body {
+        font-family: arial, sans-serif;
+    }
+
+    .checkcaption {
+        text-align: center;
+        margin-top: 10px;
+    }
+
+    .check {
+        width: 60px;
+        height: 30px;
+        border: #222 solid 2px;
+        position: relative;
+        margin: 10px auto;
+        border-radius: 15px;
+    }
+
+    .check input {
+        visibility: hidden;
+        height: 30px;
+        width: 60px;
+    }
+
+    .check label {
+        display: block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #e74c3c;
+        cursor: pointer;
+        position: absolute;
+        top: 18%;
+        left: 12%;
+        -webkit-transition: all .3s ease;
+        transition: all .3s ease;
+    }
+
+    .check input:checked + label {
+        left: 55%;
+        background-color: #7b3;
+    }
+
+    div#timeline {
+        background-color: #6ab0de;
+        margin-top: 150px;
+        height: 5px;
+        width: 100%;
+        position: relative;
+        z-index: 1;
+    }
+
+    div#timeline .inside {
+        position: absolute;
+        height: 1px;
+        background-color: #7b3;
+        width: 0%;
+        top: 3px;
+        left: 0;
+    }
+
+    div#timeline .dot {
+        z-index: 99;
+        -webkit-transition: 0.3s ease-in-out;
+        transition: 0.3s ease-in-out;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        position: absolute;
+        top: -7px;
+        text-align: center;
+        cursor: pointer;
+    }
+
+
+
+    div#timeline .dot:hover {
+        -webkit-transform: scale(1.2);
+        transform: scale(1.2);
+    }
+
+    div#timeline .dot date {
+        font-family: roboto;
+        font-size: 1.1rem;
+        display: block;
+        position: relative;
+        top: -30px;
+        text-align: center;
+    }
+
+    div#timeline .dot span {
+        display: inline-block;
+        margin-top: 10px;
+        width: 20px;
+        height: 20px;
+        background-color: #fff;
+        position: relative;
+        border-radius: 50%;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    }
+
+    article {
+        display: none;
+        position: relative;
+        top: 30px;
+        max-width: 960px;
+        background-color: #fff;
+        padding: 20px;
+        margin: auto;
+    }
+
+    article date {
+        display: block;
+        text-align: right;
+    }
+
+    article h2 {
+        font-family: merriweather, sans-serif;
+        font-size: 5rem;
+        padding: 10px 0;
+        border-bottom: solid #111 2px;
+        margin-bottom: 20px;
+    }
+
+    article p {
+        line-height: 130%;
+    }
+</style>
+
+<!--Model sửa diem danh nhien vien trong ca-->
+<div id="create-modal-container">
+    <div class="modal" id="ShowAttendanceSetModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document" style="width:800px;">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4>Cập nhật ca làm việc - Nhân viên: @ViewBag.empName</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Trạng thái</label>
+                            <div class="col-sm-9">
+                                <div class="funkyradio col-md-12">
+                                    <div class="funkyradio-success col-md-3 p-l-0 p-t-0">
+                                        <input type="radio" name="radio" value="1" id="rbApproved" />
+                                        <label for="rbApproved" style="color: #5cb85c; font-weight: bold">Đã duyệt</label>
+                                    </div>
+                                    <div class="funkyradio-danger col-md-3 p-l-0 p-t-0">
+                                        <input type="radio" name="radio" value="2" id="rbReject" />
+                                        <label for="rbReject" style="color: #d9534f; font-weight: bold">Đã hủy</label>
+                                    </div>
+                                    <div class="funkyradio-warning col-md-3 p-l-0 p-t-0">
+                                        <input type="radio" name="radio" value="0" id="rbProcessing" />
+                                        <label for="rbProcessing" style="color: #f0ad4e; font-weight: bold">Chờ duyệt</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="attId">
+                            <label class="col-sm-3 control-label">Người duyệt</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="updatePerson" name="updatePerson" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Giờ bắt đầu ca</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="ShiftMin" placeholder="Giờ bắt đầu ca">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Giờ kết thúc ca</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="ShiftMax" placeholder="Giờ kết thúc ca">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Giờ nhân viên vào</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="CheckMin" placeholder="Giờ nhân viên vào" onblur="reloadTotalWorkTime()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Giờ nhân viên ra</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="CheckMax" placeholder="Giờ nhân viên ra" onblur="reloadTotalWorkTime()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Thời lượng nhân viên làm</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="TotalWorkTime" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Ghi chú</label>
+                            <div class="col-sm-9">
+                                <textarea rows="4" cols="78" class="form-control" id="TextAreaNote" name="TextAreaNote"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox col-sm-9 pull-right">
+                                <label>
+                                    Cho phép chương trình tự động cập nhật lại dữ liệu<input type="checkbox" id="IsOverride" /><i class="input-helper"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="submit" id="btnAction" onclick="EditAttendance()" class="btn btn-success btn-sm pull-right">Hoàn Tất</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Model cũ-->
+@*<div id="create-modal-container">
+    <div class="modal" id="ShowAttendanceSetModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document" @*style="width:700px;>
+            <div class="modal-content">
+                <div class="form-horizontal">
+            <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4>Cập nhật ca làm việc - Nhân viên: @ViewBag.empName</h4>
+            </div>
+            <div class="modal-body">
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Giờ bắt đầu ca</label>
+                    <div class="col-md-8">
+                        <div class="fg-line">
+                                    <input type="text" class="form-control" id="TimeFrameStart" name="TimeFrameStart" placeholder="Giờ bắt đầu ca">
+                        </div>
+                    </div>
+                </div>
+                        <div class="form-group">
+                    <label class="control-label col-md-4">Giờ kết thúc ca</label>
+                    <div class="col-md-8">
+                        <div class="fg-line">
+                            <input type="text" class="form-control" id="TimeFrameEnd" name="TimeFrameEnd" placeholder="Giờ kết thúc ca">
+                        </div>
+                    </div>
+                </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Giờ Vào</label>
+                    <div class="col-md-8">
+                        <div class="fg-line">
+                                    <input type="text" class="form-control" id="CheckMin" name="CheckMin" placeholder="Giờ Vào">
+                        </div>
+                    </div>
+                </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Giờ Ra</label>
+                    <div class="col-md-8">
+                        <div class="fg-line">
+                                    <input type="text" class="form-control" id="CheckMax" name="CheckMax" placeholder="Giờ Ra">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="button" class="btn btn-success" id="btn-submit-product" onclick="submit()">Hoàn tất</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>*@
+<script>
+
+    function loadData() {
+        $('#attId').val('@Model.AttendanceId');
+        $('#TextAreaNote').val('@Model.note');
+        var strTotalWorkTime = ('@Model.totalWorkTime').replace('/:/g', '');
+        $('#TotalWorkTime').val(moment(strTotalWorkTime, "hmm").format("HH:mm"));
+        $('#ShiftMin').val('@Model.shiftMin');
+        $('#ShiftMax').val('@Model.shiftMax');
+        if ('@Model.checkMin' == "01/01/0001 00:00") {
+
+            $('#CheckMin').val("");
+        } else {
+            $('#CheckMin').val('@Model.checkMin');
+        }
+
+        if ('@Model.checkMax' == "01/01/0001 00:00") {
+            $('#CheckMax').val("");
+        } else {
+            $('#CheckMax').val('@Model.checkMax');
+        }
+
+        if ('@Model.processStt' == '@((int) ProcessingStatusAttendenceEnum.UpdatedByManualCanOveride)') {
+            $("#IsOverride").prop('checked', true);
+        } else {
+            $("#IsOverride").prop('checked', false);
+        }
+
+        if ('@Model.stt' == '@((int) StatusAttendanceEnum.Processing)') {
+            $("#rbProcessing").prop('checked', true);
+        } else if ('@Model.stt' == '@((int) StatusAttendanceEnum.Approved)') {
+            $("#rbApproved").prop('checked', true);
+        } else if ('@Model.stt' == '@((int) StatusAttendanceEnum.Reject)') {
+            $("#rbReject").prop('checked', true);
+        }
+        if ('@Model.updatePerson' != null && '@Model.updatePerson' != "System") {
+            $('#updatePerson').val('@Model.updatePerson');
+        } else {
+            $('#updatePerson').val("N/A");
+        }
+    }
+
+    $(document).ready(function () {
+        loadData();
+        $('#ShiftMin').datetimepicker({
+            sideBySide: true,
+            format: 'DD/MM/YYYY HH:mm',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#ShiftMax').datetimepicker({
+            sideBySide: true,
+            format: 'DD/MM/YYYY HH:mm',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#CheckMax').datetimepicker({
+            sideBySide: true,
+            format: 'DD/MM/YYYY HH:mm',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#CheckMin').datetimepicker({
+            sideBySide: true,
+            format: 'DD/MM/YYYY HH:mm',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+
+    });
+    @*function submit() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("EditAtendance")',
+            data: {
+                AttendanceId: @Model.AttendanceId,
+                CheckMin: $('#CheckMin').val(),
+                CheckMax: $('#CheckMax').val(),
+                ShiftMin: $('#TimeFrameStart').val(),
+                ShiftMax: $('#TimeFrameEnd').val()
+            },
+            success: function (result) {
+                ShowAlert("Chỉnh sửa ca thành công", 2);
+                $('#ShowAttendanceSetModal').modal('hide');
+                $("#rowEmpName").empty();
+                $("#rowIdEmp").empty();
+                loadCalendar();
+            },
+            error: function (error) {
+                ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+            }
+        });
+    }*@
+
+    function EditAttendance() {
+        debugger;
+        var checkMax = new Date(moment($("#CheckMax").val()).format('DD/MM/YYYY HH:mm')).getTime();
+        var checkMin = new Date(moment($("#CheckMin").val()).format('DD/MM/YYYY HH:mm')).getTime();
+        var shiftMax = new Date(moment($("#ShiftMax").val()).format('DD/MM/YYYY HH:mm')).getTime();
+        var shiftMin = new Date(moment($("#ShiftMin").val()).format('DD/MM/YYYY HH:mm')).getTime();
+
+        if (checkMax < checkMin) {
+            ShowAlert("Giờ vào phải bé hơn giờ ra", 1);
+            return;
+        }
+
+        if (shiftMax < shiftMin) {
+            ShowAlert("Giờ bắt đầu ca phải bé hơn giờ kết thúc ca", 1);
+            return;
+        }
+
+        var rsStt = 0;
+        if ($("#rbApproved").is(':checked')) {
+            rsStt = $("#rbApproved").val();
+        } else if ($("#rbProcessing").is(':checked')) {
+            rsStt = $("#rbProcessing").val();
+        } else if ($("#rbReject").is(':checked')) {
+            rsStt = $("#rbReject").val();
+        }
+
+        var isOverride = 0;
+        if ($("#IsOverride").is(':checked')) {
+            isOverride = @((int) ProcessingStatusAttendenceEnum.UpdatedByManualCanOveride);
+        } else {
+            isOverride = @((int) ProcessingStatusAttendenceEnum.UpdatedByManualCanNotOveride);
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("EditAttendance", "Attendance")',
+            data: {
+                'attId': $('#attId').val(),
+                'checkMin': $('#CheckMin').val(),
+                'checkMax': $('#CheckMax').val(),
+                'shiftMin': $('#ShiftMin').val(),
+                'shiftMax': $('#ShiftMax').val(),
+                'note': $('#TextAreaNote').val(),
+                'processingStatus': isOverride,
+                'stt': rsStt
+            },
+            success: function(result) {
+                if (result.rs == true) {
+                    $('#ShowAttendanceSetModal').modal('hide');
+                    loadCalendar();
+                    ShowAlert(result.mess, 2);
+                } else {
+                    ShowAlert(result.mess, 1);
+                }
+            },
+            error: function(error) {
+                ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+            }
+        });
+    }
+
+    function reloadTotalWorkTime() {
+        var dateEnd = new Date(moment($("#CheckMax").val()).format('DD/MM/YYYY HH:mm')).getTime();
+        var dateStart = new Date(moment($("#CheckMin").val()).format('DD/MM/YYYY HH:mm')).getTime();
+        var timeSpan = dateEnd - dateStart;
+        var timeSpanHour = parseInt(timeSpan / 1000 / 60 / 60);
+        var rs = "";
+        if (timeSpanHour < 10) {
+            rs += "0" + timeSpanHour;
+        } else {
+            rs += timeSpanHour;
+        }
+        var timeSpanMinute = parseInt((timeSpan - (timeSpanHour * 60 * 60 * 1000)) / 60 / 1000);
+        if (timeSpanMinute < 10) {
+            rs += ":0" + timeSpanMinute;
+        } else {
+            rs += ":" + timeSpanMinute;
+        }
+
+        $("#TotalWorkTime").val(rs);
+    }
+
+
+</script>

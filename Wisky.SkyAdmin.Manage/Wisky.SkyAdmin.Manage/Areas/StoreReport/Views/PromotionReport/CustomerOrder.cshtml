@@ -1,0 +1,552 @@
+﻿
+@{
+    ViewBag.Title = "Order List";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .tableDiv-responsive {
+        overflow-x: auto !important;
+    }
+
+    .m-t-7 {
+        margin-top: 7px !important;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Hoá đơn của @ViewData["customerName"]</h3>
+                <h5 class="smallDate" data-role="small-date">
+                    @{
+                        var stime = (string)ViewData["sTime"];
+                        var etime = (string)ViewData["eTime"];
+
+                        if (stime.Equals(etime))
+                        {
+                            <span>(@stime)</span>
+                        }
+                        else
+                        {
+                            <span>(@stime - @etime)</span>
+                        }
+                    }
+                </h5>
+            </div>
+            <div class="col-md-4">
+                <div class="pull-right m-t-7">
+                    <a id="btn-comeback" class="btn btn-success" href="@Url.Action("/")">
+                        Quay về
+                    </a>
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-padding">
+        <div class="row" style="margin-top:-10px;margin-bottom:10px">
+            <div class="col-md-12">
+                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo" style="margin-bottom:10px !important">Bộ lọc hóa đơn</button>
+            </div>
+            @*<div class="col-md-6">
+                    <div class="input-group">
+                        <div class="input-group date" id="datetimepicker" style="float: right">
+                            <input id="date-time" type="text" class="input-group-addon form-control myInputCelender" style="padding-left: 0px !important;height: 37px; margin-top: -1px;" />
+                            <span class="input-group-addon myCerlenderSpan">
+                                <span class="fa fa-calendar"></span>
+                            </span>
+                        </div>
+                        <div class="input-group-btn">
+                            <a class="btn btn-primary btn-sm" id="btnSearch">
+                                <i class="left-icon fa fa-search"></i>     Tìm
+                            </a>
+                        </div>
+                    </div>
+                </div>*@
+        </div>
+        <div id="demo" class="collapse">
+            <div class="group-radio-buttons myGroup-radio-buttons " style="padding-bottom: 10px">
+                <div class="col-md-12">
+                    <h4 style="margin-bottom:20px;font-weight:bold;">Tình trạng hóa đơn</h4>
+                </div>
+                <div class="row small-margin">
+                    <div class="col-md-3">
+                        <input type="radio" name="report-filter-status" value="0" class="nice-check" id="filter1" checked />
+                        <label for="filter1"><span>Tất cả</span></label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="radio" name="report-filter-status" value="2" class="nice-check" id="filter2" />
+                        <label for="filter2"><span>Hoàn thành</span></label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="radio" name="report-filter-status" value="3" class="nice-check" id="filter3" style="margin-top: 0px!important;" />
+                        <label for="filter3"><span>Hủy sau chế biến</span></label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="radio" name="report-filter-status" value="4" class="nice-check" id="filter4" style="margin-top: 0px!important;" />
+                        <label for="filter4"><span>Hủy trước chế biến</span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="group-radio-buttons myGroup-radio-buttons" style="padding-bottom:15px">
+                <div class="col-md-12">
+                    <h4 style="margin-bottom:20px;font-weight:bold;">Loại hóa đơn</h4>
+                </div>
+                <div class="row small-margin">
+                    <div class="col-md-3">
+                        <input type="radio" name="report-filter-type" value="0" class="nice-check" id="filter-type1" checked />
+                        <label for="filter-type1"><span>Tất cả</span></label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="radio" name="report-filter-type" value="4" class="nice-check" id="filter-type2" />
+                        <label for="filter-type2"><span>Tại quán</span></label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="radio" name="report-filter-type" value="6" class="nice-check" id="filter-type3" style="margin-top: 0px!important;" />
+                        <label for="filter-type3"><span>Giao hàng</span></label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="radio" name="report-filter-type" value="5" class="nice-check" id="filter-type4" style="margin-top: 0px!important;" />
+                        <label for="filter-type4"><span>Mang đi</span></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <table id="tblOrderDetail" class="table table-striped table-bordered table-hover table-responsive table-condensed">
+            <thead>
+                <tr>
+                    <th>
+                        <label class="">STT</label>
+                    </th>
+                    <th>
+                        <label class="">Mã hóa đơn</label>
+                    </th>
+                    <th>
+                        <label class="">Số lượng</label>
+                    </th>
+                    <th>
+                        <label class="">Thanh toán</label>
+                    </th>
+                    <th>
+                        <label class="">Thời gian</label>
+                    </th>
+                    <th>
+                        <label class="">Loại hóa đơn</label>
+                    </th>
+                    <th>
+                        <label class="">Tình trạng</label>
+                    </th>
+                    <th>
+                        <label class="">Cashier</label>
+                    </th>
+                    <th>
+                        <label class="">Chi tiết</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="modal fade " tabindex="-1" id="order-detail-report-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Chi tiết hóa đơn</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="clearfix" style="margin-bottom: 20px;">
+                        <div class="col-md-6 float-left">
+                            @*<div id="delivery">*@
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Địa chỉ giao:</label>
+                            <label class="control-label float-left" data-role="delivery-address"></label>
+                            <br />
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Điện thoại:</label>
+                            <label class="control-label float-left" data-role="customer-phone"></label>
+                            <br />
+                            @*</div>*@
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Cashier:</label>
+                            <label class="control-label float-left" data-role="cashier">
+                            </label>
+                            <br />
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Thời gian đặt:</label>
+                            <label class="control-label float-left " data-role="order-time"></label>
+                            <br />
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Phân loại:</label>
+                            <label class="control-label float-left" data-role="status">
+                            </label>
+                        </div>
+                        <div class="col-md-6 float-right">
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Mã hóa đơn:</label>
+                            <label class="control-label float-left" data-role="invoiceid">
+                            </label>
+                            <br />
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Tổng cộng:</label>
+                            <label class="control-label float-left" data-role="total-amount">
+                            </label>
+                            <br />
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Giảm giá:</label>
+                            <label class="control-label float-left" data-role="discount">
+                            </label>
+                            <br />
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Thanh toán:</label>
+                            <label class="control-label float-left" data-role="final-amount">
+                            </label>
+                            <br />
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Ghi chú:</label>
+                            <label class="control-label float-left" data-role="notes">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-md-offset-7">
+                        <button type="submit" id="exportEx" class="btn btn-primary btn-sm pull-right">
+                            <i class="fa fa-download"></i>
+                            Xuất ra file Excel
+                        </button>
+                    </div>
+                    <table class="table table-striped table-bordered table-hover table-condensed" id="order-report-detail-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Giá sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Tình trạng</th>
+                                <th>Giảm giá</th>
+                                <th>Thanh toán</th>
+                                @*<th>RentID</th>*@
+                            </tr>
+                        </thead>
+                    </table>
+                    <form class="hidden" id="formDetailReportExcel" action="@Url.Action("ExportOrderTableToExcel","Order", new {area = "Orders"})">
+                        <input type="hidden" name="brandId" id="brandId" value="@ViewData["brandId"]" />
+                        <input type="hidden" name="storeId" id="storeId" value="@ViewData["storeId"]" />
+                        <input type="hidden" name="_id" id="RentID" value="" />
+                    </form>
+                </div>
+                @*<div class="modal-footer">
+                        <a class="btn btn-success" id="order-detail-submit">Lưu thay đổi</a>
+                        <a class="btn btn-default close" data-dismiss="modal" aria-label="Close">Thoát</a>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var orderDetailTable = null;
+    var currentId = -1;
+
+    function RefreshOrderTable() {
+        var oTable = $("#tblOrderDetail").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+    $(document).ready(function () {
+        InitOrderDatatable();
+        $('[name="report-filter-status"]').change(function (e) {
+            RefreshTableFilter("#tblOrderDetail", true);
+
+        });
+        $('[name="report-filter-type"]').change(function (e) {
+            RefreshTableFilter("#tblOrderDetail", true);
+        });
+    });
+    function InitOrderDatatable() {
+        $("#tblOrderDetail").dataTable({
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadOrderByPromotion", "PromotionReport")",
+            "bProcessing": true,
+            "iDisplayLength": 10,
+            "aLengthMenu": [10, 50, 100],
+            "bFilter": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "promotionId", "value": '@ViewData["promotionId"]' }),
+                aoData.push({ "name": "customerId", "value": '@ViewData["customerId"]' }),
+                aoData.push({ "name": "status", "value": $('input[name=report-filter-status]:checked').val() }),
+                aoData.push({ "name": "type", "value": $('input[name=report-filter-type]:checked').val() });
+                aoData.push({ "name": "sTime", "value": '@ViewData["sTime"]' });
+                aoData.push({ "name": "eTime", "value": '@ViewData["eTime"]' });
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                },
+                "sSearchPlaceholder": "Mã hóa đơn"
+            },
+            "aoColumnDefs": [
+               {
+                   "aTargets": [0, 2, 3, 4, 5],
+                   "sClass": "text-center"
+               },
+               {
+                   "aTargets": [3],
+                   "mRender": function (data, type, row) {
+                       //var money = o.aData[5];
+                       var data = row[3];
+                       return toMoney(data, ',', '');
+                   }
+               },
+               {
+                   "aTargets": [5],
+                   "mRender": function (data, type, row) {
+                       var status = "";
+                       var color = "";
+                       var colorS = "";
+                       data = row[5];
+                       status = row[8];
+
+                       switch (data) {
+                           case 4:
+                               type = "@Resources.EnumLanguage.View_AtStore";
+                               color = "<div class='label label-primary myCate'>";
+                               break;
+                           case 5:
+                               type = "@Resources.EnumLanguage.View_TakeAway";
+                               color = "<div class='label label-success myCate'>";
+                               break;
+                           case 6:
+                               type = "@Resources.EnumLanguage.View_Delivery";
+                               color = "<div class='label label-warning myCate'>";
+                               break;
+                           case 1:
+                               type = "@Resources.EnumLanguage.View_OnlineProduct";
+                               color = "<div class='label label-warning myCate'>";
+                               break;
+                           default:
+                               type = "@Resources.EnumLanguage.Unknown";
+                               color = "<div class='label label-default myCate'>";
+                       }
+
+                       return color + type + '</div>';
+                   }
+               },
+               {
+                   "aTargets": [6],
+                   "mRender": function (data, type, row) {
+                       var status = "";
+                       var colorS = "";
+                       var status = row[8];
+
+                       switch (status) {
+                           case 2:
+                               status = "@Resources.EnumLanguage.View_Finish";
+                               colorS = "<div class='label label-success myCate'>";
+                               break;
+                           case 3:
+                               status = "@Resources.EnumLanguage.View_Cancel";
+                               colorS = "<div class='label label-warning myCate'>";
+                               break;
+                           case 4:
+                               status = "@Resources.EnumLanguage.View_PreCancel";
+                               colorS = "<div class='label label-warning myCate'>";
+                               break;
+                           case 8:
+                               status = "@Resources.EnumLanguage.View_New";
+                               colorS = "<div class='label label-primary myCate'>";
+                               break;
+                           case 10:
+                               status = "@Resources.EnumLanguage.View_Processing";
+                               colorS = "<div class='label label-warning myCate'>";
+                               break;
+                       }
+
+                       return colorS + status + '</div>';
+                   }
+               },
+               {
+                   "aTargets": [7],
+                   "mRender": function (data, type, row) {
+                       var data = row[6];
+                       return data;
+                   }
+               },
+               {
+                   "aTargets": [8],
+                   "mRender": function (data, type, row) {
+                       var data = row[7];
+                       var btn = $('<a/>', {
+                           'class': 'btn btn-sm btn-primary',
+                           'html': $('<i/>', {
+                               'class': 'glyphicon glyphicon-eye-open'
+                           }),
+                           'data-delivery-address': row[9],
+                           'data-customer-phone': row[10],
+                           'data-invoiceid': row[1],
+                           'data-cashier': row[6],
+                           'data-id': row[7],
+                           'data-order-time': row[4],
+                           'data-status': row[5],
+                           'data-store-name': row[8],
+                           'data-notes': row[11],
+                           'data-total-amount': toMoney(row[12], ',', ''),
+                           'data-final-amount': toMoney(row[3], ',', ''),
+                           'data-discount': toMoney(row[13], ',', ''),
+                           'data-role': 'detail'
+                       });
+                       return btn[0].outerHTML;
+                   }
+               }
+
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(800);
+    }
+
+    $(document).on('click', '[data-role=detail]', function () {
+        currentId = $(this).data('id');
+        $("#RentID").val(currentId);
+        $('#order-detail-report-modal').modal('show');
+        $('#order-detail-report-modal [data-role=delivery-address]').html($(this).data('delivery-address'));
+        $('#order-detail-report-modal [data-role=customer-phone]').html($(this).data('customer-phone'));
+        $('#order-detail-report-modal [data-role=store-name]').html($(this).data('delivery-address'));
+        $('#order-detail-report-modal [data-role=order-time]').html($(this).data('order-time'));
+        $('#order-detail-report-modal [data-role=invoiceid]').html($(this).data('invoiceid'));
+        $('#order-detail-report-modal [data-role=cashier]').html($(this).data('cashier'));
+        $('#order-detail-report-modal [data-role=notes]').html($(this).data('notes'));
+        $('#order-detail-report-modal [data-role=total-amount]').html($(this).data('total-amount'));
+        $('#order-detail-report-modal [data-role=final-amount]').html($(this).data('final-amount'));
+        $('#order-detail-report-modal [data-role=discount]').html($(this).data('discount'));
+        switch ($(this).data('status')) {
+            case 4:
+                $('#order-detail-report-modal [data-role=status]').html("<div class='label label-primary myCate'>@Resources.EnumLanguage.View_AtStore</div>")
+                break;
+            case 5:
+                $('#order-detail-report-modal [data-role=status]').html("<div class='label label-success myCate'>@Resources.EnumLanguage.View_TakeAway</div>")
+                break;
+            case 6:
+                $('#order-detail-report-modal [data-role=status]').html("<div class='label label-warning myCate'>@Resources.EnumLanguage.View_Delivery</div>")
+                break;
+        }
+        $('#order-detail-report-modal [data-role=store-name]').html($(this).data('store-name'));
+
+        orderDetailTable();
+        RefreshTableOrderDetail();
+    });
+
+
+    var orderDetailTable = function () {
+        $('#order-report-detail-table').dataTable({
+            "bFilter": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadOrderDetail", "Order", new {area = "Orders" })",
+            "bProcessing": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "id", "value": currentId });
+            },
+            "oLanguage": {
+                "sSearch": "Tên Phòng:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                { "aTargets": [0, 1, 2, 3, 4, 5, 6], "bSortable": false },
+                { "aTargets": [2, 3, 4, 5], "sClass": "text-center" },
+                {
+                    "aTargets": [2],
+                    "mRender": function (data, type, row) {
+                        //var money = o.aData[5];
+                        var data = row[2];
+                        return toMoney(data, ',', '');
+                    }
+                },
+                {
+                    "aTargets": [5],
+                    "mRender": function (data, type, row) {
+                        //var money = o.aData[5];
+                        var data = row[5];
+                        return toMoney(data, ',', '');
+                    }
+                },
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, row) {
+                        //var money = o.aData[5];
+                        var data = row[6];
+                        return toMoney(data, ',', '');
+                    }
+                },
+                {
+                    "aTargets": [7],
+                    "sClass": "hidden",
+                },
+                {
+                    "aTargets": [4],
+                    "mRender": function (data, type, row) {
+                        var type = "";
+                        var color = "";
+                        data = row[4];
+                        switch (data) {
+                            case 11:
+                                type = "@Resources.EnumLanguage.View_PosFinished";
+                                color = "<div class='label label-success myCate'>";
+                                break;
+                            case 12:
+                                type = "@Resources.EnumLanguage.View_PosPreCancel";
+                                color = "<div class='label label-warning myCate'>";
+                                break;
+                            case 13:
+                                type = "@Resources.EnumLanguage.View_PosCancel";
+                                color = "<div class='label label-warning myCate'>";
+                                break;
+                            default:
+                                type = "---";
+                                color = "<div>";
+
+                        }
+                        return color + type + '</div>';
+                    }
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(800);
+    };
+
+    function RefreshTableOrderDetail() {
+        var oTable = $("#order-report-detail-table").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+    // export to excel
+    $(document).on('click', '#exportEx', function () {
+        $('#formDetailReportExcel').submit();
+    });
+</script>
+
+<style>
+    .modal-content {
+        width: 620px !important;
+    }
+    .myCate {
+    display: block;
+    padding: 6px;
+    /* width: 120px; */
+    }
+</style>

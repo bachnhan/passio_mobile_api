@@ -1,0 +1,85 @@
+﻿@model HmsService.ViewModels.PosFileViewModel
+
+@{
+    ViewBag.Title = "Create Product";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@this.Html.Partial("Editor", this.Model)
+
+
+@section scripts {
+
+    <link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/elfinder/css/theme.css" rel="stylesheet" />
+
+    <script src="~/Content/plugins/dropzone/dropzone.js"></script>
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            SKYWEB.Admin.Product.init();
+
+            $('#btn-submit').on('click', function () {
+                var fileName = $('#file-name').val().trim();
+                var version = $('#file-version').val().trim();
+                var brandId = $('#brandId').val();
+                var storeId = $('#storeId').val();
+                if (fileName == '') {
+                    ShowMessage('Xin nhập tên file!', 3);
+                    return;
+                }
+
+                if (version == '') {
+                    ShowMessage('Xin nhập phiên bản!', 3);
+                    return;
+                }
+
+                if (version.length > 10) {
+                    ShowMessage('Tên phiên bản quá 10 ký tự', 1);
+                    return;
+                }
+
+                if (brandId == '' || brandId == null) {
+                    ShowMessage('Xin hãy chọn 1 thương hiệu!', 3);
+                    return;
+                }
+
+                if (storeId == '' || storeId == null) {
+                    ShowMessage('Xin hãy chọn 1 cửa hàng!', 3);
+                    return;
+                }
+
+                var keyList = $('input[name=config-key]');
+                var valueList = $('input[name=config-value]');
+                var configList = [];
+                for (var i = 0; i < keyList.length; i++) {
+                    if ($(keyList[i]).val().trim() != '' && $(valueList[i]).val().trim() != '') {
+                        configList.push({ "Key": $(keyList[i]).val().trim(), "Value": $(valueList[i]).val().trim() });
+                    }
+                }
+
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("CreatePosFile")',
+                    data: {
+                        "FileName": $('#file-name').val().trim(),
+                        "Version": $('#file-version').val().trim(),
+                        "StoreId": $('#storeId').val(),
+                        "BrandId": $('#brandId').val(),
+                        "PosConfigList": JSON.stringify(configList)
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            ShowMessage(result.message, 2);
+                            window.location.href = '@Url.Action("Index", "PosFile")';
+                        } else {
+                            ShowMessage(result.message, 1);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

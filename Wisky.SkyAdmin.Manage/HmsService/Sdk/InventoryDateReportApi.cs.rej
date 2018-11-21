@@ -1,0 +1,15 @@
+diff a/HmsService/HmsService/Sdk/InventoryDateReportApi.cs b/HmsService/HmsService/Sdk/InventoryDateReportApi.cs	(rejected hunks)
+@@ -38,6 +38,13 @@
+                 .ToList();
+             return list;
+         }
++        public IEnumerable<InventoryDateReport> GetListInventoryDateReportByTimeRange(DateTime startDate, DateTime endDate)
++        {
++            var list = this.BaseService.GetListInventoryDateReportByTimeRange(startDate, endDate)
++                //.ProjectTo<InventoryDateReport>(this.AutoMapperConfig)
++                .ToList();
++            return list;
++        }
+         public IQueryable<InventoryDateReportViewModel> GetInventoryDateReport()
+         {
+             var inventoryDateReports = this.BaseService.GetInventoryDateReport()

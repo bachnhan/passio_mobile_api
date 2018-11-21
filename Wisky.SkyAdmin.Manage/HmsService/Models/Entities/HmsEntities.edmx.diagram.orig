@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="22f033864a4242febe0b8546cb81c994" Name="Diagram1" ZoomLevel="72">
+<<<<<<< HEAD
+        <EntityTypeShape EntityType="HmsService.Models.Entities.C__MigrationHistory" Width="1.5" PointX="9.75" PointY="0.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Account" Width="1.5" PointX="5.25" PointY="18.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Application" Width="1.5" PointX="0.75" PointY="1.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Article" Width="1.5" PointX="5.25" PointY="52" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.AspNetRole" Width="1.5" PointX="6" PointY="88" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.AspNetUserClaim" Width="1.5" PointX="10.5" PointY="84.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.AspNetUserLogin" Width="1.5" PointX="10.5" PointY="87.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.AspNetUser" Width="1.5" PointX="8.25" PointY="75.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BlogCategory" Width="1.5" PointX="5.25" PointY="55.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BlogPost" Width="1.5" PointX="7.5" PointY="67.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BlogPostCollection" Width="1.5" PointX="5.25" PointY="69.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BlogPostCollectionItem" Width="1.5" PointX="9.75" PointY="64.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BlogPostImage" Width="1.5" PointX="9.75" PointY="68.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BookingSource" Width="1.5" PointX="5.25" PointY="102.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CategoryExtra" Width="1.5" PointX="5.25" PointY="24.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CategoryPriceGroup" Width="1.5" PointX="7.5" PointY="118.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ComboDetail" Width="1.5" PointX="7.5" PointY="36.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Composition" Width="1.5" PointX="7.5" PointY="64.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Cost" Width="1.5" PointX="10" PointY="9" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CostCategory" Width="1.5" PointX="7.75" PointY="9.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Currency" Width="1.5" PointX="0.75" PointY="9.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Customer" Width="1.5" PointX="3" PointY="65.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CustomerFeedback" Width="1.5" PointX="5.25" PointY="96.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CustomerProduct" Width="1.5" PointX="10.5" PointY="49" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CustomerStore" Width="1.5" PointX="5.25" PointY="76.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CustomerType" Width="1.5" PointX="2.75" PointY="9.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.DateHotelReport" Width="1.5" PointX="4.75" PointY="9.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.DateProduct" Width="1.5" PointX="14.25" PointY="73.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.DateProductItem" Width="1.5" PointX="5.25" PointY="153.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.DateReport" Width="1.5" PointX="5.25" PointY="126" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Group" Width="1.5" PointX="0.75" PointY="77" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Guest" Width="1.5" PointX="16.5" PointY="76.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.HotelInfo" Width="1.5" PointX="11.75" PointY="0.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ImageCollection" Width="1.5" PointX="5.25" PointY="112.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ImageCollectionItem" Width="1.5" PointX="7.5" PointY="112.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryChecking" Width="1.5" PointX="7.75" PointY="5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryCheckingItem" Width="1.5" PointX="10" PointY="5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryDateReport" Width="1.5" PointX="5.25" PointY="144.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryDateReportItem" Width="1.5" PointX="7.5" PointY="141.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryReceipt" Width="1.5" PointX="5.25" PointY="80.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryReceiptItem" Width="1.5" PointX="7.5" PointY="84.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ItemCategory" Width="1.5" PointX="3" PointY="92" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Language" Width="1.5" PointX="5.25" PointY="131" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.LanguageKey" Width="1.5" PointX="5.25" PointY="141.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.LanguageValue" Width="1.5" PointX="7.5" PointY="136.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Menu" Width="1.5" PointX="8.25" PointY="88" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.OrderDetail" Width="1.5" PointX="19.5" PointY="75.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.OrderFeeItem" Width="1.5" PointX="13.5" PointY="67.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Payment" Width="1.5" PointX="13.5" PointY="89.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.PriceAddition" Width="1.5" PointX="0.75" PointY="12.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.PriceGroup" Width="1.5" PointX="9" PointY="58" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.PriceNight" Width="1.5" PointX="11.25" PointY="59.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Product" Width="1.5" PointX="5.25" PointY="27.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductCategory" Width="1.5" PointX="3" PointY="30.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductCollection" Width="1.5" PointX="5.25" PointY="39.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductCollectionItem" Width="1.5" PointX="7.5" PointY="39.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductDetail" Width="1.5" PointX="8.25" PointY="81.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductExtra" Width="1.5" PointX="7.5" PointY="26.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductImage" Width="1.5" PointX="7.5" PointY="30.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductItem" Width="1.5" PointX="5.25" PointY="90.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductSpecification" Width="1.5" PointX="7.5" PointY="33.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Profile" Width="1.5" PointX="7.5" PointY="1.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Provider" Width="1.5" PointX="3" PointY="84.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProviderProductItem" Width="1.5" PointX="10.5" PointY="90.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Quota" Width="1.5" PointX="7.5" PointY="122.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Rent" Width="1.5" PointX="11.25" PointY="72.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.RentGroup" Width="1.5" PointX="5.25" PointY="105.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ReportTracking" Width="1.5" PointX="5.25" PointY="72.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Role" Width="1.5" PointX="3" PointY="1.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Room" Width="1.5" PointX="10.5" PointY="121.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.RoomCategory" Width="1.5" PointX="5.25" PointY="121.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.RoomFloor" Width="1.5" PointX="8.25" PointY="130.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Session" Width="1.5" PointX="5.25" PointY="148.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.SessionDivision" Width="1.5" PointX="7.5" PointY="150.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.SessionProduct" Width="1.5" PointX="7.5" PointY="147.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.SessionProductItem" Width="1.5" PointX="12.75" PointY="4.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Store" Width="1.5" PointX="3" PointY="72.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.StoreDomain" Width="1.5" PointX="5.25" PointY="115.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.StoreUser" Width="1.5" PointX="5.25" PointY="110.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.StoreWebRoute" Width="1.5" PointX="5.25" PointY="48" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.StoreWebRouteModel" Width="1.5" PointX="7.5" PointY="48.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.StoreWebSetting" Width="1.5" PointX="5.25" PointY="119" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.SubRentGroup" Width="1.5" PointX="7.5" PointY="125.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Task" Width="1.5" PointX="6.75" PointY="12.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.TokenUser" Width="1.5" PointX="12.75" PointY="7.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.TotalBooking" Width="1.5" PointX="12.75" PointY="10.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Transaction" Width="1.5" PointX="7.5" PointY="19.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.User" Width="1.5" PointX="5.25" PointY="1" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ViewCounter" Width="1.5" PointX="5.25" PointY="134.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Voucher" Width="1.5" PointX="5.25" PointY="5.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.VoucherCampaign" Width="1.5" PointX="3" PointY="5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.VoucherProvider" Width="1.5" PointX="0.75" PointY="5.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.WebMenu" Width="1.5" PointX="7.5" PointY="43" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.WebMenuCategory" Width="1.5" PointX="5.25" PointY="43.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.WebPage" Width="1.5" PointX="5.25" PointY="137.625" />
+=======
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Account" Width="1.5" PointX="5.25" PointY="15.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Application" Width="1.5" PointX="0.75" PointY="1.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Article" Width="1.5" PointX="5.25" PointY="99" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.AspNetRole" Width="1.5" PointX="6" PointY="85" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.AspNetUserClaim" Width="1.5" PointX="10.5" PointY="89.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.AspNetUserLogin" Width="1.5" PointX="10.5" PointY="75.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.AspNetUser" Width="1.5" PointX="8.25" PointY="75.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BlogCategory" Width="1.5" PointX="5.25" PointY="54" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BlogPost" Width="1.5" PointX="7.5" PointY="66.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BlogPostCollection" Width="1.5" PointX="5.25" PointY="153.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BlogPostCollectionItem" Width="1.5" PointX="9.75" PointY="110.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BlogPostImage" Width="1.5" PointX="9.75" PointY="52.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.BookingSource" Width="1.5" PointX="8.25" PointY="50.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CategoryExtra" Width="1.5" PointX="8.25" PointY="32.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CategoryPriceGroup" Width="1.5" PointX="10.5" PointY="65.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ComboDetail" Width="1.5" PointX="10.5" PointY="34" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Composition" Width="1.5" PointX="15.5" PointY="58.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Cost" Width="1.5" PointX="10" PointY="9" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CostCategory" Width="1.5" PointX="7.75" PointY="9.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Currency" Width="1.5" PointX="9.75" PointY="0.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Customer" Width="1.5" PointX="3" PointY="32" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CustomerFeedback" Width="1.5" PointX="5.25" PointY="138.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CustomerProduct" Width="1.5" PointX="10.5" PointY="27.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CustomerStore" Width="1.5" PointX="5.25" PointY="80.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.CustomerType" Width="1.5" PointX="0.75" PointY="9.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.DateHotelReport" Width="1.5" PointX="2.75" PointY="9.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.DateProduct" Width="1.5" PointX="11.25" PointY="79.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.DateProductItem" Width="1.5" PointX="5.25" PointY="39.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.DateReport" Width="1.5" PointX="5.25" PointY="49" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Group" Width="1.5" PointX="0.75" PointY="77" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Guest" Width="1.5" PointX="15" PointY="70.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.HotelInfo" Width="1.5" PointX="4.75" PointY="9.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ImageCollection" Width="1.5" PointX="5.25" PointY="58.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ImageCollectionItem" Width="1.5" PointX="7.5" PointY="58.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryChecking" Width="1.5" PointX="7.75" PointY="5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryCheckingItem" Width="1.5" PointX="10" PointY="5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryDateReport" Width="1.5" PointX="5.25" PointY="145.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryDateReportItem" Width="1.5" PointX="7.5" PointY="142.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryReceipt" Width="1.5" PointX="5.25" PointY="70.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.InventoryReceiptItem" Width="1.5" PointX="15.5" PointY="74.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ItemCategory" Width="1.5" PointX="11" PointY="94" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Language" Width="1.5" PointX="5.25" PointY="106.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.LanguageKey" Width="1.5" PointX="5.25" PointY="128.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.LanguageValue" Width="1.5" PointX="7.5" PointY="115.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Menu" Width="1.5" PointX="8.25" PointY="94" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.OrderDetail" Width="1.5" PointX="18" PointY="69.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.OrderFeeItem" Width="1.5" PointX="15" PointY="82.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Payment" Width="1.5" PointX="15" PointY="78.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.PriceAddition" Width="1.5" PointX="11.75" PointY="0.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.PriceGroup" Width="1.5" PointX="8.25" PointY="81.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.PriceNight" Width="1.5" PointX="10.5" PointY="97.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Product" Width="1.5" PointX="8.25" PointY="21.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductCategory" Width="1.5" PointX="6" PointY="24.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductCollection" Width="1.5" PointX="5.25" PointY="65.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductCollectionItem" Width="1.5" PointX="10.5" PointY="69.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductDetail" Width="1.5" PointX="5.25" PointY="76.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductExtra" Width="1.5" PointX="10.5" PointY="20.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductImage" Width="1.5" PointX="10.5" PointY="30.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductItem" Width="1.5" PointX="13.25" PointY="92.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProductSpecification" Width="1.5" PointX="10.5" PointY="24.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Profile" Width="1.5" PointX="7.5" PointY="1.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Provider" Width="1.5" PointX="3" PointY="68.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ProviderProductItem" Width="1.5" PointX="17.5" PointY="81.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Quota" Width="1.5" PointX="10.5" PointY="56.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Rent" Width="1.5" PointX="12.75" PointY="66.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.RentGroup" Width="1.5" PointX="5.25" PointY="33.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ReportTracking" Width="1.5" PointX="5.25" PointY="45.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Role" Width="1.5" PointX="3" PointY="1.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Room" Width="1.5" PointX="10.5" PointY="60.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.RoomCategory" Width="1.5" PointX="5.25" PointY="61.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.RoomFloor" Width="1.5" PointX="8.25" PointY="46.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Session" Width="1.5" PointX="5.25" PointY="120.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.SessionDivision" Width="1.5" PointX="7.5" PointY="119.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.SessionProduct" Width="1.5" PointX="7.5" PointY="122.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.SessionProductItem" Width="1.5" PointX="12.75" PointY="3.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Store" Width="1.5" PointX="3" PointY="72.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.StoreDomain" Width="1.5" PointX="5.25" PointY="135.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.StoreUser" Width="1.5" PointX="5.25" PointY="142.875" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.StoreWebRoute" Width="1.5" PointX="5.25" PointY="89.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.StoreWebRouteModel" Width="1.5" PointX="7.5" PointY="90.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.StoreWebSetting" Width="1.5" PointX="5.25" PointY="126" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.SubRentGroup" Width="1.5" PointX="7.5" PointY="62.125" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Task" Width="1.5" PointX="12.75" PointY="6.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.TokenUser" Width="1.5" PointX="12.75" PointY="10.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.TotalBooking" Width="1.5" PointX="13.75" PointY="0.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Transaction" Width="1.5" PointX="7.5" PointY="16.5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.User" Width="1.5" PointX="5.25" PointY="1" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.ViewCounter" Width="1.5" PointX="5.25" PointY="42.625" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.Voucher" Width="1.5" PointX="5.25" PointY="5.25" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.VoucherCampaign" Width="1.5" PointX="3" PointY="5" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.VoucherProvider" Width="1.5" PointX="0.75" PointY="5.75" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.WebMenu" Width="1.5" PointX="7.5" PointY="148.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.WebMenuCategory" Width="1.5" PointX="5.25" PointY="149.375" />
+        <EntityTypeShape EntityType="HmsService.Models.Entities.WebPage" Width="1.5" PointX="5.25" PointY="131.875" />
+>>>>>>> 0bc7937deb26485e0b7556ca093439a71564597a
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Account_Customer" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Transaction_Account" />
+        <AssociationConnector Association="HmsService.Models.Entities.RoleApplication" />
+        <AssociationConnector Association="HmsService.Models.Entities.UserApplication" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Article_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_dbo_AspNetUserClaims_dbo_AspNetUsers_UserId" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_dbo_AspNetUserLogins_dbo_AspNetUsers_UserId" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_AspNetUsers_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_BlogCategory_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_BlogPost_BlogCategory" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_BlogPost_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_BlogPostCollectionItem_BlogPost" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_BlogPostImage_BlogPost" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_BlogPostCollection_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_BlogPostCollectionItem_BlogPostCollection" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Quota_BookingSource" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_CategoryExtra_ProductCategory" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_CategoryExtra_ProductCategory1" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_CategoryPriceGroup_PriceGroup" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_CategoryPriceGroup_RoomCategory" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ComboDetail_Product" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ComboDetail_Product1" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK__Compositi__ItemI__76969D2E" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Composition_Product" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Cost_CostCategory" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_CustomerProduct_Customer" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_CustomerStore_Customer" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Rent_Customer" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_RentGroup_Customer" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_CustomerFeedback_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_CustomerProduct_Product" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_CustomerStore_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_DateProduct_Product" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_DateProduct_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_DateProductItem_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_DateReport_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Store_Group" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Guest_Rent" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Guest_RentGroup" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ImageCollection_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ImageCollectionItem_ImageCollection" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_InventoryCheckingItem_InventoryChecking" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_InventoryReport_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ReportItem_InventoryReport" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK__ReportIte__ItemI__55009F39" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_InventoryReceipt_Provider" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_InventoryReceipt_Store3" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_InventoryReceipt_Store4" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_InventoryReceipt_Store5" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ReceiptItem_InventoryReceipt" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ReceiptItem_ProductItem" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductItem_ItemCategory" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Language_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_LanguageValue_Language" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_LanguageKey_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_LanguageValue_LanguageKey" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Menu_Menu" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_OrderDetail_OrderDetail" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_OrderDetail_Product" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_OrderDetail_Rent" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_OrderFeeItem_Rent" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK__Payment__RentID__7EC1CEDB" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_PriceNight_PriceGroup" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Rent_PriceGroup" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Product_ProductCategory" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductCollectionItem_Product" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductDetail_Product" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductExtra_Product" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductExtra_Product1" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductImage_Product" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductSpecification_Product" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductCategory_ProductCategory" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductCollection_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductCollectionItem_ProductCollection" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProductDetail_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProviderProductItem_ProductItem" />
+        <AssociationConnector Association="HmsService.Models.Entities.UserProfile" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ProviderProductItem_Provider" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Quota_RoomCategory" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Rent_Room1" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Rent_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Rent_SubRentGroup" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_SubRentGroup_RentGroup" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ReportTracking_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK__Room__CategoryID__76EBA2E9" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK__Room__FloorID__4589517F" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_RoomCategory_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_SubRentGroup_RoomCategory" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_SectionDivision_Section" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Session_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_SessionProduct_Session" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_StoreDomain_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_StoreUser_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_StoreWebRoute_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_StoreWebSetting_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_ViewCounter_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_WebMenuCategory_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_WebPage_Store" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_StoreWebRoute_StoreWebRoute" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_StoreWebRouteModel_StoreWebRoute" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_Vourcher_VoucherCampagin" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_VoucherCampagin_VourcherProvider" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_WebMenu_WebMenu" />
+        <AssociationConnector Association="HmsService.Models.Entities.FK_WebMenu_WebMenuCategory" />
+        <AssociationConnector Association="HmsService.Models.Entities.AspNetUserRoles" />
+        <AssociationConnector Association="HmsService.Models.Entities.GuestRent" />
+        <AssociationConnector Association="HmsService.Models.Entities.MenuRole" />
+        <AssociationConnector Association="HmsService.Models.Entities.UsersInRoles" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

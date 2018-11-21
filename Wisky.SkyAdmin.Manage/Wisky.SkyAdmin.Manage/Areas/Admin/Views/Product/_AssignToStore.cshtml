@@ -1,0 +1,40 @@
+﻿<!--Modal-->
+<div id="assignToStoreModal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="assignModalHeader">Modal title</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" id="updateAssignForm">
+                    <table id="assignDatatable" class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label class="">STT</label>
+                                </th>
+                                <th>
+                                    <label class="">Tên cửa hàng</label>
+                                </th>
+                                <th>
+                                    <label class="">Giá</label>
+                                </th>
+                                <th>
+                                    <label class="">Giảm giá (%)</label>
+                                </th>
+                                <th>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <input type="hidden" value="" id="productID" name="productID" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="btnUpdateAssign">Cập nhật</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>

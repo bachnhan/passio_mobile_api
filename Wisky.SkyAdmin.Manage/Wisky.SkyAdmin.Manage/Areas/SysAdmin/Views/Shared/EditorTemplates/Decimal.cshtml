@@ -1,0 +1,8 @@
+﻿@model System.Decimal?
+
+@{ 
+    var isRequired= (ViewData.ModelMetadata).ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName).HasRequiredAttribute();
+}
+
+<input type="number" step="0.001" name="@this.Html.NameForModel()" id="@this.Html.IdForModel()"
+       class="form-control" required="@(isRequired ? "" : null)" value="@this.Html.ValueForModel()" />

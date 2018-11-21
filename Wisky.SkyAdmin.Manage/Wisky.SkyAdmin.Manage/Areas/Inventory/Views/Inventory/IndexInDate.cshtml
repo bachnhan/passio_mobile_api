@@ -1,0 +1,359 @@
+﻿@{
+    ViewBag.Title = "IndexInDate";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    IEnumerable<HmsService.ViewModels.ProductItemCategoryViewModel> productCategories = ViewBag.ProductCategories;
+    IQueryable<HmsService.ViewModels.StoreViewModel> stores = ViewBag.Stores;
+
+    //var currentStoreDomain = this.ViewBag.CurrentDomain as HmsService.ViewModels.StoreDomainViewModel;
+    //var storeId = 0;
+    //if (ViewContext.RouteData.Values["storeId"] != null)
+    //{
+    //    storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    //}
+    //var store = Utils.GetStore(storeId);
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Tồn kho hiện tại</h3>
+                <h5 class="smallDate" data-role="small-date">@ViewBag.InstockDate</h5>
+            </div>
+        </div>
+        <hr />
+    </div> <!-- /.card-header -->
+
+    <div class="card-padding">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="form-group" >
+                    <select class="selectpicker" id="item-categories" title="Tất cả loại nguyên liệu" multiple>
+
+                        @foreach (var item in productCategories)
+                        {
+                            <option value="@item.CateID">@item.CateName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            @if (stores.Count() != 0)
+            {
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <select class="selectpicker" id="selectedStore">
+                            <option value="0" selected>Tất cả cửa hàng</option>
+                            @foreach (var item in stores)
+                            {
+                                <option value="@item.ID">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
+            
+        </div>
+
+        <table class="table table-striped table-hover table-bordered myTable" style="width:100%" id="main-table">
+            <thead>
+                <tr>
+                    <th rowspan="2"><label>STT</label></th>
+                    @*<th rowspan="2"><label>Hình ảnh</label></th>*@
+                    <th rowspan="2"><label>Tên sản phẩm</label></th>
+                    <th rowspan="2"><label>Đơn vị</label></th>
+                    <th rowspan="2"><label>Phân loại</label></th>
+                    <th rowspan="2"><label>Tồn kho hôm qua</label></th>
+                    <th colspan="3">
+                        <a id="toggle-import" class="glyphicon glyphicon-plus" style="background: transparent; color: black; float: left;" data-status="0" onclick="toggleButton(this)"></a>
+                        <label class="">Nhập Kho</label>
+                    </th>
+                    <th colspan="5">
+                        <a id="toggle-export" class="glyphicon glyphicon-plus" style="background: transparent; color: black; float: left" data-status="0" onclick="toggleButton(this)"></a>
+                        <label class="">Xuất Kho</label>
+                    </th>
+                    <th rowspan="2"><label>Lý thuyết hôm nay</label></th>
+                    <th rowspan="2"><label>Thực tế</label></th>
+                    <th rowspan="2"><label>Chênh lệch</label></th>
+                </tr>
+                <tr>
+                    <th><label>Nhập Kho</label></th>
+                    <th><label>Nhận Chuyển Kho</label></th>
+                    <th><label>Tổng Nhập</label></th>
+                    <th><label>Xuất Bán</label></th>
+                    <th><label>Xuất Trả</label></th>
+                    <th><label>Xuất Hủy</label></th>
+                    <th><label>Chuyển Kho</label></th>
+                    <th><label>Tổng Xuất</label></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div> <!-- /.card-padding -->
+
+</div>
+
+<script type="text/javascript">
+    var status = "0";
+    var inStockDate = "";
+    var selectedCategories = [];
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker({
+            size:10,
+        });
+        //loadAllStore();
+        function cb(date) {
+            var datetime = date.format('DD/MM/YYYY');
+            $('.date-pick input').val(datetime);
+        }
+        cb(moment());
+        $('#startTime').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        }, cb);
+
+        $('#item-categories').on('change', function () {
+            LoadFilter();
+        });
+
+        $('#selectedStore').on('change', function () {
+            LoadFilter();
+        });
+
+        function LoadFilter() {
+            var select = document.getElementById("item-categories");
+            selectedCategories.length = 0;
+            for (var i = 0; i < select.length; i++) {
+                if (select.options[i].selected) selectedCategories.push(select.options[i].value);
+            }
+            RefreshTable();
+        }
+
+
+        window.TableHistory = $('#main-table').DataTable({
+            "bAutoWidth": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "deferRender": true,
+            "sAjaxSource": "@Url.Action("GetInventoryInDate","Inventory")",
+            "bProcessing": true,
+            "bSort": false,
+            //"bScrollCollapse": true,
+            "bInfo": false,
+            //"bPaginate": false,
+            "lengthMenu": [[10, 20, 50], [10, 20, 50]],
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "cateId", "value": selectedCategories.toString() },
+                { "name": "selectedStoreId", "value": $('#selectedStore').val() })
+
+
+                //$('#sTime').data('daterangepicker').startDate.toISOString()
+            },
+            "columns": [
+                { "data": "No" },
+                //{
+                //    "data": function (data) {
+
+                //        return "<img src='" + (data.ImageURL) + "' style='max-width:100px;max-height:100px'/>";
+                //    }
+                //},
+                { "data": "ItemName" },
+                { "data": "ItemUnit" },
+                { "data": "CategoryName" },
+                { "data": "RealQuantity" },
+                { "data": "IOQuantity.InInventory" },
+                { "data": "IOQuantity.InChangeInventory" },
+                { "data": "IOQuantity.TotalImport" },
+                { "data": "IOQuantity.SoldProduct" },
+                { "data": "IOQuantity.OutInventory" },
+                { "data": "IOQuantity.DraftInventory" },
+                { "data": "IOQuantity.OutChangeInventory" },
+                { "data": "IOQuantity.TotalExport" },
+                { "data": "TheoryQuantity" },
+                { "data": function (data) {
+                        //if (!data.InDayCheckingQuantity) {
+                            var html;
+                            html = '<div  style="display: inline-flex;"><input id=' + data.ItemId + ' name=input' + data.No + ' class="realistics col-md-10" size="5" value="' + data.RealQuantity + '" style="border:none;background-color:#6FB3E0" onkeyup="this.value = checkDigit(this.value)" readonly/></div>';
+                            // +"<button type='button' class='btn btn-sm btn-primary' id=" + data.No + " onclick='editRealAmount(this)'>Kiểm tra</button>";
+                            //return '<input id=' + o.aData[7] + ' name=input' + o.aData[0] + ' class="realistics" size="3" value="' + o.aData[5] + '" style="border:none;background-color:cornflowerblue" onkeyup="this.value = checkDigit(this.value)" readonly/>'
+                            return html;
+                        //} else {
+                        //    var html;
+                        //    html = '<div  style="display: inline-flex"><input id=' + data.ItemId + ' name=input' + data.No + ' class="realistics col-md-10" size="5" value="' + data.RealQuantity + '" style="border:none;color: red;background-color:#6FB3E0" onkeyup="this.value = checkDigit(this.value)" readonly/></div>';                              
+                        //    //+"<button type='button' class='btn btn-sm btn-primary' id=" + data.No + " onclick='editRealAmount(this)'>Kiểm tra</button>";
+                        //    return html;
+                        //}
+                    }
+
+                },
+                //{
+                //    "data": function (data) {
+                //        var labels = data.Difference;
+                //        return "<textarea style='border:none;resize: none' class='col-md-12' readonly >" + labels + "</textarea>";
+                //    }
+                //},
+                { "data": "Difference" }
+
+            ],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " ",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                },
+                "sSearchPlaceholder": "Tên sản phẩm"
+
+            },
+            "columnDefs": [
+                 {
+                     "aTargets": [5, 6, 7, 8, 9, 10, 11, 12],
+                     "sClass": "SmallChildHeader text-center"
+                 },
+                {
+                    "aTargets": [0, 2, 3, 4, 13, 14, 15],
+                    "sClass": "text-center"
+                },
+                {
+                    "visible": false, "targets": [5, 6, 8, 9, 10, 11]
+                },
+            ],
+            "dom": 'T<"clear">lfrtip',
+        });
+    });
+
+    // load customer type
+    function loadAllStore() {
+
+        $.ajax({
+            url: '@Url.Action("LoadAllStoreById")',
+            type: "POST",
+            success: function (result) {
+                if (result != null && result.length > 0) {
+                    //render to store dropdown
+                    $('#store-menu').html();
+                    $('#store-menu').append("<li onclick=\"changeStore(0, \'Tất cả cửa hàng\')\"><a href=\'#\'>Tất cả cửa hàng</a></li>");
+                    for (var i = 0; i < result.length; i++) {
+                        $('#store-menu').append("<li onclick=\"changeStore(" + result[i].storeId + ", \'" + result[i].Name + "\')\"><a href=\'#\'>" + result[i].Name + "</a></li>");
+                    }
+
+                    //default store
+                    $('#btn-store').html('Tất cả cửa hàng &#9660');
+                    $('#storeId').val(0);
+
+                } else {
+                    $('#btn-store').html('Không tìm thấy cửa hàng');
+                    $('#storeId').val(-1);
+                }
+            },
+            error: function (error) {
+                alert("Có lỗi xảy ra, vui lòng thử lại. Nếu lỗi tiếp tục tiếp diễn xin vui lòng liên hệ admin");
+            }
+        });
+    }
+
+    function changeStore(strId, storeName) {
+        $('#btn-store').html(storeName + " &#9660");
+        $('#storeId').val(strId);
+
+        RefreshTable();
+
+    }
+
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    };
+    function toggleButton(btn) {
+        var id = $(btn).attr("id");
+        var status = $(btn).data("status");
+        //console.log(status);
+        var idColumns;
+        if (id === "toggle-export") idColumns = [9, 10, 11];
+        else idColumns = [5, 6];
+        toggleColumn(idColumns);
+        $(btn).removeClass();
+        if (status == 0) {
+            $(btn).addClass("glyphicon glyphicon-minus");
+            $(btn).data("status", 1);
+        } else {
+            $(btn).addClass("glyphicon glyphicon-plus");
+            $(btn).data("status", 0);
+        }
+    }
+    function toggleColumn(idColumns) {
+        for (var i = 0; i < idColumns.length; i++) {
+            var column = TableHistory.column(idColumns[i]);
+            // Toggle the visibility
+            column.visible(!column.visible());
+            
+        }
+    }
+    //user datatable
+    function RefreshTable() {
+        var oTable = $("#main-table").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    };
+    
+    function editRealAmount(btn) {
+        var id = $(btn).attr("data-id");
+        var inputsName = 'input' + btn.id;
+        var input = document.getElementsByName(inputsName)[0];
+        var quantity = input.value;
+
+        if (btn.innerText == "Kiểm tra" || btn.innerText == "KIỂM TRA") {
+            input.readOnly = false;
+            input.value = "";
+            input.focus();
+            btn.innerText = "Lưu";
+        } else {
+            if (quantity != "" && quantity != "-") {
+                input.readOnly = true;
+                //var storeId = $('#hiddenStoreId').val();
+                var itemId = input.id;
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("EditInventoryChecking", "Inventory")",
+                    dataType: 'JSON',
+                    data: {
+                        storeId: @ViewBag.storeId,
+                        itemId: itemId,
+                        quantity: quantity
+                    },
+                    success: function (rs) {
+                        if (rs.success == true) {
+                            refreshRowData();
+                            ShowMessage('Lưu thành công', 2);
+                        } else {
+                            ShowMessage('Lưu thất bại', 1);
+                        }
+                    },
+                    error: function (rs) {
+                        ShowMessage('Lưu thất bại', 1);
+                    }
+                });
+                input.style.color = "red";
+                btn.innerText = "Sửa";
+            } else {
+                ShowMessage('Số lượng trống. Vui lòng thêm vào!', 1);
+            }
+        }
+    }
+    function refreshRowData() {
+        var table = $('#main-table').dataTable();
+        table._fnAjaxUpdate();
+    }
+</script>
+

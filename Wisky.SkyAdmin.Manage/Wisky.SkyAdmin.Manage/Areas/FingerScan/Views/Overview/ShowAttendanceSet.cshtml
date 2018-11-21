@@ -1,0 +1,224 @@
+﻿@using HmsService.ViewModels{
+@model OverviewViewModel
+}
+<style>
+    .pair-group.btn,
+    .variant-group.btn {
+        font-weight: 500 !important;
+        padding-left: 13px !important;
+    }
+
+    .col-md-4 {
+        padding-top: 10px;
+    }
+
+    .width-100 {
+        width: 100%;
+    }
+
+    .select2-container.select2-choice {
+        display: block;
+        height: 35px;
+        padding: 0 0 0 8px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #e0e0e0 !important;
+        white-space: nowrap;
+        line-height: 35px;
+        color: #444;
+        text-decoration: none;
+        border-radius: 0px;
+        user-select: none;
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #fff));
+    }
+
+    .select2-arrow {
+        opacity: 1;
+    }
+
+    .select2-container.select2-choice.select2-arrow {
+        display: inline-block;
+        width: 18px;
+        height: 100%;
+        position: absolute;
+        right: 0;
+        top: 3px;
+        border-left: 0px;
+        border-radius: 0px;
+        background-clip: padding-box;
+        /* background: #ccc; */
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #fff));
+        background-image: -webkit-linear-gradient(center bottom, #fff 0%, #fff 60%);
+        /*background-image: -moz-linear-gradient(center bottom, #fff 0%, #fff 60%);*/
+    }
+
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+</style>
+<div class="modal fade" id="ShowAttendanceSetModal" role="dialog" style="z-index: 1000; " @*class="modal-content">*@>
+    <div class="modal-dialog" style="background-color:#f0f0f0; margin-top: 50px;">
+        <div class="modal-header">
+            <h4>Cập nhật ca làm việc </h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group  row" style="margin-right:5px;margin-left:5px">
+                <label class="control-label col-md-4" style="margin-top:10px;">Gợi ý Khung giờ</label>
+                <div class="col-md-8" style="margin-top: 12px;">
+                    <select id="timeframe" class="form-control" onchange="fillIn()">
+                    </select>
+                </div>
+            </div>
+            <div class="form-group  row" style="margin-right:5px;margin-left:5px">
+                <label class="control-label col-md-4" style="margin-top:10px;">Giờ bắt đầu ca</label>
+                <div class="col-md-8">
+                    <div class="fg-line">
+                        <input type="text" class="form-control" id="TimeFrameStart" name="TimeFrameStart" placeholder="Giờ bắt đầu ca" style="margin-top:10px;">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group  row" style="margin-top:10px;margin-right:5px;margin-left:5px">
+                <label class="control-label col-md-4">Giờ kết thúc ca</label>
+                <div class="col-md-8">
+                    <div class="fg-line">
+                        <input type="text" class="form-control" id="TimeFrameEnd" name="TimeFrameEnd" placeholder="Giờ kết thúc ca">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group  row" style="margin-right:5px;margin-left:5px">
+                <label class="control-label col-md-4" style="margin-top:10px;">Giờ bắt điểm danh</label>
+                <div class="col-md-8">
+                    <div class="fg-line">
+                        <input type="text" class="form-control" id="CheckMin" name="CheckMin" placeholder="Giờ bắt đầu điểm danh" style="margin-top:10px;">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group  row" style="margin-right:5px;margin-left:5px">
+                <label class="control-label col-md-4" style="margin-top:10px;">Giờ kết thúc điểm danh</label>
+                <div class="col-md-8">
+                    <div class="fg-line">
+                        <input type="text" class="form-control" id="CheckMax" name="CheckMax" placeholder="Giờ kết thúc điểm danh" style="margin-top:10px;">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group  row" style="margin-top:10px;margin-right:5px;margin-left:5px">
+                <div class="col-md-6 text-right">
+                    <ul class="actions" style="float:right">
+                        <li>
+                            <button type="button" class="btn btn-primary" id="btn-submit-product" onclick="createShift()">Hoàn tất</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#CheckMin').val('@Model.checkMin');
+    $(document).ready(function () {
+        $('#TimeFrameStart').datetimepicker({
+            format: 'HH:mm',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#TimeFrameEnd').datetimepicker({
+            format: 'HH:mm',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#CheckMax').datetimepicker({
+            format: 'HH:mm',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#CheckMin').datetimepicker({
+            format: 'HH:mm',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        loadTimeFrame();
+    });
+    function createShift() {
+        var check=true;
+        if($('#CheckMin').val()== ""){
+            ShowAlert("Vui lòng điền vào ô Giờ bắt đầu điểm danh ", 1);
+            check=false;
+        }
+        if($('#CheckMax').val()== ""){
+            ShowAlert("Vui lòng điền vào ô Giờ kết thúc điểm danh", 1);
+            check=false;
+        }
+        if($('#TimeFrameStart').val()== ""){
+            ShowAlert("Vui lòng điền vào ô Giờ kết thúc ca", 1);
+            check=false;
+        }
+        if($('#TimeFrameEnd').val()== ""){
+            ShowAlert("Vui lòng điền vào ô Giờ bắt đầu ca", 1);
+            check=false;
+        }
+        if(check ==true){
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CreateShift")',
+                data: {
+                    day: $('#sTime').val(),
+                    Id: @Model.EmployeeId,
+                    start:  $('#TimeFrameStart').val(),
+                    end: $('#TimeFrameEnd').val(),
+                    checkMin:$('#CheckMin').val(),
+                    checkMax:$('#CheckMax').val()
+                },
+                success: function (result) {
+                    if (result.success == true) {
+                        ShowAlert("Đã thêm thành công ca vào nhân viên", 2);
+                        $('#ShowAttendanceSetModal').modal('hide');
+                        $("#item-type-table").dataTable().fnDestroy();
+                        loadEmployeeTable();
+                    } else {
+                        ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                    }
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+    }
+    function loadTimeFrame() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetAllTimeFrame")',
+            success: function (result) {
+                result.timeFrameSelect.forEach(drawSelect);
+                $("#timeframe").val('@Model.datePicked');
+
+                if( $("#timeframe").val()!=null){
+                    fillIn();
+                }
+            },
+            error: function (error) {
+                ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+            }
+        });
+    }
+    function drawSelect(item, index) {
+        $("#timeframe").append("<option value='"+item.Id+"'>"+item.Name+"</option>")
+    }
+    function fillIn(){
+        var e = document.getElementById("timeframe");
+        var strUser = e.options[e.selectedIndex].value;
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetTimeStartAndEnd")',
+            data:{'Id': strUser},
+            success: function (result) {
+                $('#TimeFrameStart').val(result.startTime);
+                $('#TimeFrameEnd').val(result.endTime);
+            },
+            error: function (error) {
+                ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+            }
+        });
+    }
+
+</script>

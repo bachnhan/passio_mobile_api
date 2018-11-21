@@ -1,0 +1,144 @@
+﻿@model HmsService.ViewModels.CouponEditViewModel
+
+@{
+    Layout = null;
+}
+
+@Html.ValidationSummary()
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <form action="@Url.Action("EditCoupon","Coupon")" method="post" enctype="multipart/form-data">
+            <div class="modal-header">
+                @*<a href="@Url.Action("Coupon","Coupon",new { id = this.Model.CampaginId})" class="btn btn-default pull-right"><span aria-hidden="true">&times;</span></a>*@
+                <h3 class="modal-title" id="createCouponLabel">Sửa thông tin Coupon</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px; margin-top:12px; padding-top:20px; padding-bottom:22px;">
+                        @Html.HiddenFor(q => q.CouponViewModel.CampaginId)
+                        @Html.HiddenFor(q => q.CouponViewModel.IsActive)
+                        @Html.HiddenFor(q => q.CouponViewModel.Status)
+                        @Html.HiddenFor(q => q.CouponViewModel.Id)
+                        @Html.HiddenFor(q => q.CouponViewModel.ImageUrl, new { @id = "currentCouponImg" })
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="SerialNumber">Mã số thẻ<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.CouponViewModel.SerialNumber, new { id = "SerialNumber", @class = "form-control fg-line", placeholder = "Nhập mã số thẻ", required = "required" })
+                            </div>
+                        </div>
+                        @* Status không cho tạo *@
+                        @*<div class="form-group">
+                                <label class="control-label col-md-4" for="AccountName">Tên tài khoản<span style="color:red"></span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(q => q.Status, new { id = "AccountName", @class = "form-control fg-line", placeholder = "Nhập tên tài khoản", required = "required" })
+                                </div>
+                            </div>*@
+                        <div class="form-group">
+                            <label class="control-label col-md-4">Chọn cửa hàng<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.DropDownListFor(q => q.CouponViewModel.StoreId, this.Model.AvailableStore, new { @class = "form-control" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Ngày sử dụng</label>
+                            <div class="col-md-6 dateTime">
+                                <input class="form-control" type="text" name="DateUse" value="01/01/2016" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Ảnh</label>
+                            <div class="col-md-6">
+                                <div style="display: none">
+
+                                    <input type='file' style="" id="imageUpload" name="imageUpload" onchange="readURL(this);" />
+                                </div>
+
+                                <div class="photo-item removeable">
+                                    <div class="ratio-wrapper ratio-wrapper-1-1" style="width:200px; height:150px; margin-bottom:15px;">
+                                        <div id="ShowImg" class="ratio-item">
+                                            @if (Model.CouponViewModel.ImageUrl != null)
+                                            {
+                                                <img style="width:200px; height:150px;" src="@Model.CouponViewModel.ImageUrl" />
+                                                <span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>
+                                            }
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <button type="button" id="btnUploadImage" class="btn btn-sm btn-success">
+                                    <i class="icon-upload"></i>Browse
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Đóng</button>
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        @if (Model.CouponViewModel.DateUse.HasValue) {
+            <text>
+        var start ='@Model.CouponViewModel.DateUse.GetValueOrDefault().ToString("dd/MM/yyyy")';
+        </text>
+        }
+        else
+        {
+            <text>
+        var start = moment().toString("dd/MM/yyyy");
+        //$('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        </text>
+        }
+        $('input[name="DateUse"]').daterangepicker({
+            format: "DD/MM/YYYY",
+            singleDatePicker: true,
+            showDropdowns: true,
+            startDate: start,
+            locale: {
+                format: "DD/MM/YYYY"
+            },
+            "minDate": "@Model.CouponViewModel.CouponCampaign.StartDate.GetValueOrDefault().ToString("dd/MM/yyyy")",
+            "maxDate": "@Model.CouponViewModel.CouponCampaign.EndDate.GetValueOrDefault().ToString("dd/MM/yyyy")",
+        },
+        function (start, end, label) {
+            var years = moment().diff(start, 'years');
+        });
+    });
+
+    $("#btnUploadImage").click(function () {
+        $("#imageUpload").click();
+    });
+
+
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            $('#ShowImg').html('');
+            $('#ShowImg').append('<img id="image" src="#" alt="your image" /><span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>');
+            reader.onload = function (e) {
+                $('#image')
+                    .attr('src', e.target.result)
+                    .width(200)
+                    .height(150);
+            };
+
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function delImg() {
+        $("#ShowImg").html("");
+        $("#imageUpload").val("");
+        $("#currentCouponImg").val("");
+    }
+
+
+</script>

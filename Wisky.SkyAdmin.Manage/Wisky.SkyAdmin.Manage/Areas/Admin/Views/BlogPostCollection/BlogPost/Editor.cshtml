@@ -1,0 +1,330 @@
+﻿@model BlogPostEditViewModel
+@{
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var firstImage = true;
+}
+<form method="post">
+    @this.Html.AntiForgeryToken()
+    @this.Html.HiddenFor(q => q.BlogPost.Id)
+
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3 class="margin-bottom30">Thêm mới tin tức</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <ul class="actions">
+                    <li class="m-r-10">
+                        <a class="btn btn-success myComeback" href="@this.Url.Action("Index", new { parameters=currentStoreDomain.Directory })">Quay lại</a>
+                    </li>
+                    <li>
+                        <button type="submit" class="btn btn-primary">Hoàn tất</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+       
+    </div>
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Thông tin chính</h2>
+                </div>
+                <div class="card-body card-padding">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        <label for="inputTitle" class="control-label">Tiêu đề</label>
+                        <div class="fg-line">
+                            @Html.EditorFor(model => model.BlogPost.Title, new
+                       {
+                           additionalClasses = "seo-source",
+                           htmlAttributes = new KeyValuePair<string, string>[] { new KeyValuePair<string, string>("data-seo-target", "#" + this.Html.IdFor(q => q.BlogPost.SeoName)), }
+                       })
+                            @Html.ValidationMessageFor(model => model.BlogPost.Title, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDescription" class="control-label">Nội dung</label>
+                        <div class="fg-line" id="haha">
+                            @Html.TextAreaFor(model => model.BlogPost.BlogContent, new
+                       {
+                           @id = "inputDescription"
+                       })
+                            @Html.ValidationMessageFor(model => model.BlogPost.BlogContent, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Hình ảnh</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="row sm-margin">
+                        <div class="col-md-4">
+                            <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                                @if (this.Model.BlogPostImages != null && this.Model.BlogPostImages.Count() > 0)
+                                {
+                                    var url = this.Model.BlogPostImages.First().ImageUrl;
+
+                                    <li class="col-md-4 photo-item removeable">
+                                        <div class="ratio-wrapper ratio-wrapper-1-1">
+                                            <div class="ratio-item">
+                                                <div class="img-container">
+                                                    <img src="@(url)" />
+                                                </div>
+                                                <input type="hidden" name="@this.Html.NameFor(q => q.SelectedImages)" value="@(url)" />
+                                                <span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>
+                                            </div>
+                                        </div>
+                                    </li>
+                                }
+
+
+                            </ul>
+                        </div>
+                        <div class="col-md-8">
+                            <ul class="row sm-margin images-preview" id="images-preview">
+                                @if (this.Model.BlogPostImages != null && this.Model.BlogPostImages.Count() > 1)
+                                {
+                                    foreach (var image in this.Model.BlogPostImages)
+                                    {
+                                        if (firstImage)
+                                        {
+                                            firstImage = false;
+                                            continue;
+                                        }
+
+                                        var url = image.ImageUrl;
+
+                                        <li class="col-md-4 photo-item removeable">
+                                            <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                <div class="ratio-item">
+                                                    <div class="img-container">
+                                                        <img src="@(url)" />
+                                                    </div>
+                                                    <input type="hidden" name="@this.Html.NameFor(q => q.SelectedImages)" value="@(url)" />
+                                                    <span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <input type="hidden" id="PicURL" data-name="@this.Html.NameFor(q => q.SelectedImages)" multiple />
+                        @*<button type="button" id="GetElImage" class="btn btn-sm btn-success getimagefromelfinder">
+                            <i class="icon-upload"></i>Browse
+                        </button>*@
+                        <div style="display: none">
+                            <input type="file" hidden id="uploadImage" accept="image/gif, image/jpeg, image/png" class="btn btn-sm btn-success uploadImageToBlob" multiple />
+                        </div>
+                        <button type="button" id="GetElImage" class="btn btn-sm btn-success">
+                            <i class="icon-upload"></i>Browse
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-5">
+            <!-- Card: Collection -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Nhóm tin tức</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label class="control-label">Nhóm</label>
+                        <div class="fg-line">
+                            <select class="selectpicker" name="@this.Html.NameFor(q => q.SelectedBlogPostCollections)" multiple>
+                                @foreach (var item in this.Model.AvailableCollections)
+                                {
+                                    <option value="@(item.Value)" selected="@(item.Selected ? "" : null)">@(item.Text)</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card: SEO -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>SEO</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label class="control-label">Từ khóa SEO</label>
+                        <div class="fg-line">
+                            @Html.EditorFor(model => model.BlogPost.MetaKeyword)
+                            @Html.ValidationMessageFor(model => model.BlogPost.MetaKeyword, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Mô tả SEO</label>
+                        <div class="fg-line">
+                            @Html.TextAreaFor(model => model.BlogPost.MetaDescription, new { @class = "form-control", name = "MetaDescription" })
+                            @Html.ValidationMessageFor(model => model.BlogPost.MetaDescription, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Đường dẫn</label>
+                        <div class="fg-line">
+                            @Html.EditorFor(model => model.BlogPost.SeoName)
+                            @Html.ValidationMessageFor(model => model.BlogPost.SeoName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+<!-- Template Pair Group -->
+<template id="templatePairGroup">
+    <div class="pair-group form-group xs-margin">
+        <div class="col-sm-5">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="Specifications.Name" placeholder="Tên" />
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="Specifications.Value" placeholder="Nội dung" />
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <button type="button" class="btn btn-danger form-control" data-action="remove-pair-group">
+                <i class="zmdi zmdi-close"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Template Variant Group -->
+<template id="templateVariantGroup">
+    <div class="variant-group form-group sm-margin">
+        <div class="col-sm-4">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="title" />
+            </div>
+        </div>
+        <div class="col-sm-7">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="content" />
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <button type="button" class="btn btn-danger form-control" data-action="remove-variant-group">
+                <i class="zmdi zmdi-close"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Template Mutant Group -->
+<template id="templateMutantGroup">
+    <div class="mutant-group form-group sm-margin">
+        <div class="col-sm-4 mutant-label"></div>
+        <div class="col-sm-8">
+            <div class="fg-line">
+                <input type="text" class="form-control" />
+            </div>
+        </div>
+    </div>
+</template>
+
+<!-- Template Photo Block -->
+<template id="tmpPhotoBlock">
+    <li class="col-md-4 photo-item">
+        <div class="ratio-wrapper ratio-wrapper-1-1">
+            <div class="ratio-item">
+                <div class="img-container">
+                    <img />
+                </div>
+                <input type="hidden" name="@this.Html.NameFor(q => q.SelectedImages)" value="" />
+            </div>
+        </div>
+    </li>
+</template>
+
+
+<script>
+    var firstImage = '@firstImage'.toLowerCase() === 'true';
+
+    $(document).ready(function () {
+        $("#GetElImage").on('click', function () {
+            $('#uploadImage').click();
+        });
+
+        $("#uploadImage").on('change', function () {
+            var files = this.files;
+
+            // Kiểm tra file extension hợp lệ hay không
+            for (var i = 0; i < files.length; ++i) {
+                var exType = files[i].type;
+                if (exType != "image/gif" && exType != "image/png" && exType != "image/jpeg") {
+                    ShowMessage("Sai định dạng hình, xin hãy chọn hình .png, .jpg hoặc .gif", 3);
+                    return;
+                }
+            }
+
+            // Kiểm tra ảnh diện có hay không
+            if (!$.trim($("#avatar-preview").html())) {
+                firstImage = true;
+            }
+
+            if (files) {
+                sendFiles(files);
+            }
+        });
+    });
+
+    function sendFiles(files) {
+        var formData = new FormData();
+        if (files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                formData.append('file-' + i, files[i]);
+            }
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("UploadImages", "File")',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    for (var i = 0; i < result.imagesUrl.length; ++i) {
+                        var isFirst = i == 0 ? "true" : "false";
+                        var htmlInnerData = '<li class="col-md-4 photo-item removeable">' +
+                        '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                        '<div class="ratio-item"><div class="img-container"><img src="' + result.imagesUrl[i] + '"/></div>' +
+                    '<input type="hidden" name="SelectedImages" value="' + result.imagesUrl[i] + '"/>'
+                    + '<span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                    '</div></div></li>';
+                        if (firstImage) {
+                            $("#avatar-preview").html(htmlInnerData);
+                            firstImage = false;
+                        }
+                        else {
+                            $('#images-preview').append(htmlInnerData);
+                        }
+                    }
+                }
+            },
+            processData: false,
+            contentType: false,
+            error: function () {
+                ShowMessage("Có lỗi xảy ra!", 1);
+            }
+        });
+    }
+
+</script>

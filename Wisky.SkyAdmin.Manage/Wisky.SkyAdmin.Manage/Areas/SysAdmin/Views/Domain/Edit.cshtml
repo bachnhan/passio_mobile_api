@@ -1,0 +1,32 @@
+﻿@model StoreEditViewModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<form class="form-horizontal" method="post">
+    @this.Html.AntiForgeryToken()
+
+    <div class="card">
+        <div class="card-header">
+            <h2>Edit Store</h2>
+        </div>
+
+        <div class="card-body card-padding">
+            @this.Html.ValidationSummary()
+
+            @this.Html.EditorFor(q => q.Name)
+            @this.Html.EditorFor(q => q.ShortName)
+            @this.Html.EditorFor(q => q.Address)
+
+            @this.Html.EditorFor(q => q.HasNews)
+            @this.Html.EditorFor(q => q.HasProducts)
+            @this.Html.EditorFor(q => q.HasImageCollections)
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-primary btn-lg">Save</button>
+            </div>
+        </div>
+
+    </div>
+</form>

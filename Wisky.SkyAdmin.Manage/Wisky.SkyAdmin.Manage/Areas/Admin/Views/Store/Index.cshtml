@@ -1,0 +1,432 @@
+﻿@{
+    ViewBag.Title = "Quản lý cửa hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Quản lý cửa hàng
+                </h3>
+            </div>
+            <div class="col-md-6" hidden>
+                <a data-toggle="modal" href="@Url.Action("Create")" id="btnCreate" role="button" class="btn btn-primary btn-sm pull-right">
+                    <i class="zmdi zmdi-plus" hidden></i> Thêm cửa hàng
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-padding">
+        <table id="storeDatatable" class="table table-striped table-bordered table-hover">
+            <thead style="white-space:nowrap; text-overflow:ellipsis;">
+                <tr>
+                    <th>
+                        <label class="">STT</label>
+                    </th>
+                    <th>
+                        <label class="">ID</label>
+                    </th>
+                    <th>
+                        <label class="">Tên cửa hàng</label>
+                    </th>
+                    <th>
+                        <label class="">Địa chỉ</label>
+                    </th>
+                    <th>
+                        <label class="">Điện thoại</label>
+                    </th>
+                    <th>
+                        <label class="">Loại hình</label>
+                    </th>
+                    <th>
+                        <label class="">Nhóm</label>
+                    </th>
+                    <th>
+                        <label class="">Trạng thái</label>
+                    </th>
+                    <th>
+                        <label class="">Tùy chọn</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+@*<div id="createStorePanel" class="modal fade" data-backdrop="static" data-keyboard="true"></div>
+    <div id="editStorePanel" class="modal fade" data-backdrop="static" data-keyboard="true"></div>*@
+<div id="asignUserPanel" class="modal fade" role="dialog" aria-hidden="true"></div>
+
+<script>
+    $(document).ready(function () {
+        InitDatatable();
+    });
+
+    function showCreateStore() {
+        $.ajax({
+            type: "GET",
+            url: '#createStore',
+            url: '@Url.Action("Create")',
+            success: function (result) {
+                //$('#myModal').modal('show');
+                $('#createStorePanel').html(result);
+                $('#createStorePanel').modal('show');
+                initializeTimePicker();
+            },
+            error: function (error) {
+                ShowAlert("Lỗi xảy ra",1)
+            }
+        });
+    }
+
+    function showEditStore(storeId) {
+        $.ajax({
+            type: "GET",
+            url: '#editStore',
+            url: '@Url.Action("Edit")',
+            data: {
+                "Id": storeId
+            },
+            success: function (result) {
+                $('#editStorePanel').html(result);
+                $('#editStorePanel').modal('show');
+                initializeTimePicker();
+            }
+        });
+    }
+
+
+    function showAsignUser(storeId, storeName) {
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("AsignUser")',
+            success: function (result) {
+                $('#asignUserPanel').html(result);
+                $('#asignUserPanel').modal('show');
+                $("#modalUserHeader").html(storeName + " Manager");
+                $("#StoreID").val(storeId);
+                intdatatable();
+                //userTable(storeId);
+            }
+        });
+    }
+
+    function initializeTimePicker() {
+        $('#OpenTime').datetimepicker({
+            format: 'LT',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#CloseTime').datetimepicker({
+            format: 'LT',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+    };
+
+    function RefreshTableUser() {
+        var oTable = $("#UserDatatable").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    };
+
+    function RefreshTable() {
+        var oTable = $("#storeDatatable").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+
+    }
+
+    @*function deactiveStore(id) {
+        ShowConfirm("Xác nhận hủy cửa hàng này?", function () {
+            $.ajax({
+                url: '@Url.Action("DeactiveStore")',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    "id": id
+                },
+                success: function (data) {
+                    if (data.success) {
+                        //$('#asignUserPanel').modal('hide');
+                        ShowAlert("Hủy cửa hàng thành công!", 2);
+                        //RefreshTable();
+                        setTimeout(function () {
+                            location.reload();                            
+                        }, 2000);                        
+                    }
+                    else {
+                        ShowAlert("Hủy cửa hàng thất bại!", 1);
+                    }
+                },
+            });
+        });
+    }*@
+    function RefreshTable() {
+        var oTable = $("#storeDatatable").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+    function InitDatatable() {
+        //var storeId = $('#hiddenStoreId').val();
+        $("#storeDatatable").dataTable({
+            "bSort":false,
+            "bFilter": true,
+            "bRetrieve": true,
+            //"bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": '@Url.Action("LoadStoreByStatusDatatables")',
+            "bProcessing": true,
+            "oLanguage": {
+                "sSearchPlaceholder":"Tên cửa hàng",
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfo": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sInfoEmpty": "Hiển thị 0 từ 0 của 0 dòng",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 3, 4, 5, 6, 7, 8],
+                    "sClass": "text-center",
+                    "bSearchable": false
+                },
+                {
+                    "aTargets": [1],                                     
+                    "bVisible": false,
+                    
+                },
+                {
+                    "aTargets": [2],
+                    "bSortable": true,
+                    "bSearchable": true,
+                    
+                },
+               
+            ],
+            "bAutoWidth": false,
+
+        }).fnSetFilteringDelay(delaySearch);
+    }
+
+    @*var userTable = function (storeId) {
+        $("#UserDatatable").dataTable({
+            //"bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "bStateSave": true,
+            "sAjaxSource": '@Url.Action("LoadManagerStore")',
+            "bProcessing": true,
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Tên đăng nhập",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfo": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sInfoEmpty": "Hiển thị 0 từ 0 của 0 dòng",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "selectedStoreId", "value": storeId });
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2],
+                    "bSortable": false,
+                },
+            ],
+
+            "aoColumnDefs": [
+                {
+                    "aTargets": [3],
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'className': 'dt-body-center',
+                    "bSortable": false,
+                },
+            ],
+            "bAutoWidth": false,
+
+        }).fnSetFilteringDelay(delaySearch);
+    };*@
+   
+
+    @*$(document).on('click', '#btnAssignUser', function () {
+        var formManager = new FormData($("#AssignManagerForm")[0]);
+        var selectedUser = [];
+        $('input[type=checkbox]').each(function () {
+            selectedUser.push({
+                username: $(this).val(),
+                selected: $(this).prop('checked')
+            });
+        });
+        $.ajax({
+            url: '@Url.Action("ManagerStore")',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                "selectedUser": selectedUser,
+                "selectedStoreId": $("#StoreID").val(),
+            },
+            success: function (data) {
+                if (data.success) {
+                    //$('#asignUserPanel').modal('hide');
+                    ShowMessage("Đã cập nhật quản lý thành công!", 2);
+                }
+            },
+        });
+
+        return false;
+
+    });*@
+
+    //$("#btnSubmit").click(function () {
+    $(document).on('click', '#btnSubmit', function () {
+        // clear error
+        $(".error-message").html("");
+        $("#FormError").hide();
+        $("#FormError").html("");
+        $("#FormSuccess").hide();
+        $("#FormSuccess").html("");
+
+        var hasError = false;
+        
+        // validating
+        if ($("input[name='Name']").val() == "") {
+            $("span[data-valmsg-for='Name']").html("Tên đối tác không được bỏ trống");
+            hasError = true;
+        }
+
+        if ($("textarea[name='Address']").val() == "") {
+            $("span[data-valmsg-for='Address']").html("Địa chỉ đối tác không được bỏ trống");
+            hasError = true;
+        }
+        if ($("input[name='Lat']").val() == "") {
+            $("span[data-valmsg-for='Lat']").html("Kinh độ không được bỏ trống");
+            hasError = true;
+        }
+        //if (!isNumerString($("input[name='Lat']").val())) {
+        //    $("span[data-valmsg-for='Lat']").html("Kinh độ không được nhập chữ");
+        //    hasError = true;
+        //}
+        if ($("input[name='Lon']").val() == "") {
+            $("span[data-valmsg-for='Lon']").html("Vĩ độ không được bỏ trống");
+            hasError = true;
+        }
+        //if (!isNumerString($("input[name='Lon']").val())) {
+        //    $("span[data-valmsg-for='Lon']").html("Vĩ độ không được nhập chữ");
+        //    hasError = true;
+        //}
+
+        if (!validateEmail(($("input[name='Email']").val()))) {
+            $("span[data-valmsg-for='Email']").html("Email không hợp lệ");
+            hasError = true;
+        }
+        if ($("input[name='Phone']").val() == "") {
+            $("span[data-valmsg-for='Phone']").html("Số điện thoại không được bỏ trống");
+            hasError = true;
+        }
+        if (!isNumerString($("input[name='Phone']").val())) {
+            $("span[data-valmsg-for='Phone']").html("Số điện thoại không được nhập chữ");
+            hasError = true;
+        }
+        if ($("input[name='Fax']").val() == "") {
+            $("span[data-valmsg-for='Fax']").html("Số Fax không được bỏ trống");
+            hasError = true;
+        }
+        if (!isNumerString($("input[name='Fax']").val())) {
+            $("span[data-valmsg-for='Fax']").html("Số Fax không được nhập chữ");
+            hasError = true;
+        }
+        // submit
+        if (!hasError) {
+            $("form#CreateEditForm").submit();
+        }
+    });
+    //validate number
+
+    function isNumerString(str) {
+        var matchingString = str.match(/\d+/);
+
+        return !(matchingString == null || matchingString[0].length != str.length);
+    }
+
+    //valid email
+
+    function validateEmail(sEmail) {
+        var filter = /^[\w-.+]+@@[a-zA-Z0-9.-]+.[a-zA-z0-9]{2,4}$/;
+        if (filter.test(sEmail)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // Delete a storeId
+    //Hiện thời chưa cho xóa store
+    @*function DeleteStore(id, name) {
+        bootbox.dialog({
+            title: 'Xác nhận',
+            message: "<h5>Bạn có muốn xóa cửa hàng '" + name + "'?</h5>",
+            buttons:
+            {
+                "ok":
+                 {
+                     "label": "<i class='icon-ok'></i> Đồng ý",
+                     "className": "btn-sm btn-success",
+                     "callback": function () {
+                         $.ajax({
+                             url: '@Url.Action("Delete")',
+                             type: 'POST',
+                             data: {
+                                "id":id,
+                             },
+                             error: function () {
+                                 ShowMessage("Không thể xóa cửa hàng này. Xin vui lòng thử lại sau!", 1);
+                             },
+                             success: function (data) {
+                                 if (data.success) {
+                                     RefreshTable();
+                                 } else {
+                                     ShowMessage("Không thể xóa cửa hàng này. Xin vui lòng thử lại sau!", 1);
+                                 }
+                             }
+                         });
+                     }
+                 },
+                "close":
+                 {
+                     "label": "<i class='icon-remove'></i> Đóng",
+                     "className": "btn-sm btn-danger",
+                     "callback": function () {
+                         bootbox.hideAll();
+                     }
+                 }
+            }
+        });
+    }*@
+</script>

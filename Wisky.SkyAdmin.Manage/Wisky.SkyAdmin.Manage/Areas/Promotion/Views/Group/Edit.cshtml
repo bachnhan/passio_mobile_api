@@ -1,0 +1,58 @@
+﻿
+
+@model HmsService.ViewModels.GroupViewModel
+
+@{
+    ViewBag.Title = "Cập nhật nhóm";
+
+}
+
+<form action="@Url.Action("Edit")" method="POST">
+    @Html.HiddenFor(m => m.GroupId)
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4>Cập nhật nhóm khuyến mãi</h4>
+    </div>
+    <div class="modal-body">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-3 control-label">
+                    Tên nhóm khuyến mãi<span style="color:red">*</span>
+                </label>
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Name)
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-sm-3 control-label">
+                    Mô tả
+                </label>
+                <div class="col-sm-9">
+                    @Html.TextBoxFor(model => model.Description, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Description)
+                </div>
+            </div>
+           
+            
+        </div>
+    </div>
+    <div class="modal-footer">
+
+        <button type="submit" onclick="return validate(this)" class="btn btn-primary">Cập nhật</button>
+    </div>
+</form>
+
+
+<script type="text/javascript">
+    
+    function validate(btn) {
+        hasValue = true;
+        if ($("input[name='Name']").val() == "") {
+            ShowMessage("Vui lòng nhập tên nhóm khuyến mãi.", 3);
+            hasValue = false;
+        }
+        
+        return hasValue;
+    }
+</script>

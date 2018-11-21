@@ -1,0 +1,328 @@
+﻿@{
+    ViewBag.Title = "Báo cáo theo thứ";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Báo cáo theo thứ</h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div><!-- /col -->
+            <div class="col-md-6">
+                <!-- export to excel -->
+                <button type="submit" id="export" class="btn btn-primary btn-sm pull-right">
+                    <i class="fa fa-download"></i> Xuất ra file Excel
+                </button>
+            </div><!-- /col -->
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-12" style="margin-top: 19px;">
+                <div class="input-group">
+                    <!-- Daterange picker -->
+                    @*<div class="date-picker text-right">
+                        <input id="datestring" hidden />
+                        <div id="reportrange">
+                            <input class="p-7 width230" type="text" id="date-string" readonly />
+                            <a id="" class="CelenderA"><i class="fa fa-calendar"></i></a>
+                        </div>
+                    </div>*@
+
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                   
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>  Tìm
+                        </a>
+                    </div>
+                </div>
+                <form id="form-create-session" class="form-inline" style="display:none">
+                    <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" />
+                </form>
+            </div>
+        </div>   
+    </div><!-- /.card-header-->
+
+    
+
+
+
+    <div class="card-padding">
+        <!-- LINE CHART -->
+        <div id="container" style="min-width: 310px; height: 300px;"></div>
+
+        <div id="datatable">
+            <table id="dayRReport" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label class="">STT</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng(Mang đi)</label>
+                        </th>
+                        <th>
+                            <label class="">Thành tiền</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng(Tại store)</label>
+                        </th>
+                        <th>
+                            <label class="">Thành tiền</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng(Giao hàng)</label>
+                        </th>
+                        <th>
+                            <label class="">Thành tiền</label>
+                        </th>
+                        <th>
+                            <label class="">Tổng cộng</label>
+                        </th>
+                        <th>
+                            <label class="">Thành tiền</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<form class="hidden" id="formReportExcel" action="@Url.Action("ReportDayOfWeekExportExcelEPPlus","StoreReport")">
+    <input name="storeId" />
+    <input name="startTime" />
+    <input name="endTime" />
+</form>
+<script>
+    $(document).ready(function () {
+        $('#export').on('click', null, function () {
+            $('[name=storeId]').val(@ViewBag.storeId);
+            //$('#hiddenStoreId').val()
+            $('[name=startTime]').val($('#sTime').val());
+            $('[name=endTime]').val($('#eTime').val());
+            $('#formReportExcel').submit();
+        });
+        function cb(start, end, label) {
+            //Prepare start time and end time format
+            var startTime = start.format('DD/MM/YYYY'),
+                endTime = end.format('DD/MM/YYYY');
+            var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $('#date-string').val(dateRange);
+            }
+
+            $('#sTime').val(startTime);
+            $('#eTime').val(endTime);
+            //Chage date at page header
+            $('[data-role=small-date]').html('(' + startTime + (startTime == endTime ? '' : ' - ' + endTime) + ')');
+        }
+        //show date range in input date
+        cb(moment().startOf('isoWeek'), moment(),'Tuần này');
+
+        $('#reportrange').daterangepicker({
+            startDate: moment().startOf('isoWeek'),
+            endDate: moment(),
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+        DayOfWeekReport();
+    });
+
+    function RefreshTable() {
+        var oTable = $("#dayRReport").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    };
+
+    var InitProDatatable = function(data) {
+        $('#datatable').html('<table id="dayRReport" class="table table-striped table-bordered table-hover">'
+                                +'<thead>'
+                                +'<tr>'
+                                +'<th>'
+                                    +'<label class=""></label>'
+                                +'</th>'
+                                +'<th>'
+                                    +'<label class="">Số lượng(Mang đi)</label>'
+                                +'</th>'
+                                +'<th>'
+                                    +'<label class="">Thành tiền</label>'
+                                +'</th>'
+                                +'<th>'
+                                   +'<label class="">Số lượng(Tại store)</label>'
+                                +'</th>'
+                                +'<th>'
+                                   +'<label class="">Thành tiền</label>'
+                                +'</th>'
+                                +'<th>'
+                                    +'<label class="">Số lượng(Giao hàng)</label>'
+                                +'</th>'
+                                +'<th>'
+                                    +'<label class="">Thành tiền</label>'
+                                +'</th>'
+                                +'<th>'
+                                    +'<label class="">Tổng cộng</label>'
+                                +'</th>'
+                                +'<th>'
+                                    +'<label class="">Thành tiền</label>'
+                                +'</th>'
+                                +'</tr>'
+                                +'</thead>'
+                                +'<tbody></tbody>'
+                                +'</table');
+
+        $("#dayRReport").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            'data':data,
+            "bProcessing": true,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+
+    $('#btnSearch').on('click', function () {
+        if ($("#eTime").val().length > 16 || $("#sTime").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            DayOfWeekReport();
+        }
+    });
+
+    var DayOfWeekReport = function () {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadDayOfWeekReport", "StoreReport")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(),'storeId': @ViewBag.storeId },
+            success: function (result) {
+                var startTime = $('#sTime').val();
+                var endTime = $('#eTime').val();
+                var dateRange = "(" + startTime + (startTime == endTime? '':' - ' + endTime) + ")";
+
+                $('[data-role=small-date]').html(dateRange); // Chage date at page header
+
+                InitProDatatable(result.datatable);
+                DoanhThuChart(result.dataChart)
+            }
+        });
+    };
+
+    //-------------
+    //- LINE CHART -
+    //--------------
+    function DoanhThuChart(dataChart)
+    {
+        $('#container').highcharts({
+            title: {
+                text: 'BIỂU ĐỒ HÓA ĐƠN',
+                x: -20 //center
+            },
+            subtitle: {
+                text: '',
+                x: -20
+            },
+            xAxis: {
+                categories: dataChart.WeekDay
+            },
+            yAxis: {
+                title: {
+                    text: 'Hóa đơn'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ' Hóa đơn'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [
+                {
+                    name: 'TakeAway',
+                    data: dataChart.TakeAway,
+                },
+                {
+                    name: 'AtStore',
+                    data: dataChart.AtStore,
+                },
+                {
+                    name: 'Delivery',
+                    data: dataChart.Delivery,
+                }
+            ]
+        });
+    };
+
+    // export to excel
+    @*$(document).on('click', '#export', function () {
+        $.ajax({
+            url: '@Url.Action("ReportDayOfWeekExportExcelEPPlus", "StoreReport")',
+            type: 'POST',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(),'storeId': @ViewBag.storeId },
+            success: function (rs) {
+                if(rs.success == true) {
+                    ShowMessage('Xuất file Excel thành công <br/>' + rs.fileName, 3);
+                }else {
+                    ShowMessage('Xuất file Excel thất bại', 1);
+                }
+            }
+        });
+    });*@
+</script>

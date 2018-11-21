@@ -1,0 +1,457 @@
+﻿@using HmsService.Sdk
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<style>
+    .pair-group.btn,
+    .variant-group.btn {
+        font-weight: 500 !important;
+        padding-left: 13px !important;
+    }
+
+    .col-md-4 {
+        padding-top: 10px;
+    }
+
+    .width-100 {
+        width: 100%;
+    }
+
+    .select2-container.select2-choice {
+        display: block;
+        height: 35px;
+        padding: 0 0 0 8px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #e0e0e0 !important;
+        white-space: nowrap;
+        line-height: 35px;
+        color: #444;
+        text-decoration: none;
+        border-radius: 0px;
+        user-select: none;
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #fff));
+    }
+
+    .select2-arrow {
+        opacity: 1;
+    }
+
+    .select2-container.select2-choice.select2-arrow {
+        display: inline-block;
+        width: 18px;
+        height: 100%;
+        position: absolute;
+        right: 0;
+        top: 3px;
+        border-left: 0px;
+        border-radius: 0px;
+        background-clip: padding-box;
+        /* background: #ccc; */
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #fff));
+        background-image: -webkit-linear-gradient(center bottom, #fff 0%, #fff 60%);
+        /*background-image: -moz-linear-gradient(center bottom, #fff 0%, #fff 60%);*/
+    }
+
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+</style>
+<div class="card">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="margin-bottom30">Thêm ca làm việc</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <ul class="actions">
+                        <li class="m-r-10">
+                            <a href="@this.Url.Action("Index", "Shift")" class="btn btn-success myComeback">Quay lại</a>
+                        </li>
+                        <li>
+                            <button type="button" class="btn btn-primary" id="btn-submit-product" onclick="addShift()">Hoàn tất</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+
+        <div class="card-body card-padding">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Tạo ca</h2>
+                </div>
+                <div class="card-body card-padding row">
+                    <div>
+
+                        <div class="col-md-6">
+                            <div class="form-group  row">
+                                <label for="Product_Code" class="control-label col-md-4">Chọn khung giờ</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        <select class="selectpicker width-100" name="Shift_TimeFrame" id="Shift_TimeFrame" onchange="loadStartTime_Duration()"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group  row">
+                                <label for="Product_Code" class="control-label col-md-4">Giờ bắt đầu ca</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        <input type="text" class="form-control" id="TimeFrameStart" name="TimeFrameStart" placeholder="Giờ bắt đầu ca">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group  row">
+                                <label for="Product_Code" class="control-label col-md-4">Thời lượng của ca</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        <input type="text" class="form-control" id="TimeFrameDuration" name="TimeFrameDuration" placeholder="Thời lượng làm việc">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group  row">
+                                <label for="Product_Code" class="control-label col-md-4">Thời gian cộng thêm</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        <select class="selectpicker width-100" name="ExpandTime" id="ExpandTime">
+                                            <option value="15">15 Phút</option>
+                                            <option value="20">20 Phút</option>
+                                            <option value="25">25 Phút</option>
+                                            <option value="30">30 Phút</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="form-group  row">
+                                <label for="Product_ProductType" class="control-label col-md-4">Thêm theo</label>
+                                <div class="col-md-8 p-l-10">
+                                    <div class="group-radio-buttons myGroup-radio-buttons">
+                                        <table width="100%">
+                                            <td width="47%">
+                                                <div>
+                                                    <input type="radio" name="filter-type" value="1" class="nice-check" id="rbThemMotNgay" />
+
+                                                    <label for="rbThemMotNgay">
+                                                        <span>Một ngày</span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td width="1%"></td>
+                                            <td width="52%">
+                                                <div>
+                                                    <input type="radio" name="filter-type" value="2" class="nice-check" id="rbThemNhieuNgay" />
+
+                                                    <label for="rbThemNhieuNgay"><span>Nhiều ngày</span></label>
+                                                </div>
+                                            </td>
+                                        </table>
+                                        <div class="col-md-4 p-l-0 p-t-0">
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="form-group  row" hidden="true" id="themMotNgay">
+                                <label class="control-label col-md-4">Ngày làm việc</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line" width="30%">
+                                        <input class="form-control" type="text" id="ShiftWorkDay" value="" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group  row" @*hidden="true"*@ id="themNhieuNgayBD">
+                                <label class="control-label col-md-4">Thêm từ ngày</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line" width="30%">
+                                        <input class="form-control" type="text" id="ShiftWorkDayStart" value="" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group  row" @*hidden="true"*@ id="themNhieuNgayKT">
+                                <label class="control-label col-md-4">Đến ngày</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line" width="30%">
+                                        <input class="form-control" type="text" id="ShiftWorkDayEnd" value="" />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2>Thêm nhân viên vào ca</h2>
+                    <div class="checkbox"><label>Chọn thêm tất cả nhân viên<input type="checkbox" id="CheckAll" /><i class="input-helper"></i></label></div>
+
+                    <div class="card-body card-padding row">
+                        <!-- Datatable -->
+                        <div class="col-md-12">
+
+                            <table id="item-type-table" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th><label>STT</label></th>
+                                        <th><label>Tên nhân viên</label></th>
+                                        <th><label>Số điện thoại</label></th>
+                                        <th><label>Thêm nhân viên vào ca</label></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+        </div>
+
+
+
+    </div>
+
+
+</div>
+@section scripts {
+    <script>
+        // --- Load datatable
+        $(document).ready(function () {
+            loadEmployeeTable();
+            getTimeFrame();
+
+            $("#rbThemNhieuNgay").prop('checked', true);
+            //$('#btn-submit-product').parent().parent().css('z-index', '6');
+            //$('.myComeback').fixedScroll(70);
+            //$('#btn-submit-product').fixedScroll(70);
+
+            $('#TimeFrameStart').datetimepicker({
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+
+            $('#TimeFrameDuration').datetimepicker({
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+
+            $("#ShiftWorkDay").daterangepicker({
+                singleDatePicker: true,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                startDate: moment(),
+                showDropdowns: true
+            });
+            $("#ShiftWorkDayStart").daterangepicker({
+                singleDatePicker: true,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                startDate: moment(),
+                showDropdowns: true
+            });
+            $("#ShiftWorkDayEnd").daterangepicker({
+                singleDatePicker: true,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                startDate: moment().endOf('isoweek'),
+                showDropdowns: true
+            });
+        });
+
+
+        $("#rbThemMotNgay").change(function () {
+            $('#themMotNgay').show();
+            $('#themNhieuNgayBD').hide();
+            $('#themNhieuNgayKT').hide();
+        });
+        $("#rbThemNhieuNgay").change(function () {
+            $('#themMotNgay').hide();
+            $('#themNhieuNgayBD').show();
+            $('#themNhieuNgayKT').show();
+        });
+
+        function loadEmployeeTable() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetAllEmployeeToAdd", "Employee")',
+
+                success: function (result) {
+                    initEmployeeDatatable(result.datatable);
+                }
+            });
+        }
+
+        function initEmployeeDatatable(data) {
+            $("#item-type-table").dataTable().fnDestroy();
+            $("#item-type-table").dataTable({
+                stateSave: true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Tìm nhân viên",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3],
+                        "sClass": "text-center",
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [3],
+                        "mRender": function (data, type, row) {
+                            var checkEmployee = " <div class='checkbox'>" +
+                                "<label>Chọn" +
+                                "<input type='checkbox' value='" + data + "' name='EmpID'/>" +
+                                "<i class='input-helper'></i>" +
+                                "</label>" +
+                                "</div>";
+
+                            return " " + checkEmployee;
+                        },
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+        $("#CheckAll").change(function () {
+            var allPages = $("#item-type-table").dataTable().fnGetNodes();
+
+            if ($("#CheckAll").is(':checked')) {
+                $('input[type="checkbox"]', allPages).prop('checked', true);
+            } else {
+                $('input[type="checkbox"]', allPages).prop('checked', false);
+            }
+        });
+
+        function addShift() {
+            if ($("#rbThemNhieuNgay").is(':checked')) {
+                createShift($("#ShiftWorkDayStart").val(), $("#ShiftWorkDayEnd").val());
+            } else if ($("#rbThemMotNgay").is(':checked')) {
+                createShift($('#ShiftWorkDay').val(), $('#ShiftWorkDay').val());
+            }
+        }
+
+
+        function createShift(workDay_Start, workDay_End) {
+            var allPages = $("#item-type-table").dataTable().fnGetNodes();
+            var yourArray = new Array();
+            $('input[type="checkbox"]:checked', allPages).each(function () {
+                var tr = $(this).closest('tr');
+                var rowData = $("#item-type-table").dataTable().fnGetData(tr);
+                yourArray.push(rowData[3]);
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CreateShift")',
+                data: {
+                    timeFrameId: $('#Shift_TimeFrame').val(),
+                    strWorkDayStart: workDay_Start,
+                    strWorkDayEnd: workDay_End,
+                    listId: yourArray,
+                    start:  $('#TimeFrameStart').val(),
+                    duration: $('#TimeFrameDuration').val(),
+                    expandTime: $('#ExpandTime').val(),
+                },
+                success: function (result) {
+                    if (result == true) {
+                        ShowAlert("Thêm thành công", 2);
+                        $('#create-edit-webElementType-modal').modal('hide');
+                        window.location.replace("@Url.Action("Index","Shift")");
+                        @*@this.Url.Action("Index", "Shift")*@
+                    } else {
+                        ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                    }
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+
+        function getTimeFrame() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetAllTimeFrame", "TimeFrame")',
+
+                success: function (result) {
+                    loadTimeFrame(result.datatable);
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+
+        function loadTimeFrame(listData) {
+            $("#Shift_TimeFrame").empty();
+            for (var i = 0; i < listData.length; i++) {
+                $("#Shift_TimeFrame").append('<option value="' + listData[i][5] + '">' + listData[i][1] + '</option>');
+            }
+            $("#Shift_TimeFrame").selectpicker('refresh');
+            loadStartTime_Duration();
+        }
+
+        function loadStartTime_Duration() {
+           
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetTimeFrameInfo")',
+                data: {
+                    id: $("#Shift_TimeFrame").val()
+                },
+                success: function (result) {
+                    $("#TimeFrameStart").val(result.startTime);
+                    $("#TimeFrameDuration").val(result.duration);
+                    $('#ExpandTime').val(result.expandTime).change();
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+            
+        }
+    </script>
+}

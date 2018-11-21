@@ -1,0 +1,220 @@
+﻿@model  HmsService.ViewModels.ProductItemEditViewModel
+
+@{
+    var currentStore = HmsService.Models.Utils.GetStore();
+    var storeId = currentStore?.ID;
+    var storeName = currentStore?.ShortName;
+    Layout = null;
+    var url = this.Model.ImageUrl;
+}
+<div class="card-padding">
+    <input type="hidden" id="originCode" value="@this.Model.ItemCode" />
+    <form id="editProductItemForm" method="post">
+        <div class="modal-body">
+            @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+            @Html.HiddenFor(q => q.ItemID)
+            <div class="form-horizontal">
+                <div class="row group-info" style="margin-left:-2px; margin-right:-2px; margin-top:12px; padding-top:20px; padding-bottom:22px;">
+                    <div class="col-md-6">
+                        <div class="card p-15-30">
+                            <div class="form-group">
+                                <label class="control-label col-md-5" for="ItemName">Tên thành phần<span style="color:red">*</span></label>
+                                <div class="col-md-7">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.ItemName, new { @class = "form-control", required = "true" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-5" for="ItemCode">Mã nguyên liệu<span style="color:red">*</span></label>
+                                <div class="col-md-7">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.ItemCode, new { @class = "form-control", required = "true" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-5" for="Price">Giá<span style="color:red">*</span></label>
+                                <div class="col-md-7">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Price, new { @class = "form-control", required = "true", onkeyup = "this.value = checkDigit(this.value)" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-5" for="IndexPriority">Ưu tiên<span style="color:red">*</span></label>
+                                <div class="col-md-7">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.IndexPriority, new { @class = "form-control", required = "true", onkeyup = "this.value = checkDigit(this.value)" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Hình ảnh (640x480)</h2>
+                            </div>
+                            <div class="card-body card-padding">
+                                <div class="row sm-margin">
+                                    <div class="col-md-12">
+                                        <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                                            @*@if (this.Model.ImageUrl != null)
+                                                 { var url = this.Model.ImageUrl;*@
+                                                
+
+                                                <li class="col-md-4 photo-item removeable">
+                                                    <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                        <div class="ratio-item">
+                                                            <div class="img-container">
+                                                                <img id="imgName" src="@(url != null ? url : "/Content/images/Default_product_img.jpg")" />
+                                                            </div>
+                                                            <input type="hidden" id="imgValue" name="@this.Html.NameFor(q => q.SelectedImage)" value="@(url)" />
+                                                            <span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            @*}else
+                                            {
+                                                <div class="">
+                                                    <img id="imageUpload" src="#" alt="Image" />
+                                                </div>
+                                            }*@
+
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div>
+                                    <input type="hidden" id="PicURL" data-name="@this.Html.NameFor(q => q.SelectedImage)" />
+                                    <div style="display: none">
+                                        <input type="file" name="uploadImage" hidden id="uploadImage" accept="image/gif, image/jpeg, image/png" class="btn btn-sm btn-success uploadImageToBlob" />
+                                    </div>
+                                    <button type="button" id="btnUploadImage" class="btn btn-sm btn-success">
+                                        <i class="icon-upload"></i>Browse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card p-15-30">
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Unit">Đơn vị 1<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Unit, new { @class = "form-control", required = "true" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Unit2">Đơn vị 2<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Unit2, new { @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="UnitRate">Tỉ lệ qui đổi (từ đơn vị 2 sang 1)<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line m-t-8">
+                                        @Html.TextBoxFor(q => q.UnitRate, new { @class = "form-control", required = "true", onkeyup = "this.value = checkDigit(this.value)" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4">Danh mục<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.DropDownListFor(q => q.CatID, Model.AvailableCate, new { name = "CatID", @id = "CatID", @class = "selectpicker" })
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="ProductItemType">Kiểu nguyên liệu<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.EnumDropDownListFor(q => q.ProductItemType, new { @class = "selectpicker" })
+                                    @*<div class="fg-line">
+                                            @Html.EnumDropDownListFor(q => q.ProductItemType, new { @class = "form-control" })
+                                        </div>*@
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Price">Nhà cung cấp<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    @Html.DropDownListFor(q => q.Providers, this.Model.AvailableProvider, new { name = "ProviderDropdown", @id = "providerListModal", @class = "selectpicker" })
+                                    @*<div class="fg-line">
+                                            @{
+                                                <select name="ProviderDropdown" id="providerListModal" class="form-control"></select>
+                                            }
+                                        </div>*@
+                                </div>
+                                <div class="col-md-1 text-right">
+                                    <button title="Thêm nhà cung cấp" type="button" class="btn btn-primary btn-sm" id="addProviderModal">
+                                        <i class="zmdi zmdi-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+                                    <label class="control-label col-md-4" for="Price"></label>
+                                    <div class="col-md-6 text-right">
+                                        <button type="button" class="btn btn-primary btn-sm" id="addProviderModal">
+                                            Thêm nhà cung cấp
+                                        </button>
+                                    </div>
+
+                                </div>*@
+                            <div class="scroll-div" style="overflow-y: auto; width:100%;">
+                                <table id="providerListTable" class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th><label>STT</label></th>
+                                            <th><label>Tên nhà cung cấp</label></th>
+                                            <th><label>Tùy chọn</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Card: Images -->
+                        @*<div class="form-group">
+                                <div class="col-md-10 myOption">
+                                    <a href="@Url.Action("Index")" class="btn btn-success"> Huỷ</a>
+                                    <button type="button" class="btn btn-primary" onclick="EditItem()"></i> Hoàn tất</button>
+                                </div>
+                            </div>*@
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.selectpicker').selectpicker({
+            size: 10,
+        });
+    });
+</script>
+
+
+<script>
+   
+    function delImg() {
+
+          $("#imgValue").val("");
+          $("#imgName").attr('src', '/Content/images/Default_product_img.jpg');
+          $("#uploadImage").val("")
+
+        }
+   
+</script>
+

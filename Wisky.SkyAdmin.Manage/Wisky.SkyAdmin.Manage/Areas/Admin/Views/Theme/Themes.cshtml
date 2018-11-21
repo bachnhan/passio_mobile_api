@@ -1,0 +1,91 @@
+﻿@{
+    ViewBag.Title = "Theme Store";
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var storeId = 0;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+    var store = Utils.GetStore(storeId);
+}
+<link href="@Url.Content("~/Content/css/Galary.css")"
+      rel="stylesheet" type="text/css" />
+<h2>Theme Store</h2>
+
+<div class="StoreTheme-container">
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        // Load theme list
+        GetAllThemes();
+        // Open file theme
+        $(document).on("click", "#linkTheme", function () {
+            var path = $(this).attr("path");
+            OpenBrowser(path);
+        });
+
+        $(document).on("click", "#linkTheme_Image", function () {
+            var path = $(this).attr("path");
+            OpenBrowser(path);
+        });
+    });
+    function OpenBrowser(path) {
+        path = "C:/Users/HienLN/Desktop/aaaa.html";
+        //window.location = "C:/Users/HienLN/Desktop/aaaa.html";
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("openBrowser","Theme")",
+            data: { path: path },
+            success: function (result) {
+            },
+            error: function (error) {
+                //console.log(error);
+            }
+        });
+    }
+    function GetAllThemes() {
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetAllThemes")",
+            dataType: 'json',
+            data: null,
+            success: function (result) {
+                if (result.success) {
+                    //console.log(result.themes);
+                    // $('#renderThemeItemsHere').html('load succeed!');
+                    var imageDataHtml = "";
+                    $.each(JSON.parse(result.themes), function (index, themes) {
+                        if (index == 0) {
+                            imageDataHtml += "<div id='StoreTheme-result' class='row'>"
+                        } else if (index % 2 == 0) {
+                            imageDataHtml += "</div>"
+                            imageDataHtml += "<div id='StoreTheme-result' class='row'>"
+                        }
+                        imageDataHtml += "<div class='col-md-6 p-l-45'>"
+                                        +"<div class='container'>"
+                                        + "<div class='view view-first'>"
+                                        + "<img src='" + themes.ImageUrl + "' />"
+                                        + "<div class='mask'>"
+                                        + "<h2>" + themes.ThemeName + "</h2>"
+                                        + "<p>" + themes.Description + "</p>"
+                                        + "<a href='@Url.Action("GetTheme","Theme")?id=" + themes.ThemeId + "' class='info'>" + "Chi Tiết" + "</a>"
+                                        + "</div>"
+                                        + "</div>"
+                                        + "</div>"
+                                        + "</div>"
+                    });
+                    imageDataHtml += "</div>"
+                    $('.StoreTheme-container').html(imageDataHtml);
+
+                } else {
+                    alert('An error occurred');
+                }
+            },
+            error: function (error) {
+                //console.log(error);
+            }
+        });
+    }
+</script>

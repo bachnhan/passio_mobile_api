@@ -1,0 +1,621 @@
+﻿@model HmsService.ViewModels.ProductCategoryEditViewModel
+
+
+@{
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var storeId = 0;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+    var store = Utils.GetStore(storeId);
+}
+@Html.HiddenFor(q => q.StoreId)
+<script src="http://cdn.ckeditor.com/4.6.2/standard-all/ckeditor.js"></script>
+@if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+{
+    <div class="card">
+        <div class="card-body card-padding text-danger">
+            @this.Html.ValidationSummary()
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-7 p-l-45">
+        <div class="card">
+            <div class="card-header">
+                <h2>Thông tin chính</h2>
+            </div>
+            <div class="card-body card-padding">
+                <!--Ten danh muc-->
+                <div class="form-group">
+                    <label for="inputTitle" class="control-label">Tên danh mục sản phẩm</label><br />
+                    <div class="fg-line">
+                        <input type="text" name="CateName" id="CateName" class="form-control seo-source" required="" value="@Model.CateName" data-seo-target="#SeoName">
+                    </div>
+                </div>
+                <!--./Ten danh muc-->
+                <!--Loai san pham-->
+                <div class="form-group">
+                    <label for="" class="control-label">Phân loại</label><br />
+                    <div class="fg-line">
+                        <div class="select">
+                            @Html.EnumDropDownListFor(model => model.CategoryTypes, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <!--./Loai san pham-->
+                <!--Select Nhom extra-->
+                <div class="form-group">
+                    <label class="control-label">Nhóm sản phẩm extra</label><br />
+                    <div class="fg-line">
+                        <select class="selectpicker" name="@this.Html.NameFor(q => q.SelectedProductCategoryExtras)" multiple>
+                            @foreach (var item in this.Model.AvailableCategoryExtras)
+                            {
+                                <option value="@(item.Value)" selected="@(item.Selected ? "" : null)">@(item.Text)</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <!--./Select Nhom extra-->
+                <!--Mo ta-->
+                <div class="form-group ">
+                    <label for="inputDescription" class="control-label">Mô tả</label><br />
+                    <div class="fg-line">
+                        @this.Html.TextAreaFor(q => q.Description, new {
+                       Rows = 6,
+                       id = "inputDescription",
+                       @class = "ckeditor" })
+                    </div>
+                </div>
+                <!--./Mo ta-->
+            </div>
+        </div>
+        <!--Upload Anh-->
+        <div class="card">
+            <div class="card-header">
+                <h2>Hình Ảnh Đại Diện</h2>
+            </div>
+            <div class="card-body card-padding">
+                <div class="row sm-margin">
+                    <div class="col-md-4">
+                        <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                            <li class="col-md-4 photo-item removeable img-vpos">
+                                <div class="ratio-wrapper ratio-wrapper-1-1">
+                                    <div class="ratio-item">
+                                        <div class="img-container"><img src="@Model.PicUrl" /></div>
+                                        <input type="hidden" name="SelectedImages" value="@Model.PicUrl" />
+                                        <span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        Ảnh đại diện
+                    </div>
+                    <div class="col-md-4 pull-right">
+                        <ul class="row sm-margin images-preview avatar center" id="avatar-preview-banner">
+                            <li class="col-md-4 photo-item removeable img-vpos">
+                                <div class="ratio-wrapper ratio-wrapper-1-1">
+                                    <div class="ratio-item">
+                                        <div class="img-container"><img src="@Model.BannerUrl" /></div>
+                                        <input type="hidden" name="SelectedImagesBanner" value="@Model.BannerUrl" />
+                                        <span class="btn-remove" onclick="delImgBanner()"><i class="glyphicon glyphicon-remove"></i></span>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        Ảnh Banner
+                    </div>
+                </div>
+                <div class="row sm-margin">
+                    <div class="col-md-4 pull-left">
+                        @Html.TextBoxFor(q => q.PicUrl, new { @class = "form-control", @id = "PicURLFinal", @type = "hidden" })
+                        <div style="display: none">
+                            <input type="file" hidden id="uploadImage" accept="image/*" class="btn btn-sm btn-success uploadImageToBlob" />
+                        </div>
+                        <button type="button" id="btnUploadImage" class="btn btn-sm btn-success">
+                            <i class="icon-upload"></i>Browse
+                        </button>
+                    </div>
+                    <div class="col-md-4 pull-right">
+                        @Html.TextBoxFor(q => q.BannerUrl, new { @class = "form-control", @id = "BannerURLFinal", @type = "hidden" })
+                        <div style="display: none">
+                            <input type="file" hidden id="uploadImageBanner" accept="image/*" class="btn btn-sm btn-success uploadImageToBlob" />
+                        </div>
+                        <button type="button" id="btnUploadImageBanner" class="btn btn-sm btn-success">
+                            <i class="icon-upload"></i>Browse
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--./Upload Anh-->
+        <!--Ghi chú và biểu tượng-->
+        <div class="card">
+            @Html.HiddenFor(model => model.AdjustmentNote)
+            <div class="card-header">
+                <h2>Ghi chú</h2>
+            </div>
+            <div class="card-body card-padding">
+                <div class="form-group">
+                    <label for="" class="control-label">Ghi chú 1:</label>
+                    <div class="fg-line">
+                        <input type="text" id="note11" />
+                        <input type="text" id="note12" />
+                        <input type="text" id="note13" />
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label">Ghi chú 2:</label>
+                        <div class="fg-line">
+                            <input type="text" id="note21" />
+                            <input type="text" id="note22" />
+                            <input type="text" id="note23" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label">Ghi chú 3:</label>
+                        <div class="fg-line">
+                            <input type="text" id="note31" />
+                            <input type="text" id="note32" />
+                            <input type="text" id="note33" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="control-label">Biểu tượng</label>
+                        <div class="fg-line">
+                            <div class="select">
+                                @Html.EnumDropDownListFor(model => model.IconEnum, new { @class = "form-control iconoption", @style = "font-family: 'FontAwesome', Helvetica;" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--./Ghi chú và biểu tượng-->
+    </div>
+    <div class="col-md-5 p-r-45">
+        <!--Is Active, is extra-->
+        <div class="card">
+            <div class="card-body card-padding">
+                <div class="form-group">
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" @(@Model.Active ? "checked" : "") name="myDisplay" />
+                                <i class="input-helper"></i>
+                                Kích hoạt
+                            </label>
+                        </div>
+                        <input type="hidden" id="checkboxHiddenActive" name="@(this.Html.NameFor(q=>q.Active))" value="" />
+
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" @(@Model.IsExtra ? "checked" : "") name="result" value="" />
+                            <i class="input-helper"></i>
+                            Là sản phẩm kèm theo
+                        </label>
+
+                    </div>
+                    <input type="hidden" id="checkboxHidden" name="@Html.NameFor(q=>q.IsExtra)" value="" />
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" @(@Model.IsDisplayed ? "checked" : "") name="display" value="" />
+                            <i class="input-helper"></i>
+                            Hiển thị (máy POS)
+                        </label>
+
+                    </div>
+                    <input type="hidden" id="checkboxHiddenIsDisplay" name="@Html.NameFor(q=>q.IsDisplayed)" value="" />
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" @(@Model.IsDisplayedWebsite ? "checked" : "") name="displayWebsite" value="" />
+                            <i class="input-helper"></i>
+                            Hiển thị (Website)
+                        </label>
+
+                    </div>
+                    <input type="hidden" id="checkboxHiddenIsDisplayWebsite" name="@Html.NameFor(q=>q.IsDisplayedWebsite)" value="" />
+                </div>
+            </div>
+        </div>
+        <!--./Is Active, is extra-->
+        <!--Duong dan SEO-->
+        <div class="card">
+            <div class="card-header">
+                <h2>SEO</h2>
+            </div>
+            <div class="card-body card-padding">
+                <label for="" class="control-label">Đường dẫn SEO</label>
+                <div class="fg-line">
+                    @this.Html.TextBoxFor(q => q.SeoName, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <!--./Duong dan SEO-->
+        <!--Uu tien hien thi-->
+        <div class="card">
+            <div class="card-header">
+                <h2>Độ ưu tiên</h2>
+            </div>
+            <div class="card-body card-padding">
+                <label for="" class="control-label">Ưu tiên hiển thị</label>
+                <div class="fg-line">
+                    @this.Html.TextBoxFor(q => q.Position, new { @class = "form-control" })
+                </div>
+                <label for="" class="control-label">Vị trí xuất hiện</label>
+                <div class="fg-line">
+                    @this.Html.TextBoxFor(q => q.DisplayOrder, new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <!--./Uu tien hien thi-->
+        <!--Category Cha-->
+        <div class="card">
+            <div class="card-header">
+                <h2>Liên kết</h2>
+            </div>
+            <div class="card-body card-padding">
+                <label for="" class="control-label">Nhóm cha</label>
+                <div class="fg-line">
+                    <div class="select">
+                        @this.Html.DropDownListFor(q => q.ParentCateId, this.Model.AvailableCategories, new { @class = "form-control", @id = "parentCateId" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--./Category Cha-->
+        <!--10 Thuoc tinh-->
+        <div class="card">
+            <div class="card-header">
+                <h2>Thuộc tính</h2>
+            </div>
+            <div class="card-body card-padding">
+                <div class="row">
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <label>Tên</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <label>Giá trị thuộc tính ( ngăn cách bởi dấu ";")</label>
+                        </div>
+                    </div>
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="nameAtt1" placeholder="Thuộc tính 1" value="@(!String.IsNullOrEmpty(Model.Att1)?@Model.Att1.Split(':')[0]:"")">
+                            <input type="hidden" name="Att1" />
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="Att1" value="@(!String.IsNullOrEmpty(Model.Att1)?@Model.Att1.Split(':')[1]:"")">
+                        </div>
+                    </div>
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="nameAtt2" placeholder="Thuộc tính 2" value="@(!String.IsNullOrEmpty(Model.Att2)?@Model.Att2.Split(':')[0]:"")">
+                            <input type="hidden" name="Att2" />
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="Att2" value="@(!String.IsNullOrEmpty(Model.Att2)?@Model.Att2.Split(':')[1]:"")">
+                        </div>
+                    </div>
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="nameAtt3" placeholder="Thuộc tính 3" value="@(!String.IsNullOrEmpty(Model.Att3)?@Model.Att3.Split(':')[0]:"")">
+                            <input type="hidden" name="Att3" />
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="Att3" value="@(!String.IsNullOrEmpty(Model.Att3)?@Model.Att3.Split(':')[1]:"")">
+                        </div>
+                    </div>
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="nameAtt4" placeholder="Thuộc tính 4" value="@(!String.IsNullOrEmpty(Model.Att4)?@Model.Att4.Split(':')[0]:"")">
+                            <input type="hidden" name="Att4" />
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="Att4" value="@(!String.IsNullOrEmpty(Model.Att4)?@Model.Att4.Split(':')[1]:"")">
+                        </div>
+                    </div>
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="nameAtt5" placeholder="Thuộc tính 5" value="@(!String.IsNullOrEmpty(Model.Att5)?@Model.Att5.Split(':')[0]:"")">
+                            <input type="hidden" name="Att5" />
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="Att5" value="@(!String.IsNullOrEmpty(Model.Att5)?@Model.Att5.Split(':')[1]:"")">
+                        </div>
+                    </div>
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="nameAtt6" placeholder="Thuộc tính 6" value="@(!String.IsNullOrEmpty(Model.Att6)?@Model.Att6.Split(':')[0]:"")">
+                            <input type="hidden" name="Att6" />
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="Att6" value="@(!String.IsNullOrEmpty(Model.Att6)?@Model.Att6.Split(':')[1]:"")">
+                        </div>
+                    </div>
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="nameAtt7" placeholder="Thuộc tính 7" value="@(!String.IsNullOrEmpty(Model.Att7)?@Model.Att7.Split(':')[0]:"")">
+                            <input type="hidden" name="Att7" />
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="Att7" value="@(!String.IsNullOrEmpty(Model.Att7)?@Model.Att7.Split(':')[1]:"")">
+                        </div>
+                    </div>
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="nameAtt8" placeholder="Thuộc tính 8" value="@(!String.IsNullOrEmpty(Model.Att8)?@Model.Att8.Split(':')[0]:"")">
+                            <input type="hidden" name="Att8" />
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="Att8" value="@(!String.IsNullOrEmpty(Model.Att8)?@Model.Att8.Split(':')[1]:"")">
+                        </div>
+                    </div>
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="nameAtt9" placeholder="Thuộc tính 9" value="@(!String.IsNullOrEmpty(Model.Att9)?@Model.Att9.Split(':')[0]:"")">
+                            <input type="hidden" name="Att9" />
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="Att9" value="@(!String.IsNullOrEmpty(Model.Att9)?@Model.Att9.Split(':')[1]:"")">
+                        </div>
+                    </div>
+                    <div class="col-sm-4 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="nameAtt10" placeholder="Thuộc tính 10" value="@(!String.IsNullOrEmpty(Model.Att10)?@Model.Att10.Split(':')[0]:"")">
+                            <input type="hidden" name="Att10" />
+                        </div>
+                    </div>
+                    <div class="col-sm-8 m-b-5">
+                        <div class="form-group fg-line">
+                            <input type="text" class="form-control" id="Att10" value="@(!String.IsNullOrEmpty(Model.Att10)?@Model.Att10.Split(':')[1]:"")">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!--./10 Thuoc tinh-->
+    </div>
+</div>
+
+
+
+<script>
+    function delImgBanner() {
+        $("#BannerUrl").val("");
+        $("#avatar-preview-banner").html("");
+        $("#BannerURLFinal").val("");
+    }
+    function delImg() {
+        $("#PicURL").val("");
+        $("#avatar-preview").html("");
+        $("#PicURLFinal").val("");
+    }
+    $(document).ready(function () {
+        $("#btnUploadImage").on('click', function () {
+            $('#uploadImage').click();
+        });
+
+        $("#btnUploadImageBanner").on('click', function () {
+            $('#uploadImageBanner').click();
+        });
+
+        $("#parentCateId").on('change', function () {
+            if ($('#parentCateId').val().length != 0) {
+                $.ajax({
+                type: 'POST',
+                url: '@Url.Action("LoadParentCategoryAttribute", "ProductCategory")',
+                data: { "Id": $('#parentCateId').val() },
+                success: function (result) {
+                    if (result.success) {
+                        for (var i = 1; i <= 10; i++) {
+                            $("#nameAtt" + i).val('');
+                            $("#Att" + i).val('');
+                        }
+                        for (var i = 0; i < result.result.length; i++) {
+                            if (result.result[i] != null && result.result[i] != "") {
+                                $("#nameAtt" + (i + 1)).val(result.result[i].split(':')[0]);
+                                $("#Att" + (i + 1)).val(result.result[i].split(':')[1]);
+                            }
+                        }
+                    } else {
+                        ShowMessage("Có lỗi xảy ra!", 1);
+                    }
+                },
+                error: function () {
+                    ShowMessage("Có lỗi xảy ra!", 1);
+                }
+            });
+            } else {
+
+            }
+
+        });
+
+        $("#uploadImage").on('change', function () {
+
+            var file, img;
+            if ((file = this.files[0])) {
+                img = new Image();
+                img.onload = function () {
+                    sendFile(file);
+                };
+                img.onerror = function () {
+                    ShowMessage("Not a valid file:" + file.type, 1);
+                };
+                var _URL = window.URL || window.webkitURL;
+                img.src = _URL.createObjectURL(file);
+            }
+        });
+
+        $("#uploadImageBanner").on('change', function () {
+
+                var file, img;
+                if ((file = this.files[0])) {
+                    img = new Image();
+                    img.onload = function () {
+                        sendFileBanner(file);
+                    };
+                    img.onerror = function () {
+                        ShowMessage("Not a valid file:" + file.type, 1);
+                    };
+                    var _URL = window.URL || window.webkitURL;
+                    img.src = _URL.createObjectURL(file);
+                }
+            });
+
+            function sendFileBanner(file) {
+                var formData = new FormData();
+                formData.append('file', $('#uploadImageBanner')[0].files[0]);
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UploadImage", "File")',
+                    data: formData,
+                    success: function (result) {
+                        if (result.success) {
+                            var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                                '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                                '<div class="ratio-item"><div class="img-container"><img src="' + result.imageUrl + '"/></div>' +
+                            '<input type="hidden" name="SelectedImagesBanner" value="' + result.imageUrl + '"/>'
+                            + '<span class="btn-remove" onclick="delImgBanner()"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                            '</div></div></li>';
+                            $("#avatar-preview-banner").html(htmlInnerData);
+                            $("#BannerURLFinal").val(result.imageUrl);
+                            $("#BannerUrl").val(result.imageUrl);
+                        }
+                    },
+                    processData: false,
+                    contentType: false,
+                    error: function () {
+                        ShowMessage("Có lỗi xảy ra!", 1);
+                    }
+                });
+            };
+
+
+            function sendFile(file) {
+                var formData = new FormData();
+                formData.append('file', $('#uploadImage')[0].files[0]);
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UploadImage", "File")',
+                    data: formData,
+                    success: function (result) {
+                        if (result.success) {
+                            var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                                '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                                '<div class="ratio-item"><div class="img-container"><img src="' + result.imageUrl + '"/></div>' +
+                            '<input type="hidden" name="SelectedImages" value="' + result.imageUrl + '"/>'
+                            + '<span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                            '</div></div></li>';
+                            $("#avatar-preview").html(htmlInnerData);
+                            $("#PicURL").val(result.imageUrl);
+                            $("#PicURLFinal").val(result.imageUrl);
+                        }
+                    },
+                    processData: false,
+                    contentType: false,
+                    error: function () {
+                        ShowMessage("Có lỗi xảy ra!", 1);
+                    }
+                });
+            };
+
+
+            $('.selectpicker').selectpicker({
+                size: 10,
+            });
+
+            if ($("#Position").val() == "") {
+                $("#Position").val(1000);
+            }
+
+            /*la san pham con*/
+            if ($('[name="result"]').prop("checked")) {
+                $('#checkboxHidden').val(true);
+            } else {
+                $('#checkboxHidden').val(false);
+            }
+            $('[name="result"]').change(function () {
+                if ($('[name="result"]').is(":checked")) {
+                    $('#checkboxHidden').val(true);
+                } else {
+                    $('#checkboxHidden').val(false);
+                }
+            });
+            /*kich hoat*/
+
+            if ($('[name="myDisplay"]').prop("checked")) {
+                $('#checkboxHiddenActive').val(true);
+            } else {
+                $('#checkboxHiddenActive').val(false);
+            }
+            $('[name="myDisplay"]').change(function () {
+                if ($('[name="myDisplay"]').is(":checked")) {
+                    $('#checkboxHiddenActive').val(true);
+                } else {
+                    $('#checkboxHiddenActive').val(false);
+                }
+            });
+            /*Hien thi*/
+
+            if ($('[name="display"]').prop("checked")) {
+                $('#checkboxHiddenIsDisplay').val(true);
+            } else {
+                $('#checkboxHiddenIsDisplay').val(false);
+            }
+            $('[name="display"]').change(function () {
+                if ($('[name="display"]').is(":checked")) {
+                    $('#checkboxHiddenIsDisplay').val(true);
+                } else {
+                    $('#checkboxHiddenIsDisplay').val(false);
+                }
+            });
+            
+        //Hien thi tren website
+            if ($('[name="display"]').prop("checked")) {
+                $('#checkboxHiddenIsDisplayWebsite').val(true);
+            } else {
+                $('#checkboxHiddenIsDisplayWebsite').val(false);
+            }
+            $('[name="displayWebsite"]').change(function () {
+                if ($('[name="displayWebsite"]').is(":checked")) {
+                    $('#checkboxHiddenIsDisplayWebsite').val(true);
+                } else {
+                    $('#checkboxHiddenIsDisplayWebsite').val(false);
+                }
+            });
+
+
+    });
+
+</script>

@@ -1,0 +1,324 @@
+﻿@{
+    ViewBag.Title = "Index";
+    var stores = (IEnumerable<SelectListItem>)ViewBag.Stores;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .vertical-align {
+        vertical-align: middle;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Kiểm tra báo cáo theo ngày</h3>
+                <small data-role="small-date"></small>
+            </div>
+
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-padding">        
+        <div class="row">                     
+            <div class="col-md-5 pull-left">
+                <div class="col-md-2 pull-left p-l-0">
+                    <h5>Cửa hàng</h5>
+                </div>  
+                <div class="col-md-7 pull-left">
+                    @Html.DropDownList("stores", stores, new { @class = "selectpicker" })
+                </div>
+            </div>
+            <div class="col-md-4 pull-right">
+                <div class="input-group">
+                    <div class="input-group date" id="datetimepicker" style="float: right; width: 230px">
+                        <input id="date-string" type="text" class="input-group-addon form-control myInputCelender" style="padding-left: 0px !important;height: 37px; margin-top: -1px;" />
+                        <span class="input-group-addon myCerlenderSpan">
+                            <span class="fa fa-calendar"></span>
+                        </span>
+                    </div>
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>     Tìm
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 pull-right">
+                <div class="input-group">
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm pull-right" id="btnReRun">
+                            <i class="left-icon fa fa-play"></i> Chạy Lại Báo Cáo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="allcust">
+                    <!-- Datatable -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table id="reDateReport" class="table table-responsive table-striped table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <label class="">Cửa hàng</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Ngày</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Số hóa đơn</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Số hóa đơn thực tế</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Doanh thu</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Doanh thu thực tế</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Thanh toán</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Thanh toán thực tế</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Trạng thái</label>
+                                                </th>
+                                                @*<th>
+                                                    <label class="">Tùy chọn</label>
+                                                </th>*@
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<script>
+    var sDate;
+    var eDate;
+    var incorrectReports = [];
+
+    $(document).ready(function () {
+        sDate = moment().add(-1, 'days').format("DD/MM/YYYY");
+        eDate = moment().add(-1, 'days').format("DD/MM/YYYY");
+        var initData = [];
+        initialDatatable(initData);
+
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = startTime + (startTime == endTime ? "" : " - " + endTime + " ");
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+
+            sDate = startTime;
+            eDate = endTime;
+            
+        };
+
+        cb(moment().add(-1, 'days'), moment().add(-1, 'days'), "Hôm qua");
+
+        $('#datetimepicker').daterangepicker({
+            "maxDate": moment().add(-1, 'days'),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+    });
+
+
+    function loadReportDt() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ViewReport", "ReRunDateReport")',
+            data: {
+                "sDate": sDate,
+                "eDate": eDate,
+                "storeId": $('#stores').val()
+            },
+            dataType: "json",
+            success: function (result) {
+                if (result.success == true) {
+                    $.each(result.listReport, function (key, value) {
+                        if (value["Status"] == false) {
+                            incorrectReports.push(value["Id"]);
+                        }
+                    });
+                    initialDatatable(result.listReport);
+                } else {
+                    ShowAlert("Có lỗi xảy ra", 1, null);
+                }
+            },
+            error: function () {
+                ShowAlert("Có lỗi trong quá trình xử lý", 1, null);
+            }
+
+        });
+    }
+
+    function reloadData() {
+        var dateString = "(" + sDate + (sDate == eDate) ? "" : (" - " + eDate) + ")";
+        $('[data-role=small-date]').html(dateString);
+        incorrectReports = [];
+        loadReportDt();
+    }
+
+    $('#btnSearch').click(function () {
+        reloadData();     
+    });
+
+    function initialDatatable(data) {
+        $('#reDateReport').dataTable().fnDestroy();
+        $('#reDateReport').dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bProcessing": true,
+            "bScrollCollapse": true,
+            "bLengthChange": true,
+            "aaData": data,
+            //"iDisplayLength": 50,
+            //"aLengthMenu": [50, 150],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "columns": [
+                { "data": "StoreName" },
+                { "data": "Date" },
+                { "data": "TotalOrders" },
+                { "data": "RealTotalOrders" },
+                { "data": "Revenue" },
+                { "data": "RealRevenue" },
+                { "data": "TotalPayments" },
+                { "data": "RealTotalPayments" },
+                {
+                    "data": function (data) {
+                        var correct = '<span class="label label-success">Chuẩn</span>';
+                        var incorrect = '<span class="label label-warning">Cần chỉnh</span>';
+                        return data.Status ? correct : incorrect;
+                    }
+                },
+                //{
+                //    "data": function (data) {
+                //        if (data.Status)
+                //            return "---";
+                //        else {
+                //            var result = '';
+                //            result = '<div><a class="btn bt-sm btn-primary"'
+                //                + ' id = "report-' + data.Id + '"'
+                //                + ' onclick = "updateReport(' + data.Id + ', ' + data.StoreId + ', \'' + data.Date + '\')"'
+                //                + ' > Update </a></div>';
+                //            return result;
+                //        }
+                //    }
+                //}
+            ],
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "sClass": "text-center vertical-align"
+                },
+            ],
+            //"bAutoWidth": true,
+            //"order": [[1, 'asc']],
+        });
+        if ($('#stores').val() == 0) {
+            $('#reDateReport').dataTable().fnSetColumnVis(0, true);
+        } else {
+            $('#reDateReport').dataTable().fnSetColumnVis(0, false);
+        }
+    }
+
+    function updateReport(reportId, storeId, date) {
+
+        $.ajax({
+            //disable buttons
+            type: "POST",
+            url: '@Url.Action("ReCreateReport", "ReRunDateReport")',
+            data: {
+                "date": date,
+                "reportId": reportId,
+                "storeId": storeId
+            },
+            dataType: "json",
+            success: function (result) {
+                if (result.success == true) {
+                    ShowAlert("Chạy report thành công", 2, null);
+                    reloadData();
+                } else {
+                    ShowAlert("có lỗi xảy ra", 1, null);
+                }
+            }
+        });
+    };
+
+    $('#btnReRun').click(function () {
+        //Initital DataTable
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ReRunReport")',
+            data: {
+                'incorrectReports': incorrectReports
+            },
+            success: function (data) {
+                if (data.success == true) {
+                    swal("Thành công!", "Chạy report thành công", "success");
+                    reloadData();
+                } else {
+                    ShowAlert("Có lỗi xảy ra", 1, null);
+                }
+            },
+            error: function () {
+                ShowAlert("Có lỗi trong quá trình xử lý", 1, null);
+            }
+        });
+    });
+
+
+</script>

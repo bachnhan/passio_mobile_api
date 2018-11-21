@@ -1,0 +1,492 @@
+﻿@using HmsService.Models
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .tableDiv-responsive {
+        overflow-x: scroll !important;
+    }
+     .table > tbody > tr:last-child > td, .table > tfoot > tr:last-child > td {
+        padding-bottom: 0px!important;
+        padding-top: 0px!important;
+    }
+
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+
+    .relativeColl label {
+        position: relative;
+    }
+
+    .fixedClassNo {
+        position: absolute;
+        width: 46px;
+        height: 45px !important;
+        display:flex;
+        align-items: center;
+        background-color:white;
+        left: 0px;
+        padding-top:0px !important;
+        padding-bottom:0px !important;
+        z-index: 100;
+    }
+
+    thead > tr > th.fixedClassNo {
+        height: 35px !important;
+    }
+
+    thead > tr > th.fixedClassName {
+         height: 35px !important;
+    }
+    thead > tr > th.fixedClassName1 {
+        height: 35px !important;
+    }
+
+    .fixedClassName {
+        position: absolute;
+        width: 120px;
+        height: 45px !important;
+        display:flex;
+        align-items: center;
+        background-color:white;
+        left: 64px;
+        padding-top:0px !important;
+        padding-bottom:0px !important;
+        z-index: 100;
+    }
+    .fixedClassName1 {
+        position: absolute;
+        width: 240px;
+        height: 45px !important;
+        display: flex;
+        align-items: center;
+        background-color: white;
+        left: 199px;
+        padding-top: 0px !important;
+        padding-bottom: 0px !important;
+        z-index: 100;
+    }
+
+    #shift-table tr td {
+        height: 47px;
+    }
+
+    .table-wrapper {
+        position: relative;
+    }
+
+    body {
+        position: relative !important;
+    }
+
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+
+    .funkyradio div {
+        /*margin: 0 50px;*/
+        overflow: hidden;
+    }
+
+    .funkyradio label {
+        /*min-width: 400px;*/
+        width: 100%;
+        border-radius: 3px;
+        border: 1px solid #D1D3D4;
+        font-weight: normal;
+    }
+
+    .funkyradio input[type="radio"]:empty, .funkyradio input[type="checkbox"]:empty {
+        display: none;
+    }
+
+        .funkyradio input[type="radio"]:empty ~ label, .funkyradio input[type="checkbox"]:empty ~ label {
+            position: relative;
+            line-height: 2.5em;
+            text-indent: 3.25em;
+            margin-top: 0em;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+            .funkyradio input[type="radio"]:empty ~ label:before, .funkyradio input[type="checkbox"]:empty ~ label:before {
+                position: absolute;
+                display: block;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                content: '';
+                width: 2.5em;
+                background: #D1D3D4;
+                border-radius: 3px 0 0 3px;
+            }
+
+    .funkyradio input[type="radio"]:hover:not(:checked) ~ label:before, .funkyradio input[type="checkbox"]:hover:not(:checked) ~ label:before {
+        content: '\2714';
+        text-indent: .9em;
+        color: #C2C2C2;
+    }
+
+    .funkyradio input[type="radio"]:hover:not(:checked) ~ label, .funkyradio input[type="checkbox"]:hover:not(:checked) ~ label {
+        color: #888;
+    }
+
+    .funkyradio input[type="radio"]:checked ~ label:before, .funkyradio input[type="checkbox"]:checked ~ label:before {
+        content: '\2714';
+        text-indent: .9em;
+        color: #333;
+        background-color: #ccc;
+    }
+
+    .funkyradio input[type="radio"]:checked ~ label, .funkyradio input[type="checkbox"]:checked ~ label {
+        color: #777;
+    }
+
+    .funkyradio input[type="radio"]:focus ~ label:before, .funkyradio input[type="checkbox"]:focus ~ label:before {
+        box-shadow: 0 0 0 3px #999;
+    }
+
+    .funkyradio-default input[type="radio"]:checked ~ label:before, .funkyradio-default input[type="checkbox"]:checked ~ label:before {
+        color: #333;
+        background-color: #ccc;
+    }
+
+    .funkyradio-primary input[type="radio"]:checked ~ label:before, .funkyradio-primary input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #337ab7;
+    }
+
+    .funkyradio-success input[type="radio"]:checked ~ label:before, .funkyradio-success input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5cb85c;
+    }
+
+    .funkyradio-danger input[type="radio"]:checked ~ label:before, .funkyradio-danger input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #d9534f;
+    }
+
+    .funkyradio-warning input[type="radio"]:checked ~ label:before, .funkyradio-warning input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #f0ad4e;
+    }
+
+    .funkyradio-info input[type="radio"]:checked ~ label:before, .funkyradio-info input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5bc0de;
+    }
+</style>
+
+<input type="hidden" id="EmpId" />
+<div class="card">
+    <div class="card-header">
+        <div class="box-header p-b-0">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3>Báo cáo chấm công</h3>
+                </div>
+
+            </div>
+
+        </div>
+        <!-- Search end-->
+        <div class="row">
+            <div class="col-md-8 pull-right text-right p-0">
+                <div class="col-md-6 pull-right p-0">
+                    <div class="input-group" style="margin-left: -15px;padding-right:20px">
+                        <!-- Daterange picker -->
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div class="height-fix">
+                                    <div id="reportrange">
+                                        <input id="date-string" readonly class="form-control text-center">
+                                        <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                    </div>
+
+                                    <input type="hidden" id="startTime" />
+                                    <input type="hidden" id="endTime" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group-btn FindButtonDateTime">
+                            <a class="btn btn-primary FindDateTime" id="btnSearch2" style="height: 39px;">
+                                <i class="left-icon fa fa-search"></i> Tìm
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 p-r-0 p-t-5">
+                    @*<button type="submit" id="exportOneStore" class="width230 btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>*@
+                    <button id="exportOneShift2" class="width230 btn btn-primary btn-sm" onclick="exportExcellFileExist()">
+                        <i class="fa fa-download"></i>
+                        Xuất File Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="card-padding p-0">
+            <div class="row">
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="allcust">
+                        <!-- Datatable -->
+                        <div class="col-md-12 table-wrapper" id="datatable_initial">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<form class="hidden" id="ExportTimeKeepingExcel" action="@Url.Action("ExportToExcel2")">
+    <input id="startDate" name="startDate">
+    <input id="endDate" name="endDate">
+</form>
+
+@section scripts {
+    <script>
+
+        $(document).ready(function () {
+            var jQuery = function (selector, context) {
+                // The jQuery object is actually just the init constructor 'enhanced'
+                return new jQuery.fn.init(selector, context);
+            }
+            setupDaterangepicker();
+        });
+
+        $(document).on('click',
+            '#exportOneStore',
+            function () {
+                $('#startDate').val($("#startTime").val());
+                $('#endDate').val($("#endTime").val());
+                $('#ExportTimeKeepingExcel').submit();
+            });
+        // chon lọc
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+            $("#date-string").val(dateString);
+            $("#startTime").val(startTime);
+            $("#endTime").val(endTime);
+        }
+
+        function setupDaterangepicker() {
+            cb(moment().startOf('month'), moment().endOf('month'));
+            $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') +
+                ' - ' +
+                moment().add(0, 'days').format('MMM D, YYYY'),
+                "Tháng này");
+            $('#reportrange').daterangepicker({
+                "opens": "left",
+                "minViewMode": "months",
+                "maxDate": moment(),
+                locale: {
+                    format: 'MM/YYYY'
+                },
+                ranges: {
+                    'Hôm nay': [moment(), moment()],
+                    'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                    'Tuần trước': [
+                        moment().subtract(1, 'week').startOf('isoweek'),
+                        moment().subtract(1, 'week').endOf('isoweek')
+                    ],
+                    'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                    'Tháng trước': [
+                        moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')
+                    ]
+                }
+            },
+                cb);
+            getdataDatatale();
+        }
+
+        // Chọn tháng
+
+        $('#btnSearch2').on('click', function () {
+            getdataDatatale();
+        });
+
+        //function loadChooseMonth() {
+        //    $("#datepicker").datepicker({
+        //        format: "mm/yyyy",
+        //        startView: "months",
+        //        minViewMode: "months",
+        //        endDate: new Date(),
+        //        onClose: function (dateText, inst) {
+        //            var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+        //            $(this).datepicker('setDate', new Date(year, 1));
+        //        }
+        //    });
+
+        //    var now = new Date();
+        //    var month = (now.getMonth() + 1);
+        //    if (month < 10)
+        //        month = "0" + month;
+        //    var today = month + '/' + now.getFullYear();
+        //    $('#datepicker').val(today);
+        //    getdataDatatale();
+        //}
+
+        function getdataDatatale() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetTimekeeping", "TimeKeepingReport")',
+                data: {
+                    startDate:  $("#startTime").val(),
+                    endDate:    $("#endTime").val(),
+                },
+                success: function (result) {
+                    window.storeList = result.storelist;
+                    window.sttEmp = undefined;
+                    initItemTypeDatatable(result.result, result.stringdate);
+                }
+            });
+        }
+
+
+        function initItemTypeDatatable(data, stringdate) {
+            var firstHtmlDatatable =
+                '<table id="shift-table" class="table table-condensed table-striped table-bordered table-hover">' +
+                    '<thead>' +
+                    '<tr>' +
+                    '<th>' +
+                    '<label class="">STT</label>' +
+                    '</th>' +
+                    '<th>' +
+                    '<label class="">Mã chấm công</label>' +
+                    '</th>' +
+                    '<th>' +
+                    '<label class="">Tên nhân viên</label>' +
+                    '</th>';
+            var lastHtmlDatatable = '</tr>' + '</thead>' + '<tbody></tbody>' + '</table';
+            var bodyHtml = "";
+            for (var i = 0; i < stringdate.length; i++) {
+                bodyHtml += '<th>' + '<label class="">' + stringdate[i] + '</label>' + '</th>';
+            }
+            bodyHtml += '<th>' + '<label class="">Tổng giờ</label>' + '</th>';
+            bodyHtml += '<th>' + '<label class="">Tùy chỉnh</label>' + '</th>';
+            $('#datatable_initial').html(firstHtmlDatatable + bodyHtml + lastHtmlDatatable);
+
+            var oTable = $("#shift-table").dataTable({
+                "bFilter": false,
+                "bSort": false,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                'data': data,
+                "bProcessing": true,
+                "createdRow": function (row, data, dataIndex) {
+                    var allTd = row.getElementsByTagName('td');
+                    for (var i = 0; i < data.length - 1; i++) {
+                        if (data[i] != null) {
+                            var timeSplit = data[i].split(':');
+                            if (timeSplit.length !== 2) continue;
+                            if (Number(timeSplit[0]) == 8 && Number(timeSplit[1]) > 30 || Number(timeSplit[0]) > 8) {
+                                allTd[i].style.backgroundColor = 'yellow';
+                            }
+                        }
+                        allTd[data.length - 2].style.backgroundColor = 'white';
+                    }
+                },
+                "bPaginate": true,
+                "bAutoWidth": true,
+                "iDisplayLength": 50,
+                "aLengthMenu": [10, 50, 100],
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                    "sSearchPlaceholder": "Tên nhân viên"
+                },
+
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0],
+                        "sWidth": "47px",
+                        "sClass": "fixedClassNo",
+                        "mRender": function (data, type, row) {
+                            return Number(data) + 1;
+                        }
+                    },
+                    {
+                        "aTargets": [1],  
+                        "sWidth": "123px",
+                        "sClass": "fixedClassName",
+                        "mRender": function (data, type, row) {
+                            return data;
+                        }
+                    },
+                    {
+                        "aTargets": [2],
+                        "sWidth": "243px",
+                        "sClass": "fixedClassName1",
+                        "mRender": function (data, type, row) {
+                            window.sttEmp = (window.sttEmp != undefined) ? ++(window.sttEmp) : 0;
+                            if (window.storeList[window.sttEmp] != "") {
+                                data += `<b style="margin-left : 5px;"> (${window.storeList[window.sttEmp]})</b>`;
+                            }
+                            return data;
+                        }
+                    }
+                ],
+                "order": [[0, "desc"]]
+            }).fnSetFilteringDelay(delaySearch);
+            $('table').wrap('<div class="tableDiv-responsive" />');;
+        }
+
+        //-------------------Datatable------------------
+        //redraw datatable without reload
+        function reDrawDatatable(id) {
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+        }
+
+        //user datatable
+        function RefreshTable(datatableId) {
+            reDrawDatatable(datatableId);
+        }
+
+        function exportExcellFileExist() {
+            window.location.replace("@Url.Action("ExportToExcel4", "TimeKeepingReport")" + "?startDate=" + $("#startTime").val() + "&endDate=" + $("#endTime").val());
+        }
+
+        function exportOneEmployee(empId) {
+            window.location.replace("@Url.Action("ExportSingleToExcel", "TimeKeepingReport")" + "?startDate=" + $("#startTime").val() + "&endDate=" + $("#endTime").val() + "&empId=" + empId);
+        }
+    </script>
+}
+

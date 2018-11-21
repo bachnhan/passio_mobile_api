@@ -1,0 +1,58 @@
+﻿@model IEnumerable<HmsService.ViewModels.ProductItemCategoryViewModel>
+
+<h4>Danh sách thành phần</h4>
+
+<input type="hidden" value="@ViewBag.ProductId" id="productid" />
+<div class="col-md-5" style="padding-left: 0px;">
+    <div class="form-group">
+        <select class="selectpicker" id="categories" onchange="changeCategory()">
+            <option value="0" selected>Tất cả</option>
+            @foreach (var item in Model)
+            {
+                <option value="@item.CateID">@item.CateName</option>
+            }
+        </select>
+    </div>
+</div>
+<div class="col-md-3" style="padding:0px;"><label style="float:right; padding-top:8px;">Tìm kiếm:</label></div>
+<div class="col-md-4">
+    <div class="form-group" style="display: inline;">
+        
+        <input class="form-control" type="text" id="searchProduct"
+               placeholder="Tên sản phẩm" style="padding:0px 5px;" />
+    </div>
+</div>
+<div class="col-md-12 slim-scroll" id="productItemList" data-height="400" style="padding-left:0px;"></div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker({
+            size: 10,
+        });
+        changeCategory();
+
+        var timer;
+        var delayTime = 500;
+        //$('#searchProduct').keyup(function () {
+        //    timer = setTimeout(changeCategory(), delayTime);
+        //});
+        $('#searchProduct').keyup(function () {
+            clearTimeout(timer);
+            timer = setTimeout(changeCategory, delayTime);
+        });
+    });
+    function changeCategory() {
+        $.ajax({
+            url: "@Url.Action("ListProductByCategory", "Products")",
+            data: {
+                productId: $("#productid").val(),
+                cateId: $("#categories").val(),
+                searchName: $('#searchProduct').val()
+            },
+            success: function (result) {
+                $("#productItemList").html(result);
+            }
+        });
+    }
+</script>

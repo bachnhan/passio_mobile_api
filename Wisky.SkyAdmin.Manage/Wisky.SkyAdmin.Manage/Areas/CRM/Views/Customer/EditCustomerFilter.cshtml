@@ -1,0 +1,548 @@
+﻿@model CustomerFilterEditViewModel
+@{
+    ViewBag.Title = "EditCustomerFilter";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    int BirthdayOptionMonth = (int)BirthdayOptionFilterEnum.BirthdayMonth;
+    int BirthdayOptionRange = (int)BirthdayOptionFilterEnum.BirthdayRange;
+    int BirthdayThisMonth = (int)BirthdayOptionFilterEnum.ThisMonth;
+}
+<div class="card" style="height:580px">
+    <form id="EditCustomerFilterForm" method="post">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-7">
+                    <h3>Chỉnh sửa tập khách hàng</h3>
+                </div>
+                @*<div class="col-md-4 text-right">
+                        <ul class="actions">
+                            <li>
+                                <a href="@this.Url.Action("CustomerFilter")" class="btn btn-success myComeback">Quay về</a>
+                            </li>
+                            <li>
+                                <button @*onclick="submitForm()" type="submit" class="btn btn-primary" id="btn-submit-product">Cập nhật</button>
+                                <button type="submit" class="btn btn-primary" style="display: none"></button>
+                            </li>
+                        </ul>
+                    </div>*@
+                <div class="col-md-5">
+                    <div class="pull-right">
+                        <a id="btn-comeback" href="@this.Url.Action("CustomerFilter")">
+                            <div id="create-advertising" type="button" class="btn btn-success">Quay về</div>
+                        </a>
+                        <button id="btn-submit" type="submit" class="btn btn-primary">Cập nhật</button>
+                    </div>
+                </div>
+            </div>
+            <hr />
+        </div>
+        <div class="row eh-wrapper">
+            <div class="col-md-5 p-l-45">
+                <div class="card eh-item" style="margin-bottom:initial">
+                    <div class="card-header">
+                        <div class="">
+                            <h4 class="c-black f-500 m-b-5"><strong>Thông tin cơ bản</strong></h4>
+                        </div>
+                    </div>
+                    <div class="group-info">
+                        <div class="p-7">
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-3 text-right">
+                                        <label class="control-label" for="Name">Tên tập<span style="color:red">*</span></label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="fg-line">
+                                            @Html.TextBoxFor(a => a.Name, new { @class = "form-control", @required = "required", maxlength = "30" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="row">
+                                    <div class="col-md-3 text-right">
+                                        <label class="control-label" for="Description">Mô tả</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="fg-line">
+                                            @Html.TextAreaFor(a => a.Description, new { @class = "form-control", @rows = "5" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-md-7  p-r-45 eh-item">
+                <div class="card eh-item" style="margin-bottom:initial; height:400px">
+                    <div class="card-header">
+                        <div class="">
+                            <h4 class="c-black f-500 m-b-5"><strong>Chi tiết bộ lọc</strong></h4>
+                        </div>
+                    </div>
+                    <div class="row group-info">
+                        <div class="p-7">
+                            <div class="row small-margin m-b-30">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-7 col-sm-offset-1">
+                                        <label for="IsEnableAge" class="ts-label">Tuổi</label>
+                                    </div>
+                                    <div class="toggle-switch col-sm-3" data-ts-color="green">
+                                        <input id="IsEnableAge" name="IsEnableAge" type="checkbox" value="true" hidden="hidden" />
+                                        <label for="IsEnableAge" class="ts-helper"></label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div id="age-noti-field">
+                                        <div class="col-md-5" style="text-align: left;">
+                                            Theo mọi độ tuổi
+                                        </div>
+                                    </div>
+                                    <div id="age-field" style="display:none">
+
+                                        <div class="col-md-3">
+                                            @Html.TextBoxFor(a => a.AgeFrom, new { @type = "number", @class = "form-control", @placeholder = "Từ" })
+                                        </div>
+                                        <div class="col-md-3">
+                                            @Html.TextBoxFor(a => a.AgeTo, new { @type = "number", @class = "form-control", @placeholder = "Đến" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row small-margin m-b-30">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-7 col-sm-offset-1">
+                                        <label for="IsEnableGender" class="ts-label">Giới tính</label>
+                                    </div>
+                                    <div class="toggle-switch col-sm-3" data-ts-color="green">
+                                        <input id="IsEnableGender" name="IsEnableGender" type="checkbox" value="true" hidden="hidden" />
+                                        <label for="IsEnableGender" class="ts-helper"></label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div id="gender-noti-field">
+                                        <div class="col-md-5" style="text-align: left;">
+                                            Theo mọi giới tính
+                                        </div>
+                                    </div>
+                                    <div id="gender-field" style="display:none">
+                                        <div class="col-sm-4">
+                                            @Html.DropDownList("Gender", new SelectList(Model.AvailableGender, "Value", "Text"), new { @class = "selectpicker" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row small-margin m-b-30">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-7 col-sm-offset-1">
+                                        <label for="IsEnableBirthday" class="ts-label">Ngày sinh</label>
+                                    </div>
+                                    <div class="toggle-switch col-sm-3" data-ts-color="green">
+                                        <input id="IsEnableBirthday" name="IsEnableBirthday" type="checkbox" value="true" hidden="hidden" />
+                                        <label for="IsEnableBirthday" class="ts-helper"></label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div id="birthday-noti-field">
+                                        <div class="col-md-6" style="text-align: left;">
+                                            Theo mọi ngày sinh
+                                        </div>
+                                    </div>
+                                    <div id="birthday-field" style="display:none">
+
+                                        @{
+                                            string birthdayShow;
+                                            if (Model.IsEnableBirthday == true)
+                                            {
+                                                if (this.Model.BirthdayMonth != null)
+                                                {
+                                                    birthdayShow = "Tháng " + this.Model.BirthdayMonth;
+                                                }
+                                                else
+                                                {
+                                                    birthdayShow = String.Format("{0:dd/MM}", this.Model.BirthdayFrom) + " - " + String.Format("{0:dd/MM}", this.Model.BirthdayTo);
+                                                }
+
+
+
+                                                <div style="text-align: left; padding: 0px 15px;">
+                                                    Sinh nhật hiện tại: <strong>@birthdayShow</strong>. Bạn có thể dùng một tùy chọn khác để cập nhật.
+                                                </div>
+                                            }
+                                        }
+                                        <div class="group-info">
+
+                                            <div class="col-md-6">
+                                                @Html.DropDownList("BirthdayOption", new SelectList(Model.AvailableBirthdayOptions, "Value", "Text"), new { @class = "selectpicker" })
+                                            </div>
+                                            <div id="range-month-field" style="display:none">
+                                                <div class="col-md-6 dateTime">
+                                                    <div class="fg-line m-t-5">
+                                                        <div id="reportrange" class="btn-datetime form-control">
+                                                            <i class="fa fa-calendar"></i>
+                                                            <span></span> <b class="caret"></b>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="month-field" style="display:none">
+                                                <div class="col-md-3">
+                                                    <div class="fg-line">
+                                                        @Html.TextBoxFor(q => q.BirthdayMonth, new { @type = "number", @class = "form-control", @placeholder = "Eg: 1 - 12" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row small-margin m-b-30">
+                                <div class="col-sm-4">
+                                    <div class="col-sm-7 col-sm-offset-1">
+                                        <label for="IsEnableVisitedTimes" class="ts-label">Số lần đến</label>
+                                    </div>
+                                    <div id="visit-switch" class="toggle-switch col-sm-3" data-ts-color="green">
+                                        <input id="IsEnableVisitedTimes" name="IsEnableVisitedTimes" type="checkbox" value="true" hidden="hidden" />
+                                        <label for="IsEnableVisitedTimes" class="ts-helper"></label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div id="visit-noti-field">
+                                        <div class="col-md-5" style="text-align: left;">
+                                            Theo mọi số lần đến cửa hàng
+                                        </div>
+                                    </div>
+                                    <div id="visit-field" style="display:none">
+                                        <div class="col-md-3">
+                                            @Html.TextBoxFor(a => a.VisitedTimesFrom, new { @type = "number", @class = "form-control", @placeholder = "Từ" })
+                                        </div>
+                                        <div class="col-md-3">
+                                            @Html.TextBoxFor(a => a.VisitedTimesTo, new { @type = "number", @class = "form-control", @placeholder = "Đến" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @Html.HiddenFor(q => q.BirthdayFrom, new { id = "BirthdayFrom" })
+        @Html.HiddenFor(q => q.BirthdayTo, new { id = "BirthdayTo" })
+        @*<input id="BirthdayFrom" hidden="hidden" name="BirthdayFrom" />
+            <input id="BirthdayTo" hidden="hidden" name="BirthdayTo" />*@
+    </form>
+</div>
+<style>
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+
+        setupDaterangepickerForThisMonth();
+
+        $('#IsEnableAge').change(function () {
+            $('#age-noti-field').slideToggle();
+            $('#age-field').slideToggle();
+            if ($(this).prop('checked')) {
+                $('#AgeFrom').attr("required", "required");
+                $('#AgeTo').attr("required", "required");
+            } else {
+                $('#AgeFrom').removeAttr("required", "required");
+                $('#AgeTo').removeAttr("required", "required");
+            }
+        });
+        $('#IsEnableGender').change(function () {
+            $('#gender-noti-field').slideToggle();
+            $('#gender-field').slideToggle();
+        });
+        $('#IsEnableBirthday').change(function () {
+            $('#birthday-noti-field').slideToggle();
+            $('#birthday-field').slideToggle();
+
+            if ($(this).prop('checked')) {
+                $('#BirthdayOption').change(function () {
+
+                    switch ($('#BirthdayOption').val()) {
+                        case 1:
+                            $('#BirthdayMonth').attr("required", "");
+                            $('#BirthdayFrom').val("");
+                            $('#BirthdayTo').val("");
+                            $('#BirthdayFrom').removeAttr("required", "");
+                            $('#BirthdayTo').removeAttr("required", "");
+                            break;
+                        case 2:
+                            $('#BirthdayMonth').removeAttr("required", "");
+                            $('#BirthdayMonth').val("");
+                            $('#BirthdayFrom').attr("required", "");
+                            $('#BirthdayTo').attr("required", "");
+                    }
+                });
+            }
+        });
+        $('#IsEnableVisitedTimes').change(function () {
+            $('#visit-noti-field').slideToggle();
+            $('#visit-field').slideToggle();
+            if ($(this).prop('checked')) {
+                $('#VisitedTimesFrom').attr("required", "required");
+                $('#VisitedTimesTo').attr("required", "required");
+            } else {
+                $('#VisitedTimesFrom').removeAttr("required", "required");
+                $('#VisitedTimesTo').removeAttr("required", "required");
+                $('#VisitedTimesFrom').val("");
+                $('#VisitedTimesTo').val("");
+            }
+        });
+
+        @if(this.Model.IsEnableAge.HasValue && this.Model.IsEnableAge.Value == true)
+                    {
+                        <text>
+        $('#IsEnableAge').prop("checked", true);
+        $('#age-field').slideDown();
+        $('#age-noti-field').slideUp();
+
+        </text>
+                    }
+
+        @if(this.Model.IsEnableGender.HasValue && this.Model.IsEnableGender.Value == true)
+                    {
+                        <text>
+        $('#IsEnableGender').prop("checked", true);
+        $('#gender-field').slideDown();
+        $('#gender-noti-field').slideUp();
+
+        </text>
+                    }
+
+        @if(this.Model.IsEnableBirthday.HasValue && this.Model.IsEnableBirthday.Value == true)
+                    {
+                        <text>
+        $('#IsEnableBirthday').prop("checked", true);
+        $('#birthday-field').slideDown();
+        $('#birthday-noti-field').slideUp();
+
+        </text>
+                    }
+
+        @if(this.Model.IsEnableVisitedTimes.HasValue && this.Model.IsEnableVisitedTimes.Value == true)
+                    {
+                        <text>
+        $('#IsEnableVisitedTimes').prop("checked", true);
+        $('#visit-field').slideDown();
+        $('#visit-noti-field').slideUp();
+        </text>
+                    }
+
+
+        if ($('#BirthdayOption').val() == '@BirthdayThisMonth') {
+            $('#BirthdayFrom').val(moment().add(0, 'month').startOf('month').toISOString());
+            $('#BirthdayTo').val(moment().add('months', 1).date(1).subtract('days', 1).toISOString());
+            $('#range-month-field').slideUp();
+            $('#month-field').slideUp();
+        }
+        if ($('#BirthdayOption').val() == '@BirthdayOptionRange') {
+            setupDaterangepickerForThisMonth();
+            $('#range-month-field').slideDown();
+            $('#month-field').slideUp();
+        }
+        if ($('#BirthdayOption').val() == '@BirthdayOptionMonth') {
+            $('#range-month-field').slideUp();
+            $('#month-field').slideDown();
+        }
+
+        $('#BirthdayOption').on('change', function () {
+            if ($('#BirthdayOption').val() == '@BirthdayThisMonth') {
+                $('#BirthdayFrom').val(moment().add(0, 'month').startOf('month').toISOString());
+                $('#BirthdayTo').val(moment().add('months', 1).date(1).subtract('days', 1).toISOString());
+                $('#range-month-field').slideUp();
+                $('#month-field').slideUp();
+                $('#BirthdayMonth').val(moment().month() + 1);
+            }
+            if ($('#BirthdayOption').val() == '@BirthdayOptionRange') {
+                setupDaterangepickerForThisMonth();
+                $('#range-month-field').slideDown();
+                $('#month-field').slideUp();
+            }
+            if ($('#BirthdayOption').val() == '@BirthdayOptionMonth') {
+                $('#range-month-field').slideUp();
+                $('#month-field').slideDown();
+            }
+        });
+
+        $('#reportrange').click(function () {
+            $('.applyBtn').attr("type", "button");
+            $('.cancelBtn').attr("type", "button");
+        });
+
+        $('#EditCustomerFilterForm').submit(function (e) {
+            e.preventDefault();
+            if (validateSubmitForm()) {
+                editFilter();
+            }
+        });
+
+        $('#btn-comeback').parent().fixedScroll(70);
+    });
+
+    function validateSubmitForm() {
+
+        if ($('#Name').val() == "") {
+            ShowMessage('Vui lòng nhập tên tập khách hàng', 1);
+            return false;
+        }
+        if ($('#IsEnableAge').prop('checked')) {
+            if (isNaN(parseInt($('#AgeFrom').val())) || isNaN(parseInt($('#AgeTo').val()))) {
+                ShowMessage('Tuổi<br/>Vui lòng chỉ nhập số', 1);
+                $('#AgeFrom').focus();
+                return false;
+            }
+
+            if ((parseInt($('#AgeFrom').val())) > (parseInt($('#AgeTo').val()))) {
+                ShowMessage('Khoảng giá trị của tuổi không hợp lệ', 1);
+                $('#AgeFrom').focus();
+                return false;
+            }
+
+            if ($('#AgeFrom').val() != "") {
+                if (isNaN(parseInt($('#AgeFrom').val())) || (parseInt($('#AgeFrom').val())) < 0) {
+                    ShowMessage('Tuổi phải lớn hơn 0', 1);
+                    $('#AgeFrom').focus();
+                    return false;
+                }
+            }
+
+            if ($('#AgeTo').val() != "") {
+                if (isNaN(parseInt($('#AgeTo').val())) || (parseInt($('#AgeTo').val())) > 100) {
+                    ShowMessage('Tuổi phải nhỏ hơn 100', 1);
+                    $('#AgeTo').focus();
+                    return false;
+                }
+            }
+        }
+        if ($('#IsEnableVisitedTimes').prop('checked')) {
+            if (!isNaN(parseInt($('#VisitedTimesFrom').val())) && !isNaN(parseInt($('#VisitedTimesTo').val()))) {
+                if ((parseInt($('#VisitedTimesFrom').val())) > (parseInt($('#VisitedTimesTo').val()))) {
+                    ShowMessage('Khoảng giá trị của số lần đến cửa hàng không hợp lệ', 1);
+                    $('#VisitedTimesFrom').focus();
+                    return false;
+                }
+            } else {
+                ShowMessage('Số lần đến<br/>Vui lòng chỉ nhập số', 1);
+                $('#VisitedTimesFrom').focus();
+                return false;
+            }
+
+            if ($('#VisitedTimesFrom').val() != "") {
+                if (isNaN(parseInt($('#VisitedTimesFrom').val())) || (parseInt($('#VisitedTimesFrom').val())) <= 0) {
+                    ShowMess('Số lần đến cửa hàng phải lớn hơn 0', 1);
+                    $('#VisitedTimesFrom').focus();
+                    return false;
+                }
+            }
+        }
+        if ($('#IsEnableBirthday').prop('checked') && ($('#BirthdayOption').val() == '@BirthdayOptionMonth')) {
+            if (isNaN(parseInt($('#BirthdayMonth').val())) || $('#BirthdayMonth').val() < 1 || $('#BirthdayMonth').val() > 12) {
+                ShowMessage('Tháng chỉ nằm trong khoảng 1 - 12', 1);
+                $('#BirthdayMonth').focus();
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function editFilter() {
+        var formData = $('#EditCustomerFilterForm').serialize();
+
+        $.ajax({
+            type: "POST",
+            url: '@this.Url.Action("EditCustomerFilter")',
+            dataType: 'JSON',
+            data: formData,
+            success: function (result) {
+                ShowAlert(result.message, 2);
+                window.location.href = '@this.Url.Action("CustomerFilter")';
+            },
+            error: function (error) {
+                ShowAlert(error.message, 2);
+            }
+        });
+    }
+
+    function setupDaterangepickerForThisMonth() {
+
+        var start;
+        var end;
+        @if(this.Model.IsEnableBirthday.HasValue && this.Model.IsEnableBirthday.Value == true)
+                    {
+                        <text>
+        start = new Date('@this.Model.BirthdayFrom.Value.ToShortDateString()');
+        end = new Date('@this.Model.BirthdayTo.Value.ToShortDateString()');
+        </text>
+                    }
+                    else
+                    {
+        <text>
+        start = new Date('01/01/2000');
+        end = new Date('02/01/2000');
+        </text>
+            }
+        $('#BirthdayFrom').val(start.toISOString());
+        $('#BirthdayTo').val(end.toISOString());
+        $('#reportrange span').html(('0' + start.getDate()).slice(-2) + '/' + ('0' + (start.getMonth() + 1)).slice(-2) + ' - ' + ('0' + end.getDate()).slice(-2) + '/' + ('0' + (end.getMonth() + 1)).slice(-2));
+        $('#reportrange').daterangepicker({
+            format: 'MM/DD/YYYY',
+            startDate: start,
+            endDate: end,
+            minDate: '01/01/2000',
+            maxDate: '12/31/2000',
+            showDropdowns: true,
+            showWeekNumbers: true,
+            timePicker: false,
+            timePickerIncrement: 1,
+            timePicker12Hour: true,
+            parentEl: '.modal-body',
+            opens: 'left',
+            drops: 'down',
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-primary',
+            cancelClass: 'btn-default',
+            separator: ' to ',
+            locale: {
+                applyLabel: 'Apply',
+                cancelLabel: 'Cancel',
+                fromLabel: 'From',
+                toLabel: 'To',
+                customRangeLabel: 'Custom',
+                daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+                monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                firstDay: 1
+            }
+        }, function (start, end, label) {
+            console.log(start.format('DD/MM'), end.format('DD/MM'), label);
+            startDate = start;
+            endDate = end;
+            $('#reportrange span').html(start.format('DD/MM') + ' - ' + end.format('DD/MM'));
+        });
+
+
+        $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
+            $('#BirthdayFrom').val(picker.startDate.toISOString());
+            $('#BirthdayTo').val(picker.endDate.toISOString());
+
+        });
+    }
+</script>
+<style>
+    .daterangepicker .daterangepicker_input {
+        display: none;
+    }
+
+    .daterangepicker select.yearselect {
+        display: none;
+    }
+</style>

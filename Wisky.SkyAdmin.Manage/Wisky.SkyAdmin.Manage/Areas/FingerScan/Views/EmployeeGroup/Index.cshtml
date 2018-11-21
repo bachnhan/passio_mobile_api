@@ -1,0 +1,622 @@
+﻿@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<style>
+    .pair-group.btn,
+    .variant-group.btn {
+        font-weight: 500 !important;
+        padding-left: 13px !important;
+    }
+
+    .col-md-4 {
+        padding-top: 10px;
+    }
+
+    .width-100 {
+        width: 100%;
+    }
+
+    .select2-container.select2-choice {
+        display: block;
+        height: 35px;
+        padding: 0 0 0 8px;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid #e0e0e0 !important;
+        white-space: nowrap;
+        line-height: 35px;
+        color: #444;
+        text-decoration: none;
+        border-radius: 0px;
+        user-select: none;
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #fff));
+    }
+
+    .select2-arrow {
+        opacity: 1;
+    }
+
+    .select2-container.select2-choice.select2-arrow {
+        display: inline-block;
+        width: 18px;
+        height: 100%;
+        position: absolute;
+        right: 0;
+        top: 3px;
+        border-left: 0px;
+        border-radius: 0px;
+        background-clip: padding-box;
+        /* background: #ccc; */
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0, #fff), color-stop(0.5, #fff));
+        background-image: -webkit-linear-gradient(center bottom, #fff 0%, #fff 60%);
+        /*background-image: -moz-linear-gradient(center bottom, #fff 0%, #fff 60%);*/
+    }
+
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+</style>
+<div class="card">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="margin-bottom30">Quản lý nhóm nhân viên</h3>
+                </div>
+                <div class="col-md-6 text-right m-t-15 ">
+                    <button class="btn btn-success btn-sm m-r-5" onclick="callShowCreateModal()">
+                        <i class="glyphicon glyphicon-plus"></i> THÊM NHÓM NHÂN VIÊN
+                    </button>
+                </div>
+            </div>
+            <hr />
+        </div>
+        <div class="card-padding">
+            <div class="row">
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="allcust">
+                        <!-- Datatable -->
+                        <div class="col-md-12">
+                            <input type="hidden" id="enrollnumber" />
+                            <div id="datatable_empGroup" style="padding-top:5px; overflow-x: scroll;">
+                                <table id="empGroup-table" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th><label>STT</label></th>
+                                            <th><label>Mã nhóm</label></th>
+                                            <th><label>Tên nhóm</label></th>
+                                            <th><label>Giờ cho phép sớm - trễ</label></th>
+                                            <th><label>Tùy chọn</label></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Model container thêm-->
+    <div id="create-modal-container">
+        <div class="modal" id="create-edit-timeFrame-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="Title_Create_Edit">Thêm nhóm nhân viên</h4>
+                        </div>
+                        <div class="modal-body col-md-12">
+                            <div class="col-md-12 p-0">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">Mã nhóm</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="EmployeeGroupCode" name="EmployeeGroupCode" placeholder="Mã nhóm">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">Tên nhóm</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="EmployeeGroupName" name="EmployeeGroupName" placeholder="Tên nhóm">
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group">
+                                            <label class="col-sm-4 control-label">Thời gian trễ</label>
+                                            <div class="col-sm-8">
+                                                <select data-live-search="true" data-size="7" class="form-control selectpicker" name="EmployeeGroupExpandTime" id="EmployeeGroupExpandTime">
+                                                    <option value="-1">Chọn thời gian trễ</option>
+                                                    <option value="15_m">15 phút</option>
+                                                    <option value="20_m">20 phút</option>
+                                                    <option value="30_m">30 phút</option>
+                                                    <option value="01_h">1 tiếng</option>
+                                                    <option value="02_h">2 tiếng</option>
+                                                    <option value="03_h">3 tiếng</option>
+                                                </select>
+                                            </div>
+                                        </div>*@
+                                </div>
+                                @*<div class="col-md-6">
+                                        <div class="form-group">
+                                            <span class="col-md-4 control-label p-t-10">Cửa hàng</span>
+                                            <div class="col-md-8">
+                                                <select data-live-search="true" data-size="7" onchange="changeInfor()" class="form-control selectpicker" name="storeIdAdd" id="storeIdAdd">
+                                                    <option value="-1">Chọn cửa hàng</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <button class="btn btn-success" type="button" id="loadListEmployee">Tải danh sách nhân viên</button>
+                                        </div>
+                                    </div>*@
+                            </div>
+                        </div>
+
+                        @*<div class="col-md-12 p-0" id="table_employee">
+                                <div class="checkbox p-b-10"><label>Chọn tất cả nhân viên<input type="checkbox" id="CheckAll" /><i class="input-helper"></i></label></div>
+                                <div id="datatable" ; overflow-x scroll;">
+                                    <table id="item-type-table" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th><label>STT</label></th>
+                                                <th><label>Tên nhân viên</label></th>
+                                                <th><label>Số điện thoại</label></th>
+                                                <th><label>Chọn</label></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>*@
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="button" id="btnAction" onclick="createEmpGroup()" class="btn btn-success btn-sm pull-right">(Thêm mới - Hoàn Tất)</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!--Model container Sửa-->
+    <div id="edit-modal-container">
+        <div class="modal" id="edit-timeFrame-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="form-horizontal">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="Title_Edit">Sửa thông tin nhóm nhân viên</h4>
+                        </div>
+                        <div class="modal-body col-md-12">
+                            <div class="col-md-12 p-0">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <input type="hidden" id="EmployeeGroupId" />
+                                        <label class="col-sm-4 control-label">Mã nhóm</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="EmployeeGroupCodeEdit" name="EmployeeGroupCode" placeholder="Mã nhóm" onchange="checkIsChange()">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">Tên nhóm</label>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control" id="EmployeeGroupNameEdit" name="EmployeeGroupName" placeholder="Tên nhóm">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-4 control-label">Thời gian trễ</label>
+                                        <div class="col-sm-8">
+                                            <select data-live-search="true" data-size="7" class="form-control selectpicker" name="EmployeeGroupExpandTime" id="EmployeeGroupExpandTimeEdit">
+                                                <option value="-1">Chọn thời gian trễ</option>
+                                                <option value="15_m">15 phút</option>
+                                                <option value="20_m">20 phút</option>
+                                                <option value="30_m">30 phút</option>
+                                                <option value="01_h">1 tiếng</option>
+                                                <option value="02_h">2 tiếng</option>
+                                                <option value="03_h">3 tiếng</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="button" id="btnActionEdit" onclick="editEmpGroup()" class="btn btn-success btn-sm pull-right">(Thêm mới - Hoàn Tất)</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+    <script>
+        function resetData() {
+            $('#EmployeeGroupCode').val("");
+            $('#EmployeeGroupName').val("");
+            $('#EmployeeGroupExpandTime').val(-1).change();
+            $('#storeIdAdd').val(-1).change();
+
+        }
+        // --- Load datatable
+        $(document).ready(function () {
+
+            loadEmpGroup();
+            getListStore();
+            $('#storeIdAdd').val(-1);
+            //document.getElementById("btnAction").disabled = true;
+            $('#datetimepicker_End').datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+            $('#datetimepicker_Start').datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+
+            $('#TimeFrameDuration').datetimepicker({
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+            $('#TimeFrameStart').datetimepicker({
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+            $('#TimeFrameEnd').datetimepicker({
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+
+
+        });
+
+        function changeInfor() {
+            $("#table_employee").css('display', 'none');
+            document.getElementById("btnAction").disabled = true;
+        }
+
+        function loadEmpGroup() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetAllEmpGroup", "EmployeeGroup")',
+
+                success: function (result) {
+                    initTimeFrameDatatable(result.datatable);
+                }
+            });
+        }
+        function loadEmpGroup1() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ReadExcelFile", "EmployeeGroup")',
+
+                success: function (result) {
+                    initTimeFrameDatatable(result.rs);
+                }
+            });
+        }
+
+        function initTimeFrameDatatable(data) {
+            $("#empGroup-table").dataTable().fnDestroy();
+            $("#empGroup-table").dataTable({
+                stateSave: true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Nhân viên",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3, 4],
+                        "sClass": "text-center",
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [4],
+                        "mRender": function (data, type, row) {
+                            //var detail = "<a title='Thêm nhân viên'class='btn btn-sm btn-success' onclick='ShowShiftModal(" + data + ")'><i class='glyphicon glyphicon-eye-open'></i></a>";
+                            var edit =
+                                "<a title='Chỉnh sửa' class='btn btn-sm btn-primary' onclick='showEditModal(" +
+                                data +
+                                ")'><i class='glyphicon glyphicon-pencil'></i></a>";
+                            var del = "<a title='Xóa' class='btn btn-sm btn-danger' onclick='deleteEmpGroup(" +
+                                data +
+                                ")'><i class='glyphicon glyphicon-trash'></i></a>";
+                            return edit + " " + del;
+                        },
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+        // edit employeeGroup
+        var isChange = false; // kiem tra code co duoc sua hay khong (modal: edit-timeFrame-modal)
+        function checkIsChange() {
+            isChange = true;
+        }
+
+        function showEditModal(id) {
+            isChange = false;
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("PrepareEdit", "EmployeeGroup")',
+                data: {
+                    'empGroupId': id
+                },
+                success: function(result) {
+                    $('#edit-timeFrame-modal').modal('show');
+                    $('#EmployeeGroupId').val(result.rs.id);
+                    $('#EmployeeGroupCodeEdit').val(result.rs.code);
+                    $('#EmployeeGroupNameEdit').val(result.rs.name);
+                    $('#EmployeeGroupExpandTimeEdit').val(result.rs.expTime).change();
+                    //$('#EmployeeGroupExpandTimeEdit option[value=result.rs.expTime]').attr('selected', 'selected');
+
+                },
+                error: function(error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+
+
+
+        function editEmpGroup() {
+            if ($('#EmployeeGroupCodeEdit').val() == "") {
+                ShowAlert("Vui lòng nhập mã nhóm", 1);
+                return;
+            }
+            if ($('#EmployeeGroupNameEdit').val() == "") {
+                ShowAlert("Vui lòng nhập tên nhóm", 1);
+                return;
+            }
+            if ($('#EmployeeGroupExpandTimeEdit').val() == -1) {
+                ShowAlert("Vui lòng chọn giờ cho phép sớm - trễ", 1);
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("EditEmpGroup", "EmployeeGroup")',
+                data: {
+                    id: $('#EmployeeGroupId').val(),
+                    code: $('#EmployeeGroupCodeEdit').val(),
+                    name: $('#EmployeeGroupNameEdit').val(),
+                    strExpandTime: $('#EmployeeGroupExpandTimeEdit').val(),
+                    isChange: isChange
+        },
+                success: function(result) {
+                    if (result.rs == true) {
+                        ShowAlert(result.mess, 2);
+                        $('#edit-timeFrame-modal').modal('hide');
+                        resetData();
+                        loadEmpGroup();
+                    } else {
+                        ShowAlert(result.mess, 1);
+                    }
+                },
+                error: function(error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+        @*function ShowShiftModal(data) {
+            $("#table_employee").css('display', 'none');
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("detailsTimeFrame")',
+                data: {
+                    Id: data
+                },
+                success: function (result) {
+                    $('#create-edit-timeFrame-modal').modal('show');
+                    $('#NameTimeFrame').val(result.Name);
+                    $('#TimeFrameStart').val(result.StartTime);
+                    $('#TimeFrameEnd').val(result.EndTime);
+                    $('#TimeFrameDuration').val(result.Duration);
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }*@
+
+        function callShowCreateModal() {
+            $("#table_employee").css('display', 'none');
+            $('#create-edit-timeFrame-modal').modal('show');
+        }
+
+        $("#loadListEmployee").on("click", function () {
+            $("#table_employee").css('display', 'none');
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetAllEmployeeToAdd", "EmployeeGroup")',
+                data: {
+                    storeIdAdd: $('#storeIdAdd').val(),
+                },
+                success: function (result) {
+                    initEmployeeDatatable(result.datatable);
+                    $("#table_employee").css('display', 'block');
+                    document.getElementById("btnAction").disabled = false;
+                }
+            });
+        });
+
+        function initEmployeeDatatable(data) {
+            $("#item-type-table").dataTable().fnDestroy();
+            $("#item-type-table").dataTable({
+                stateSave: true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Tìm Nhân Viên",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3],
+                        "sClass": "text-center",
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [3],
+                        "mRender": function (data, type, row) {
+                            var checkEmployee = " <div class='checkbox'>" +
+                                "<label>" +
+                                "<input type='checkbox' value='" + data + "' name='EmpID'/>" +
+                                "<i class='input-helper'></i>" +
+                                "</label>" +
+                                "</div>";
+
+                            return " " + checkEmployee;
+                        },
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+        $("#CheckAll").change(function () {
+            var allPages = $("#item-type-table").dataTable().fnGetNodes();
+
+            if ($("#CheckAll").is(':checked')) {
+                $('input[type="checkbox"]', allPages).prop('checked', true);
+            } else {
+                $('input[type="checkbox"]', allPages).prop('checked', false);
+            }
+        });
+
+        function createEmpGroup() {
+            var allPages = $("#item-type-table").dataTable().fnGetNodes();
+            var yourArray = new Array();
+            $('input[type="checkbox"]:checked', allPages).each(function () {
+                var tr = $(this).closest('tr');
+                var rowData = $("#item-type-table").dataTable().fnGetData(tr);
+                yourArray.push(rowData[3]);
+            });
+
+            if ($('#EmployeeGroupCode').val() == "") {
+                ShowAlert("Vui lòng nhập mã nhóm", 1);
+                return;
+            }
+            if ($('#EmployeeGroupName').val() == "") {
+                ShowAlert("Vui lòng nhập tên nhóm", 1);
+                return;
+            }
+            if ($('#EmployeeGroupExpandTime').val() == -1) {
+                ShowAlert("Vui lòng chọn giờ cho phép sớm - trễ", 1);
+                return;
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CreateEmpGroup", "EmployeeGroup")',
+                data: {
+                    //'empIdList': yourArray,
+                    'code': $('#EmployeeGroupCode').val(),
+                    'name': $('#EmployeeGroupName').val(),
+                    'strExpandTime': $('#EmployeeGroupExpandTime').val()
+                },
+                success: function (result) {
+                    if (result.rs == true) {
+                        ShowAlert(result.mess, 2);
+                        $('#create-edit-timeFrame-modal').modal('hide');
+                        resetData();
+                        loadEmpGroup();
+                    } else {
+                        ShowAlert(result.mess, 1);
+                    }
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+
+        function getListStore() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetAllStore", "EmployeeGroup")',
+
+                success: function (result) {
+                    loadListStoreInDrodownList(result.rs);
+                },
+                error: function (error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+
+        function loadListStoreInDrodownList(listData) {
+            for (i = 0; i < listData.length; i++) {
+                $("#storeIdAdd").append('<option value="' + listData[i].ID + '">' + listData[i].Name + '</option>');
+            }
+            $("#storeIdAdd").selectpicker('refresh');
+        }
+
+        function deleteEmpGroup(id) {
+            ShowConfirm("Bạn có muốn xóa nhóm nhân viên này?",
+                function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("DeleteEmpGroup", "EmployeeGroup")',
+                        data: {
+                            'empGroupId': id,
+                        },
+                        success: function(data) {
+                            if (data.rs) {
+                                ShowAlert("Xóa thành công", 2);
+                                loadEmpGroup();
+                            } else {
+                                ShowAlert(data.mess, 1);
+                            }
+                        },
+                        error: function(error) {
+                            showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                        }
+                    });
+                });
+        }
+    </script>
+}

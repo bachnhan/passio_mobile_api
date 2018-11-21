@@ -1,0 +1,10 @@
+diff a/Wisky.SkyAdmin.Manage/Wisky.SkyAdmin.Manage/Areas/Admin/Controllers/StoreGroupController.cs b/Wisky.SkyAdmin.Manage/Wisky.SkyAdmin.Manage/Areas/Admin/Controllers/StoreGroupController.cs	(rejected hunks)
+@@ -164,6 +164,8 @@
+                     ++count,
+                     a.Name,
+                     a.Address,
++                    a.Phone,
++                    a.Email,
+                     "<input type=\"checkbox\" name='managerchk' id='" + a.Name + "' value='" + a.ID + "' "+(listStoreInGroup.Contains(a.Name)?"checked='true'":"")+"/>",
+                 }
+                 );

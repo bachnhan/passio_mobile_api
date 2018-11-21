@@ -1,0 +1,877 @@
+﻿@model HmsService.ViewModels.CostViewModel
+@using HmsService.Models
+@{
+    ViewBag.Title = "Quản lý thu chi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var storeId = 0;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+    var brandId = 0;
+    if (ViewContext.RouteData.Values["brandId"] != null)
+    {
+        brandId = int.Parse(ViewContext.RouteData.Values["brandId"]?.ToString());
+    }
+}
+
+<!-- Overall statistics -->
+<style>
+    .chartOption {
+        cursor: pointer;
+    }
+
+    .widget-header {
+        cursor: pointer;
+    }
+
+    .infobox {
+        height: 100px !important;
+    }
+
+    .chartOptionActive {
+        font-weight: bold;
+    }
+
+    #storePieChart {
+        margin-top: 80px;
+    }
+
+    /*  bhoechie tab */
+    div.bhoechie-tab-container {
+        z-index: 10;
+        background-color: #ffffff;
+        padding: 0;
+        border-radius: 4px;
+        -moz-border-radius: 4px;
+        /*border: 1px solid #ddd;*/
+        -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        -moz-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        background-clip: padding-box;
+        opacity: 0.97;
+        filter: alpha(opacity=97);
+    }
+
+    div.bhoechie-tab-menu {
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
+        background-color: rgba(44, 73, 73, 1);
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+    }
+
+    a.list-group-item {
+        color: #ffffff !important;
+        background-color: rgba(44, 73, 73, 1) !important;
+        border: 0 !important;
+    }
+
+        a.list-group-item:hover,
+        button.list-group-item:hover,
+        a.list-group-item:focus,
+        button.list-group-item:focus {
+            text-decoration: none !important;
+            color: #ffffff !important;
+            background-color: rgba(44, 73, 73, 1) !important;
+        }
+
+    .no-padding {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .bhoechie-tab-menu .list-group {
+        margin-bottom: 0;
+        /*border: 0;*/
+    }
+
+        .bhoechie-tab-menu .list-group a {
+            margin-bottom: 0;
+        }
+
+            .bhoechie-tab-menu .list-group a .glyphicon,
+            .bhoechie-tab-menu .list-group a .fa {
+                color: #fff;
+            }
+
+            .bhoechie-tab-menu .list-group a:first-child {
+                border-radius: 0;
+                -moz-border-radius: 0;
+            }
+
+            /*.bhoechie-tab-menu .list-group  a:last-child {
+            border-bottom-right-radius: 0;
+            -moz-border-bottom-right-radius: 0;
+        }*/
+
+            .bhoechie-tab-menu .list-group a.active,
+            .bhoechie-tab-menu .list-group a.active .glyphicon,
+            .bhoechie-tab-menu .list-group a.active .fa {
+                background-color: #fff !important;
+                color: rgba(44, 73, 73, 1) !important;
+            }
+
+                .bhoechie-tab-menu .list-group a.active:after {
+                    content: '';
+                    position: absolute;
+                    top: 100%;
+                    margin-left: -13px;
+                    /* border-left: 0; */
+                    border-right: 13px solid transparent;
+                    border-left: 13px solid transparent;
+                    border-top: 10px solid rgba(44, 73, 73, 1);
+                }
+
+    div.bhoechie-tab-content {
+        background-color: #ffffff;
+        /* border: 1px solid #eeeeee; */
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+
+    a.list-group-item,
+    button.list-group-item {
+        color: #fff;
+    }
+
+
+    div.bhoechie-tab-content > .col-sm-12, .col-xs-12 {
+        padding-top: 20px;
+    }
+
+    div.bhoechie-tab div.bhoechie-tab-content:not(.active) {
+        display: none;
+    }
+
+
+    .clearfix > * {
+        color: #fff;
+    }
+
+    .nav-tabs {
+        border-bottom: 1px solid rgba(44, 73, 73, 1);
+    }
+
+    .infobox-data > h1, h2, h3, h4 {
+        color: #fff;
+        margin-top: 0;
+    }
+
+    .padding15 {
+        padding-bottom: 15px;
+        padding-top: 15px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .bgm-wheat {
+        background-color: wheat !important;
+    }
+
+    .bgm-cadet {
+        background-color: cadetblue;
+    }
+
+    .bgm-seagreen {
+        background-color: seagreen;
+    }
+
+    .bgm-sandbrown {
+        background-color: sandybrown;
+    }
+
+    .margin-in-col {
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+
+    .my-widget {
+        border-radius: 10px;
+        margin-right: 15px;
+    }
+
+    .widget-rev {
+        background-color: darkslategrey;
+    }
+
+    .widget-rev-odd {
+        background-color: rgba(44, 73, 73, 1);
+    }
+
+    .wdidget-as {
+        background-color: rgba(200, 81, 81, 1);
+    }
+
+    .wdidget-as-odd {
+        background-color: rgba(191, 79, 79, 1);
+    }
+
+    .widget-del {
+        background-color: rgba(204, 155, 30, 1);
+    }
+
+    .widget-del-odd {
+        background-color: rgba(195, 148, 29, 1);
+    }
+
+    .wdidget-ta {
+        background-color: darkolivegreen;
+    }
+
+    .wdidget-ta-odd {
+        background-color: rgba(83, 103, 50, 1);
+    }
+
+    .infobox-content {
+        visibility: hidden;
+    }
+
+    .dataTables_wrapper.no-footer .dataTables_scrollBody {
+        border-bottom: 1px solid lightgray;
+    }
+
+    #storeReportDatatable > thead {
+        visibility: hidden;
+        border: 0;
+    }
+
+    #storeReportDatatable tr[role=row] {
+        cursor: pointer;
+    }
+
+    .tableDiv-responsive {
+        width: 100%;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    @Resources.EnumLanguage.Menu_HouseKeeping_IncomeExpenditure
+                </h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div>
+            @*@if (storeId != 0)
+            {
+                <div class="col-md-6 pull-right ">
+                    <a id="receive-cost-btn" class="btn btn-success btn-sm pull-right" href="@Url.Action("CreateReceipt")" data-id="@((int)CostTypeEnum.ReceiveCost)">
+                        Lập phiếu thu
+                    </a>
+                    <a id="add-cost-btn" class="btn btn-primary btn-sm pull-right" href="@Url.Action("CreateSpend")" data-id="@((int)CostTypeEnum.SpendingCost)" style="margin-right: 5px;">
+                        Lập phiếu chi
+                    </a>
+                </div>
+
+
+            }
+            else
+            {
+                <div class="col-md-6">
+                    
+                </div>
+            }*@
+            <div class="col-md-6">
+                <button type="button" onclick="GetCreatingForm(@((int)CostTypeEnum.ReceiveCost))" class="btn btn-primary pull-right">
+                    <i class="zmdi zmdi-plus"></i>   Tạo phiếu thu
+                </button>
+                <button type="button" onclick="GetCreatingForm(@((int)CostTypeEnum.SpendingCost))" class="btn btn-primary pull-right m-r-5">
+                    <i class="zmdi zmdi-plus"></i>   Tạo phiếu chi
+                </button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="col-sm-4 col-xs-6">
+                    <div class="padding15 margin-in-col wdidget-as-odd">
+                        <div class="clearfix">
+                            <center>
+                                Tổng thu
+                            </center>
+                        </div>
+                    </div>
+                    <div class="padding15 margin-in-col wdidget-as">
+                        <div class="clearfix">
+                            <div class="pull-right">
+                                <small>VNĐ</small>
+                            </div>
+                            @*<div>Tiền mặt</div>*@
+                            <h2 style="margin-bottom:0; margin-top:0;" id="totalReceipt">0</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 col-xs-6">
+                    <div class="padding15 margin-in-col widget-del-odd">
+                        <div class="clearfix">
+                            <center>
+                                Tổng chi
+                            </center>
+                        </div>
+                    </div>
+                    <div class="padding15 margin-in-col widget-del">
+                        <div class="clearfix">
+                            <div class="pull-right">
+                                <small>VNĐ</small>
+                            </div>
+                            @*<div>Master Card & Visa Card</div>*@
+                            <h2 style="margin-bottom:0; margin-top:0;" id="totalSpend">0</h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-4 col-xs-6">
+                    <div class="padding15 margin-in-col wdidget-ta-odd">
+                        <div class="clearfix">
+                            <center>
+                                Tổng nợ còn lại
+                            </center>
+                        </div>
+                    </div>
+                    <div class="padding15 margin-in-col wdidget-ta">
+                        <div class="clearfix">
+                            <div class="pull-right">
+                                <small>VNĐ</small>
+                            </div>
+                            @*<div>Thẻ thành viên</div>*@
+                            <h2 style="margin-bottom:0; margin-top:0;" id="totalDebt">0</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <hr />
+        <div class="row" style="margin-top: 10px">
+            <div class="col-md-5">
+                @if (storeId == 0)
+                {
+                    <label class="col-md-4 right-icon pull-left" style="line-height: 25px;margin-bottom:0!important">Cửa hàng: &nbsp;</label>
+                    <div class="col-md-8">
+                        <div class="fg-line">
+                            <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7">
+                                <option value='0'>Hệ Thống</option>
+                            </select>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="col-md-5 pull-right">
+                <div class="input-group pull-right" style="width:230px">
+                    <div class="dateTime pull-right" style="width:100%">
+                        <div class="fg-line m-t-5">
+                            <input id="datestring" hidden />
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>  Tìm
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="group-radio-buttons myChoosebox" style="margin-right:25px;">
+                    <div class="row small-margin">
+                        <div class="col-md-2">
+                            <input type="radio" name="report-filter" value="3" class="nice-check" id="filter1" checked />
+                            <label for="filter1"><span>Tất cả</span></label>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="radio" name="report-filter" value="@((int)CostTypeEnum.ReceiveCost)" class="nice-check" id="filter2">
+                            <label for="filter2"><span>@CostTypeEnum.ReceiveCost.DisplayName()</span></label>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="radio" name="report-filter" value="@((int)CostTypeEnum.SpendingCost)" class="nice-check" id="filter3">
+                            <label for="filter3"><span>@CostTypeEnum.SpendingCost.DisplayName()</span></label>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="radio" name="report-filter" value="@((int)CostTypeEnum.ReceiveCostTranferOut)" class="nice-check" id="filter4">
+                            <label for="filter4"><span>@CostTypeEnum.ReceiveCostTranferOut.DisplayName()</span></label>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="radio" name="report-filter" value="@((int)CostTypeEnum.SpendingCostTranferIn)" class="nice-check" id="filter5">
+                            <label for="filter5"><span>@CostTypeEnum.SpendingCostTranferIn.DisplayName()</span></label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <button type="submit" id="exportExcel" class="width230 m-r-15 btn btn-primary btn-sm pull-right">
+                <i class="fa fa-download"></i>
+                Xuất ra file Excel
+            </button>
+        </div>
+        <div class="form-horizontal" id="infoIndex">
+
+        </div>
+    </div>
+
+    <div class="card-padding">
+        <table class="table table-hover" id="cost-main-table">
+            <thead>
+                <tr>
+                    <th><label>@Resources.EnumLanguage.CostManagement_IncomeExpenditure_Order</label></th>
+                    <th><label>Mã phiếu</label></th>
+                    <th><label>@Resources.EnumLanguage.CostManagement_IncomeExpenditure_Category</label></th>
+                    @if (storeId == 0)
+                    {
+                        <th><label>Cửa hàng</label></th>
+                    }
+                    <th><label>@Resources.EnumLanguage.CostManagement_IncomeExpenditure_Description</label></th>
+                    <th><label>@Resources.EnumLanguage.CostManagement_IncomeExpenditure_Amount</label></th>
+                    <th><label>@Resources.EnumLanguage.CostManagement_IncomeExpenditure_Date</label></th>
+                    <th><label>@Resources.EnumLanguage.CostManagement_IncomeExpenditure_PaidPerson</label></th>
+                    <th><label>@Resources.EnumLanguage.CostManagement_IncomeExpenditure_Type</label></th>
+                    <th><label>Tùy chọn</label></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="add-cost-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+</div>
+<input type="hidden" id="startDate" />
+<input type="hidden" id="endDate" />
+<form class="hidden" id="ExportTransactionExcel" action="@Url.Action("ExportCostExcel")">
+    <input id="startTime" name="startTime" />
+    <input id="endTime" name="endTime" />
+    <input id="selectedStoreId" name="selectedStoreId" />
+</form>
+<style>
+    .input-group .input-group-btn > a.btn {
+        margin-top: 0px !important;
+    }
+</style>
+
+<script>
+    var status = 3;
+    var test;
+
+    $(document).ready(function () {
+
+        if (@storeId==0) {
+            setupListStoreFilter();
+        }
+        loadDataTableCost();
+        //HMS.Cost.loadOverViewCost('@Url.Action("CostOverview","CostManage")');
+
+        $('[name="report-filter"]').change(function (e) {
+            status = $(this).val();
+            RefreshTable();
+        });
+    });
+
+    $(document).on('click', '#exportExcel', function () {
+
+        var selectedStore = @storeId;
+        if (@storeId==0) {
+            selectedStore = $('#listStoreId').val();
+        }
+        $('#startTime').val($('#startDate').val());
+        $('#endTime').val($('#endDate').val());
+        $('#selectedStoreId').val(selectedStore);
+        $('#ExportTransactionExcel').submit();
+
+    });
+
+    $(function () {
+        // Daterange picker
+        function cb(start, end, label) {
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else if (start.format('DD/MM/YYYY') == end.format('DD/MM/YYYY')) {
+                $('#date-string').val(start.format('DD/MM/YYYY'));
+            } else {
+                $('#date-string').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+            }
+            $('#startDate').val(start.format('DD/MM/YYYY'));
+            $('#endDate').val(end.format('DD/MM/YYYY'));
+            var startTime = start.format('DD/MM/YYYY'),
+                endTime = end.format('DD/MM/YYYY');
+            $('[data-role=small-date]').html('(' + startTime + (startTime == endTime ? '' : ' - ' + endTime) + ')');
+        };
+        cb(moment(), moment(), 'Hôm nay');
+
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Toàn bộ': ['01/01/2010', '01/01/2100']
+            }
+        }, cb);
+    });
+
+    function setupListStoreFilter() {
+        $.ajax({
+            type: "GET",
+            url: "@(Url.Action("GetListStore"))",
+            success: function (data) {
+                var content = "";
+                for (var i = 0; i < data.listresult.length; ++i) {
+                    content += "<option value='" + data.listresult[i].storeId + "'>" + data.listresult[i].storeName + "</option>";
+                }
+                $("#listStoreId").append(content);
+                $("#listStoreId").selectpicker('refresh');
+            },
+            error: function (error) {
+                ShowMessage("Không tải dc dữ liệu!",1)
+            }
+        });
+    }
+
+    function getOverView() {
+        var store = 0;
+        if (@storeId == 0) {
+            store = parseInt($('#listStoreId').val());
+        } else {
+            store = @storeId;
+        }
+        $.ajax({
+            type: "GET",
+            url: "@(Url.Action("GetCostOverView"))",
+            data: {
+                "startTime": $('#startDate').val(),
+                "endTime": $('#endDate').val(),
+                "store": store
+            },
+            success: function (data) {
+                $("#totalReceipt").text(0);
+                $("#totalSpend").text(0);
+                $("#totalDebt").text(0);
+                $("#totalReceipt").text(formatVND(data.model.TotalReceipt));
+                $("#totalSpend").text(formatVND(data.model.TotalSpend));
+                $("#totalDebt").text(formatVND(data.model.TotalDebt));
+            },
+            error: function (error) {
+                ShowMessage("Không tải dc dữ liệu!", 1);
+            }
+        });
+    }
+
+    var loadDataTableCost = function () {
+        if (@storeId != 0) {
+            window.dt = $("#cost-main-table").dataTable({
+                "bSortable": false,
+                "bProcessing": true,
+                "bServerSide": true,
+                "sAjaxSource": "@Url.Action("GetData")",
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "startTime", "value": $('#startDate').val() });
+                    aoData.push({ "name": "endTime", "value": $('#endDate').val() });
+                    aoData.push({ "name": "strID", "value": @storeId });
+                    aoData.push({ "name": "costType", "value": status });
+                },
+                "sServerMethod": "GET",
+                "oLanguage": {
+                    "sSearchPlaceholder": "Danh mục",
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfoEmpty": "Không có dữ liệu",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "bAutoWidth": false,
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3, 4, 5, 6, 7],
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [4],
+                        "sClass": "text-right"
+                    },
+                ],
+                "columns": [
+                    { "data": "STT" },
+                    { "data": "CostCode" },
+                    { "data": "Cate" },
+                    { "data": "Description" },
+                    { "data": "Amount" },
+                    { "data": "Date" },
+                    { "data": "PaidPerson" },
+                    {
+                        "data": function (data) {
+                            var costClass, costLabel;
+                            switch (data.CostType) {
+                                case @((int)CostTypeEnum.ReceiveCost):
+                                    costClass = "label label-primary";
+                                    costLabel = "@CostTypeEnum.ReceiveCost.DisplayName()";
+                                    break;
+                                case @((int)CostTypeEnum.SpendingCost):
+                                    costClass = "label label-success";
+                                    costLabel = "@CostTypeEnum.SpendingCost.DisplayName()";
+                                    break;
+                                case @((int)CostTypeEnum.ReceiveCostTranferOut):
+                                    costClass = "label label-danger";
+                                    costLabel = "@CostTypeEnum.ReceiveCostTranferOut.DisplayName()";
+                                    break;
+                                case @((int)CostTypeEnum.SpendingCostTranferIn):
+                                    costClass = "label label-warning";
+                                    costLabel = "@CostTypeEnum.SpendingCostTranferIn.DisplayName()";
+                                    break;
+                            }
+                            return $('<span/>', {
+                                'html': costLabel,
+                                'class': costClass,
+                            })[0].outerHTML;
+                        }
+                    },
+                    {
+                        "data": function (data) {
+                            if (data.CostType ==@((int)CostTypeEnum.ReceiveCostTranferOut)) {
+                                return "<button class='btn btn-primary waves-effect' onclick=\"showInfo(" + data.CostType + ",'" + data.InventoryReceiptName + "')\"><i class='zmdi zmdi-info-outline'></i></button>";
+                        } else if (data.CostType ==@((int)CostTypeEnum.SpendingCostTranferIn)) {
+                            return "<button class='btn btn-primary waves-effect' onclick=\"showInfo(" + data.CostType + ",'" + data.InventoryReceiptName + "')\"><i class='zmdi zmdi-info-outline'></i></button>";
+                        } else {
+                                return "<a title='Hủy' class=\"btn btn btn-danger btn-sm\"  data-id=\"" + data.CostID
+                                    + "\" onclick=\"CancelCost(" + data.CostID + ")\"><i class='glyphicon glyphicon-trash'></i></a>";
+                                }
+                        },
+                            "bSortable": false,
+                            }
+                    
+                ]
+            });
+        } else {
+            window.dt = $("#cost-main-table").dataTable({
+                "bSortable": false,
+                "bProcessing": true,
+                "bServerSide": true,
+                "sAjaxSource": "@Url.Action("GetData")",
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "startTime", "value": $('#startDate').val() });
+                    aoData.push({ "name": "endTime", "value": $('#endDate').val() });
+                    aoData.push({ "name": "strID", "value": parseInt($('#listStoreId').val()) });
+                    aoData.push({ "name": "costType", "value": status });
+                },
+                "sServerMethod": "GET",
+                "oLanguage": {
+                    "sSearchPlaceholder": "Danh mục",
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfoEmpty": "Không có dữ liệu",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "bAutoWidth": false,
+                "aoColumnDefs": [
+                    {
+                           "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                           "bSortable": false,
+                    },
+                    {
+                        "aTargets": [4],
+                        "sClass": "text-center"
+                    },
+                ],
+                "columns": [
+                    { "data": "STT" },
+                    { "data": "CostCode" },
+                    { "data": "Cate" },
+                    { "data": "StoreName" },
+                    { "data": "Description" },
+                    { "data": "Amount" },
+                    { "data": "Date" },
+                    { "data": "PaidPerson" },
+                    {
+                        "data": function (data) {
+                            var costClass, costLabel;
+                            switch (data.CostType) {
+                                case @((int)CostTypeEnum.ReceiveCost):
+                                    costClass = "label label-primary";
+                                    costLabel = "@CostTypeEnum.ReceiveCost.DisplayName()";
+                                    break;
+                                case @((int)CostTypeEnum.SpendingCost):
+                                    costClass = "label label-success";
+                                    costLabel = "@CostTypeEnum.SpendingCost.DisplayName()";
+                                    break;
+                                case @((int)CostTypeEnum.ReceiveCostTranferOut):
+                                    costClass = "label label-danger";
+                                    costLabel = "@CostTypeEnum.ReceiveCostTranferOut.DisplayName()";
+                                    break;
+                                case @((int)CostTypeEnum.SpendingCostTranferIn):
+                                    costClass = "label label-warning";
+                                    costLabel = "@CostTypeEnum.SpendingCostTranferIn.DisplayName()";
+                                    break;
+                            }
+                            return $('<span/>', {
+                                'html': costLabel,
+                                'class': costClass,
+                            })[0].outerHTML;
+                        }
+                    },
+                    {
+                        "data": function (data) {
+                            if (data.CostType ==@((int)CostTypeEnum.ReceiveCostTranferOut)) {
+                                return "<button class='btn btn-primary waves-effect' onclick=\"showInfo(" + data.CostType + ",'" + data.InventoryReceiptName + "')\"><i class='zmdi zmdi-info-outline'></i></button>";
+                            } else if (data.CostType ==@((int)CostTypeEnum.SpendingCostTranferIn)) {
+                                return "<button class='btn btn-primary waves-effect' onclick=\"showInfo(" + data.CostType + ",'" + data.InventoryReceiptName + "')\"><i class='zmdi zmdi-info-outline'></i></button>";
+                            } else {
+                                return "<a title='Hủy' class=\"btn btn btn-danger btn-sm\"  data-id=\"" + data.CostID
+                                    + "\" onclick=\"CancelCost(" + data.CostID + ")\"><i class='glyphicon glyphicon-trash'></i></a>";
+                            }
+                        },
+                        "bSortable": false,
+                    }
+                ]
+            });
+        }
+    }
+
+    $('#btnSearch').on('click', function () {
+        if ($("#endDate").val().length > 16 || $("#startDate").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            //HMS.Cost.loadOverViewCost('@Url.Action("CostOverview","CostManage")');
+            getOverView();
+            RefreshTable();
+        }
+    });
+
+    function showInfo(type, id) {
+        if (type == @((int)CostTypeEnum.ReceiveCostTranferOut)){
+            swal("Không thể xóa!", "Phiếu được tạo trong quá trình xuất kho. Tìm kiếm phiếu xuất kho với mã hóa đơn: " + id, "warning");
+        } else if (type == @((int)CostTypeEnum.SpendingCostTranferIn)){
+            swal("Không thể xóa!", "Phiếu được tạo trong quá trình nhập kho. Tìm kiếm phiếu nhập kho với mã hóa đơn: " + id, "warning");
+        }
+
+    }
+
+    function RefreshTable() {
+        var oTable = $("#cost-main-table").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    };
+
+    function GetCreatingForm(type) {
+        if (type == '@((int)CostTypeEnum.SpendingCost)') {
+            $("#roomModalTitle").html('Phiếu chi');
+            $('#add-cost-modal').html("");
+            $.ajax({
+                url: "@Url.Action("CreatingSpendForm")",
+                dataType: "HTML",
+                data: { 'costCategoryType': type },
+                beforeSend: function () {
+
+                },
+                success: function (result) {
+                    $('#add-cost-modal').html(result);
+                    $('#add-cost-modal').modal('show');
+                }
+            });
+        }
+        else {
+            $("#roomModalTitle").html('Phiếu thu');
+            $('#add-cost-modal').html("");
+
+            $.ajax({
+                url: "@Url.Action("CreatingReceiptForm")",
+                dataType: "HTML",
+                data: {
+                    costCategoryType: type,
+                    brandId: @brandId,
+                    storeId: @storeId
+                },
+                beforeSend: function () {
+
+                },
+                success: function (result) {
+                    $('#add-cost-modal').html(result);
+                    $('#add-cost-modal').modal('show');
+                }
+            });
+        }
+
+    }
+
+    //$('#add-cost-btn').on('click', function (e) {
+    //    GetCreatingForm(e.currentTarget.getAttribute("data-id"));
+    //});
+    //$('#receive-cost-btn').on('click', function (e) {
+    //    GetCreatingForm(e.currentTarget.getAttribute("data-id"));
+    //});
+
+
+    function CancelCost(CostID) {
+            swal({
+		        title: "Bạn có muốn hủy phiếu thu/chi ?",
+		        text: "Không thể khôi phục sau khi hủy !",
+		        type: "warning",
+		        showCancelButton: true,
+		        confirmButtonColor: '#DD6B55',
+		        confirmButtonText: 'Đồng ý!',
+		        cancelButtonText: "Thoát",
+		        closeOnConfirm: false,
+		        closeOnCancel: false
+	        },
+	        function(isConfirm){
+                if (isConfirm) {
+                    $.ajax({
+                        url: "@Url.Action("CancelCost")",
+                        type: 'POST',
+                        data: { "CostID": CostID },
+                        error: function () {
+                            ShowMessage("Không thể hủy. Xin vui lòng thử lại sau!", 1);
+                        },
+                        success: function (data) {
+                            if (data.success) {
+                                RefreshTable();
+                                swal("Đã xóa thành công!", "", "success");
+                            } else {
+                                swal("Hủy thất bại!", "", "error");
+                            }
+                        }
+                    });
+                }
+                else {
+                    swal("Đã hủy bỏ thao tác", "", "error");
+                }
+            });
+
+    }
+    var formatVND = function (x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+</script>

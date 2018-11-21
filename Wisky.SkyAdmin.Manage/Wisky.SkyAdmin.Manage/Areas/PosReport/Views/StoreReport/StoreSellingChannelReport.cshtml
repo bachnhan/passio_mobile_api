@@ -1,0 +1,207 @@
+﻿@{
+    ViewBag.Title = "StoreSellingChannelReport";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-content">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="row">
+            <!-- HEADER NAME -->
+            <div class="col-md-6">
+                <h1>
+                    Báo cáo theo kênh bán hàng<small data-role="small-date" id="dateRange"></small>
+                </h1>
+            </div><!-- HEADER NAME END -->
+            <!-- SEARCH -->
+            <div class="col-md-4 pull-right text-right">
+                <div class="input-group">
+                    <!-- DATE PICKER -->
+                    <div class="date-picker">
+                        <div id="reportrange">
+                            <input type="text" id="date-string" readonly="">
+                            <a id=""><i class="fa fa-calendar"></i></a>
+                        </div>
+                    </div><!-- DATE PICKER END -->
+                    <!-- SEARCH BUTTON -->
+                    <div class="input-group-btn">
+                        <a class="btn btn-success btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>Tìm
+                        </a>
+                    </div><!-- SEARCH BUTTON END -->
+                </div>
+                <input type="hidden" id="sTime" />
+                <input type="hidden" id="eTime" />
+                <input type="hidden" id="sTimeTmp" />
+                <input type="hidden" id="eTimeTmp" />
+            </div><!-- SEARCH END -->
+        </div>
+    </div><!-- PAGE HEADER END -->
+    <!-- SELLING CHANNEL CHART -->
+    <div id="container" style="width:100%;height:auto"></div><!-- SELLING CHANNEL CHART END -->
+    <!-- SELLING CHANNEL TABLE -->
+    <div id="sellingChannelTableArea">
+        <table id="sellingChannelTable" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <label class="">Kênh bán hàng</label>
+                    </th>
+                    <th>
+                        <label class="">Tổng hóa đơn</label>
+                    </th>
+                    <th>
+                        <label class="">Tổng doanh thu</label>
+                    </th>
+                    <th>
+                        <label class="">Giảm giá</label>
+                    </th>
+                    <th>
+                        <label class="">Doanh thu sau giảm giá</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div><!-- SELLING CHANNEL TABLE END -->
+</div>
+
+<script>
+    $(function () {
+        $('.page-header').on('click', '#btnSearch', function () {
+            var startTime = $("#sTimeTmp").val(),
+                endTime = $("#eTimeTmp").val(),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+            // Change date range on header.
+            $("#dateRange").html(dateString);
+
+            // Update new date for searching.
+            $("#sTime").val(startTime);
+            $("#eTime").val(endTime);
+
+        });
+
+        // Daterange picker
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+
+            $("#sTimeTmp").val(startTime);
+            $("#eTimeTmp").val(endTime);
+        }
+        cb(moment(), moment(), 'Hôm nay');
+
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+        var startTime = $("#sTimeTmp").val(),
+            endTime = $("#eTimeTmp").val(),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        $("#sTime").val(startTime);
+        $("#eTime").val(endTime);
+        // Change date range on header.
+        $("#dateRange").html(dateString);
+
+        getData();
+    });
+
+    function getData() {
+        $.ajax({
+            url: '@Url.Action("GetSellingChannelReportDate", "StoreReport")',
+            type: 'GET',
+            data: { startTime: $('#sTime').val(), endTime: $('#eTime').val(), storeId: @ViewBag.storeId },
+            success: function (rs) {
+                initSellingChannelTable(rs.dataTable);
+            },
+        });
+    };
+
+
+    function initSellingChannelTable(data) {
+        $("#sellingChannelTable").dataTable({
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "bProcessing": true,
+            "iDisplayLength": 25,
+            "aLengthMenu": [25, 50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý..."
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2],
+                    "bSortable": false
+                },
+                {
+                    "visible": false, "targets": 0
+                },
+                //{
+                //    "aTargets": [2],
+                //    "mRender": function (data,type, o) {
+                //        return '<a data-pname="' + o[0] + '" data-pid="'+ o[3] +'" class="btn btn-sm btn-info btnDetail"><span class="fa fa-tasks"></span></a>';
+                //    },
+                //}
+            ],
+            "bAutoWidth": true,
+            //"order": [[1, 'asc']],
+            "drawCallback": function (settings) {
+                var api = this.api();
+                var rows = api.rows({ page: 'current' }).nodes();
+                var last = null;
+
+                api.column(0, { page: 'current' }).data().each(function (group, i) {
+                    var channel = "";
+                    if (group == "0") {
+                        channel = "POS";
+                    } else if (channel == "1") {
+                        channel = "FaceBook";
+                    } else {
+                        channel = "WebSite";
+                    }
+                    if (last !== group) {
+                        $(rows).eq(i).before(
+                            '<tr><td class="bg-warning" colspan="5">' + channel + '</td></tr>'
+                        );
+
+                        last = group;
+                    }
+                });
+            },
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+
+    function setUpSellingChannelChart() {
+
+    };
+</script>

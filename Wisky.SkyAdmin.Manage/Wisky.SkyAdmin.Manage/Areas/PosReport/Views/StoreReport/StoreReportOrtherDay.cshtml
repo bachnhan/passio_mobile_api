@@ -1,0 +1,299 @@
+﻿@{
+    ViewBag.Title = "Quản lý ngày";
+    //  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@*<style>
+    .date-rangepicker {
+        float: right;
+        position: relative;
+    }
+</style>*@
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Quản lý ngày</h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div>
+            <div class="col-md-6">
+                <a href="@Url.Action("StoreDateReport","StoreReport")"
+                   class="btn btn-primary btn-sm pull-right">
+                    Xem báo cáo ngày hiện tại
+                </a>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-12 pull-right" style="margin-top: 19px;">
+                <div class="input-group">
+                    <div class="date-picker text-right">
+                    <input id="datestring" hidden/>
+                        <div id="reportrange">
+                            <input class="p-7 width230" type="text" id="date-string" readonly />
+                            <a id="" class="CelenderA"><i class="fa fa-calendar"></i></a>
+                        </div>
+                        </div><!-- /input-group -->
+
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" onclick="ReDrawDatatable('dateDatatable')">
+                            <i class="left-icon fa fa-search"></i>Tìm
+                        </a>
+                    </div>
+                </div><!-- /input-group -->
+            </div>
+        </div>
+    </div>
+    <div class="card-padding">
+        <div style="display:none">
+
+            <div class="col-xs-3" style="width: 17%;">
+                <div class="input-group input-group-sm">
+                    <input type="text" id="dpFrom" class="form-control" data-date-format="dd/mm/yyyy" placeholder="Từ" hidden />
+                </div>
+            </div>
+            <div class="col-xs-3" style="width: 17%;">
+                <div class="input-group input-group-sm">
+                    <input type="text" id="dpTo" class="form-control" data-date-format="dd/mm/yyyy" placeholder="Đến" hidden />
+                </div>
+            </div>
+        </div>
+        <div class="form-inline">
+
+            <div class="clearfix"></div>
+            <div class="">
+                <table id="dateDatatable" class="table table-striped table-bordered table-hover" style="width: 100% !important">
+                    <thead>
+                        <tr>
+                            <th>
+                                <label class="">Id</label>
+                            </th>
+                            <th>
+                                <label class="">STT</label>
+                            </th>
+                            <th>
+                                <label class="">Ngày</label>
+                            </th>
+                            <th>
+                                <label class="">Doanh thu</label>
+                            </th>
+                            <th>
+                                <label class="">Giảm giá</label>
+                            </th>
+                            <th>
+                                <label class="">Doanh thu sau giảm giá</label>
+                            </th>
+                            <th>
+                                <label class="">Trạng thái</label>
+                            </th>
+                            <th>
+                                <label class="">Tùy chọn</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@*<div class="page-content">
+    <div class="page-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Quản lý ngày<small data-role="small-date"></small></h1>
+            </div>
+            <div class="col-md-3">
+                <a href="@Url.Action("StoreDateReport","StoreReport")"
+                   class="btn btn-success btn-sm pull-right">
+                    Xem báo cáo ngày hiện tại
+                </a>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group">
+                    <div class="date-picker">
+                        <input type="text" id="date-string" readonly />
+                        <a id="reportrange"><i class="fa fa-calendar"></i></a>
+                    </div><!-- /input-group -->
+
+                    <div class="input-group-btn">
+                        <a class="btn btn-success btn-sm" onclick="ReDrawDatatable('dateDatatable')">
+                            <i class="left-icon fa fa-search"></i>Tìm
+                        </a>
+                    </div>
+                </div><!-- /input-group -->
+            </div>
+        </div>
+
+        @*<h1 class="col-md-6">Quản lý ngày</h1>*@
+@*<div class="date-rangepicker col-md-6">
+        <div class="col-xs-5" style="margin-left: 0; padding-left: 0;">
+            <a href="~/Report/@ViewBag.storeId/@ViewBag.storeName/StoreReport/StoreDateReport" class="btn btn-success">Xem báo cáo ngày hiện tại</a>
+        </div>
+        <div class="col-md-3 date-picker" style="padding:0; width: 200px;">
+            <input type="text" class="form-control" id="date-string" readonly style="height:42px; cursor:auto">
+        </div><!-- /input-group -->
+        <span class="input-group-btn col-md-3" style="padding:0;margin-bottom: 4px">
+            <button class="btn btn-default" id="reportrange" type="button"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></button>
+            <input type="button" class="btn btn-sm" style="height: 42px; " value="Lọc" onclick="ReDrawDatatable('dateDatatable')" />
+        </span>
+    </div>*@
+@*<div style="display:none">
+
+        <div class="col-xs-3" style="width: 17%;">
+            <div class="input-group input-group-sm">
+                <input type="text" id="dpFrom" class="form-control" data-date-format="dd/mm/yyyy" placeholder="Từ" hidden />
+            </div>
+        </div>
+        <div class="col-xs-3" style="width: 17%;">
+            <div class="input-group input-group-sm">
+                <input type="text" id="dpTo" class="form-control" data-date-format="dd/mm/yyyy" placeholder="Đến" hidden />
+            </div>
+        </div>
+    </div>
+    <div class="form-inline">
+
+        <div class="clearfix"></div>
+        <div class="">
+            <table id="dateDatatable" class="table table-striped table-bordered table-hover" style="width: 100% !important">
+                <thead>
+                    <tr>
+                        <th>
+                            <label class="">Id</label>
+                        </th>
+                        <th>
+                            <label class="">STT</label>
+                        </th>
+                        <th>
+                            <label class="">Ngày</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu</label>
+                        </th>
+                        <th>
+                            <label class="">Giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu sau giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Trạng thái</label>
+                        </th>
+                        <th>
+                            <label class="">Chi tiết</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>*@
+
+<script>
+    $(document).ready(function () {
+        function cb(start, end, label) {
+            var startTime = start.format('DD/MM/YYYY'),
+                endTime = end.format('DD/MM/YYYY');
+            var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $('#date-string').val(dateRange);
+            }
+            $('#dpFrom').val(startTime);
+            $('#dpTo').val(endTime);
+            $('[data-role=small-date]').html(dateRange);
+        }
+        //show date time input
+        cb(moment().subtract(29, 'days'), moment(),'30 ngày trước');
+
+        $('#reportrange').daterangepicker({
+            startDate: moment().subtract(29, 'days'),
+            endDate: moment(),
+            maxDate: moment(),
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                '7 ngày trước': [moment().subtract(6, 'days'), moment()],
+                '30 ngày trước': [moment().subtract(29, 'days'), moment()],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]              
+            }
+        }, cb);
+
+        InitDatatable();
+    });
+   
+    function RefreshTable() {
+        var oTable = $("#dateDatatable").datatablevpn();
+        //oTable._fnPageChange(0);
+        //oTable._fnAjaxUpdate();
+    }
+
+    function InitDatatable() {
+
+        $("#dateDatatable").datatablevpn({
+            "bFilter": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": '@Url.Action("LoadDateByStatusDatatable", "StoreReport")',
+            "bProcessing": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "sStartTime", "value": $('#dpFrom').val() });
+                aoData.push({ "name": "sEndTime", "value": $('#dpTo').val() });
+                aoData.push({ "name": "storeId", "value": @ViewBag.storeId });
+            },
+            "oLanguage": {
+                "sSearch": "Tên Phòng:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+
+            },
+            "aoColumnDefs": [
+                { "aTargets": [1, 2, 3, 4, 5], "bSortable": false },
+                {
+                    "aTargets": [0],
+                    "bSortable": false,
+                    "bVisible": false
+                },
+                {
+                    "aTargets": [6],
+                    "fnRender": function (o) {
+                        return ConvertToDateStatusLabel(o.aData[6]);
+                    },
+                    "bSortable": false
+                },
+                {
+                    "aTargets": [7],
+                    "fnRender": function (o) {
+                        return "<a class='btn btn-sm btn-primary'  href='@Url.Action("StoreDateReport", "StoreReport")" + "?dateReportId=" + o.aData[7] + "'><i class='glyphicon glyphicon-eye-open'></a>";
+                    },
+                    "bSortable": false
+                }
+            ],
+            "bAutoWidth": false,
+            "aaSorting": [[1, "desc"]]
+
+        });
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    }
+
+    function ConvertToDateStatusLabel(status) {
+        if (status == 2) {
+            return '<span class="label label-success">Đang mở</span>';
+        }
+
+
+        return '<span class="label label-info">Đã duyệt</span>';
+    }
+
+</script>

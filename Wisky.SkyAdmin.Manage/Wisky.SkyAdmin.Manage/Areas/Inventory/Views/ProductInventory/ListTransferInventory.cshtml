@@ -1,0 +1,317 @@
+﻿@model HmsService.ViewModels.InventoryReceiptEditViewModel
+@{
+    ViewBag.Title = "ListTransferInventory";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .text-center {
+        text-align: center;
+    }
+
+    .title-width {
+        width: 21%;
+    }
+
+    .button-width {
+        width: 16%;
+        padding-top:5px;
+    }
+
+    .group-radio-buttons {
+        width: 63%;
+        position: static;
+        float: left;
+        padding-top: 5px;
+    }
+
+    .title-width, .button-width {
+        padding-left: 15px;
+        padding-right: 15px;
+        float:left;
+    }
+
+    .small-radio-button-width {
+        width: 15%;
+        float: left;
+    }
+
+    .medium-radio-button-width {
+        width: 18%;
+        float: left;
+    }
+
+    .large-radio-button-width {
+        width: 19%;
+        float: left;
+    }
+
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="title-width">
+                <h3>Phiếu chuyển kho đi</h3>
+            </div>
+            <div class="group-radio-buttons">
+                <div class="row small-margin">
+                    <div class="small-radio-button-width text-center">
+                        <input type="radio" name="report-filter" value="3" class="nice-check" id="filter4" checked />
+                        <label for="filter4"><span>Tất cả</span></label>
+                    </div>
+                    <div class="medium-radio-button-width text-center">
+                        <input type="radio" name="report-filter" value="0" class="nice-check" id="filter1" />
+                        <label for="filter1"><span>Chờ duyệt</span></label>
+                    </div>
+                    <div class="medium-radio-button-width text-center">
+                        <input type="radio" name="report-filter" value="1" class="nice-check" id="filter2" />
+                        <label for="filter2"><span>Đã duyệt</span></label>
+                    </div>
+                    <div class="large-radio-button-width text-center">
+                        <input type="radio" name="report-filter" value="6" class="nice-check" id="filter3" />
+                        <label for="filter3"><span>Yêu cầu hủy</span></label>
+                    </div>
+                    <div class="small-radio-button-width text-center">
+                        <input type="radio" name="report-filter" value="2" class="nice-check" id="filter5" />
+                        <label for="filter5"><span>Đã hủy</span></label>
+                    </div>
+                    <div class="small-radio-button-width text-center">
+                        <input type="radio" name="report-filter" value="4" class="nice-check" id="filter6" />
+                        <label for="filter6"><span>Đã đóng</span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="button-width text-right">
+                <a href="@(Url.Action("TransferInventory","ProductInventory"))" class="btn btn-primary btn-icon-text waves-effect addNewEmp">
+                    <i class="zmdi zmdi-plus"></i> Thêm hóa đơn
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <table id="inventoryReceiptTable" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th><label>STT</label></th>
+                    <th><label>Tên Hóa Đơn</label></th>
+                    <th><label>Người phụ trách</label></th>
+                    <th><label>Thành tiền</label></th>
+                    <th><label>Ngày tạo</label></th>
+                    <th><label>Trạng thái</label></th>
+                    <th><label>Ghi chú</label></th>
+                    <th><label>Kho nhận hàng</label></th>
+                    <th><label>Loại</label></th>
+                    <th><label>Tùy chọn</label></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+    </div>
+</div>
+
+@section InventoryReceipt{
+    <script>
+        function AcceptCancel(id) {
+            ShowConfirm("Xác nhận hủy đơn hàng này?", function () {
+                $.ajax({
+                    "type": "post",
+                    "url": "@(Url.Action("AcceptCancel", "ProductInventory"))",
+                    "data": {
+                        id: parseInt(id),
+                    },
+                    success: function (result) {
+                        if (!result.success) {
+                            ShowAlert("Duyệt thất bại!", 1);
+                        } else {
+                            ShowAlert("Đã duyệt thành công!", 2);
+                            //location.href = "(Url.Action("ListImportInventory", "ProductInventory"))";
+                            RefreshTable();
+                        }
+                    }
+                });
+            });
+        }
+        function RequestCancel(id) {
+            ShowConfirm("Yêu cầu hủy đơn hàng này?", function () {
+                $.ajax({
+                    "type": "post",
+                    "url": "@(Url.Action("InStoreCancelRequest", "ProductInventory"))",
+                    "data": {
+                        id: parseInt(id)
+                    },
+                    success: function (result) {
+                        ShowAlert("Yêu cầu hủy thành công!", 2);
+                        RefreshTable();
+                    }
+                });
+            });
+        }
+        function CancelReceipt(id) {
+            ShowConfirm("Xác nhận hủy đơn hàng này?", function () {
+                $.ajax({
+                    "type": "post",
+                    "url": "@(Url.Action("CancelReceipt", "ProductInventory"))",
+                    "data": {
+                        id: parseInt(id)
+                    },
+                    success: function (result) {
+                        ShowAlert("Đã hủy thành công!", 2);
+                        RefreshTable();
+                    }
+                });
+            });
+        }
+        $(document).ready(function () {
+            InitVoucherCampaignDatatable();
+            $('[name="report-filter"]').change(function (e) {
+                RefreshTableFilter('#inventoryReceiptTable', true);
+            });
+        });
+
+        function InitVoucherCampaignDatatable() {
+            $("#inventoryReceiptTable").dataTable({
+                "bFilter": true,
+                "bSort": false,
+                "bRetrieve": true,
+                "bServerSide": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("LoadTransferInventory")",
+                "bProcessing": true,
+                "bFilter": true,
+                "deferRender": true,
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "status", "value": $('input[name=report-filter]:checked').val() });
+                },
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                    "sSearchPlaceholder": "Tên hóa đơn"
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 4, 6, 7],
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [3],
+                        "sClass": "text-right",
+                        "mRender": function (data, type, row) {
+                            if (row[3] != null) {
+                                return formatVND(parseFloat(row[3])) + " đ";
+                            } else {
+                                return "";
+                            }
+                        }
+                    },
+                    {
+                        "aTargets": [5],
+                        "mRender": function (data, type, row) {
+                            var data = row[5];
+                            var result = "";
+                            if (data === 0) {
+                                result = "<div class='label myStatus not-approved meStatus'>Chưa duyệt</div>";
+                            }
+                            else if (data === 1) {
+                                result = "<div class='label myStatus approved meStatus'>Đã duyệt</div>";
+                            }
+                            else if (data === 2) {
+                                result = "<div class='label myStatus canceled meStatus'>Đã hủy</div>";
+                            }
+                            else if (data === 3) {
+                                result = "<div class='label myStatus rejected meStatus'>Đã từ chối</div>";
+                            }
+                            else if (data === 4) {
+                                result = "<div class='label myStatus closed meStatus'>Đã đóng</div>";
+                            }
+                            else if (data === 5) {
+                                result = "<div class='label myStatus not-confirmed meStatus'>Chờ xác nhận</div>";
+                            }
+                            else if (data === 6) {
+                                result = "<div class='label myStatus not-approved meStatus'>Yêu cầu hủy</div>";
+                            }
+                            return result;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [8],
+                        "mRender": function (data, type, row) {
+                            var data = row[8];
+                            var result = "";
+                            if (data === 2) {
+                                result = "<div class='label myStatus myStatuses' style='background:#4CAF50; color: white'>Chuyển kho đi</div>";
+                            }
+                            return result;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [9],
+                        "mRender": function (data, type, row) {
+                            var data = row[9];
+                            var result = "";
+                            if (row[4] === '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")' && row[5] === 0) {
+                                result = "<a class='btn btn-sm btn-primary' title='Chi tiết' target='_blank' href='InventoryReceiptItem/" + data + "'><i class='glyphicon glyphicon-eye-open' style='color: white'></i></a>" + "  " +
+                                    "<a class='btn btn-sm btn-danger' title='Hủy'  onclick='CancelReceipt(" + data + ")'><i class='glyphicon glyphicon-remove' style='color: white'></i></a>" + "  ";
+                            }
+                            else if (row[4] === '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")' && row[5] === 1) {
+                                result = "<a class='btn btn-sm btn-primary' title='Chi tiết' target='_blank' href='InventoryReceiptItem/" + data + "'><i class='glyphicon glyphicon-eye-open' style='color: white'></i></a>" + "  " +
+                                    "<a class='btn btn-sm btn-danger' title='Yêu cầu hủy'  onclick='RequestCancel(" + data + ")'><i class='glyphicon glyphicon-remove-sign' style='color: white'></i></a>" + "  ";
+                            }
+                            else if (row[4] === '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")' && row[5] === 6) {
+                                result = "<a class='btn btn-sm btn-primary' title='Chi tiết' target='_blank' href='InventoryReceiptItem/" + data + "'><i class='glyphicon glyphicon-eye-open' style='color: white'></i></a>" + "  " +
+                                    "<a class='btn btn-sm btn-success' title='Đồng ý hủy' onclick='AcceptCancel(" + data + ")'><i class='glyphicon glyphicon-ok-sign' style='color: white'></i></a>" + "  ";
+                            }
+                            else {
+                                result = "<a class='btn btn-sm btn-primary' title='Chi tiết' target='_blank' href='InventoryReceiptItem/" + data + "'><i class='glyphicon glyphicon-eye-open' style='color: white'></i></a>" + "  ";
+                            }
+                            return result;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    }
+                ],
+                "bAutoWidth": false,
+            }).fnSetFilteringDelay(delaySearch);
+        }
+        //redraw datatable without reload
+        function reDrawDatatable(id) {
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+        }
+
+        //user datatable
+        function RefreshTable() {
+            reDrawDatatable("#inventoryReceiptTable");
+        }
+        var formatVND = function (x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        };
+    </script>
+}
+

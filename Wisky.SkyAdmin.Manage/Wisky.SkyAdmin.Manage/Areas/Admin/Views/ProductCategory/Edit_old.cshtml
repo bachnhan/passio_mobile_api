@@ -1,0 +1,180 @@
+﻿@model HmsService.ViewModels.ProductCategoryEditViewModel
+@{
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var storeId = 0;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+    var store = Utils.GetStore(storeId);
+    ViewBag.Title = "Tạo nhóm sản phẩm";
+}
+
+@if (store.Type == (int)StoreTypeEnum.Website)
+{
+    <div class="card">
+        @this.Html.Partial("Editor", this.Model);
+    </div>
+}
+else
+{
+    <div class="card">
+        <form role="form" method="post">
+            @this.Html.AntiForgeryToken()
+            @this.Html.HiddenFor(q => q.CateID)
+            <input type="hidden" name="ImageFontAwsomeCss" value="." />
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>Chỉnh sửa danh mục sản phẩm</h3>
+                    </div>
+                    <div class="col-md-6 text-right">
+                        <a href="@this.Url.Action("Index", new { parameters = currentStoreDomain.Directory })" class="btn btn-success">Quay lại</a>
+                        <button type="button" class="btn btn-primary" id="btn-submit-product">Hoàn tất</button>
+                    </div>
+                </div>
+                <hr />
+            </div>
+            @this.Html.Partial("Editor", this.Model)
+        </form>
+    </div>
+    <input hidden id="validateId" value="@Model.CateID" />
+}
+@section Scripts{
+    @if (store.Type == (int)StoreTypeEnum.Website)
+    {
+        <link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+        <link href="~/Content/plugins/elfinder/css/theme.css" rel="stylesheet" />
+
+        <script src="~/Content/plugins/dropzone/dropzone.js"></script>
+        <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+        <script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+
+
+        <script>
+            SKYWEB.Admin.Product.init();
+            SKYWEB.Admin.General.init();
+            SKYWEB.Admin.General.setupElfinderToCkeditor('inputDescription');
+        </script>
+    }
+    else
+    {
+        <script>
+            $(document).ready(function () {
+                loadIcon();
+                SplitAdjustmentNote();
+
+                $('.btn-success').fixedScroll(70);
+                $('#btn-submit-product').fixedScroll(70);
+            });
+
+            function loadIcon() {
+                $(".iconoption option").each(function () {
+                    var note = $(this).text();
+                    $(this).html($(this).text());
+                });
+            }
+
+            $('#btn-submit-product').click(function () {
+                if ($('#CateName').val() == "") {
+                    ShowMessage('Vui lòng nhập tên loại sản phẩm', 3);
+                    return;
+                }
+                else if ($('#SeoName').val() == "") {
+                    ShowMessage('Vui lòng nhập đường dẫn SEO', 3);
+                    return;
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        url: '@Url.Action("ValidateSeoName")',
+                        dataType: 'JSON',
+                        data: {
+                            seoName: $('#SeoName').val(),
+                            id: $('#validateId').val()
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                var adjustmentNote = JoinAdjustmentNote();
+
+                                $('#AdjustmentNote').val(adjustmentNote);
+
+                                var $form = $('form');
+
+                                $form.submit();
+                            }
+                            else {
+                                ShowMessage('Đường dẫn Seo đã tồn tại', 3);
+                                return;
+                            }
+                        },
+                    });
+                }
+            });
+
+            function JoinAdjustmentNote() {
+                var result = "";
+                var note1text1 = $('#note11').val();
+                var note1text2 = $('#note12').val();
+                var note1text3 = $('#note13').val();
+
+                var note2text1 = $('#note21').val();
+                var note2text2 = $('#note22').val();
+                var note2text3 = $('#note23').val();
+
+                var note3text1 = $('#note31').val();
+                var note3text2 = $('#note32').val();
+                var note3text3 = $('#note33').val();
+
+                result = note1text1 + '-' + note1text2 + '-' + note1text3 + '|' +
+                    note2text1 + '-' + note2text2 + '-' + note2text3 + '|' +
+                    note3text1 + '-' + note3text2 + '-' + note3text3;
+                return result;
+            }
+
+            function SplitAdjustmentNote() {
+                var adjustmentNote = $('#AdjustmentNote').val();
+                if (adjustmentNote != "") {
+                    var notes = adjustmentNote.split("|");
+                    for (var i = 0; i < notes.length; i++) {
+                        if (i == 0) {
+                            var note1 = notes[0].split("-");
+                            if (note1[0] != null) {
+                                $('#note11').val(note1[0]);
+                            }
+                            if (note1[1] != null) {
+                                $('#note12').val(note1[1]);
+                            }
+                            if (note1[2] != null) {
+                                $('#note13').val(note1[2]);
+                            }
+                        } else if (i == 1) {
+                            var note2 = notes[1].split("-");
+                            if (note2[0] != null) {
+                                $('#note21').val(note2[0]);
+                            }
+                            if (note2[1] != null) {
+                                $('#note22').val(note2[1]);
+                            }
+                            if (note2[2] != null) {
+                                $('#note23').val(note2[2]);
+                            }
+                        } else {
+                            var note3 = notes[2].split("-");
+                            if (note3[0] != null) {
+                                $('#note31').val(note3[0]);
+                            }
+                            if (note3[1] != null) {
+                                $('#note32').val(note3[1]);
+                            }
+                            if (note3[2] != null) {
+                                $('#note33').val(note3[2]);
+                            }
+                        }
+                    }
+                }
+            }
+
+        </script>
+    }
+} 

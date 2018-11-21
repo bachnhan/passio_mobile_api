@@ -1,0 +1,1361 @@
+﻿@model HmsService.ViewModels.PromotionEditViewModel
+
+
+@{
+    ViewBag.Title = "Tạo đặt hàng mới";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    label.control-label {
+        color: #8c9184;
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+    .tab_header {
+        font-size: 16px;
+    }
+
+    .inform_Display {
+        font-size: 15px;
+    }
+
+    a > i.fa-plus {
+        top: 28%;
+        position: absolute;
+        left: 0;
+        right: 0;
+        text-align: center;
+        display: block;
+        opacity: 0;
+        transition: 0.1s;
+    }
+
+    .ratio-item:hover i.fa-plus {
+        opacity: 1;
+    }
+</style>
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&key=AIzaSyDwJA7jUX5F9KR44NAKvfJsxn-9cjQwzZk"></script>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Đặt hàng
+                </h3>
+                <h5>
+                    <a id="btn-setting" data-status="setting" style="color: black; font-weight: 600">Call center</a>
+                </h5>
+            </div>
+
+        </div>
+        <hr />
+    </div>
+
+    <!--Show up modal chọn extra cho sản phẩm-->
+    <div>
+        <div id="showExtra" class="modal fade in" data-dissmiss="modal" data-keyboard="true"></div>
+    </div>
+
+    <div class="card-padding custom">
+
+
+
+
+        <div role="tabpanel">
+            <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active" style="cursor: pointer">
+                    <a id="cus-infoTab" role="tab" class="tab_header" href="#cus_info" data-toggle="tab">Thông tin khách hàng</a>
+                </li>
+
+                <li role="presentation" onclick="DisplayOrder(1);" class="" style="cursor: pointer">
+                    <a id="orderTab" role="tab" class="tab_header" href="#order" data-toggle="tab">Đơn hàng</a>
+                </li>
+
+                <li role="presentation" onclick="DisplayOrder(2);" style="cursor: pointer">
+                    <a id="promotionTab" href="#promotion" class="tab_header" role="tab" data-toggle="tab">Khuyến mãi</a>
+                </li>
+                <li role="presentation" style="cursor: pointer">
+                    <a id="finalizeTab" role="tab" class="tab_header" href="#summary" data-toggle="tab">Tổng kết</a>
+                </li>
+
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content" style="overflow:hidden;">
+
+                <!--tab customer information-->
+                <div role="tabpanel" class="tab-pane fade active in" id="cus_info">
+                    <div class="form-horizontal">
+                        <div class="row">
+                            <div class="col-md-4">
+
+                                <div class="form-group row">
+                                    <label class="control-label col-md-4">Tìm kiếm</label>
+                                    <div class="col-md-8 ">
+                                        <div class="styled-select blue semi-square">
+                                            <input id="customers-list" name="custName" class="inform_Display" style="width:100%;" />
+                                            <input type="hidden" name="custID" id="customer-id" />
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group row">
+                                    <label class="control-label col-md-4">hoặc</label>
+                                    <div class="col-md-8">
+                                        <button type="button" class="btn btn-primary btn-block" id="btnIsNewUser">
+                                            <i class="zmdi zmdi-plus"></i> Thêm khách hàng mới
+                                        </button>
+                                        <button type="button" id="btn-cancel" style="display:none; width: 192px;" role="button" class="btn btn-danger">
+                                            <i class="left-icon fa fa-check"></i> Hủy
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Tên KH</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control inform_Display" id="cust-name" type="text" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Địa chỉ</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control inform_Display" id="cust-address" type="text" disabled />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Điện thoại</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control inform_Display" id="cust-phone" type="text" disabled />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label col-md-4">Email</label>
+                                    <div class="col-md-8">
+                                        <input class="form-control inform_Display" id="cust-email" type="text" disabled />
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="col-md-4 col-md-offset-4">
+                                    <div class="form-group">
+                                        <label class="control-label col-md-4">Ghi chú</label>
+                                        <div class="col-md-8">
+                                            <input class="form-control" id="notes" type="text" />
+                                        </div>
+                                    </div>
+                                </div>*@
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="color: #8c9184;font-weight: bold;">Lịch sử mua hàng</h4>
+                        <table id="customer-history-table" class="table-condensed table-striped table-hover">
+                            <thead>
+                                <tr style="background-color: #4caf50; color: white;">
+                                    <th style="text-align: center">
+                                        <strong>Sản phẩm</strong>
+                                    </th>
+                                    <th style="text-align: center">
+                                        <strong>Số lượng đã mua</strong>
+                                    </th>
+                                    <th style="text-align: center">
+                                        <strong>Ngày mua</strong>
+                                    </th>
+
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!--tab Summary include Map-->
+                <div role="tabpanel" class="tab-pane fade" id="summary" style="">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="inform_Display col-md-12"><label class="control-label">Khách hàng : </label><span data-role="summary-cus-name"> Tô Chít Cuồng</span></div>
+                            <div class="inform_Display col-md-12"><label class="control-label">Điện thoại : </label><span data-role="summary-cus-phone"> 0123355555</span> </div>
+                            <div class="inform_Display col-md-12"><label class="control-label">Địa chỉ : </label><span data-role="summary-cus-address"> 6A Nguyễn Văn Của</span>  </div>
+
+                        </div>
+                        <div class="col-md-6">
+                            <div class="inform_Display col-md-12"><label class="control-label">Order : </label> có <span data-role="summary-total-product"> 5  </span> sản phẩm </div>
+                            <div class="inform_Display col-md-12"><label class="control-label">Tổng tiền : </label><span data-role="summary-final-money"> 65000 VND</span> </div>
+                            <div class="form-group col-md-12">
+                                <label class="control-label">Ghi chú : </label>
+                                <input class="form-control inform_Display" style="width:63%;display: initial;" id="notes" type="text" />
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row" style="margin-bottom:25px;">
+                                <div class="col-md-10">
+                                    <input type="text" id="txt-delivery-address" class="form-control inform_Display" placeholder="Nhập để tìm địa chỉ">
+                                </div>
+                                <div class="col-md-2">
+                                    <button type="button" class="btn btn-primary btn-sm pull-right" id="btn-search-address">
+                                        <i class="left-icon fa fa-search"></i> Tìm
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <ul class="nearby-stores"></ul>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div id="map-canvas" style="width: 100%; height: 300px;"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-12" style="margin-top:26px;">
+                        <button type="button" id="btn-order" role="button" style="width:150px;" class="btn btn-primary btn-sm pull-right" >
+                            <i class="left-icon fa fa-check"></i> Đặt hàng
+                        </button>
+                    </div>
+                </div>
+
+                <!--tab promotion-->
+                <div role="tabpanel" class="tab-pane fade col-md-6" id="promotion">
+                    <div class="row">
+                        <div class="" id="promotion-panel">
+
+                            @*@foreach (var group in Model.AvailableGroup)
+                                {
+                                    <div class="col-md-12">
+                                        <h5 class="row inform_Display"><b>@group.Text</b></h5>
+                                        @foreach (var promotion in Model.AvailablePromotion)
+                                        {
+                                            if (promotion.Group == int.Parse(group.Value))
+                                            {
+                                                <div class="col-md-5 checkbox" style="margin-top:0px;">
+                                                    <label class="inform_Display">
+                                                        <input name="@group.Value" value="@promotion.PromotionID" type="radio">@promotion.PromotionName
+                                                        <i class="input-helper"></i>
+                                                    </label>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                }*@
+
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <!--tab Order-->
+                <div role="tabpanel" class="tab-pane fade" id="order">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="form-group">
+                                    <div class="col-md-5">
+                                        <select class="form-control inform_Display" id="category-menu" data-filter="category">
+                                            <option value="-1">Tất cả</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <input class="form-control inform_Display" data-filter="name" placeholder="Tìm theo tên" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row" id="product-table-panel">
+                                <div class="tableDiv-responsive">
+                                    <div class="col-sm-12" style="margin-top:30px; margin-bottom:20px">
+                                        @*<div id="forScroll" class="scroll-div" style="overflow-y: auto">
+                                            <ul class="row small-margin" data-role="service-container" id="iso-container" style="padding-left: 0"></ul>
+                                        </div>*@
+                                        <div id="forScroll" class="row small-margin" style="height:590px; overflow-y: auto; overflow: hidden; outline:none ;padding: 0">
+                                            <ul class="row small-margin" data-role="service-container" id="iso-container" style="width:100%;"></ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tableDiv-responsive">
+                                <table id="orderItemDatatable" class="table-bordered table-condensed col-md-12">
+                                    <thead style="white-space: nowrap;">
+                                        <tr style="background-color:#4caf50;color: white;">
+                                            <th>
+                                                <label class="">Tên</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Đơn giá</label>
+                                            </th>
+                                            <th>
+                                                <label class="">SL</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Giảm giá (%)</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Giảm giá (tiền mặt)</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Tổng cộng</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Xóa</label>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    @*<tr><td colspan="7">Không có dữ liệu</td></tr>*@
+                                    </tbody>
+                                </table>
+                                <label id="total-Item" class="pull-right text-bold inform_Display"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <template id="tmpServiceItem">
+                        <li class="col-md-3">
+                            <div class="service-item service-item-sm no-border" style="border:none;">
+                                <div class="ratio-wrapper ratio-wrapper-1-1">
+                                    <div class="ratio-item">
+                                        <a class="img-container" style="cursor:pointer;" data-spinner="plus" onclick="showExtraMenu(this);">
+                                            <img style="min-height:88%;" src="/Content/images/Default_product_img.jpg"
+                                                 onerror="window.HMS.ServiceItemHandler.resetDefaultImage(this)">
+                                            <i class="fa fa-plus fa-5x" aria-hidden="true"></i>
+                                            <div class="price">
+                                                <label data-role="price"></label>
+                                            </div>
+                                            <div class="title">
+                                                <label data-role="name"></label>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ace-spinner touch-spinner">
+                                    <div class="input-group">
+                                        <div class="spinner-buttons input-group-btn spinner-left" data-spinner="minus">
+                                            <button class="btn btn-warning btn-minus btn-xs">
+                                                <i class="fa fa-minus smaller-75"></i>
+                                            </button>
+                                        </div>
+                                        <input type="text" class="input-sm input-quantity form-control" style="text-align:center" value="1" maxlength="4" onkeyup="this.value = checkDigit(this.value)">
+                                        <div class="spinner-buttons input-group-btn spinner-right">
+                                            <button class="btn btn-info btn-order btn-xs" data-action="order-item" data-type="spinner">
+                                                <i class="fa fa-check smaller-75"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </template>
+
+                    <template id="tmpServiceItemRow">
+                        <tr>
+                            <td data-role="name"></td>
+                            <td data-role="price"></td>
+                            <td data-role="quantity"></td>
+                            <td data-role="discount"></td>
+                            <td data-role="discount-amount"></td>
+                            <td data-role="total"></td>
+                            <td>
+                                <button class="btn btn-xs btn-danger" data-action="delete-ordered-item"><i class="glyphicon glyphicon-trash"></i></button>
+                            </td>
+                        </tr>
+                    </template>
+
+
+
+
+                    <!--tab History-->
+                    <!--
+                    <div role="tabpanel" class="tab-pane fade" id="history">
+                        <div class="row">
+                            <div class="col-md-5" id="customer-order">
+
+                            </div>
+                            <div class="col-md-7">
+                                <h2>Danh sách sản phẩm đã mua</h2>
+                                <table class="table table-bordered table-striped" id="customer-order-history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>STT</th>
+                                            <th>Tên sản phẩm</th>
+                                            <th>Số lần đã mua</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+
+                </div>
+
+
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script src="~/Scripts/accounting.min.js"></script>
+<script src="~/Content/frontend/js/common.js"></script>
+<script src="~/Content/Delivery/delivery.js"></script>
+<script src="~/Content/frontend/js/skyplus-delivery2.js"></script>
+<script src="~/Content/Delivery/delivery.dom.object.init.js"></script>
+<script>
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "1";
+        }
+        return str;
+    }
+    $(document).ready(function () {
+
+        $('#sidebar').css('left', '-260px');
+        $('#content').css('padding-left', '0px');
+
+        $('#sidebar').on("mouseenter", function () { $('#sidebar').css('left', '0px') });
+        $('#sidebar').on("mouseleave", function () { $('#sidebar').css('left', '-260px') })
+
+        //Add navigation tab click events
+        //$("li[role=presentation]:eq(0)").on("click", function () {
+        //    changeTab("order");
+        //});
+        //$("li[role=presentation]:eq(1)").click(function () {
+        //    changeTab("map");
+        //});
+
+
+        $("#forScroll").niceScroll({
+            cursorcolor: "green",
+            cursoropacitymin: 0.3,
+            background: "#bbb",
+            cursorborder: "0",
+            autohidemode: true,
+            cursorfixedheight: 100
+        });
+        $('#ascrail2000').show();
+        window.HMS.Delivery.init();
+        loadAllCategory();
+
+        window.OnlineOrder = new DeliveryOrder(window['storeId'],
+                '@Url.Action("CreateOnlineOrder")');
+
+        $(function () {
+            //$("#map-canvas").width('100%').height(300);
+            google.maps.event.addDomListener(window, 'load', initialize);
+
+
+
+
+        });
+        autocomplete = new google.maps.places.Autocomplete((document.getElementById('txt-delivery-address')), { types: ['geocode'] });
+
+        $('a[href=#summary]').click(function (e) {
+            setTimeout(function () {
+                google.maps.event.trigger(map, 'resize');
+            }, 700);
+        });
+
+        google.maps.event.addListener(autocomplete, 'place_changed', function () {
+            fillInAddress();
+        });
+
+
+
+        $("#cust-address").on('focusout', function () {
+            $("#txt-delivery-address").val($(this).val());
+        });
+
+        $("a[href=#promotion]").click(function () {
+            checkPromotions(false);
+
+        });
+
+        $('a[href=#order]').click(function () {
+
+            resetAll();
+
+            loadOrderTable(window.OnlineOrder.Order.OrderDetails, window.OnlineOrder.Order, false);
+            checkCustomerInfo();
+        });
+
+
+        ////Thiết lập 
+        //var a = $('#orderItemDatatable tbody tr');
+        //for (var i = 0; i < a.length; i++) {
+        //    $(a[i]).find('td[data-role=discount]').hide();
+        //    $(a[i]).find('td[data-role=discount-amount]').hide();
+        //}
+        InitCustomerProductDatatable();
+    });
+
+
+    /*Bản đồ*/
+    var map;
+    var mapOptions;
+    var listStore = new Array();
+    function initialize() {
+        var styles = [{ featureType: "road.highway", stylers: [{ visibility: "off" }] }, { featureType: "landscape", stylers: [{ visibility: "off" }] }, { featureType: "transit", stylers: [{ visibility: "off" }] }, { featureType: "poi", stylers: [{ visibility: "off" }] }, { featureType: "poi.park", stylers: [{ visibility: "on" }] }, { featureType: "poi.park", elementType: "labels", stylers: [{ visibility: "off" }] }, { featureType: "poi.park", elementType: "geometry.fill", stylers: [{ color: "#d3d3d3" }, { visibility: "on" }] }, { featureType: "poi.medical", stylers: [{ visibility: "off" }] }, { featureType: "poi.medical", stylers: [{ visibility: "off" }] }, { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#cccccc" }] }, { featureType: "water", elementType: "geometry.fill", stylers: [{ visibility: "on" }, { color: "#cecece" }] }, { featureType: "road.local", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#808080" }] }, { featureType: "administrative", elementType: "labels.text.fill", stylers: [{ visibility: "on" }, { color: "#808080" }] }, { featureType: "road", elementType: "geometry.fill", stylers: [{ visibility: "on" }, { color: "#fdfdfd" }] }, { featureType: "road", elementType: "labels.icon", stylers: [{ visibility: "off" }] }, { featureType: "water", elementType: "labels", stylers: [{ visibility: "off" }] }, { featureType: "poi", elementType: "geometry.fill", stylers: [{ color: "#d2d2d2" }] }];
+
+        // Create a new StyledMapType object, passing it the array of styles,
+        // as well as the name to be displayed on the map type control.
+        var styledMap = new google.maps.StyledMapType(styles,
+        { name: "Styled Map" });
+
+        mapOptions = {
+            center: new google.maps.LatLng(10.789886817455374, 106.6787300934875),
+            zoom: 14,
+            mapTypeControlOptions: {
+                mapTypeIds: [google.maps.MapTypeId.ROADMAP, 'map_style']
+            }
+        };
+
+        map = new google.maps.Map(document.getElementById("map-canvas"),
+            mapOptions);
+        map.mapTypes.set('map_style', styledMap);
+        map.setMapTypeId('map_style');
+        //setPositionTerminal();
+        //setPositionUser();
+
+        window.map = map;
+        window.geocoder = new google.maps.Geocoder();
+
+        addStoreLocations();
+
+    }
+
+
+
+    var markerList = [];
+    function addStoreLocations() {
+        $.ajax({
+            url: "@Url.Action("GetStoreCoordinateList")",
+            type: "POST",
+
+            success: function (data) {
+                window.storeInfos = data;
+                if (markerList.length != 0) {
+                    for (var i in markerList) {
+                        markerList[i].setMap(null);
+                    }
+                }
+                for (var index in data) {
+                    var store = data[index];
+                    listStore.push(store);
+                    var img = "/Content/images/m_terminal.png";
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(store.Latitude, store.Longitude),
+                        map: window.map,
+                        title: store.Name,
+                        icon: img
+                    });
+                    markerList.push(marker);
+                }
+            },
+
+            error: function () {
+                window.setTimeout(addStoreLocations, 500);
+            },
+        });
+    }
+
+    var markers = [];
+
+    function addLatLngTe(data) {
+        for (var i = 0; i < data.length; i++) {
+            var location = new google.maps.LatLng(data[i].lat, data[i].lon);
+            var label = data[i].Name;
+            addMarkerTerminal(location, label);
+        }
+    }
+
+    function addLatLngDe(data) {
+        for (var i = 0; i < data.length; i++) {
+            var location = new google.maps.LatLng(data[i].Lat, data[i].Lon);
+            var label = data[i].Label;
+            GetPositionUser(location, label);
+        }
+    }
+
+    // add marker terminal
+    function addMarkerTerminal(location, label) {
+        var image = '/Content/images/m_terminal.png';
+        //if (map == "undefined") {
+        //    map = new google.maps.Map(document.getElementById("map-canvas"),
+        //        mapOptions);
+        //}
+        var marker = new window.google.maps.Marker({
+            position: location,
+            map: map,
+            icon: image,
+            title: label
+        });
+        var contentString = label;
+        var infowindow = new google.maps.InfoWindow({
+            content: contentString
+        });
+
+        google.maps.event.addListener(marker, 'click', function () {
+            infowindow.open(map, marker);
+        });
+
+        markers.push(marker);
+
+
+    }
+    function fillInAddress() {
+        // Get the place details from the autocomplete object.
+        var place = autocomplete.getPlace();
+        $('#btn-search-address').trigger('click');
+    }
+
+    var resultMarker = null;
+    $("#btn-search-address").on('click', function () {
+        var address = $("#txt-delivery-address").val();
+
+        window.geocoder.geocode({ 'address': address }, function (results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                map.setCenter(results[0].geometry.location);
+                if (resultMarker != null) {
+                    resultMarker.setMap(null);
+                }
+                resultMarker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+            } else {
+                ShowMessage("Geocode was not successful for the following reason: " + status, 1);
+            }
+        });
+
+        searchClosestStore(address);
+    });
+
+
+
+
+    function searchClosestStore(address) {
+        if (window.storeInfos == null) {
+            ShowMessage("Dữ liệu danh sách cửa hàng chưa được load xong, vui lòng thử lại sau.", 3);
+            return;
+        }
+
+        var origins = [];
+        //for (var index in window.storeInfos) {
+        //    var store = window.storeInfos[index];
+
+        //    origins.push(new google.maps.LatLng(store.Latitude, store.Longitude));
+        //}
+
+        for (var i = 0; i < window.storeInfos.length; i++) {
+            var store = window.storeInfos[i];
+            origins.push(new google.maps.LatLng(store.Latitude, store.Longitude));
+        }
+
+        var service = new google.maps.DistanceMatrixService();
+        service.getDistanceMatrix(
+        {
+            origins: origins,
+            destinations: [address],
+            travelMode: google.maps.TravelMode.DRIVING,
+        }, onFindingClosestStoreFinished);
+
+
+    }
+
+    function onFindingClosestStoreFinished(response, status) {
+        if (status == "OK") {
+            var minDistance = Number.POSITIVE_INFINITY;
+            var minIndex = -1;
+
+            var resultString = "";
+            var rs = [];
+            var rows = [];
+            var i;
+            for (i = 0; i < response.rows.length; i++) {
+                var lowest = response.rows[i].elements[0];
+                lowest.storeIndex = i;
+                rows.push(lowest);
+            }
+            var count = rows.length;
+            var checkOk = function (ele) {
+                return ele.status == 'OK';
+            };
+            for (var index = 0; rows.length > 0; i++) {
+                var result = rows[0];
+                if (rows.filter(checkOk).length != 0) {
+                    var l = result.status == 'OK' ? result.distance.value : -1;
+                    for (var j in rows) {
+                        var ele = rows[j];
+                        if (ele.status == 'OK' && (result.status != 'OK' || ele.distance.value < result.distance.value)) {
+                            result = ele;
+                        }
+                    }
+                }
+                rows = rows.filter(function (ele) {
+                    return ele.storeIndex != result.storeIndex;
+                });
+                if (result.status != "OK") {
+                    rs.push($('<li/>', {
+                        'class': 'row',
+                        'html': [
+                            $('<lable/>', {
+                                'class': 'col-md-4',
+                                html: window.storeInfos[result.storeIndex].Name
+                            }),
+                            $('<label/>', {
+                                'class': 'col-md-8',
+                                html: 'Không tìm thấy đường đi.'
+                            })
+                        ]
+                    }));
+                    continue;
+                }
+                rs.push($('<li/>', {
+
+                    'html': $('<div/>', {
+                        'class': 'row',
+                        'html': [
+                            $('<input/>', {
+                                'type': 'hidden',
+                                'value': window.storeInfos[result.storeIndex].ID
+                            }),
+                            $('<label/>', {
+                                'class': 'col-md-4',
+                                html: window.storeInfos[result.storeIndex].Name
+                            }),
+                            $('<label/>', {
+                                'class': 'col-md-4',
+                                html: result.distance.text
+                            }),
+                            $('<div/>', {
+                                'class': 'col-md-4',
+                                html: $('<button/>', {
+                                    'class': 'btn btn-primary btn-sm pull-right',
+                                    'html': 'Chọn',
+                                    'data-role': 'select-storeId',
+                                })
+                            })
+                        ]
+                    })
+                }));
+
+                if (result.distance.value < minDistance) {
+                    minDistance = result.distance.value;
+                    minIndex = index;
+                }
+            }
+            $('ul.nearby-stores').html('');
+            if (minDistance == Number.POSITIVE_INFINITY) {
+                $('#nearest-storeId').html($('<li/>', {
+                    html: 'Không tìm thấy đường đi từ bất kỳ cửa hàng nào đến địa chỉ trên.'
+                }));
+            } else {
+                var store = window.storeInfos[minIndex];
+                $('ul.nearby-stores').html(rs);
+                $('ul.nearby-stores li:first-child').addClass('active');
+            }
+        } else {
+            ShowMessage("Lỗi: " + status, 1);
+        }
+    }
+
+    var echo = 0, MAX_VALUE = 500, MIN_VALUE = 1;
+    function loadAllCategory() {
+
+        $.ajax({
+            url: '@Url.Action("LoadAllCategory","Delivery2", new { @area="Delivery"})',
+            type: "POST",
+            success: function (result) {
+                if (result != null && result.length > 0) {
+                    //render to store dropdown
+                    $('#category-menu').html();
+                    for (var i = 0; i < result.length; i++) {
+                        $('#category-menu').append("<option value=\'" + result[i].CategoryId + "\'>" + result[i].Name + "</option>");
+                    }
+                }
+
+            },
+            error: function (error) {
+                ShowMessage("Có lỗi xảy ra, vui lòng thử lại. Nếu lỗi tiếp tục tiếp diễn xin vui lòng liên hệ admin", 1);
+            }
+        });
+    }
+
+    $('#btn-order').click(function () {
+        //var table = $('#orderItemDatatable');
+        window.OnlineOrder.assignStore($('.nearby-stores li.active input[type=hidden]').val());
+        if (window.OnlineOrder.Order.CustomerID == 0) {
+            window.OnlineOrder.addNewCustomer(
+                $('#cust-name').val(),
+                $('#cust-address').val(),
+                $('#cust-phone').val(),
+                $('#cust-email').val(),
+                $('#notes').val()
+                );
+        }
+        var validObj = window.OnlineOrder.isValidate();
+        if (!validObj.valid) {
+            ShowMessage(validObj.msg, 2);
+            return;
+        }
+        saveOrder();
+    });
+
+
+
+
+    //clear input field
+    function cancelAddNewGuest() {
+        $('#cust-name').val('');
+        $('#cust-address').val('');
+        $('#notes').val('');
+        $('#cust-phone').val('');
+        $('#cust-email').val('');
+        $('#cust-name').prop('disabled', true);
+        $('#cust-phone').prop('disabled', true);
+        $('#cust-address').prop('disabled', true);
+        $('#cust-email').prop('disabled', true);
+        $('#customers-list').prop('disabled', false);
+
+    }
+
+    function changeTab(tab) {
+
+        //Tại sao không dùng data-toggle trong thẻ a mà phải đổi css = tay?
+        //Tại vì nó LAGGGGGGGG
+        if (tab == "order") {
+
+            //Hiện sản phẩm lên
+            $('div[id=map]').css({ 'opacity': '0', 'display': 'none', 'z-index': '0' });
+
+            //Chỉnh lại màu cho tab map nè, cho nó xám xíu ha
+            $("li[role=presentation]:eq(1) a").css({ 'background': '#ecf0f1', 'border-bottom': 'none', 'color': '#00AA41' });
+
+            //Chỉnh lại màu cho tab order nè, cho nó sáng sáng lên để biết nó đang được chọn :3
+            $("li[role=presentation]:eq(0) a").css({ 'background': 'transparent', 'border': '1px solid #ddd', 'color': 'black', 'border-bottom-color': 'white' });
+
+        } else {
+
+            //Hiện map lên
+            $('div[id=map]').css({ 'opacity': '1', 'display': 'block', 'z-index': '11' });
+            //Chỉnh lại màu cho tab order nè, cho nó xám xíu ha
+            $("li[role=presentation]:eq(0) a").css({ 'background': '#ecf0f1', 'border-bottom': 'none', 'color': '#00AA41' });
+
+            //Chỉnh lại màu cho tab map nè, cho nó sáng sáng lên để biết nó đang được chọn :3
+            $("li[role=presentation]:eq(1) a").css({ 'background': 'transparent', 'border': '1px solid #ddd', 'color': 'black', 'border-bottom-color': 'white' });
+
+        }
+    }
+
+
+
+    $('#showPromo').on('hidden.bs.modal', function () {
+        // do something…
+
+        var OrderDetails = window.OnlineOrder.Order.OrderDetails;
+        for (var i = 0; i < OrderDetails.length; i++) {
+            OrderDetails[i].DiscountPercent = 0;
+            OrderDetails[i].FinalAmount = OrderDetails[i].TotalAmount;
+        }
+        window.OnlineOrder.Order.DiscountPercent = 0;
+    })
+
+    function DisplayOrder(index) {
+        if (index == 2) {
+            $('a[data-toggle="tab"]:eq(2)').on('shown.bs.tab', function (e) {
+
+                $('div[role=tabpanel][id=order]').addClass('active in');
+                $('div[role=tabpanel][id=order] div[class=col-md-6]:eq(0)').css('display', 'none');
+            });
+            $('#orderItemDatatable thead th:eq(5)').hide();
+            $('button[data-action=delete-ordered-item]').parent().hide();
+        } else {
+            setTimeout(function () {
+                $('div[role=tabpanel][id=order] div[class=col-md-6]:eq(0)').css('display', 'block');
+                $('#orderItemDatatable thead th:eq(5)').show();
+                $('button[data-action=delete-ordered-item]').parent().show();
+            }, 200);
+        }
+    }
+
+    function checkExistss(item, IdArray, QuantityArray) {
+        for (var i = 0; i < IdArray.length; i++) {
+            if (item.ProductID == IdArray[i]) {
+                QuantityArray[i] += item.Quantity;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function checkExist(a, b) {
+        var length = a.length;
+        for (var i = 0; i < length; i++) {
+            if (a[i].PromotionID == b) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function checkOrderItemExist(orderItems, itemID, endIndex) {
+        for (var i = 0; i < endIndex; i++) {
+            if (orderItems[i].ProductID == itemID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    var data;
+
+    function checkPromotions(isChange) {
+        resetAll();
+        var orderDetails = window.OnlineOrder.Order.OrderDetails;
+        var itemsIDs = new Array();
+        var quantityDetails = new Array();
+        var selectedPromotionIDs = new Array();
+        var allPromotionIDs = new Array();
+
+
+        for (var i = 0; i < orderDetails.length; i++) {
+
+            if (checkExistss(orderDetails[i], itemsIDs, quantityDetails) == false) {
+                itemsIDs.push(orderDetails[i].ProductID);
+                quantityDetails.push(orderDetails[i].Quantity);
+            }
+        }
+        if (isChange == true) {
+            $('#promotion-panel input').each(function () {
+                allPromotionIDs.push($(this).val());
+                if (this.checked == true) {
+                    selectedPromotionIDs.push($(this).val());
+                }
+            })
+        }
+
+        var sendValues = {
+            orderDetailsIDs: itemsIDs,
+            quantityDetails: quantityDetails,
+            strTotal: window.OnlineOrder.getTotalNoDiscount(),
+            selectedPromotionIDs: selectedPromotionIDs,
+            allPromotionIDs: allPromotionIDs,
+            isChange: isChange,
+        }
+
+
+        $.ajax({
+            url: '@Url.Action("getSuitablePromotions", "Delivery2")',
+            dataType: "json",
+            type: "POST",
+            data: sendValues,
+            success: function (result) {
+                if (result.success == true) {
+                    data = result;
+
+                    showPromotions(result);
+                    var allOrderDetails = window.OnlineOrder.Order.OrderDetails;
+                    var order = window.OnlineOrder.Order;
+                    var orderDetailsLength = allOrderDetails.length;
+                    var dataLength = data.length;
+
+                    //Tính toán đủ các hình thức khuyến mãi sản phẩm
+                    for (var i = 0; i < orderDetailsLength; i++) {
+                        var position = data.promoProductTrack.buyProductID.indexOf(allOrderDetails[i].ProductID);
+                        while (position > -1) {
+                            allOrderDetails[i].DiscountPercent = allOrderDetails[i].DiscountPercent +
+                                ((100 - allOrderDetails[i].DiscountPercent) * data.promoProductTrack.discountRate[position] / 100);
+                            allOrderDetails[i].DiscountAmount += data.promoProductTrack.discountAmount[position];
+                            if (data.promoProductTrack.giftID[position] != 0) {
+                                //allOrderDetails[i].GiftIDs.push(data.promoProductTrack.giftID[position]);
+                                if (checkOrderItemExist(allOrderDetails, allOrderDetails[i].ProductID, i) == false) {
+                                    allOrderDetails[i].GiftNames.push(data.promoProductTrack.giftName[position]);
+                                    allOrderDetails[i].GiftQuantity.push(data.promoProductTrack.giftAmount[position]);
+                                }
+                            }
+                            position = data.promoProductTrack.buyProductID.indexOf(allOrderDetails[i].ProductID, position + 1);
+                        }
+                    }
+
+                    //Tính toán đủ các hình thức khuyến mãi hóa đơn
+                    var promoBillLength = data.promoBillTrack.promotionID.length;
+                    for (var i = 0; i < promoBillLength; i++) {
+                        order.DiscountPercent = order.DiscountPercent + ((100 - order.DiscountPercent) * data.promoBillTrack.discountRate[i]) / 100;
+                        order.DiscountAmount += data.promoBillTrack.discountAmount[i];
+                        //order.GiftIDs.push(data.promoBillTrack.giftID[i]);
+                        if (data.promoBillTrack.giftID[i] != 0) {
+                            order.GiftNames.push(data.promoBillTrack.giftName[i]);
+                            order.GiftQuantity.push(data.promoBillTrack.giftAmount[i]);
+                        }
+                    }
+
+                    //Vẽ lại table
+                    loadOrderTable(allOrderDetails, order, true);
+                } else {
+                    ShowMessage(result.msg, 1, 2000);
+                }
+
+            },
+
+        });
+    }
+
+    function showExtraMenu(product) {
+        var data = $(product).parents('.service-item').data('ServiceItem')
+        $('#showExtra').html("");
+        $.ajax({
+            url: "@Url.Action("ExtraMenu","Delivery2")",
+            datatype: "Json",
+            type: "POST",
+            data: { "productId": data.id },
+            success: function (result) {
+                $('#showExtra').html(result);
+                $('#showExtra').modal("show");
+            },
+            error: function (error) {
+                ShowMessage("Error Occured", 1)
+            }
+        });
+    }
+
+    function showPromotions(result) {
+        var s = "";
+        var length = result.promotionOriginIDs.length;
+        var startGroup = 0;
+        for (var i = 0; i < length; i++) {
+            if (result.promotionGroups[i].Group != startGroup) {
+                s += '<div class="col-md-12">';
+                s += '<h5 class="row inform_Display"><b>' + result.promotionGroupNames[i] + '</b></h5>';
+                startGroup = result.promotionGroups[i].Group;
+            }
+            s += '<div class="col-md-6 checkbox" style="margin-top:0px;" >' +
+                            '<label class="inform_Display">' +
+                                '<input name="' + result.promotionGroups[i].Group +
+                                '" value="' + result.promotionOriginIDs[i].PromotionID +
+
+                                '" type="checkbox" ' + (checkExist(result.promotionSelectedIDs, result.promotionOriginIDs[i].PromotionID) == true ? ' checked="checked"' : '') +
+                                
+
+                                '" type="radio" ' + (checkExist(result.promotionSelectedIDs, result.promotionOriginIDs[i].PromotionID) == true ? ' checked="checked"' : '') +
+
+
+                                ' />' +
+                                result.promotionNames[i].PromotionName +
+                                '<i class="input-helper"><br/>' + result.promotionDescriptions[i].Description +'</i>' +
+                            '</label>' +
+                        '</div>';
+            if (i == length - 1 || result.promotionGroups[i + 1].Group != startGroup) {
+                s += '</div>';
+            }
+        }
+
+        $('#promotion-panel').html(s);
+    }
+
+    function loadOrderTable(allOrderDetails, order, needPromotion) {
+        var table = $('#orderItemDatatable tbody');
+        table.html('');
+        var length = allOrderDetails.length;
+        var s = "";
+        for (var i = 0; i < length; i++) {
+            allOrderDetails[i].FinalAmount =
+                (allOrderDetails[i].TotalAmount - allOrderDetails[i].ExtraAmount  -allOrderDetails[i].DiscountAmount) * (1 - allOrderDetails[i].DiscountPercent * 0.01) + allOrderDetails[i].ExtraAmount;
+            if (allOrderDetails[i].Extra != undefined) {
+                var len = allOrderDetails[i].Extra.length;
+                var extraDisplayName = "";
+                for (var j = 0; j < len; j++) {
+                    extraDisplayName += "<div class='extraNameDiplay'>" + allOrderDetails[i].Extra[j].Quantity +
+                    " x " + allOrderDetails[i].Extra[j].Name +
+                    " (" + toMoney(allOrderDetails[i].Extra[j].Money, ",", "") + " VND)</div>"
+                }
+            } else {
+                extraDisplayName = "";
+            }
+            s += '<tr data-role="order-detail" data-id=' + (i + 1) + ' style="height: 60px">';
+
+            s += '<td data-role="name">' + allOrderDetails[i].Name + (extraDisplayName == undefined ? "" : extraDisplayName) + '</td>';
+            s += '<td data-role="price">' + toMoney(allOrderDetails[i].UnitPrice, ',', '') + '</td>';
+            s += '<td data-role="quantity">' + allOrderDetails[i].Quantity + '</td>';
+            s += '<td data-role="discount">' + (allOrderDetails[i].DiscountPercent != 0 ? allOrderDetails[i].DiscountPercent : ' ') + '</td>';
+            s += '<td data-role="discount-amount">' + (allOrderDetails[i].DiscountAmount != 0 ? allOrderDetails[i].DiscountAmount : ' ') + '</td>';
+            s += '<td data-role="total">' + (needPromotion == true ? toMoney(allOrderDetails[i].FinalAmount, ',', '') : toMoney(allOrderDetails[i].TotalAmount, ',', '')) + '</td>';
+            s += '<td><button class="btn btn-xs btn-danger" data-action="delete-ordered-item"><i class="glyphicon glyphicon-trash"></i></button></td>';
+            s += '</tr>'
+
+            var giftLength = allOrderDetails[i].GiftNames.length;
+            if (giftLength > 0) {
+                for (var j = 0; j < giftLength; j++) {
+                    s += '<tr data-role="gift" data-id="child-of-' + (i + 1) + '">';
+                    s += '<td data-role="name" style="padding-left: 40px">' + allOrderDetails[i].GiftNames[j] + '</td>';
+                    s += '<td data-role="price"></td>';
+                    s += '<td data-role="quantity">' + allOrderDetails[i].GiftQuantity[j] + '</td>';
+                    s += '<td data-role="discount"></td>';
+                    s += '<td data-role="discount-amount"></td>';
+                    s += '<td data-role="total">0</td>';
+                    s += '<td></td>';
+                    s += '</tr>';
+                }
+            }
+        }
+        length = order.GiftNames.length;
+        for (var i = 0; i < length; i++) {
+            s += '<tr data-role="gift" data-id="child-of-0">';
+            s += '<td data-role="name">' + order.GiftNames[i] + '</td>';
+            s += '<td data-role="price"></td>';
+            s += '<td data-role="quantity">' + order.GiftQuantity[i] + '</td>';
+            s += '<td data-role="discount"></td>';
+            s += '<td data-role="discount-amount"></td>';
+            s += '<td data-role="total">0</td>';
+            s += '<td></td>';
+            s += '</tr>';
+        }
+        table.html(s);
+        if (needPromotion == true) {
+            var a = $('#orderItemDatatable tbody tr');
+            for (var i = 0; i < a.length; i++) {
+                $(a[i]).find('td[data-role=discount]').show();
+                $(a[i]).find('td[data-role=discount-amount]').show();
+                $(a[i]).find('td:eq(6)').hide();
+
+            }
+            $('#orderItemDatatable thead th:eq(3)').show();
+            $('#orderItemDatatable thead th:eq(4)').show();
+            $('#orderItemDatatable thead th:eq(5)').show();
+            $('#orderItemDatatable thead th:eq(6)').hide();
+            $('#total-Item').html('Giảm giá hóa đơn: ' + order.DiscountPercent + '<br/>Tổng cộng: ' + toMoney(window.OnlineOrder.getTotal(), ',' , ''));
+
+            $('input[type=checkbox]').change(function () {
+                var temp = this;
+                if (this.checked) {
+                    var t = $('input[name=' + this.name + ']');
+                    t.each(function () {
+                        if (this.value != temp.value) {
+                            this.checked = false;
+                        }
+                    })
+                }
+                checkPromotions(true);
+            });
+        } else {
+            var a = $('#orderItemDatatable tbody tr');
+            for (var i = 0; i < a.length; i++) {
+                $(a[i]).find('td[data-role=discount]').hide();
+                $(a[i]).find('td[data-role=discount-amount]').hide();
+                $(a[i]).find('td:eq(6)').show();
+            }
+            $('#orderItemDatatable thead th:eq(3)').hide();
+            $('#orderItemDatatable thead th:eq(4)').hide();
+            $('#orderItemDatatable thead th:eq(6)').show();
+            $('tr[data-role="gift"]').each(function () { $(this).remove() });
+            $('#total-Item').html('Tổng cộng: ' + toMoney(window.OnlineOrder.getTotalNoDiscount(), ',', ''));
+
+        }
+    }
+
+    function resetAll() {
+        var order = window.OnlineOrder.Order;
+        order.GiftNames = new Array();
+        order.GiftQuantity = new Array();
+        order.DiscountAmount = 0;
+        order.DiscountPercent = 0;
+        var orderDetails = window.OnlineOrder.Order.OrderDetails;
+        var length = orderDetails.length;
+        for (var i = 0; i < length; i++) {
+            orderDetails[i].GiftNames = new Array();
+            orderDetails[i].GiftQuantity = new Array();
+            orderDetails[i].DiscountAmount = 0;
+            orderDetails[i].DiscountPercent = 0;
+        }
+    }
+
+    var dataTable;
+
+    function InitCustomerProductDatatable() {
+        dataTable = $("#customer-history-table").DataTable({
+            "bFilter": true,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "bSort": false,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "Id", "value": window.OnlineOrder.Order.CustomerID });
+            },
+            //get customer product data
+            "sAjaxSource": "@(Url.Action("GetCustomerProductData", "Customer", new { area = "CRM"}))",
+            //"sAjaxSource": "/1/CRM/Customer/GetCustomerProductData",
+            "bProcessing": true,
+            "bFilter": true,
+            "aLengthMenu": [10, 20, 100],
+            "iDisplayLength" : "10",
+            "oLanguage": {
+                "sSearchPlaceholder": "Sản phẩm",
+                "sSearch": "Tìm kiếm: ",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2],
+                    "bSortable": true
+                }
+            ],
+            "bAutoWidth": false
+    });
+    }
+
+    function refreshTable() {
+        dataTable.ajax.reload();
+    }
+
+    function saveOrder() {
+
+
+
+
+        //Chuẩn bị nguyên liệu
+        var orderList = {
+            orderDetails: new Array(),
+            totalAmount: 0,
+            finalAmount: 0,
+            customerID: 0,
+            deliveryAddress: "",
+            rentStatus: 0,
+            rentType: 0,
+            storeID: 0,
+            customerName: "",
+            customerPhone: "",
+            customerAddress: "",
+            customerEmail: "",
+            note: "",
+        }
+        var windowOrderDetail = window.OnlineOrder.Order.OrderDetails;
+        var length = windowOrderDetail.length;
+        for (var i = 0; i < length; i++) {
+            if (windowOrderDetail[i].Extra != undefined) {
+                var length2 = windowOrderDetail[i].Extra.length;
+                for (var j = 0; j < length2; j++) {
+                    var extra = {
+                        productID: windowOrderDetail[i].Extra[j].Id,
+                        quantity: windowOrderDetail[i].Extra[j].Quantity * windowOrderDetail[i].Quantity,
+                        status: windowOrderDetail[i].Status,
+                        totalAmount: windowOrderDetail[i].Extra[j].Quantity * windowOrderDetail[i].Extra[j].Money * windowOrderDetail[i].Quantity,
+                        finalAmount: windowOrderDetail[i].Extra[j].Quantity * windowOrderDetail[i].Extra[j].Money * windowOrderDetail[i].Quantity,
+                        parentID: windowOrderDetail[i].ProductID,
+                    }
+                    orderList.orderDetails.push(extra);
+                }
+            }
+            var order = {
+                productID: windowOrderDetail[i].ProductID,
+                quantity: windowOrderDetail[i].Quantity,
+                status: windowOrderDetail[i].Status,
+                totalAmount: windowOrderDetail[i].TotalAmount,
+                finalAmount: windowOrderDetail[i].FinalAmount,
+                parentID: 0,
+            }
+            orderList.orderDetails.push(order);
+        }
+        orderList.totalAmount = window.OnlineOrder.getTotalNoDiscount();
+        orderList.finalAmount = window.OnlineOrder.getTotal();
+        orderList.customerID = window.OnlineOrder.Order.CustomerID;
+        orderList.deliveryAddress = window.OnlineOrder.Order.DeliveryAddress;
+        orderList.rentStatus = window.OnlineOrder.Order.RentStatus;
+        orderList.rentType = window.OnlineOrder.Order.RentType;
+        orderList.storeID = window.OnlineOrder.Order.StoreID;
+        if (window.OnlineOrder.Order.CustomerID == 0) {
+            orderList.customerName = $('#cust-name').val();
+            orderList.customerAddress = $('#cust-address').val(),
+            orderList.customerPhone = $('#cust-phone').val(),
+            orderList.customerEmail = $('#cust-email').val(),
+            orderList.note = $('#notes').val()
+        }
+
+        var sendValues = {
+            orderList: orderList,
+            promoBillTrack: data.promoBillTrack,
+            promoProductTrack: data.promoProductTrack,
+        }
+
+        $.ajax({
+            url: '@Url.Action("CreateOnlineOrder", "Delivery2")',
+            dataType: 'json',
+            data: sendValues,
+            type: 'POST',
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage("Okay", 2);
+                } else {
+                    ShowMessage("Not okay", 1);
+                }
+            }
+        });
+    }
+
+    function checkCustomerInfo() {
+
+    }
+
+    function checkRedundant(item, array, j) {
+        for (var i = 0; i < j; i++) {
+            if (item.ProductID == array[i].ProductID) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    $('a[href="#summary"]').click(function () {
+        $('span[data-role=summary-cus-name]').html($('#cust-name').val());
+        $('span[data-role=summary-cus-phone]').html($('#cust-phone').val());
+        $('span[data-role=summary-cus-address]').html($('#cust-address').val());
+        $('span[data-role=summary-final-money]').html(toMoney(window.OnlineOrder.getTotal(), ',', ''));
+
+        var allOrder = window.OnlineOrder.Order.OrderDetails;
+        var countProduct = 0;
+        for (var i = 0; i < allOrder.length; i++) {
+            if (checkRedundant(allOrder[i], allOrder, i-1) == false) {
+                countProduct += 1 + allOrder[i].GiftNames.length;
+            }
+        }
+        $('span[data-role=summary-total-product]').html(countProduct);
+
+    });
+
+    $('#cus-infoTab').on('click', function () {
+        $('#ascrail2000').hide();
+    });
+    $('#orderTab').on('click', function () {
+        $('#ascrail2000').show();
+    });
+    $('#promotionTab').on('click', function () {
+        $('#ascrail2000').hide();
+    });
+    $('#finalizeTab').on('click', function () {
+        $('#ascrail2000').hide();
+    });
+
+
+</script>
+
+

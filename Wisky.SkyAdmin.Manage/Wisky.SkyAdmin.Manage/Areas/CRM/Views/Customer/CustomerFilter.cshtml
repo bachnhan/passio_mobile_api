@@ -1,0 +1,194 @@
+﻿@model CustomerFilterViewModel
+
+@{
+    ViewBag.Title = "Lọc khách hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Tập khách hàng</h3>
+            </div>
+            <div class="col-md-4">
+                <a href="@Url.Action("CreateCustomerFilter")" class="btn btn-primary pull-right">
+                    <i class="left-icon fa fa-plus"></i> Tạo Tập Khách Hàng
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-body">
+        <table id="UserFilterDatatable" class="table table-striped table-bordered table-hover" style="table-layout :fixed">
+            <thead>
+                <tr>
+                    <th>
+                        <label class="">STT</label>
+                    </th>
+                    <th>
+                        <label class="">Tập khách hàng</label>
+                    </th>
+                    <th>
+                        <label class="">Tuổi</label>
+                    </th>
+                    <th>
+                        <label class="">Sinh nhật</label>
+                    </th>
+                    <th>
+                        <label class="">Số lần đến</label>
+                    </th>
+                    <th>
+                        <label class="">Giới tính</label>
+                    </th>
+                    <th>
+                        <label class="">Tùy chọn</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+
+@section Scripts{
+
+    <script>
+
+        $(document).ready(function () {
+            CustomerFilterProcess();
+        });
+
+        function CustomerFilterProcess() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("LoadAllCustomerFilter")',
+                success: function (result) {
+                    //console.log(result.aaData);
+                    InitUserFilterDatatable(result.aaData);
+                }
+            });
+        };
+        function InitUserFilterDatatable() {
+            $("#UserFilterDatatable").dataTable({
+                "bFilter": true,
+                "bSort": false,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("LoadAllCustomerFilter")",
+                "bDeferRender": true,
+                "bProcessing": true,
+                "bserverSide": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfoEmpty": "Không có dữ liệu",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                    "sSearchPlaceholder": "Tập khách hàng"
+                },
+
+
+
+
+                "aoColumnDefs": [
+                     {
+                         "aTargets": [0, 2, 3, 4, 5, 6],
+                         "className": "dt-center"
+                     },
+                    {
+                        "aTargets": [1],
+                        "bSearchable": true,
+                        "mRender": function (data, type, row) {
+                            var name = row[1];
+                            var data = row[6];
+                            var detail = "<a href='@Url.Action("FilterResult")\/" + data + "\'>" + name + "</a>";
+                            return detail;
+                        },
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var data = row[6];
+                            //var result = "<a class='btn btn-sm btn-primary' onclick='edit(" + data + ")'>Edit</a>";
+                            var detail = "<a class='btn btn-sm btn-primary' href='@this.Url.Action("FilterResult")\/" + data + "\'><i class='glyphicon glyphicon-eye-open'></i></a>";
+                            var edit = "<a title='Chỉnh sửa' class='btn btn-sm btn-primary' href='@this.Url.Action("EditCustomerFilter")\/" + data + "\'><i class='glyphicon glyphicon-pencil'></i></a>";
+                            var deleteFilter = "<a title='Xóa' class='btn btn-sm btn-danger' onclick='deleteFilter(" + data + ")'><i class='glyphicon glyphicon-trash'></i></a>";
+                            return edit + " " + deleteFilter;
+                        },
+                        "bSortable": false,
+                        "bSearchable": false,
+                        "sClass": "text-center"
+                    }
+                ],
+
+                "bAutoWidth": false,
+            });
+        }
+
+        //redraw datatable without reload
+        function reDrawDatatable(id) {
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+            $(id).dataTable()._fnPageChange(0);
+            $(id).dataTable()._fnAjaxUpdate();
+        }
+
+        //user datatable
+        function RefreshTable() {
+            reDrawDatatable("#UserFilterDatatable");
+            //$("#UserFilterDatatable").dataTable().fnDestroy();
+            //CustomerFilterProcess();
+        }
+
+
+
+        function deleteFilter(filterId) {
+            ShowConfirm("Bạn có muốn xóa bộ lọc này?", function () {
+                $.ajax({
+                    url: "@this.Url.Action("DeleteFilter")",
+                    type: "POST",
+                    data: { id: filterId },
+                    error: function (message) {
+                        ShowMessage(message, 1);
+                    },
+                    success: function (result) {
+                        if (result.success == true) {
+                            //e.preventDefault();
+                            RefreshTable();
+                            ShowAlert(result.message, 2);
+                            //location.reload();
+                            //CustomerFilterProcess();
+                            //$("#UserFilterDatatable").dataTable()._fnAjaxUpdate();
+                        } else {
+                            ShowAlert(result.message, 1);
+                        }
+                    }
+                })
+            });
+        }
+
+    </script>
+
+}

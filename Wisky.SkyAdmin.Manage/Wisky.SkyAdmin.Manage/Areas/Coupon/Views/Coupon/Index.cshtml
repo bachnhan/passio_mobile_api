@@ -1,0 +1,12 @@
+﻿@model IEnumerable<HmsService.ViewModels.CouponViewModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Index</h2>
+@foreach (var item in Model)
+{
+    @item.StoreName
+}
+

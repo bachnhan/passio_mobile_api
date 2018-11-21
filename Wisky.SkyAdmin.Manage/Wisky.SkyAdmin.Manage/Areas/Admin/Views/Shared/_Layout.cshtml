@@ -1,0 +1,580 @@
+﻿@{
+    var currentStore = ViewBag.CurrentStore as StoreViewModel;
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+}
+
+<!DOCTYPE html>
+<!--[if IE 9 ]><html class="ie9"><![endif]-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Trang quản trị SkyWeb</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="http://maps.googleapis.com/maps/api/js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/t/dt/dt-1.10.10/datatables.min.css" />
+    <script type="text/javascript" src="https://cdn.datatables.net/t/dt/dt-1.10.10/datatables.min.js"></script>
+
+    <!-- Vendor CSS -->
+    <link href="/Content/template/template-material/vendors/bower_components/fullcalendar/dist/fullcalendar.min.css" rel="stylesheet">
+    <link href="/Content/template/template-material/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
+    <link href="/Content/template/template-material/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet">                                            
+    <link href="/Content/template/template-material/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
+    <link href="/Content/template/template-material/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
+    <link href="/Content/template/template-material/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
+    <link href="~/Content/template/template-material/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
+
+    <!-- CSS -->
+    <link href="/Content/template/template-material/css/app.min.1.css" rel="stylesheet">
+    <link href="/Content/template/template-material/css/app.min.2.css" rel="stylesheet">
+
+    <!-- Plugins -->
+    <link href="/Content/plugins/select2/css/select2.min.css" rel="stylesheet" />
+    <link href="/Content/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />
+    <link href="/Content/plugins/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+    <!-- Custom -->
+    <link href="/Content/css/custom-ckeditor.css" rel="stylesheet" />
+    <link href="/Content/css/theme.css" rel="stylesheet" />
+    <link href="/Content/css/admin.css" rel="stylesheet" />
+    <link href="~/Content/css/style.css" rel="stylesheet" />
+    <!--DateTimePicker-->
+    <link href="~/Content/css/daterangepicker.css" rel="stylesheet" />
+    <link href="~/Content/css/datepicker.css" rel="stylesheet" />
+    <link href="~/Content/css/material-design-iconic-font.css" rel="stylesheet" />
+</head>
+<body class="toggled sw-toggled">
+    <header id="header" class="clearfix" data-current-skin="blue">
+        <ul class="header-inner">
+            <li id="menu-trigger" data-trigger="#sidebar">
+                <div class="line-wrap">
+                    <div class="line top"></div>
+                    <div class="line center"></div>
+                    <div class="line bottom"></div>
+                </div>
+            </li>
+
+            <li class="logo hidden-xs">
+                <a href="@Url.Action("Index","Default", new { area = "Admin", parameters = currentStoreDomain.Directory } )">@(currentStore.Name) - Chào mừng đến với trang quản trị SkyWeb Admin</a>
+            </li>
+
+            <li class="pull-right">
+                <ul class="top-menu">
+                    <!-- Dieu Huong -->
+                    <li>
+                        <!-- Trigger button -->
+                        <button class="btn btn-default btn-dieu-huong waves-effect" data-toggle="modal" data-target="#modalDieuHuong">
+                            <i class="fa fa-th"></i>
+                            Điều hướng
+                        </button>
+                    </li>
+                </ul>
+            </li>
+
+
+
+            @*<li class="pull-right">
+                    <ul class="top-menu">
+                        <li class="dropdown">
+                            <a data-toggle="dropdown" href="#"><i class="tm-icon zmdi zmdi-more-vert"></i></a>
+                            <ul class="dropdown-menu dm-icon pull-right">
+
+                                <li>
+                                    <a href="#"><i class="zmdi zmdi-settings"></i> Other Settings</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>*@
+        </ul>
+    </header>
+
+    <section id="main" data-layout="layout-1">
+        <aside id="sidebar" class="sidebar c-overflow">
+            <div class="profile-menu">
+                <a href="#">
+                    <div class="profile-pic">
+                        <img src="/Content/template/template-material/img/profile-pics/1.jpg" alt="">
+                    </div>
+
+                    <div class="profile-info">
+                        Xin chào, @(this.User.Identity.Name)
+
+                        <i class="zmdi zmdi-caret-down"></i>
+                    </div>
+                </a>
+
+                <ul class="main-menu">
+                    <li>
+                        <a href="@this.Url.Action("ChangePassword", "Account", new { area = "Admin"})"><i class="fa fa-users"></i>Đổi mật khẩu</a>
+                    </li>
+                    <li>
+                        <a href="@this.Url.Action("LogOff", "Account", new { area = "Admin", parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-time-restore"></i>Đăng xuất</a>
+                    </li>
+                </ul>
+            </div>
+            <ul class="main-menu">
+                @*<li><a href="/@(currentStoreDomain.Directory)" target="_blank"><i class="zmdi zmdi-home"></i> Xem trang chính</a></li>
+                
+                @if (currentStore?.HasProducts ?? true)
+                {
+                    <li class="sub-menu">
+                        <a href="#"><i class="zmdi zmdi-labels"></i> Sản phẩm</a>
+                        <ul>
+                            <li><a href="@this.Url.Action("Index", "Product", new { parameters = currentStoreDomain.Directory })">Quản lý sản phẩm</a></li>
+                            <li><a href="@this.Url.Action("Index", "ProductCategory", new { parameters = currentStoreDomain.Directory })">Quản lý loại sản phẩm</a></li>
+                            <li><a href="@this.Url.Action("Index", "ProductCollection", new { parameters = currentStoreDomain.Directory })">Quản lý nhóm</a></li>
+                        </ul>
+                    </li>
+                }
+                @if (currentStore?.HasOrder ?? false)
+                {
+                    <li><a href="@this.Url.Action("Index", "Order", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-settings"></i>Quản lý đơn hàng</a></li>
+                }
+                @if (currentStore?.HasNews ?? true)
+                {
+                    <li class="sub-menu">
+                        <a href="#"><i class="zmdi zmdi-labels"></i> Bài viết</a>
+                        <ul>
+                            <li><a href="@this.Url.Action("Index", "BlogPost", new { parameters = currentStoreDomain.Directory })">Quản lý bài viết</a></li>
+                            <li><a href="@this.Url.Action("Index", "BlogPostCollection", new { parameters = currentStoreDomain.Directory })">Quản lý chuyên mục</a></li>
+                        </ul>
+                    </li>
+                }
+                @if (currentStore?.HasCustomerFeedbacks ?? true)
+                {
+                    <li><a href="@this.Url.Action("Index", "CustomerFeedback", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-labels"></i> Tin nhắn khách hàng</a></li>
+                }
+                @if (currentStore?.HasImageCollections ?? true)
+                {
+                    <li><a href="@this.Url.Action("Index","ImageCollection", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-labels"></i> Thư viện ảnh</a></li>
+                }
+                
+                @if (currentStore?.HasWebPages ?? true)
+                {
+                    <li><a href="@this.Url.Action("Index", "WebPage", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-storage"></i>Quản lý trang</a></li>
+                }
+                <li><a href="@this.Url.Action("Index", "WebSettings", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-settings"></i>Quản lý Website</a></li>
+
+                <li class="sub-menu" hidden>
+                    <a href="#"><i class="zmdi zmdi-settings"></i> Quản lý Website</a>
+                    <ul>
+                        <li><a href="@this.Url.Action("GeneralInformation", "WebInformation", new { parameters = currentStoreDomain.Directory })"><i class="md"></i> Thông tin chung</a></li>
+                        <li><a href="@this.Url.Action("SocialNetwork", "WebInformation", new { parameters = currentStoreDomain.Directory })"><i class="md"></i> Mạng xã hội</a></li>
+                        <li><a href="@this.Url.Action("ViewCount", "WebInformation", new { parameters = currentStoreDomain.Directory })"><i class="md"></i> Lượt view</a></li>
+                    </ul>
+                </li>*@
+
+                <!--START New menu-->
+                <li class="sub-menu submenu-style">
+                    <a href="#"><i class="zmdi zmdi-globe"></i>Thương hiệu</a>
+                    <ul>
+                        <li class="sub-menu">
+                            <a href="#"><i class="zmdi zmdi-trending-up"></i> Báo cáo tổng hợp</a>
+                            <ul>
+                                <li><a href="#"><i class="zmdi zmdi-trending-flat"></i> Tổng hợp 1</a></li>
+                                <li><a href="#"><i class="zmdi zmdi-trending-flat"></i> Tổng hợp 2</a></li>
+                            </ul>
+                        </li>
+                        <li class="sub-menu">
+                            <a href="#"><i class="zmdi zmdi-settings"></i> Cấu hình sản phẩm</a>
+                            <ul>
+                                <li><a href="#"><i class="zmdi zmdi-trending-flat"></i> Sản phẩm loại 1</a></li>
+                                <li><a href="#"><i class="zmdi zmdi-trending-flat"></i> Sản phẩm loại 2</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#"><i class="zmdi zmdi-widgets"></i> Cấu hình hệ thống</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="zmdi zmdi-view-list"></i> Danh sách cửa hàng</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="zmdi zmdi-window-restore"></i> Quản lý kho</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sub-menu submenu-style">
+                    <a href="#"><i class="zmdi zmdi-balance"></i>Cửa hàng</a>
+                    <ul>
+                        <li>
+                            <a href="#"><i class="zmdi zmdi-present-to-all"></i> Tổng quan</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="zmdi zmdi-assignment"></i> Hóa đơn</a>
+                        </li>
+                        <li class="sub-menu">
+                            <a href="#"><i class="zmdi zmdi-collection-text"></i> Báo cáo</a>
+                            <ul>
+                                <li><a href="#"><i class="zmdi zmdi-trending-flat"></i> Báo cáo 1</a></li>
+                                <li><a href="#"><i class="zmdi zmdi-trending-flat"></i> Báo cáo 2</a></li>
+                            </ul>
+                        </li>
+                        <li>
+                            <a href="#"><i class="zmdi zmdi-tune"></i> Tình trạng kho</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="zmdi zmdi-exposure-alt"></i> Thao tác kho</a>
+                        </li>
+                        <li>
+                            <a href="#"><i class="zmdi zmdi-card"></i> Quản lý thu chi</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="sub-menu submenu-style">
+                    <a href="#"><i class="zmdi zmdi-laptop-chromebook"></i>Website</a>
+                    <ul>
+                        <li><a href="/@(currentStoreDomain.Directory)" target="_blank"><i class="zmdi zmdi-home"></i> Xem trang chính</a></li>
+
+                        @if (currentStore?.HasProducts ?? true)
+                        {
+                            <li class="sub-menu">
+                                <a href="#"><i class="zmdi zmdi-labels"></i> Sản phẩm</a>
+                                <ul>
+                                    <li><a href="@this.Url.Action("Index", "Product", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-trending-flat"></i> Quản lý sản phẩm</a></li>
+                                    <li><a href="@this.Url.Action("Index", "ProductCategory", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-trending-flat"></i> Quản lý loại sản phẩm</a></li>
+                                    <li><a href="@this.Url.Action("Index", "ProductCollection", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-trending-flat"></i> Quản lý nhóm</a></li>
+                                </ul>
+                            </li>
+                        }
+                        @if (currentStore?.HasOrder ?? false)
+                        {
+                            <li><a href="@this.Url.Action("Index", "Order", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-settings"></i>Quản lý đơn hàng</a></li>
+                        }
+                        @if (currentStore?.HasNews ?? true)
+                        {
+                            <li class="sub-menu">
+                                <a href="#"><i class="zmdi zmdi-labels"></i> Bài viết</a>
+                                <ul>
+                                    <li><a href="@this.Url.Action("Index", "BlogPost", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-trending-flat"></i> Quản lý bài viết</a></li>
+                                    <li><a href="@this.Url.Action("Index", "BlogPostCollection", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-trending-flat"></i> Quản lý chuyên mục</a></li>
+                                </ul>
+                            </li>
+                        }
+                        @if (currentStore?.HasCustomerFeedbacks ?? true)
+                        {
+                            <li><a href="@this.Url.Action("Index", "CustomerFeedback", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-labels"></i> Tin nhắn khách hàng</a></li>
+                        }
+                        @if (currentStore?.HasImageCollections ?? true)
+                        {
+                            <li><a href="@this.Url.Action("Index","ImageCollection", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-labels"></i> Thư viện ảnh</a></li>
+                        }
+
+                        @if (currentStore?.HasWebPages ?? true)
+                        {
+                            <li><a href="@this.Url.Action("Index", "WebPage", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-storage"></i>Quản lý trang</a></li>
+                        }
+                        <li><a href="@this.Url.Action("Index", "WebSettings", new { parameters = currentStoreDomain.Directory })"><i class="zmdi zmdi-settings"></i>Quản lý Website</a></li>
+
+                        <li class="sub-menu" hidden>
+                            <a href="#"><i class="zmdi zmdi-settings"></i> Quản lý Website</a>
+                            <ul>
+                                <li><a href="@this.Url.Action("GeneralInformation", "WebInformation", new { parameters = currentStoreDomain.Directory })"><i class="md"></i> Thông tin chung</a></li>
+                                <li><a href="@this.Url.Action("SocialNetwork", "WebInformation", new { parameters = currentStoreDomain.Directory })"><i class="md"></i> Mạng xã hội</a></li>
+                                <li><a href="@this.Url.Action("ViewCount", "WebInformation", new { parameters = currentStoreDomain.Directory })"><i class="md"></i> Lượt view</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <!--END New menu-->
+            </ul>
+        </aside>
+
+        <section id="content">
+            <div class="container">
+                @RenderBody()
+            </div>
+        </section>
+    </section>
+
+    <footer id="footer">
+        @*Copyright &copy; 2015 Material Admin*@
+
+        <ul class="f-menu">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Reports</a></li>
+            <li><a href="#">Support</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>
+    </footer>
+
+    <!-- Page Loader -->
+    <div class="page-loader">
+        <div class="preloader pls-blue">
+            <svg class="pl-circular" viewBox="25 25 50 50">
+                <circle class="plc-path" cx="50" cy="50" r="20" />
+            </svg>
+
+            <p>Please wait...</p>
+        </div>
+    </div>
+
+    <!-- Modal Dieu Huong -->
+    <div id="modalDieuHuong" class="modal fade" role="dialog" data-backdrop="true">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="pull-right btn btn-link btn-close" data-dismiss="modal">
+                        <i class="fa fa-close"></i>
+                    </button>
+                    <a class="btn btn-link btn-view-all-stores" href="#">
+                        <i class="fa fa-list-ul"></i>
+                        Xem toàn bộ hệ thống
+                    </a>
+                </div>
+                <div class="modal-body">
+                    <div class="choose">
+                        Chọn cửa hàng:
+                    </div>
+                    <div class="row eh-wrapper">
+                        @for (int i = 0; i < 15; i++)
+                        {
+                            <div class="col-sm-3">
+                                <a href="#">
+                                    <div class="inner-box waves-effect eh-item">
+                                        <strong>15F NTMK</strong><br />
+                                        15F Nguyễn Thị Minh Khai, Quận 1<br />
+                                        <b>Nhân viên quản lí:</b> quanly
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-sm-3">
+                                <a href="#">
+                                    <div class="inner-box waves-effect eh-item">
+                                        <strong>15F To Ky</strong><br />
+                                        15F To Ky, Quận 1<br />
+                                        <b>Nhân viên quản lí:</b> quanly
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Older IE warning message -->
+    <!--[if lt IE 9]>
+        <div class="ie-warning">
+            <h1 class="c-white">Warning!!</h1>
+            <p>You are using an outdated version of Internet Explorer, please upgrade <br/>to any of the following web browsers to access this website.</p>
+            <div class="iew-container">
+                <ul class="iew-download">
+                    <li>
+                        <a href="http://www.google.com/chrome/">
+                            <img src="/Content/template/template-material/img/browsers/chrome.png" alt="">
+                            <div>Chrome</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.mozilla.org/en-US/firefox/new/">
+                            <img src="/Content/template/template-material/img/browsers/firefox.png" alt="">
+                            <div>Firefox</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://www.opera.com">
+                            <img src="/Content/template/template-material/img/browsers/opera.png" alt="">
+                            <div>Opera</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.apple.com/safari/">
+                            <img src="/Content/template/template-material/img/browsers/safari.png" alt="">
+                            <div>Safari</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">
+                            <img src="/Content/template/template-material/img/browsers/ie.png" alt="">
+                            <div>IE (New)</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <p>Sorry for the inconvenience!</p>
+        </div>
+    <![endif]-->
+    <!-- Javascript Libraries -->
+    @Html.Partial("_Constant")
+    <script src="/Content/template/template-material/vendors/bower_components/jquery/dist/jquery.min.js"></script>
+    <script src="/Content/template/template-material/vendors/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/Content/template/template-material/vendors/bower_components/flot/jquery.flot.js"></script>
+    <script src="/Content/template/template-material/vendors/bower_components/flot/jquery.flot.resize.js"></script>
+    <script src="/Content/template/template-material/vendors/bower_components/flot.curvedlines/curvedLines.js"></script>
+    <script src="/Content/template/template-material/vendors/sparklines/jquery.sparkline.min.js"></script>
+    <script src="/Content/template/template-material/vendors/bower_components/jquery.easy-pie-chart/dist/jquery.easypiechart.min.js"></script>
+
+    <script src="/Content/template/template-material/vendors/bower_components/moment/min/moment.min.js"></script>
+    <script src="/Content/template/template-material/vendors/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
+    <script src="/Content/template/template-material/vendors/bower_components/Waves/dist/waves.min.js"></script>
+    <script src="/Content/template/template-material/vendors/bootstrap-growl/bootstrap-growl.min.js"></script>
+    <script src="/Content/template/template-material/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>
+    <script src="/Content/template/template-material/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script src="/Content/template/template-material/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>
+
+
+    <!-- Placeholder for IE9 -->
+    <!--[if IE 9 ]>
+        <script src="/Content/template/template-material/vendors/bower_components/jquery-placeholder/jquery.placeholder.min.js"></script>
+    <![endif]-->
+    <script src="/Content/plugins/bootbox-4.4.0/bootbox.js"></script>
+    <script src="/Content/plugins/ckeditor/ckeditor.js"></script>
+    <script src="/Content/plugins/ckeditor/adapters/jquery.js"></script>
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script src="~/Content/template/template-material/vendors/bootgrid/jquery.bootgrid.updated.min.js"></script>
+    <script src="/Content/template/template-material/js/flot-charts/curved-line-chart.js"></script>
+    <script src="/Content/template/template-material/js/flot-charts/line-chart.js"></script>
+    <script src="/Content/template/template-material/js/charts.js"></script>
+    <script src="/Content/template/template-material/js/charts.js"></script>
+    <script src="/Content/template/template-material/js/functions.js"></script>
+    <!-- Plugins -->
+    <script src="/Content/plugins/select2/js/select2.full.min.js"></script>
+    <script src="/Content/plugins/bootstrap-tagsinput/bootstrap-tagsinput.js"></script>
+    <script src="/Content/plugins/DataTables/DataTables-1.10.10/js/jquery.dataTables.js"></script>
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+
+    <!-- Custom -->
+    <script src="/Content/js/script.js"></script>
+    <script src="/Content/frontend/js/common.js"></script>
+    <script src="/Content/frontend/js/skyplus-products.js"></script>
+    <!--DateTimePicker-->
+    <script src="~/Content/js/daterangepicker.js"></script>
+    <script src="~/Content/js/bootstrap-datetimepicker.min.js"></script>
+    <!--HightChart-->
+    <script src="~/Content/js/highcharts.js"></script>
+    <script src="~/Content/js/exporting.js"></script>
+
+    @RenderSection("scripts", false)
+    <script>
+        $(function () {
+            SKYWEB.Admin.General.init();
+        });
+
+        function notifyBottomRight(message) {
+            $.growl({
+//                icon: icon,
+//                title: title,
+                message: message,
+                url: ''
+            }, {
+                element: 'body',
+//                type: type,
+                allow_dismiss: true,
+                placement: {
+                    from: 'bottom',
+//                    align: align
+                },
+                offset: {
+                    x: 20,
+                    y: 85
+                },
+                spacing: 10,
+                z_index: 1031,
+                delay: 2500,
+                timer: 1000,
+                url_target: '_blank',
+                mouse_over: false,
+//                animate: {
+//                    enter: animIn,
+//                    exit: animOut
+//                },
+                icon_type: 'class',
+                template: '<div data-growl="container" class="alert" role="alert">' +
+                                '<button type="button" class="close" data-growl="dismiss">' +
+                                    '<span aria-hidden="true">&times;</span>' +
+                                    '<span class="sr-only">Close</span>' +
+                                '</button>' +
+                                '<span data-growl="icon"></span>' +
+                                '<span data-growl="title"></span>' +
+                                '<span data-growl="message"></span>' +
+                                '<a href="#" data-growl="url"></a>' +
+                            '</div>'
+            });
+        }
+
+        function notify(from, align, title, message, icon, type, animIn, animOut) {
+            $.growl({
+                icon: icon,
+                title: title,
+                message: message,
+                url: ''
+            }, {
+                element: 'body',
+                type: type,
+                allow_dismiss: true,
+                placement: {
+                    from: from,
+                    align: align
+                },
+                offset: {
+                    x: 20,
+                    y: 85
+                },
+                spacing: 10,
+                z_index: 1031,
+                delay: 2500,
+                timer: 1000,
+                url_target: '_blank',
+                mouse_over: false,
+                animate: {
+                    enter: animIn,
+                    exit: animOut
+                },
+                icon_type: 'class',
+                template: '<div data-growl="container" class="alert" role="alert">' +
+                                '<button type="button" class="close" data-growl="dismiss">' +
+                                    '<span aria-hidden="true">&times;</span>' +
+                                    '<span class="sr-only">Close</span>' +
+                                '</button>' +
+                                '<span data-growl="icon"></span>' +
+                                '<span data-growl="title"></span>' +
+                                '<span data-growl="message"></span>' +
+                                '<a href="#" data-growl="url"></a>' +
+                            '</div>'
+            });
+        };
+
+        /*
+            set equal heights for eh-item tags
+            eh: equal heights
+            Author: DucBM
+        */
+        function setEqualHeights() {
+            // voi moi .eh-wrapper, set equal height cho tat ca cac hau due cua no
+            $('.eh-wrapper').each(function () {
+                var maxHeight = -1;
+                // calc maxHeight
+                $(this).find('.eh-item').each(function () {
+                    maxHeight = (maxHeight > $(this).height()) ? maxHeight : $(this).height();
+                });
+                // set all elements
+                $(this).find('.eh-item').each(function () {
+                    $(this).height(maxHeight);
+                });
+            });
+        }
+        $(document).ready(function () {
+            $('#modalDieuHuong').on('shown.bs.modal', function () {
+                setEqualHeights();
+            });
+        });
+
+    </script>
+
+    @if (this.TempData["message"] != null)
+            {
+        <script>
+            $(function () {
+                notify("top", "right", "", "@(this.TempData["message"])");
+            });
+        </script>
+    }
+
+</body>
+
+</html>

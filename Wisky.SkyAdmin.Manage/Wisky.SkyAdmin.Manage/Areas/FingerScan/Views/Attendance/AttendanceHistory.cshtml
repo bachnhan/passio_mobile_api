@@ -1,0 +1,1032 @@
+﻿
+@using System.Collections
+@using HmsService.Models;
+@using HmsService.Models.Entities
+@using HmsService.Sdk
+@model HmsService.ViewModels.ShiftViewModel
+@{
+    ViewBag.Title = "AttendanceHistory";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+
+    .funkyradio div {
+        /*margin: 0 50px;*/
+        overflow: hidden;
+    }
+
+    .funkyradio label {
+        /*min-width: 400px;*/
+        width: 100%;
+        border-radius: 3px;
+        border: 1px solid #D1D3D4;
+        font-weight: normal;
+    }
+
+    .funkyradio input[type="radio"]:empty, .funkyradio input[type="checkbox"]:empty {
+        display: none;
+    }
+
+        .funkyradio input[type="radio"]:empty ~ label, .funkyradio input[type="checkbox"]:empty ~ label {
+            position: relative;
+            line-height: 2.5em;
+            text-indent: 3.25em;
+            margin-top: 0em;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+            .funkyradio input[type="radio"]:empty ~ label:before, .funkyradio input[type="checkbox"]:empty ~ label:before {
+                position: absolute;
+                display: block;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                content: '';
+                width: 2.5em;
+                background: #D1D3D4;
+                border-radius: 3px 0 0 3px;
+            }
+
+    .funkyradio input[type="radio"]:hover:not(:checked) ~ label:before, .funkyradio input[type="checkbox"]:hover:not(:checked) ~ label:before {
+        content: '\2714';
+        text-indent: .9em;
+        color: #C2C2C2;
+    }
+
+    .funkyradio input[type="radio"]:hover:not(:checked) ~ label, .funkyradio input[type="checkbox"]:hover:not(:checked) ~ label {
+        color: #888;
+    }
+
+    .funkyradio input[type="radio"]:checked ~ label:before, .funkyradio input[type="checkbox"]:checked ~ label:before {
+        content: '\2714';
+        text-indent: .9em;
+        color: #333;
+        background-color: #ccc;
+    }
+
+    .funkyradio input[type="radio"]:checked ~ label, .funkyradio input[type="checkbox"]:checked ~ label {
+        color: #777;
+    }
+
+    .funkyradio input[type="radio"]:focus ~ label:before, .funkyradio input[type="checkbox"]:focus ~ label:before {
+        box-shadow: 0 0 0 3px #999;
+    }
+
+    .funkyradio-default input[type="radio"]:checked ~ label:before, .funkyradio-default input[type="checkbox"]:checked ~ label:before {
+        color: #333;
+        background-color: #ccc;
+    }
+
+    .funkyradio-primary input[type="radio"]:checked ~ label:before, .funkyradio-primary input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #337ab7;
+    }
+
+    .funkyradio-success input[type="radio"]:checked ~ label:before, .funkyradio-success input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5cb85c;
+    }
+
+    .funkyradio-danger input[type="radio"]:checked ~ label:before, .funkyradio-danger input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #d9534f;
+    }
+
+    .funkyradio-warning input[type="radio"]:checked ~ label:before, .funkyradio-warning input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #f0ad4e;
+    }
+
+    .funkyradio-info input[type="radio"]:checked ~ label:before, .funkyradio-info input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5bc0de;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="box-header">
+            <div class="row col-sm-12">
+                <h3 style="color:aquamarine"> Lịch sử Nhân Viên</h3>
+            </div>
+        </div>
+    </div>
+    <div class="card-body card-padding p-b-30 p-t-20">
+
+
+        @*-------- datepicker----*@
+
+        <div class="col-sm-12 p-b-30 p-t-10">
+  
+            <div class="input-group col-sm-6 pull-left p-l-0 p-r-15">
+                <div class="datetime width230 p-b-5 p-r-30">
+                    <div class="fg-line">
+                        <div class="fg-line">
+                            <input class="form-control" type="text" id="ShiftWorkDay" onchange="getTimeFrame()" value="" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group col-sm-6 p-l-0">
+                <select class="selectpicker width:100%" id="Shift_TimeFrame" name="Shift_TimeFrame" onchange="loadAttendance()"> </select>
+
+            </div>
+        </div>
+
+
+
+        @*----*@
+        <div class="card">
+            <div class="card-header card-padding">
+                <h2>Tổng quan</h2>
+            </div>
+            <div class="card-body card-padding row">
+                <div class="col-md-6">
+                    <div class="form-group  row">
+                        <label for="Product_Code" class="control-label col-md-4"><i class="fa fa-calendar" aria-hidden="true"></i>Khung giờ</label>
+                        <div class="col-md-8">
+                            <div class="fg-line">
+                                <label class="label" style="font-size: smaller; background-color:darkgreen" id="StartTime"></label> đến <label class="label" style="font-size: smaller; background-color: firebrick" id="EndTime"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group  row">
+                        <label for="Product_Code" class="control-label col-md-4"><i class="fa fa-clock-o" aria-hidden="true"></i>Tổng giờ làm</label>
+                        <div class="col-md-8">
+                            <div class="fg-line">
+                                <label id="totalWorkTimeOfShift"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group  row">
+                        <label for="Product_Code" class="control-label col-md-4"><i class="fa fa-user" aria-hidden="true"></i>Giờ làm TB</label>
+                        <div class="col-md-8">
+                            <div class="fg-line">
+                                <label id="avgTotalWorkTimeOfShift" class="label label-primary"></label> <label id="avgTotalWorkTimeOfShiftInfo"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group  row">
+                        <label for="Product_Code" class="control-label col-md-4"><i class="fa fa-users" aria-hidden="true"></i>Nhân viên Assigned</label>
+                        <div class="col-md-8">
+                            <div class="fg-line">
+                                <label id="numberOfEmp"></label> nhân viên
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group  row">
+                        <label for="Product_Code" class="control-label col-md-4"><i class="fa fa-user-times" aria-hidden="true"></i>Giờ làm chưa xác định</label>
+                        <div class="col-md-8">
+                            <div class="fg-line">
+                                <label id="numberNA"></label> nhân viên
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group  row">
+                        <label for="Product_Code" class="control-label col-md-4"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>Đi trễ về sớm</label>
+                        <div class="col-md-8">
+                            <div class="fg-line">
+                                <label id="numberLate"></label> nhân viên
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="row m-t-5 p-l-30 p-t-15">
+                <div class="row col-md-6">
+                    <div class="col-md-2 pull-left">
+                        <button class="btn btn-primary" id="filter-toggle" data-target="#filter-container" data-toggle="collapse" onclick="toggleIcon()"><i id="icon" class="fa fa-plus"></i> Bộ lọc</button>
+                    </div>
+                </div>
+                <div class="row col-md-6 p-r-0" style="text-align: right">
+                    <button id="exportOneShift" class="width230 btn btn-primary btn-sm" onclick="exportExcellOneShift()">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+            </div>
+
+            <div class="collapse" id="filter-container">
+                <div class="row m-t-10">
+                    <!--   --ta la duong phan cach: bộ lọc 2-->
+                    <div class="col-md-12 m-t-10 m-l-30">
+                        <div class="col-md-2 p-l-0 p-r-0">
+                            <label class="control-label p-t-5">Loại nhân viên</label>
+                        </div>
+                        <div class="group-radio-buttons col-md-10 p-l-0">
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="name-filter" value="-1" class="nice-check" id="no-filter" checked />
+                                <label for="no-filter"><span>Tất cả</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="name-filter" value="0" on class="nice-check" id="filter" />
+                                <label for="filter"><span>Đã được phân công</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-4 p-l-0">
+                                <input type="radio" name="name-filter" value="1" class="nice-check" id="filter2" />
+                                <label for="filter2"><span>Chưa được phân công</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 m-t-10 m-l-30">
+                        <div class="col-md-2 p-l-0 p-r-0">
+                            <label class="control-label p-t-5">Trạng thái:</label>
+                        </div>
+                        <div class="group-radio-buttons col-md-10 p-l-0">
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="type-filter" value="-1" class="nice-check" id="no-filter2" checked />
+                                <label for="no-filter2"><span>Tất cả</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="type-filter" value="0" class="nice-check" id="filter6" />
+                                <label for="filter6"><span>Chờ duyệt</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="type-filter" value="1" class="nice-check" id="filter7" />
+                                <label for="filter7"><span>Đã duyệt</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="type-filter" value="2" class="nice-check" id="filter8" />
+                                <label for="filter8"><span>Đã hủy</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 m-t-10 m-l-30">
+                        <div class="col-md-2 p-l-0 p-r-0">
+                            <label class="control-label p-t-5">Tình trạng</label>
+                        </div>
+                        <div class="group-radio-buttons col-md-10 p-l-0">
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="stt-filter" value="-1" class="nice-check" id="no-filter1" checked />
+                                <label for="no-filter1"><span>Tất cả</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="stt-filter" value="0" class="nice-check" id="filter4" />
+                                <label for="filter4"><span>Đi trễ</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="stt-filter" value="1" class="nice-check" id="filter5" />
+                                <label for="filter5"><span>Về sớm</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="stt-filter" value="2" class="nice-check" id="filter3" />
+                                <label for="filter3"><span>Đúng giờ</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Customer Table -->
+            <div class="card-body card-padding row">
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="allcust">
+                        <!-- Datatable -->
+                        <div class="col-md-12">
+
+                            <table id="detail-table" class="table table-hover" cellspacing="0" style="table-layout: auto">
+                                <thead>
+                                    <tr>
+                                        <th><label>STT</label></th>
+                                        <th><label>Nhân viên</label></th>
+                                        <th><label>Giờ vào</label></th>
+                                        <th><label>Giờ ra</label></th>
+                                        <th><label>Chi tiết</label></th>
+                                        <th><label>Tổng giờ làm</label></th>
+                                        <th><label>Trạng thái</label></th>
+                                        <th><label>Duyệt</label></th>
+                                        <th><label>Tình trạng</label></th>
+                                        <th><label>Sửa</label></th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                            <div class="pull-left">
+                                <label><i class="fa fa-tag" aria-hidden="true"></i> &nbsp;Chú thích:</label> <br /> <br />
+                                <label class="label label-primary" style="font-size: small; margin-left: 20px">A</label> : Nhân viên cửa hàng khác <br /><br />
+                                <label class="label label-default" style="font-size: small; margin-left: 20px">A</label> : Nhân viên cửa hàng <br /><br />
+                                <i class="fa fa-star" aria-hidden="true" style="color: #d9534f; margin-left: 20px"></i> : Nhân viên chưa được phân công
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!--Model container-->
+<div id="create-modal-container">
+    <div class="modal" id="create-edit-attendance-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="Title_Create_Edit"> Thêm nhân viên vào ca</h4>
+                </div>
+                <div class="form-horizontal">
+
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Chọn nhân viên</label>
+                            <div class="col-sm-9">
+
+                                <select class="form-control selectpicker" data-live-search="true" name="EmployeeId" id="EmployeeId"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="submit" onclick="createAttendance()" class="btn btn-success btn-sm pull-right" id="btnCreate">Hoàn Tất</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="edit-modal-container"></div>
+<div id="event-item-type-container"></div>
+<div id="event-item-modal-container"></div>
+
+<!--Model sửa diem danh nhien vien trong ca-->
+<div id="create-modal-container">
+    <div class="modal" id="edit-modal-timekeeping" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document" style="width:800px;">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Sửa thông tin trong ca: <label id="EditAtt"></label></h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Trạng thái</label>
+                            <div class="col-sm-9">
+                                @*<div class="group-radio-buttons myGroup-radio-buttons">
+                                        <div class="col-md-4 p-l-0 p-t-0">
+                                            <input type="radio" name="filter-type" value="0" class="nice-check" id="rbProcessing" />
+                                            <label for="rbProcessing"><span class="label label-warning p-l-45 p-r-45 p-t-5 p-b-5" style="font-size: smaller">Chờ duyệt</span></label>
+                                        </div>
+                                        <div class="col-md-4 p-l-0 p-t-0">
+                                            <input type="radio" name="filter-type" value="1" class="funkyradio-success col-md-6" id="rbApproved" />
+                                            <label for="rbApproved" class="col-md-6"><span class="label label-success p-l-45 p-r-45 p-t-5 p-b-5" style="font-size: smaller">Đã duyệt</span></label>
+                                        </div>
+                                        <div class="col-md-4 p-l-0 p-t-0">
+                                            <input type="radio" name="filter-type" value="2" class="nice-check" id="rbReject" />
+                                            <label for="rbReject"><span class="label label-danger p-l-45 p-r-45 p-t-5 p-b-5" style="font-size: smaller">Đã hủy</span></label>
+                                        </div>
+                                    </div>*@
+                                <div class="funkyradio col-md-12">
+                                    <div class="funkyradio-success col-md-3 p-l-0 p-t-0">
+                                        <input type="radio" name="radio" value="1" id="rbApproved" />
+                                        <label for="rbApproved" style="color: #5cb85c; font-weight: bold">Đã duyệt</label>
+                                    </div>
+                                    <div class="funkyradio-danger col-md-3 p-l-0 p-t-0">
+                                        <input type="radio" name="radio" value="2" id="rbReject" />
+                                        <label for="rbReject" style="color: #d9534f; font-weight: bold">Đã hủy</label>
+                                    </div>
+                                    <div class="funkyradio-warning col-md-3 p-l-0 p-t-0">
+                                        <input type="radio" name="radio" value="0" id="rbProcessing" />
+                                        <label for="rbProcessing" style="color: #f0ad4e; font-weight: bold">Chờ duyệt</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                                <input type="hidden" id="attId">
+                                <label class="col-sm-3 control-label">Người duyệt</label>
+                                <div class="col-sm-9">
+                                    <label id="updatePerson" class="label label-primary p-l-45 p-r-45 p-t-5 p-b-5"></label>
+                                </div>
+                            </div>*@
+                        <div class="form-group">
+                            <input type="hidden" id="attId">
+                            <label class="col-sm-3 control-label">Giờ nhân viên vào</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="TimeFrameStart" name="TimeFrameStart" placeholder="Giờ nhân viên vào">
+                            </div>
+                        </div>
+                        @*<div class="form-group">
+                                <label class="col-sm-3 control-label">Thời lượng nhân viên làm</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="DurationInShift" name="TimeFrameEnd" placeholder="Thời lượng nhân viên làm">
+                                </div>
+                            </div>*@
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Giờ nhân viên ra</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="TimeFrameEnd" name="TimeFrameEnd" placeholder="Giờ nhân viên ra">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="isOverrideInput" />
+                            <div class="checkbox col-sm-9 pull-right">
+                                <label>
+                                    Cho phép chương trình tự động cập nhật lại dữ liệu<input type="checkbox" id="IsOverride" /><i class="input-helper"></i>
+                                </label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="submit" id="btnAction" onclick="EditAttendance()" class="btn btn-success btn-sm pull-right">Hoàn Tất</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script>
+        //------------- Load Attendance
+        $(document).ready(function() {
+            //loadAttendance();
+            //$("#isOverrideInput").val(3);
+           
+            $('#TimeFrameStart').datetimepicker({
+                sideBySide: true,
+                format: 'DD/MM/YYYY HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+            $("#ShiftWorkDay").daterangepicker({
+                singleDatePicker: true,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+               
+                showDropdowns: true
+            });
+
+
+            $('#TimeFrameEnd').datetimepicker({
+                sideBySide: true,
+                format: 'DD/MM/YYYY HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+
+            getTimeFrame();
+        });
+
+        function loadAttendance() {
+            debugger
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetAttendance")',
+                data: {
+                    'shiftId': $('#Shift_TimeFrame').val(),
+                    'status':$('input[name=type-filter]:checked').val(),
+                    'empType': $('input[name=name-filter]:checked').val(),
+                    'isLate': $('input[name=stt-filter]:checked').val(),
+                },
+                success: function(result) {
+                    initDatatable(result.result);
+                    $("#numberOfEmp").text(result.numberOfEmp);
+                    $("#totalWorkTimeOfShift").text(result.totalWorkTimeOfShift);
+                    $("#avgTotalWorkTimeOfShift").text(result.avgTotalWorkTimeOfShift);
+                    $("#avgTotalWorkTimeOfShiftInfo").text(" (Được tính trên " +
+                        result.numberOfEmpCheckRight +
+                        " nhân viên có giờ làm xác định)");
+                    $("#numberNA").text(result.numberOfEmpNA);
+                    $("#numberLate").text(result.numberOfEmpNotRight);
+                    GetShiftInfo();
+                    $("#checkid").text($('option[name=Shift_TimeFrame]:selected').text());
+                  
+                },
+                error: function(error) {
+                    showMessage("Cõ lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+        
+
+        function initDatatable(data) {
+            $("#detail-table").dataTable().fnDestroy();
+            $("#detail-table").dataTable({
+                stateSave: true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3, 4, 5, 6, 7],
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [1],
+                        "mRender": function (data, type, row) {
+                            processingStatus = row[11];
+                            var nameInfo = "";
+                            var isAssign = "";
+                            if (processingStatus == "UpdateByAutoWithoutAssignOtherStore") {
+                                nameInfo = "<lable class='label label-primary p-r-10 p-l-10'style='font-size: small'>" + data + "</lable>";
+                            } else {
+                                nameInfo = "<lable>" + data + "</lable>";
+                            }
+                            if (processingStatus == "UpdateByAutoWithoutAssignOtherStore" || processingStatus == "UpdateByAutoWithoutAssign") {
+                                isAssign = "<i class='fa fa-star' aria-hidden='true' style='color: #d9534f'></i >";
+                            }
+                            return isAssign + " " + nameInfo ;
+                        },
+                    },
+                    {
+                        "aTargets": [2],
+                        "mRender": function(data, type, row) {
+                            if (data == "Chưa cập nhật") {
+                                var info = "<lable style='color : darkblue'>" + data + "</lable>";
+                            } else {
+                                var info = "<lable>" + data + "</lable>";
+                            }
+                            return info + " ";
+                        },
+                    },
+                    {
+                        "aTargets": [3],
+                        "mRender": function(data, type, row) {
+                            if (data == "Chưa cập nhật") {
+                                var info = "<lable style='color : darkblue'>" + data + "</lable>";
+                            } else {
+                                var info = "<lable>" + data + "</lable>";
+                            }
+                            return info + " ";
+                        },
+                    },
+                    {
+                        "aTargets": [4],
+
+                        "mRender": function(data, type, row) {
+                            check = row[6];
+                            vao = row[7];
+                            ra = row[8];
+                            totalTime = row[4];
+                            processingStatus = row[11];
+                            var rsProcessingStatus = "";
+                            if (processingStatus == "UpdatedByAuto" ||
+                                processingStatus == "UpdatedByCheckContinueAuto" ||
+                                processingStatus == "UpdateByAutoWithoutAssignOtherStore" ||
+                                processingStatus == "UpdateByAutoWithoutAssign") {
+                                //rsProcessingStatus = "<div class='label label-primary'><i class='fa fa-desktop' aria-hidden='true'></i></div>";
+                                rsProcessingStatus =
+                                    "<a title='Cập nhật tự động' class='label label-primary'><i class='fa fa-desktop' aria-hidden='true'></i></a>";
+                            } else if (processingStatus == "Assign") {
+                                //rsProcessingStatus = "<div class='label label-primary'>N</div>";
+                                rsProcessingStatus = "<a title='Mới thêm vào ca' class='label label-primary'>N</a>";
+                            } else if (processingStatus == "UpdatedByManualCanNotOveride" ||
+                                processingStatus == "UpdatedByManualCanOveride") {
+                                //rsProcessingStatus = "<div class='label label-primary'><i class='fa fa-exclamation-triangle' aria-hidden='true'></i></div>";
+                                rsProcessingStatus =
+                                    "<a title='Cập nhật thủ công' class='label label-primary'><i class='fa fa-hand-paper-o' aria-hidden='true'></i></a>";
+                            }
+                            //else if (processingStatus == "UpdatedByManualCanOveride") {
+                            //    rsProcessingStatus = "<div class='label label-primary'><i class='fa fa-pencil-square-o' aria-hidden='true'></i></div>";
+                            //}
+                            //else if (processingStatus == "UpdatedByCheckContinueAuto") {
+                            //    //rsProcessingStatus = "<div class='label label-primary'><i class='fa fa-play-circle' aria-hidden='true'></i></div>";
+                            //    rsProcessingStatus = "<a title='Cập nhật ' class='label label-primary'><i class='fa fa-play-circle' aria-hidden='true'></i></a>";
+                            //}
+
+                            var chuan = "<div class='label label-success'>Đúng giờ</div>";
+                            var tre = "<div class='label label-danger p-l-15 p-r-15'>Đi trễ</div>";
+                            var som = "<div class='label label-warning'>Về sớm</div>";
+                            var html = "";
+                            if (check == "chưa check đủ") {
+                                html = "--";
+                            }
+                            else if (totalTime == "00:00:00") {
+                                html = "--";
+                            }
+                            else{
+                                if (vao != "Chuẩn")
+                                    html = tre+"<br /><br />";
+                                if (ra != "Chuẩn")
+                                    html = html + som;
+                            }
+                            if (html == "") html = rsProcessingStatus + "<br /><br />" + chuan;
+                            else html = rsProcessingStatus + "<br /><br />" + html;
+                            return html;
+                        }
+                    },
+                    {
+                        "aTargets": [5],
+                        "mRender": function(data, type, row) {
+                            data = row[4];
+                            return data;
+                        }
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function(data, type, row) {
+                            data = row[9];
+                            //var attId = row[5];
+                            var Processing = "<div class='label label-warning'>Chờ duyệt</div>";
+                            var Approved = "<div class='label label-success p-l-15 p-r-15'>Đã duyệt</div>";
+                            var Reject = "<div class='label label-danger p-l-15 p-r-15'>Đã hủy</div>";
+                            //var duyet = "<a title='Duyệt' class='btn btn-sm btn-success' onclick='duyetAtt(" +
+                            //    attId +
+                            //    ")'><i class='fa fa-check' aria-hidden='true'></i></a>";
+                            //var huy = "<a title='Hủy' class='btn btn-sm btn-danger' onclick='huyAtt(" +
+                            //    attId +
+                            //    ")'><i class='fa fa-times' aria-hidden='true'></i></a>";
+                            var result = "";
+                            if (data == "Processing") result = Processing //+ " - " + duyet + " " + huy;
+                            else if (data == "Approved") result = Approved;
+                            else if (data == "Reject") result = Reject;
+                            return result;
+                        }
+                    },
+                    {
+                        "aTargets": [7],
+                        "mRender": function(data, type, row) {
+                            data = row[9];
+                            data2 = row[10];
+                            var attId = row[5];
+                            var duyet = "<a title='Duyệt' class='btn btn-sm btn-success' onclick='duyetAtt(" +
+                                attId +
+                                ")'><i class='fa fa-check' aria-hidden='true'></i></a>";
+                            var huy = "<a title='Hủy' class='btn btn-sm btn-danger' onclick='huyAtt(" +
+                                attId +
+                                ")'><i class='fa fa-times' aria-hidden='true'></i></a>";
+                            var result = "";
+                            if (data == "Processing") result = duyet + " " + huy;
+                            else {
+                                if (data2 != "System") {
+                                    result =
+                                        "<div class='label label-primary'><i class='fa fa-user' aria-hidden='true'></i> " +
+                                        data2 +
+                                        "</div>";
+                                }
+                            }
+                            //else if (data == "Approved") result = Approved;
+                            //else if (data == "Reject") result = Reject;
+                            return result;
+                        }
+                    },
+                    //{
+                    //    "aTargets": [7],
+                    //    "mRender": function (data, type, row) {
+                    //        data = row[10];
+                    //        var system = "<div class='label label-primary'><i class='fa fa-desktop' aria-hidden='true'></i> Tự động</div>";
+                    //        var nonSystem = "<div class='label label-primary'><i class='fa fa-user' aria-hidden='true'></i> " + data + "</div>";
+                    //        if (data == "System") {
+                    //            return system;
+                    //        } else {
+                    //            return nonSystem;
+                    //        }
+
+                    //    }
+                    //},
+                    {
+                        "aTargets": [8],
+                        "mRender": function(data, type, row) {
+                            data = row[5];
+                            var edit =
+                                "<a title='Chỉnh sửa' class='btn btn-sm btn-primary' onclick='showEditTimekeepingModal(" +
+                                    data +
+                                    ")'><i class='glyphicon glyphicon-pencil'></i></a>";
+                            //var del = "<a title='Xóa' class='btn btn-sm btn-danger' onclick='deleteAttendance(" +
+                            //    data +
+                            //    ")'><i class='glyphicon glyphicon-trash'></i></a>";
+                            return edit + " " /*+ del*/;
+                        }
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+        function getTimeFrame() {
+            debugger
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetDateTimeFrame", "TimeFrame")',
+                data: {
+                    datetime: $('#ShiftWorkDay').val(),
+            },
+        success: function(result) {
+            loadTimeFrame(result.datatable);
+        },
+        error: function(error) {
+            showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+        }
+        });
+        }
+
+        function ChayLai(){
+            getTimeFrame();
+        }
+
+        function loadTimeFrame(ListData){
+
+            $('#Shift_TimeFrame').empty();
+            for (var i = 0; i < ListData.length; i++) {
+                $("#Shift_TimeFrame").append('<option value="-1"> </option>');
+                $("#Shift_TimeFrame").append('<option value="' + ListData[i][4] + '">' + ListData[i][1] + '</option>');
+            }
+            $("#Shift_TimeFrame").selectpicker('refresh');
+        }
+
+         
+        function GetShiftInfo() {
+            if ($("#Shift_TimeFrame").val() == null) {
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetShiftInFo", "Shift")',
+                data: {
+                    'shiftId': $('#Shift_TimeFrame').val(),
+                },
+                success: function(result) {
+                    $("#StartTime").text(result.startTime);
+                    $("#EndTime").text(result.endTime);
+                },
+                error: function(error) {
+                    showMessage("Cõ lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+        function duyetAtt(id) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("UpdateAttendanceStt")',
+                data: {
+                    'attId': id,
+                    'stt': @((Int32)StatusAttendanceEnum.Approved),
+                },
+                success: function(result) {
+                    if (result == true) {
+                        ShowAlert("Cập nhật thành công", 2);
+                        loadAttendance();
+                    } else {
+                        ShowAlert("Chưa cập nhật được. Vui lòng thử lại", 1);
+                    }
+                },
+                error: function(error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+
+        function huyAtt(id) {
+            ShowConfirm("Bạn có muốn hủy nhân viên này ra khỏi ca?",
+                function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("UpdateAttendanceStt")',
+                        data: {
+                            'attId': id,
+                            'stt': @((Int32)StatusAttendanceEnum.Reject),
+                        },
+                        success: function(result) {
+                            if (result == true) {
+                                ShowAlert("Cập nhật thành công", 2);
+                                loadAttendance();
+                            } else {
+                                ShowAlert("Chưa cập nhật được. Vui lòng thử lại", 1);
+                            }
+                        },
+                        error: function(error) {
+                            showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                        }
+                    });
+                });
+
+
+        }
+
+        function showCreateAttendanceModal() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetEmployeeInShift")',
+                data: {
+                    'shiftId': $('#Shift_TimeFrame').val(),
+                },
+
+                success: function(result) {
+                    loadListEmployeeInDrodownList(result);
+                },
+                error: function(error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+
+        function loadListEmployeeInDrodownList(listData) {
+            $("#EmployeeId").empty();
+            for (i = 0; i < listData.length; i++) {
+                $("#EmployeeId").append('<option value="' + listData[i].Id + '">' + listData[i].Name + '</option>');
+            }
+
+            $("#EmployeeId").selectpicker('refresh');
+            $('#create-edit-attendance-modal').modal('show');
+        }
+
+
+        function createAttendance() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CreateAttendance")',
+                data: {
+                    'shiftId': $('#Shift_TimeFrame').val(),
+                    'employeeId': $('#EmployeeId').val(),
+
+                },
+
+                success: function(data) {
+                    if (data) {
+                        $('#create-edit-attendance-modal').modal('toggle');
+                        ShowAlert("Thêm thành công", 2);
+                        loadAttendance();
+                        //location.reload();
+                    } else {
+                        ShowAlert("Thất bại. Vui lòng thử lại", 1);
+                    }
+                },
+                error: function(error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+
+        function deleteAttendance(id) {
+            ShowConfirm("Bạn có muốn xóa nhân viên này ra khỏi ca?",
+                function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("DeleteAttendance")',
+                        data: { attendanceId: id },
+
+                        success: function(data) {
+                            if (data) {
+                                ShowAlert("Xóa thành công", 2);
+                                loadAttendance();
+                            } else {
+                                ShowAlert("Thất bại. Vui lòng thử lại", 1);
+                            }
+                        },
+                        error: function(error) {
+                            showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                        }
+                    });
+                });
+        }
+
+        $("#IsOverride").change(function() {
+            if ($("#IsOverride").is(':checked')) {
+                $("#isOverrideInput").val(2);
+            } else {
+                $("#isOverrideInput").val(3);
+            }
+        });
+
+        function showEditTimekeepingModal(id) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("PrepareEdit", "TimeKeepingReport")',
+                data: {
+                    'attId': id
+                },
+                success: function(result) {
+                    $('#edit-modal-timekeeping').modal('show');
+                    $('#attId').val(result.model.id);
+                    $('#EditAtt').text(result.workDayEdit);
+                    if (result.model.checkMin == "01/01/0001 00:00") {
+                        var date = $('#EditAtt').text().split("-")[0].trim() + " 00:00";
+                        $('#TimeFrameStart').val(date);
+                    } else {
+                        $('#TimeFrameStart').val(result.model.checkMin);
+                    }
+
+                    if (result.model.checkMax == "01/01/0001 00:00") {
+                        var date = $('#EditAtt').text().split("-")[0].trim() + " 00:00";
+                        $('#TimeFrameEnd').val(date);
+                    } else {
+                        $('#TimeFrameEnd').val(result.model.checkMax);
+                    }
+
+                    if (result.model.processingStatus == 2) {
+                        $("#IsOverride").prop('checked', true);
+                    } else {
+                        $("#IsOverride").prop('checked', false);
+                    }
+
+                    if (result.model.stt == "Processing") {
+                        $("#rbProcessing").prop('checked', true);
+                    } else if (result.model.stt == "Approved") {
+                        $("#rbApproved").prop('checked', true);
+                    } else if (result.model.stt == "Reject") {
+                        $("#rbReject").prop('checked', true);
+                    }
+
+                    //if (result.model.updatePerson != null & result.model.updatePerson != "System") {
+                    //    $('#updatePerson').text(result.model.updatePerson);
+                    //} else {
+                    //    $('#updatePerson').text("N/a");}
+                }
+            });
+        }
+
+        function EditAttendance() {
+            var rsStt;
+            if ($("#rbApproved").is(':checked')) {
+                rsStt = $("#rbApproved").val();
+            } else if ($("#rbProcessing").is(':checked')) {
+                rsStt = $("#rbProcessing").val();
+            } else if ($("#rbReject").is(':checked')) {
+                rsStt = $("#rbReject").val();
+            }
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("EditAttendance", "TimeKeepingReport")',
+                data: {
+                    'attId': $('#attId').val(),
+                    'currentDay': $('#EditAtt').text().split("-")[0].trim(),
+                    //'duration': $('#DurationInShift').val(),
+                    'checkMin': $('#TimeFrameStart').val(),
+                    'checkMax': $('#TimeFrameEnd').val(),
+                    'processingStatus': $('#isOverrideInput').val(),
+                    'stt': rsStt
+                },
+                success: function(result) {
+                    if (result == true) {
+                        $('#edit-modal-timekeeping').modal('hide');
+                        //showEmployeeInShiftModal($("#ShiftId").val());
+                        loadAttendance();
+                        ShowAlert("Sửa thành công", 2);
+                    } else {
+                        ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                    }
+                },
+                error: function(error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+
+        function exportExcellOneShift() {
+            debugger
+            window.location.replace("@Url.Action("ExportToExcel", "Shift")" + "?shiftId=" + $('#Shift_TimeFrame').val());
+        }
+        function chooseSearch() {
+            loadAttendance();
+        }
+
+        $('input[name=name-filter]').on('change', function () {
+            loadAttendance();
+        });
+        $('input[name=type-filter]').on('change', function () {
+            loadAttendance();
+        });$('input[name=stt-filter]').on('change', function () {
+            loadAttendance();
+        });
+
+    </script>
+
+}

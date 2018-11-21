@@ -1,0 +1,93 @@
+﻿@model IEnumerable<HmsService.ViewModels.ItemDetail>
+@{
+    int count = 1;
+}
+
+<table class="table table-striped table-bordered table-hover" style="width: 100%" id="detail-item-table">
+    <thead>
+        <tr>
+            <th><label>STT</label></th>
+            <th><label>Ngày</label></th>
+            <th><label>Tên nguyên liệu</label></th>
+            <th><label>Đơn vị</label></th>
+            <th><label>Nhập hàng</label></th>
+            <th><label>Nhận hàng</label></th>
+            <th><label>Tổng nhập</label></th>
+            <th><label>Xuất bán</label></th>
+            <th><label>Xuất trả</label></th>
+            <th><label>Xuất hủy</label></th>
+            <th><label>Chuyển hàng</label></th>
+            <th><label>Tổng xuất</label></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@(count++)</td>
+                <td>@item.DateTime</td>
+                <td>@item.ProductName</td>
+                <td>@item.Unit</td>
+                <td>@item.ImportInventory</td>
+                <td>@item.ReceiveInventory</td>
+                <td>@item.TotalImport</td>
+                <td>@item.Sold</td>
+                <td>@item.GiveBack</td>
+                <td>@item.Destroy</td>
+                <td>@item.ExportInventory</td>
+                <td>@item.TotalExport</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        $("#detail-item-table").dataTable({
+            "iDisplayLength": 25,
+            "aLengthMenu": [25],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "visible": false, "targets": 0
+                },
+            {
+                "targets": [0, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+                "sClass": "text-center"
+            }
+            ],
+            "dom": 'T<"clear">lfrtip',
+            "tableTools": {
+                "sSwfPath": "/Content/ace/assets/swf/copy_csv_xls_pdf.swf",
+                "aButtons": [
+                    {
+                        "sExtends": "copy",
+                        "oSelectorOpts": { filter: 'applied', order: 'current' }
+                    },
+                    {
+                        "sExtends": "xls",
+                        "oSelectorOpts": { filter: 'applied', order: 'current' },
+                        "sFileName": "Báo cáo khoảng thời gian.xls"
+                    },
+                    {
+                        "sExtends": "print",
+                        "oSelectorOpts": { filter: 'applied', order: 'current' },
+                    }
+                ]
+            }
+        }).fnSetFilteringDelay(delaySearch);;
+    });
+
+</script>

@@ -1,0 +1,62 @@
+﻿@model IEnumerable<HmsService.ViewModels.StoreNavigationViewModel>
+@using Microsoft.AspNet.Identity;
+@using Microsoft.AspNet.Identity.Owin;
+
+@{
+    var brandId = ViewBag.brandId;
+    var currentUser = HttpContext.Current.User;
+}
+
+<div class="modal-header">
+    <button type="button" class="pull-right btn btn-link btn-close" data-dismiss="modal">
+        <i class="fa fa-close" style="padding-top: 9px;"></i>
+    </button>
+    @if (currentUser.IsInRole("BrandManager") || currentUser.IsInRole("Administrator") || currentUser.IsInRole("ProductManager"))
+    {
+        <a class="btn btn-link btn-view-all-stores" href="@Url.Action("ChooseStore","Home", new {storeId = 0, brandId = brandId})">
+            <i class="fa fa-list-ul"></i>
+            Xem toàn bộ hệ thống
+        </a>
+    }
+</div>
+<div class="modal-body">
+    <div class="choose">
+        Chọn cửa hàng:
+    </div>
+    <div class="row eh-wrapper">
+        @foreach (var item in Model)
+        {
+            <div class="col-sm-3">
+                <a href="@Url.Action("ChooseStore","Home", new { storeId = item.Id })">
+                    <div class="inner-box waves-effect eh-item">
+                        <strong>@item.StoreName</strong><br />
+                        @item.Address<br />
+                        <b>Nhân viên quản lí:</b> @item.User
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+@*<script>
+        function setEqualHeights() {
+            // voi moi .eh-wrapper, set equal height cho tat ca cac hau due cua no
+            $('.eh-wrapper').each(function () {
+                var maxHeight = -1;
+                // calc maxHeight
+                $(this).find('.eh-item').each(function () {
+                    maxHeight = (maxHeight > $(this).height()) ? maxHeight : $(this).height();
+                });
+                // set all elements
+                $(this).find('.eh-item').each(function () {
+                    $(this).height(maxHeight);
+                });
+            });
+        }
+        $(document).ready(function () {
+            $('#modalDieuHuong').on('shown.bs.modal', function () {
+                setEqualHeights();
+            });
+        });
+    </script>*@

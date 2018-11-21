@@ -1,0 +1,275 @@
+﻿@model StoreViewModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    input[readonly].default-cursor {
+        cursor: default;
+        background-color: white;
+    }
+</style>
+
+<div class="card">
+    <form id="editStoreForm" method="post">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3> Thông tin chi tiết cửa hàng</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a id="btn-comeback" href="@Url.Action("Index")" class="btn btn-success">Quay lại</a>
+                    @*<button type="button" onclick="confirmSubmit(this)" class="btn btn-primary">Hoàn tất</button>*@
+                </div>
+            </div>
+            <hr />
+        </div>
+        <div class="card-padding">
+            <div class="modal-body">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                @Html.HiddenFor(q => q.BrandId)
+                @Html.HiddenFor(q => q.ID)
+                @Html.HiddenFor(q => q.isAvailable)
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px; margin-top:12px; padding-top:20px; padding-bottom:22px;">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Tên cửa hàng
+                                @*<span style="color:red">*</span>*@
+                                </label>
+                                <div class="col-md-6">
+                                    <div class="fg-line" >
+                                        @Html.TextBoxFor(q => q.Name, new { id = "Name", @class = "form-control", @readonly = "readonly", Style= "background-color:white" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Tên rút gọn</label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.ShortName, new { id = "ShortName", @class = "form-control", @readonly = "readonly", Style = "background-color:white" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Địa chỉ
+                                @*<span style="color:red">*</span>*@
+                                </label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Address, new { id = "Address", @class = "form-control", @readonly = "readonly", Style = "background-color:white" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Kinh độ</label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Lat, new { id = "Lat", @class = "form-control", @readonly = "readonly", Style = "background-color:white" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Vĩ độ</label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Lon, new { id = "Lon", @class = "form-control", @readonly = "readonly", Style = "background-color:white" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Email
+                                @*<span style="color:red">*</span>*@
+                                </label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Email, new { id = "Email", type = "email", @class = "form-control", @readonly = "readonly", Style = "background-color:white" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Số điện thoại
+                                @*<span style="color:red">*</span>*@
+                                </label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Phone, new { id = "Phone", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)", @readonly = "readonly", Style = "background-color:white" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Fax</label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Fax, new { id = "Fax", @class = "form-control", @readonly = "readonly", Style = "background-color:white" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Loại cửa hàng</label>
+                                <div class="col-md-6" >
+                                    <div class="fg-line">
+                                        
+                                        <input type='text' class="form-control" name="Type" readonly style="background-color:#ffffff; color:#000000;" value="@((StoreTypeEnum)this.Model.Type)"/>
+                                        
+                                        @*@Html.TextBoxFor(q => q.Type, new { id = "Type", @class = "form-control", @readonly = "readonly", Style = "background-color:white" })*@
+                                    </div>
+                                    @*<select class="form-control col-sm-12" name="Type" readonly>
+                                        @foreach (var storeType in Enum.GetValues(typeof(HmsService.Models.StoreTypeEnum)))
+                                        {
+                                            <option value="@((int)storeType.)" selected="@((int)storeType==this.Model.Type ? " ":null)" }>@(HmsService.Models.Utils.GetEnumDescription((Enum)storeType))</option>
+                                        }
+                                    </select>*@
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Giờ mở cửa
+                                @*<span style="color:red">*</span>*@
+                                </label>
+                                <div class="col-md-4">
+                                    <div class="fg-line">
+                                        <div class='input-group date' id='OpenTime'>
+                                            <input type='text' class="form-control" name="OpenTime" id="InputOpenTime" readonly style="background-color:#ffffff; color:#000000;" value="@(this.Model.OpenTime.HasValue?this.Model.OpenTime.Value.ToString("dd/MM/yyyy") : " ")" />
+                                            @*<span class="input-group-addon">
+                                                <i class="glyphicon glyphicon-time"></i>
+                                                <span></span> <b class="caret"></b>
+                                            </span>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Giờ đóng cửa
+                                @*<span style="color:red">*</span>*@
+                                </label>
+                                <div class="col-md-4">
+                                    <div class="fg-line">
+                                        <div class='input-group date' id='CloseTime'>
+                                            <input type='text' class="form-control" name="CloseTime" id="InputCloseTime" readonly style="background-color:#ffffff; color:#000000;" />
+                                            @*<span class="input-group-addon">
+                                                <i class="glyphicon glyphicon-time"></i>
+                                                <span></span> <b class="caret"></b>
+                                            </span>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Hoạt động</label>
+                                <div class="col-md-6">
+                                    <label class="form-group checkbox myCheckbox">
+                                        <input type="checkbox" name="IsAvailable" id="IsAvailable" class="form-control" value="true" @(this.Model.isAvailable.Value ? "checked" : null)>
+                                        <i class="input-helper"></i>
+                                    </label>
+                                </div>
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+            @if (this.Model.OpenTime.HasValue) {
+                <text>$('#InputOpenTime').val('@this.Model.OpenTime.Value.ToShortTimeString()').change()</text>
+            }
+    @if (this.Model.CloseTime.HasValue)
+    {
+        <text>$('#InputCloseTime').val('@this.Model.CloseTime.Value.ToShortTimeString()').change()</text>
+    }
+    $(document).ready(function () {
+        $('#OpenTime').datetimepicker({
+            format: 'LT',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#CloseTime').datetimepicker({
+            format: 'LT',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+
+        $('#btn-comeback').fixedScroll(70);
+    });
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    };
+    function validateEmail(email) {
+        var re = /^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    };
+    function confirmSubmit(btn) {
+        if ($("input[name='Name']").val() == "") {
+            ShowMessage("Vui lòng nhập tên cửa hàng.", 3);
+            return;
+        }
+        else if ($("input[name='Address']").val() == "") {
+            ShowMessage("Vui lòng nhập địa chỉ.", 3);
+            return;
+        }
+            //else if ($("input[name='Lat']").val() == "") {
+            //    ShowMessage("Vui lòng nhập Kinh độ.", 3);
+            //    return;
+            //}
+            //else if ($("input[name='Lon']").val() == "") {
+            //    ShowMessage("Vui lòng nhập Vĩ độ.", 3);
+            //    return;
+            //}
+        else if ($("input[name='Email']").val() == "") {
+            ShowMessage("Vui lòng nhập email.", 3);
+            return;
+        }
+        else if (!validateEmail($("input[name='Email']").val())) {
+            ShowMessage("Email không hợp lệ.", 3);
+            return;
+        }
+        else if ($("input[name='Phone']").val() == "") {
+            ShowMessage("Vui lòng nhập số điện thoại.", 3);
+            return;
+        }
+        else if ($("input[name='OpenTime']").val() == "") {
+            ShowMessage("Vui lòng chọn giờ mở cửa.", 3);
+            return;
+        }
+        else if ($("input[name='CloseTime']").val() == "") {
+            ShowMessage("Vui lòng chọn giờ đóng cửa.", 3);
+            return;
+        }
+        else {
+            editStore();
+        }
+    }
+    function editStore() {
+        var formData = $('#editStoreForm').serialize();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Edit")',
+            dataType: 'JSON',
+            data: formData,
+            success: function (result) {
+                if (result) {
+                    ShowMessage(result.message, 2);
+                    setTimeout(function () {
+                        window.location.href = '@Url.Action("Index")';
+                    }, 1000);                    
+                } else {
+                    ShowMessage(result.message,1);
+                }
+            },
+
+            //error: function (error) {
+            //    ShowMessage(error.message,1);
+            //}
+        });
+    }
+</script>

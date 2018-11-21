@@ -1,0 +1,165 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Quản lý POS file</h3>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-padding m-t-20">
+        <div class="row">
+            <div class="col-md-12 m-b-20">
+                <button class="btn btn-success waves-effect pull-right create-button" id="btn-config-pos-file">Cập nhật POS file từ local</button>
+                <div class="hidden"><input type="file" id="config-via-file" accept=".json" /></div>
+            </div>
+            <div class="col-md-12 m-b-20">
+                <a href="@Url.Action("Create")" class="btn btn-primary waves-effect pull-right create-button" id="btn-create-pos-file">Tạo POS file mới</a>                
+            </div>           
+            <div class="col-md-12">
+                <div class="tableDiv-responsive">
+                    <table id="pos-file-table" class="table table-bordered table-striped table-fixed-header">
+                        <thead>
+                            <tr>
+                                <th><label>STT</label></th>
+                                <th><label>Tên POS file</label></th>
+                                <th><label>Phiên bản</label></th>
+                                <th><label>Tùy chọn</label></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .input-group .input-group-btn > a.btn {
+        margin-top: 0px !important;
+    }
+
+    .create-button {
+        width: 200px;
+    }
+</style>
+<script>
+    var datatable = [];
+
+    $(document).ready(function () {
+        GetAllPosFile();
+    });
+
+    function GetAllPosFile() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GetAllPosFile")',
+            success: function (result) {
+                if (result.success) {
+                    InitDatatable(result.list);
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    }
+
+    $('#btn-config-pos-file').on('click', function () {
+        $('#config-via-file').click();
+    });
+
+    $('#config-via-file').on('change', function () {
+        if (this.files.length > 0) {
+            var file = this.files[0];
+            uploadFile(file);
+        }
+    });
+
+    function uploadFile(file) {
+        var formData = new FormData();
+        if (file != null) {
+            formData.append('file', file);
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ConfigPosFileViaLocalFile")',
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        GetAllPosFile();
+                        ShowMessage(result.message, 3);
+                    } else {
+                        ShowMessage(result.message, 1);
+                    }
+                },
+                processData: false,
+                contentType: false,
+                error: function () {
+                    ShowMessage("Có lỗi xảy ra!", 1);
+                }
+            });
+        }
+    }
+
+    function RefreshDatatable() {
+        $("#transaction-table").dataTable()._fnPageChange(0);
+        $("#transaction-table").dataTable()._fnAjaxUpdate();
+    }
+
+    function InitDatatable(datatable) {
+        //$("#transaction-table").dataTable().fnDestroy();
+        $("#pos-file-table").dataTable({
+            "bFilter": true,
+            "bSort": false,
+            "bRetrieve": true,
+            //"bDestroy": true,
+            //"bServerSide": true,
+            "bScrollCollapse": true,
+            'data': datatable,
+            "bProcessing": true,
+            "bPaginate": true,
+            "iDisplayLength": 10,
+            "aLengthMenu": [10, 50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                },
+                "sSearchPlaceholder": "Tên tài khoản"
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [0, 2, 3],
+                    "bSearch": false
+                },
+                {
+                    "aTargets": [3],
+                    "mRender": function (data, type, row) {
+                        return "<a title='Chỉnh sửa POS file' class='btn btn-primary' href='@this.Url.Action("Edit")\?posFileId=" + row[3] + "\'><i class='glyphicon glyphicon-pencil'></i></a>";
+                    }
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(200);
+    };
+</script>

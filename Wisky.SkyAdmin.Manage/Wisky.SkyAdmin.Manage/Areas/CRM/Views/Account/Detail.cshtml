@@ -1,0 +1,247 @@
+﻿@model HmsService.ViewModels.AccountViewModel
+
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container card" style="width: calc(100%)">
+    <div id="profile-main">
+        <div class="card-header">
+            <h3>@this.Model.AccountName</h3>
+            <hr />
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a data-toggle='modal' onclick='showCreateTransaction(@this.Model.AccountID)' data-target='#createTransactionPanel' class="btn btn-primary btn-sm waves-effect pull-right"><i class="glyphicon glyphicon-plus"></i> Thêm giao dịch</a>
+            </div>
+        </div>
+        <div class="row card-body">
+            @*<div class="pm-overview c-overflow mCustomScrollbar _mCS_3 mCS-autoHide" style="overflow: visible;">*@
+            @*<div id="mCSB_3" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" tabindex="0">
+                <div id="mCSB_3_container" class="mCSB_container mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr">*@
+
+            @*<div class="col-md-3 pmo-block card-padding pmo-contact hidden-xs">*@
+                <div class="col-md-3 card-padding pmo-contact hidden-xs">
+                    <ul>
+                        <li title="Số dư tài khoản">
+                            <i class="zmdi zmdi-money-box"></i>
+                            @this.Model.Balance.GetValueOrDefault(0)
+                        </li>
+                        <li title="Số tài khoản">
+                            <i class="zmdi zmdi-card"></i>
+                            @(string.IsNullOrWhiteSpace(Model.BankAccountNo) ? "Không có dữ liệu" : this.Model.BankAccountNo)
+                        </li>
+                        <li title="Tên ngân hàng">
+                            <i class="zmdi zmdi-email"></i>
+                            @(string.IsNullOrWhiteSpace(Model.BankName) ? "Không có dữ liệu" : this.Model.BankName)
+                        </li>
+
+                    </ul>
+                </div>
+
+                @*</div>
+            </div>*@
+                @*<div id="mCSB_3_scrollbar_vertical" class="mCSB_scrollTools mCSB_3_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: block;">
+            <div class="mCSB_draggerContainer"><div id="mCSB_3_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 587px; top: 0px; display: block; max-height: 695px;" oncontextmenu="return false;">
+                <div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_3_scrollbar_horizontal" class="mCSB_scrollTools mCSB_3_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;">
+            <div class="mCSB_draggerContainer">
+                <div id="mCSB_3_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;" oncontextmenu="return false;">
+                    <div class="mCSB_dragger_bar">
+                </div>
+                </div>
+            <div class="mCSB_draggerRail">
+                </div>
+            </div>
+            </div>*@
+                @*</div>*@
+
+                <div class="clearfix col-md-9 card-padding">
+                    <div class="row">
+                        <ul class="tab-nav tn-justified">
+                            <li class="active waves-effect"><a data-toggle="tab" href="#denCuaHang"><h4>Danh sách các giao dịch</h4></a></li>
+                        </ul>
+                    </div>
+
+                    <div class="row">
+                        <div class="tab-content">
+                            <div id="denCuaHang" class="tab-pane fade in active">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="card">
+                                            <div class="card-body">
+                                                <table id="voucher-table" class="table table-hover">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>
+                                                                <label class="">STT</label>
+                                                            </th>
+                                                            <th>
+                                                                <label class="">Số tiền</label>
+                                                            </th>
+                                                            <th>
+                                                                <label class="">Tiền tệ</label>
+                                                            </th>
+                                                            <th>
+                                                                <label class="">Ngày</label>
+                                                            </th>
+                                                            <th>
+                                                                <label class="">Loại giao dịch</label>
+                                                            </th>
+                                                            <th>
+                                                                <label class="">Tùy chọn</label>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+
+<div id="createTransactionPanel" class="modal fade" data-backdrop="static" data-keyboard="true"></div>
+<div id="editTransactionPanel" class="modal fade" data-backdrop="static" data-keyboard="true"></div>
+
+
+
+<script>
+
+
+    $(document).ready(function () {
+        InitTransactionDatatable();
+        RefresTransactionTable();
+    });
+
+    function RefresTransactionTable() {
+        var oTable = $("#voucher-table").dataTable();
+    }
+
+    //thêm index = 1 vào url '/CRM/Account/LoadTransactionByAccount'
+    function InitTransactionDatatable() {
+        $("#voucher-table").dataTable({
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "bSort": false,
+            "bFilter": false,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "Id", "value": '@Model.AccountID' });
+            },
+            "sAjaxSource": "@Url.Action("LoadTransactionByAccount", "Account")",
+            "bProcessing": true,
+            "aLengthMenu": [10, 20, 100],
+            "oLanguage": {
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4],
+                    "bSortable": true,
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [5],
+                    "mRender": function (data, type, row) {
+                        var data = row[5];
+                        var edit = "<a class='btn btn-sm btn-primary' onclick='showEditTransaction(" + data + ")' data-target='#editTransactionPanel' data-toggle='modal'><i class='glyphicon glyphicon-pencil'></i></a>";
+                        var deleteVoucher = " <a class='btn btn-sm btn-danger' onclick='deleteVoucher(" + data + ")'><i class='fa fa-close'></i></a>";
+                        return edit + deleteVoucher;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        });
+    }
+
+    //thêm index = 1 vào url '/CRM/Voucher/DeleteVoucher'
+    function deleteVoucher(voucherId) {
+        if (confirm("Bạn có muốn xóa tài khoản này?")) {
+            $.ajax({
+                type: 'URL',
+                url: "@(Url.Action("DeleteVoucher", "Voucher"))",
+                //url: '/1/CRM/Voucher/DeleteVoucher',
+                method: 'POST',
+                data: { Id: voucherId },
+                success: function (result) {
+                    if (result.success) {
+                        alert("Xóa thành công!");
+                        RefresVoucherTable();
+                    } else {
+                        alert("Xóa không thành công, xin thử lại sau");
+                    }
+                },
+                error: function (error) {
+                    alert("Xóa không thành công, xin thử lại sau");
+                }
+            });
+        }
+    }
+
+    //thêm index = 1 vào url '/CRM/Transaction/Create'
+    function showCreateTransaction(accountId) {
+        $.ajax({
+            type: "GET",
+            url: '#createTransaction',
+            url: '@Url.Action("Create","Transaction")',
+            data: {
+                Id: accountId
+            },
+            success: function (result) {
+                $('#createTransactionPanel').html(result);
+                $('#createTransactionPanel').modal('show');
+                setModalHeaderWidth();
+            },
+            error: function (error) {
+                alert("Error Occured")
+            }
+        });
+    }
+
+    function showEditTransaction(transactionID) {
+        $.ajax({
+            type: 'GET',
+            url: '#transactionEdit',
+            url: '@Url.Action("Edit", "Transaction")',
+
+            data: {
+                Id: transactionID,
+            },
+            success: function (result) {
+                $('#editTransactionPanel').html(result),
+                $('#editTransactionPanel').modal('show'),
+                setModalHeaderWidth()
+            },
+            error: function (error) {
+                ShowMessage("Error Occured", 1)
+            }
+        });
+    }
+
+    function setModalHeaderWidth() {
+        //set width
+        $('#fixedHeader').css('width', $('.modal-dialog').width() + "px");
+        $(window).resize(function () {
+            $('#fixedHeader').css('width', $('.modal-dialog').width() + "px");
+        });
+    }
+</script>

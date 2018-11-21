@@ -1,0 +1,288 @@
+﻿@model List<Wisky.SkyAdmin.Manage.Controllers.HomeController.menuItem>
+@using HmsService.ViewModels;
+@using Wisky.SkyAdmin.Manage.Controllers;
+@{
+    var user = HttpContext.Current.User;
+    var currentStore = HmsService.Models.Utils.GetStore();
+    var storeId = ViewBag.storeId as string;
+    var storeName = ViewBag.storeName as string;
+    var brandId = HmsService.Models.Utils.GetBrandId();
+
+    StoreTypeEnum storeType = (StoreTypeEnum)ViewBag.storeType;
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+}
+
+@if (storeType != StoreTypeEnum.Website)
+{
+    if ((user.IsInRole("BrandManager") || user.IsInRole("StoreManager") || user.IsInRole("StoreReportViewer") || user.IsInRole("Booking")) && (storeType == StoreTypeEnum.Store || storeType == StoreTypeEnum.CallCenter))
+    {
+        <li id="menuTongQuan">
+            <a href="@Url.Action("Index","DateDashBoard", new { brandId = brandId, storeId = storeId, storeName = storeName, area= "DashBoard" })"><i class="fa fa-tachometer"></i> Tổng quan</a>
+
+        </li>
+
+    }
+    if ((user.IsInRole("BrandManager") || user.IsInRole("StoreManager") || user.IsInRole("StoreReportViewer")) && (storeType == StoreTypeEnum.Store))
+    {
+        <li id="menuHoaDon">
+            <a href="@Url.Action("Index", "Order", new { area = "Orders" })"><i class="zmdi zmdi-assignment"></i> Hóa đơn</a>
+        </li>
+        @*<li>
+                <a href="@Url.Action("Index", "VATOrder", new { area = "VATOrders" })"><i class="zmdi zmdi-assignment"></i> Hóa đơn VAT (Testing)</a>
+            </li>*@
+    }
+    if ((user.IsInRole("BrandManager") || user.IsInRole("Manager") || user.IsInRole("Booking")) && storeType == StoreTypeEnum.CallCenter)
+    {
+        <li>
+            <a href="@Url.Action("Index", "Order", new { brandId = brandId, storeId = storeId, storeName = storeName, area= "Orders" })"><i class="zmdi zmdi-assignment"></i> Hóa Đơn</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Create", "Delivery", new { brandId = brandId, storeId = storeId, storeName = storeName, area= "Delivery" })"><i class="zmdi zmdi-notifications-add"></i> Đặt hàng mới</a>
+        </li>
+        <li>
+            <a href="@Url.Action("Index", "Delivery", new { brandId = brandId, storeId = storeId, storeName = storeName, area= "Delivery" })"><i class="zmdi zmdi-view-list"></i> Danh sách đặt hàng</a>
+        </li>
+    }
+    if ((user.IsInRole("BrandManager") || user.IsInRole("StoreManager") || user.IsInRole("StoreReportViewer")) && storeType == StoreTypeEnum.Store)
+    {
+        <li class="sub-menu submenu-style" id="menuBaoCao">
+            <a href="#"><i class="fa fa-line-chart"></i> Báo cáo tổng hợp</a>
+            <ul>
+                <li class="submenu-style" id="subMenuBaoCaoKinhDoanh">
+                    <a href="@Url.Action("Index","TimeReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area="StoreReport"})">
+                        <i class="fa fa-pie-chart">
+                        </i> Báo cáo kinh doanh
+                    </a>
+                </li>
+                <li class="submenu-style" id="subMenuBaoCaoTheoKhuyenMai"><a href="@Url.Action("Index","PromotionReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area="StoreReport"})"><i class="fa fa-gift"></i> Báo cáo theo khuyến mãi</a></li>
+
+                <li class="sub-menu submenu-style" id="subMenuBaoCaoSanPham">
+                    <a href="#"><i class="fa fa-cubes"></i> Báo cáo sản phẩm</a>
+                    <ul>
+                        <li id="subsubMenuBaoCaoDienTienSanPham"><a href="@Url.Action("StoreProductDateProgress","ProductReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area="StoreReport"})"><i class="zmdi zmdi-trending-flat"></i> Báo cáo diễn tiến sản phẩm</a></li>
+                        <li id="subsubMenuBaoCaoDoanhThuSanPham"><a href="@Url.Action("StoreProductProgress","ProductReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area="StoreReport"})"><i class="zmdi zmdi-trending-flat"></i> Báo cáo doanh thu sản phẩm</a></li>
+                    </ul>
+                </li>
+                <li class="sub-menu submenu-style" id="subMenuBaoCaoDoiSanh">
+                    <a href="#"><i class="fa fa-balance-scale"></i> Báo cáo đối sánh</a>
+                    <ul>
+                        <li id="subsubMenuDoiSanhSanPham"><a href="@Url.Action("Index","ComparisonReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area="StoreReport"})"><i class="zmdi zmdi-trending-flat"></i> Đối sánh sản phẩm</a></li>
+                    </ul>
+                </li>
+                <li class="submenu-style" id="subMenuBaoCaoThanhToan">
+                    <a href="@Url.Action("Index","PaymentReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area="StoreReport"})">
+                        <i class="fa fa-id-card-o">
+                        </i> Báo cáo thanh toán
+                    </a>
+                </li>
+            </ul>
+        </li>
+    }
+    if ((user.IsInRole("BrandManager") || user.IsInRole("StoreManager")) && storeType == StoreTypeEnum.Store)
+    {
+        <li class="sub-menu" id="menuKho">
+            <a href="#"><i class="sub-menu zmdi zmdi-widgets"></i> Kho hàng</a>
+            <ul>
+                <li class="sub-menu submenu-style" id="subMenuTinhTrangKho">
+                    <a href="#"><i class="zmdi zmdi-tune"></i> Tình trạng kho</a>
+                    <ul>
+                        <li id="subsubMenuTonKhoCuoiNgay"><a href="@Url.Action("Index","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Tồn kho cuối ngày</a></li>
+                        <li id="subsubMenuTonKhoCuoiThang"><a href="@Url.Action("IndexMonth","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Tồn kho cuối tháng</a></li>
+                        <li id="subsubMenuTonKhoHienTai"><a href="@Url.Action("IndexInDate","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Tồn kho hiện tại</a></li>
+                        <li id="subsubMenuTonKhoTheoThoiGian"><a href="@Url.Action("IndexTimeRange","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Tồn kho theo thời gian</a></li>
+                    </ul>
+                </li>
+                <li class="sub-menu submenu-style" id="subMenuThaoTacKho">
+                    <a href="#"><i class="zmdi zmdi-exposure-alt"></i> Thao tác kho</a>
+                    <ul>
+                        <li id="subsubMenuNhapKho"><a href="@Url.Action("ListImportInventory","ProductInventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Nhập Kho</a></li>
+                        <li id="subsubMenuXuatKho"><a href="@Url.Action("ListExportInventory","ProductInventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Xuất Kho</a></li>
+                        <li id="subsubMenuChuyenKhoDi"><a href="@Url.Action("ListTransferInventory","ProductInventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Chuyển Kho Đi</a></li>
+                        <li id="subsubMenuChuyenKhoDen"><a href="@Url.Action("ListGetTransferInventory","ProductInventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Chuyển Kho Đến</a></li>
+                    </ul>
+                </li>
+                <li class="submenu-style" id="subMenuDanhSachPhieuKho"><a href="@Url.Action("InventoryReceiptList","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-exposure-alt"></i> Danh sách phiếu kho</a></li>
+                <li class="submenu-style" id="subMenuBaoCaoNhapHang"><a href="@Url.Action("ImportReportList","Provider", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-square-right"></i> Báo cáo nhập hàng</a></li>
+            </ul>
+        </li>
+    }
+    if ((user.IsInRole("BrandManager") || user.IsInRole("StoreManager") || user.IsInRole("ProductManager")) && storeType == StoreTypeEnum.Store)
+    {
+        <li id="menuSanPham"><a href="@Url.Action("SettingAtStore","ProductSetting", new { brandId = brandId, storeId = storeId, storeName = storeName, area="Admin"})"><i class="zmdi zmdi-trending-flat"></i> Sản phẩm</a></li>
+    }
+    if ((user.IsInRole("BrandManager") || user.IsInRole("StoreManager") || user.IsInRole("StoreReportViewer") || user.IsInRole("Reception")) && storeType == StoreTypeEnum.Store)
+    {
+        <li id="menuThemTheThanhVien"><a href="@Url.Action("CreateMembershipCardStore","MembershipCard", new { brandId = brandId, storeId = storeId, storeName = storeName, area= "MembershipCard" })"><i class="zmdi zmdi-card-membership"></i> Thêm/Nạp thẻ thành viên</a></li>
+        if (user.IsInRole("BrandManager") || user.IsInRole("StoreManager") || !user.IsInRole("Reception"))
+        {
+            <li id="menuQuanlyGiaoDich">
+                <a href="@Url.Action("Index", "Transaction", new { brandId = brandId, storeId = storeId, storeName = storeName, area="Transaction"})"><i class="zmdi zmdi-swap"></i> Quản lý giao dịch</a>
+            </li>
+        }
+    }
+    if (user.IsInRole("Inventory") && !user.IsInRole("BrandManager") && storeType == StoreTypeEnum.Store)
+    {
+        <li class="sub-menu" id="menuTinhTrangKho">
+            <a href="#"><i class="sub-menu zmdi zmdi-widgets"></i> Tình trạng kho</a>
+            <ul>
+                <li class="submenu-style" id="subMenuTonKhoCuoiNgay"><a href="@Url.Action("Index","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-exposure-alt"></i> Tồn kho cuối ngày</a></li>
+                <li class="submenu-style" id="subMenuTonKhoCuoiThang"><a href="@Url.Action("IndexMonth","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-exposure-alt"></i> Tồn kho cuối tháng</a></li>
+                <li class="submenu-style" id="subMenuTonKhoHienTai"><a href="@Url.Action("IndexInDate","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-exposure-alt"></i> Tồn kho hiện tại</a></li>
+                <li class="submenu-style" id="subMenuTonKhoTheoThoiGian"><a href="@Url.Action("IndexTimeRange","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-exposure-alt"></i> Tồn kho theo thời gian</a></li>
+            </ul>
+        </li>
+    }
+    if ((user.IsInRole("BrandManager") || user.IsInRole("StoreManager")) && storeType == StoreTypeEnum.Store)
+    {
+        <li id="menuQuanLyThuChi">
+            <a href="@Url.Action("CostManagement", "CostManage", new { brandId = brandId, storeId = storeId, storeName = storeName, area="CostManager"})"><i class="zmdi zmdi-money"></i> Quản lý thu chi</a>
+        </li>
+    }
+    if ((user.IsInRole("BrandManager") || user.IsInRole("StoreManager") || user.IsInRole("StoreManager")) && (storeType == StoreTypeEnum.Store))
+    {
+        <li id="menuQuanLyNhanVienCuaHang">
+            <a href="@Url.Action("Index","StoreManager", new { brandId = brandId, storeId = storeId, storeName = storeName, area= "Admin" })"><i class="zmdi zmdi-accounts"></i> Quản lý tài khoản nhân viên</a>
+        </li>
+        <li class="sub-menu" id="menuChamCong">
+            <a href="#"><i class="sub-menu zmdi zmdi-file-add"></i> Quản lý chấm công</a>
+            <ul>
+                <li class="submenu-style" id="subMenuQuanLyNhanVien"><a href="@Url.Action("Index","Employee", new { brandId = brandId, storeId = storeId, area= "FingerScan" })"><i class="zmdi zmdi-account"></i> Quản lý nhân viên cửa hàng</a></li>
+                <li class="submenu-style" id="subMenuQuanLyThietBi"><a href="@Url.Action("Index","FingerScanMachine", new { brandId = brandId, storeId = storeId, area= "FingerScan" })"><i class="zmdi zmdi-aspect-ratio-alt"></i> Thiết bị chấm công</a></li>
+                <li class="submenu-style" id="subMenuLichSuChamCong"><a href="@Url.Action("Index","CheckFinger", new { brandId = brandId, storeId = storeId, area= "FingerScan" })"><i class="zmdi zmdi-airline-seat-legroom-reduced"></i> Lịch sử điểm danh</a></li>
+                <li class="submenu-style" id="subMenuCaLamViec"><a href="@Url.Action("Index","Shift", new { brandId = brandId, storeId = storeId, area= "FingerScan" })"><i class="zmdi zmdi-calendar-note"></i> Quản lý ca làm việc</a></li>
+                <li class="submenu-style" id="subMenuPhanCongCaLamViec"><a href="@Url.Action("CreateMoreAttendance","Attendance", new { brandId = brandId, storeId = storeId, area= "FingerScan" })"><i class="zmdi zmdi-repeat-one"></i>Phân công nhân viên vào ca</a></li>
+                <li class="submenu-style" id="subMenuQuanLyChamCong"><a href="@Url.Action("Index","TimeKeepingReport", new { brandId = brandId, storeId = storeId, area= "FingerScan" })"><i class="zmdi zmdi-repeat-one"></i> Báo cáo chấm công</a></li>
+            </ul>
+        </li>
+    }
+}
+else if ((user.IsInRole("BrandManager") || user.IsInRole("StoreManager")) && storeType == StoreTypeEnum.Website)
+{
+    <li id="subMenuXemTrangChinh"><a href="/@(currentStoreDomain.Directory)" target="_blank"><i class="zmdi zmdi-home"></i> Xem trang chính</a></li>
+    if (user.IsInRole("BrandManager") || user.IsInRole("StoreManager") || user.IsInRole("StoreReportViewer") || user.IsInRole("Booking"))
+    {
+        <li id="menuTongQuan">
+            <a href="@Url.Action("Index","DateDashBoard", new { brandId = brandId, storeId = storeId, storeName = storeName, area= "DashBoard" })"><i class="fa fa-tachometer"></i> Tổng quan</a>
+
+        </li>
+
+    }
+    if (user.IsInRole("BrandManager") || user.IsInRole("StoreManager") || user.IsInRole("StoreReportViewer"))
+    {
+        <li id="menuHoaDon">
+            <a href="@Url.Action("Index", "Order", new { area = "Orders" })"><i class="zmdi zmdi-assignment"></i> Hóa đơn</a>
+        </li>
+    }
+    if (user.IsInRole("BrandManager") || user.IsInRole("StoreManager"))
+    {
+        <li class="sub-menu" id="menuKho">
+            <a href="#"><i class="sub-menu zmdi zmdi-widgets"></i> Kho hàng</a>
+            <ul>
+                <li class="sub-menu submenu-style" id="subMenuTinhTrangKho">
+                    <a href="#"><i class="zmdi zmdi-tune"></i> Tình trạng kho</a>
+                    <ul>
+                        <li id="subsubMenuTonKhoCuoiNgay"><a href="@Url.Action("Index","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Tồn kho cuối ngày</a></li>
+                        <li id="subsubMenuTonKhoCuoiThang"><a href="@Url.Action("IndexMonth","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Tồn kho cuối tháng</a></li>
+                        <li id="subsubMenuTonKhoHienTai"><a href="@Url.Action("IndexInDate","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Tồn kho hiện tại</a></li>
+                        <li id="subsubMenuTonKhoTheoThoiGian"><a href="@Url.Action("IndexTimeRange","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Tồn kho theo thời gian</a></li>
+                    </ul>
+                </li>
+                <li class="sub-menu submenu-style" id="subMenuThaoTacKho">
+                    <a href="#"><i class="zmdi zmdi-exposure-alt"></i> Thao tác kho</a>
+                    <ul>
+                        <li id="subsubMenuNhapKho"><a href="@Url.Action("ListImportInventory","ProductInventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Nhập Kho</a></li>
+                        <li id="subsubMenuXuatKho"><a href="@Url.Action("ListExportInventory","ProductInventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Xuất Kho</a></li>
+                        <li id="subsubMenuChuyenKhoDi"><a href="@Url.Action("ListTransferInventory","ProductInventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Chuyển Kho Đi</a></li>
+                        <li id="subsubMenuChuyenKhoDen"><a href="@Url.Action("ListGetTransferInventory","ProductInventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-trending-flat"></i> Chuyển Kho Đến</a></li>
+                    </ul>
+                </li>
+                <li class="submenu-style" id="subMenuDanhSachPhieuKho"><a href="@Url.Action("InventoryReceiptList","Inventory", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-exposure-alt"></i> Danh sách phiếu kho</a></li>
+                <li class="submenu-style" id="subMenuBaoCaoNhapHang"><a href="@Url.Action("ImportReportList","Provider", new { brandId = brandId, storeId = storeId, area= "Inventory" })"><i class="zmdi zmdi-square-right"></i> Báo cáo nhập hàng</a></li>
+            </ul>
+        </li>
+    }
+    if (currentStore?.HasProducts ?? true)
+    {
+        <li id="subsubMenuSanPham"><a href="@Url.Action("SettingAtStore","ProductSetting", new { brandId = brandId, storeId = storeId, storeName = storeName, area="Admin"})"><i class="zmdi zmdi-trending-flat"></i> Sản phẩm</a></li>
+    }
+    if (currentStore?.HasOrder ?? false)
+    {
+        <li id="subMenuQuanLyDonHang"><a href="@this.Url.Action("Index", "Order", new { parameters = currentStoreDomain.Directory, brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin"  })"><i class="zmdi zmdi-settings"></i>Quản lý đơn hàng</a></li>
+    }
+
+    //Bài viết
+    if (currentStore?.HasNews ?? true)
+    {
+        <li class="sub-menu" id="subMenuBaiViet">
+            <a href="#"><i class="zmdi zmdi-labels"></i> Bài viết</a>
+            <ul>
+                <li id="subsubMenuQuanLyBaiViet"><a href="@this.Url.Action("Index", "BlogPost", new { parameters = currentStoreDomain.Directory, brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin"  })"><i class="zmdi zmdi-trending-flat"></i> Quản lý bài viết</a></li>
+                <li id="subsubMenuQuanLyChuyenMuc"><a href="@this.Url.Action("Index", "BlogPostCollection", new { parameters = currentStoreDomain.Directory, brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin"  })"><i class="zmdi zmdi-trending-flat"></i> Quản lý chuyên mục</a></li>
+            </ul>
+        </li>
+    }
+    //Tin nhắn khách hang (Customer feedback)
+    if (currentStore?.HasCustomerFeedbacks ?? true)
+    {
+        <li id="subMenuTinNhanKhachHang"><a href="@this.Url.Action("Index", "CustomerFeedback", new { parameters = currentStoreDomain.Directory, brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin"  })"><i class="zmdi zmdi-labels"></i> Tin nhắn khách hàng</a></li>
+    }
+    //Thư viện ảnh
+    if (currentStore?.HasImageCollections ?? true)
+    {
+        <li id="subMenuThuVienAnh"><a href="@this.Url.Action("Index","ImageCollection", new { parameters = currentStoreDomain.Directory, brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin"  })"><i class="zmdi zmdi-labels"></i> Thư viện ảnh</a></li>
+    }
+    //Quản lý trang
+    if (currentStore?.HasWebPages ?? true)
+    {
+        <li id="subMenuQuanLyTrang"><a href="@this.Url.Action("Index", "WebPage", new { parameters = currentStoreDomain.Directory, brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin"  })"><i class="zmdi zmdi-storage"></i>Quản lý trang</a></li>
+
+    }
+    //Quản lý website
+    <li id="subMenuQuanLyWebsite"><a href="@this.Url.Action("Index", "WebSettings", new { parameters = currentStoreDomain.Directory, brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin"  })"><i class="zmdi zmdi-settings"></i>Quản lý Website</a></li>
+
+    //Quản lý website (đang ẩn)
+    <li class="sub-menu" hidden>
+        <a href="#"><i class="zmdi zmdi-settings"></i> Quản lý Website</a>
+        <ul>
+            <li class="submenu-style"><a href="@this.Url.Action("GeneralInformation", "WebInformation", new { parameters = currentStoreDomain.Directory, brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin"  })"><i class="md"></i> Thông tin chung</a></li>
+            <li class="submenu-style"><a href="@this.Url.Action("SocialNetwork", "WebInformation", new { parameters = currentStoreDomain.Directory, brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin"  })"><i class="md"></i> Mạng xã hội</a></li>
+            <li class="submenu-style"><a href="@this.Url.Action("ViewCount", "WebInformation", new { parameters = currentStoreDomain.Directory, brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin"  })"><i class="md"></i> Lượt view</a></li>
+        </ul>
+    </li>
+    if (user.IsInRole("BrandManager") || user.IsInRole("StoreManager") || user.IsInRole("StoreManager"))
+    {
+        <li id="menuQuanLyNhanVienCuaHang">
+            <a href="@Url.Action("Index","StoreManager", new { brandId = brandId, storeId = storeId, storeName = storeName, area= "Admin" })"><i class="zmdi zmdi-accounts"></i> Quản lý tài khoản nhân viên</a>
+        </li>
+    }
+}
+
+<style>
+    .sub-menu ul > li ul {
+        margin: 0px !important;
+    }
+
+    .sub-menu .sub-menu:first-child > a:before, .sub-menu:first-child > a:after {
+        top: 11px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        @if (Model != null)
+        {
+            for(int i = 0; i < Model.Count(); i++)
+            {
+                if (Model[i].enable == false)
+                {
+                    <text>
+        if (document.getElementById("@Model[i].name") != null) {
+            document.getElementById("@Model[i].name").setAttribute("hidden", "true");
+        }
+
+        </text>
+                }
+            }
+        }
+
+    });
+</script>

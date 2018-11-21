@@ -1,0 +1,326 @@
+﻿
+@{
+    ViewBag.Title = "List Member Payment";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var stores = ViewBag.Stores;
+    //Dictionary<string, double> paymentChart = ViewBag.PaymentChart;
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Báo cáo thẻ thành viên
+                </h3>
+                <h5 data-role="small-date"></h5>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row m-t-20">
+            <label class="right-icon pull-left" style="line-height: 25px;">Cửa hàng: &nbsp;</label>
+            <div class="col-md-3">
+                <div class="fg-line">
+                    <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7"></select>
+                </div>
+            </div>
+            <div class="col-md-4 pull-right">
+                <div class="input-group pull-right">
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                            <input type="hidden" id="startTime" />
+                            <input type="hidden" id="endTime" />
+                        </div>
+                    </div>
+                    <div class="fg-line m-t-5">
+                        <button style="width:230px;" type="submit" id="exportExcel" class="btn btn-primary btn-sm pull-right">
+                            <i class="fa fa-download"></i>
+                            Xuất ra file Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 m-t-25">
+                <table id="payment-dt" class="table table-condensed table-hover table-responsive table-striped">
+                    <thead>
+                        <tr>
+                            <th><label>Mã thanh toán</label></th>
+                            <th><label>Mã hóa đơn</label></th>
+                            <th><label>Giá trị (VNĐ)</label></th>
+                            <th><label>Loại giao dịch</label></th>
+                            <th><label>Thời gian</label></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<form class="hidden" id="ExportPaymentExcel" action="@Url.Action("ExportPaymentExcel", "PaymentReport")">
+    <input id="startTimeOne" name="sTime" />
+    <input id="endTimeOne" name="eTime" />
+    <input id="storeId" name="selectedStoreId" />
+    <input id="brandId" name="brandId" />
+
+</form>
+<script>
+    $(document).on('click', '#exportExcel', function () {
+        $('#startTimeOne').val($('#startTime').val());
+        $('#endTimeOne').val($('#endTime').val());
+        $('#storeId').val($('#listStoreId').val());
+        $('#brandId').val(@ViewBag.brandId);
+        $('#ExportPaymentExcel').submit();
+        //alert(123);
+    });
+    var chartData;
+    $(document).ready(function () {
+        setupListStoreFilter()
+        setupDaterangepicker();
+        GetStoreList();
+        //renderPaymentDt();
+        $('#listStoreId').on('change', function () {
+            renderPaymentDt();
+        });
+    });
+
+    $('#chart-btn').on('click', function () {
+        $('#payment-chart-container').toggle();
+        var chart = $('#payment-chart-container').highcharts();
+        if (chart == undefined) {
+            getDataChart();
+        }
+    });
+
+    $('#listStoreId').on('change', function () {
+        renderPaymentDt();
+    });
+
+    function getDataChart() {
+        $.ajax({
+            type: 'get',
+            contentType: "application/json; charset=utf-8",
+            data: { 'sTime': $("#startTime").val(), 'eTime': $("#endTime").val() },
+            url: '@Url.Action("GetPaymentReportData")',
+            success: function (result) {
+                if (result.success) {
+                    renderChart(result.datachart);
+                } else {
+                    ShowAlert(result.message, 1)
+                }
+            },
+            error: function () {
+                ShowAlert("Có lỗi nha", 1);
+            }
+        });
+    }
+
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+        $("#startTime").val(startTime);
+        $("#endTime").val(endTime);
+        renderPaymentDt();
+        //getDataChart();
+    }
+
+    function setupDaterangepicker() {
+        cb(moment(), moment(), 'Hôm nay');
+        $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'), "Tháng này");
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+    }
+
+    function RefreshOrderTable(id) {
+        var oTable = $(id).dataTable();
+        oTable._fnAjaxUpdate();
+    }
+
+    function renderPaymentDt() {
+        $('#payment-dt').dataTable({
+            "bAutoWidth": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("GetMemberPaymentData")",
+            "bProcessing": true,
+            "bSort": false,
+            "bFilter": false,
+            "bDestroy": true,
+            "bScrollCollapse": true,
+            "bInfo": true,
+            "bPaginate": true,
+            "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "sTime", "value": $("#startTime").val() });
+                aoData.push({ "name": "eTime", "value": $("#endTime").val() });
+                aoData.push({ "name": "selectedStoreId", "value": $("#listStoreId").val() });
+            }, "columns": [
+                { "data": "id" },
+                { "data": "orderId" },
+                { "data": "amount" },
+                { "data": "type" },
+                { "data": "time" },
+            ],
+            "oLanguage": {
+                "sSearchPlaceholder": "Tên nguyên liệu",
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " ",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                 {
+                     "aTargets": [0, 1, 2, 3, 4],
+                     "sClass": "text-center"
+                 },
+                 {
+                     "aTargets": [2],
+                     "mRender": function (data, type, row) {
+                         if (data == null || data == "") {
+                             return toMoney(0, ',', 'VNĐ');
+                         } else {
+                             return toMoney(data, ',', 'VNĐ');
+                         }
+
+                     }
+                 }
+            ]
+
+        }).fnSetFilteringDelay(800);
+    }
+
+    function renderChart(data) {
+        var seriesOptions = [];
+        var categories = [];
+        $.each(data, function (i, item) {
+            seriesOptions.push({
+                name: item['PaymentType'],
+                y: item['Amount']
+            });
+            categories.push(item['PaymentType']);
+        });
+        $('#payment-chart-container').highcharts({
+            //chart: {
+            //    type: 'column'
+            //},
+
+            //xAxis: {
+            //},
+
+            //series: [{
+            //    data: seriesOptions
+            //}]
+            chart: {
+                type: 'column',
+                style: {
+                    fontFamily: 'Arial'
+                }
+            },
+            title: {
+                text: 'DOANH THU THEO HÌNH THỨC THANH TOÁN',
+                x: -20 //center
+            },
+            //subtitle: {
+            //    x: -20
+            //},
+            xAxis: {
+                categories: categories
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh Thu'
+                }
+            },
+            tooltip: {
+                valueSuffix: ' VNĐ'
+            },
+            legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'bottom',
+                borderWidth: 0
+            },
+            series: [{
+                data: seriesOptions
+            }]
+        });
+    }
+
+    function setupListStoreFilter() {
+        $.ajax({
+            type: "GET",
+            url: "@(Url.Action("GetListStore", "PaymentReport"))",
+            success: function (data) {
+                var content = "";
+                content += "<option value='0'>" + "Hệ Thống" + "</option>";
+                for (var i = 0; i < data.listresult.length; ++i) {
+                    content += "<option value='" + data.listresult[i].storeId + "'>" + data.listresult[i].storeName + "</option>";
+                }
+                $("#listStoreId").html(content);
+                $("#listStoreId").selectpicker('refresh');
+            },
+            error: function (error) {
+                alert("Error Occured")
+            }
+        });
+    }
+
+    function GetStoreList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStoreList")',
+            jsonp: "$callback",
+            success: function (result) {
+                for (var i = 0; i < result.store.length; i++) {
+                    $('#listStoreId').append('<option value="' + result.store[i].ID + '">' + result.store[i].Name + '</option>')
+                }
+                $('#listStoreId').selectpicker('refresh');
+            }
+        });
+    }
+
+</script>
+<style>
+    .m-t-25 {
+        margin-top: 0px !important;
+    }
+
+    .m-t-20 {
+        margin-top: 1px !important;
+    }
+</style>

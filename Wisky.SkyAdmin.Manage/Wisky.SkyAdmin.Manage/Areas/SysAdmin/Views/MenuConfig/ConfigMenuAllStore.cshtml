@@ -1,0 +1,179 @@
+﻿@model ConfigMenuStoreViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@helper RenderSelectedMenu(IEnumerable<SelectedMenuItem> menuItems)
+{
+foreach (var item in menuItems)
+{
+    bool containChildren = item.ChildrenMenus.Any();
+
+        <li>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" @(item.Selected ? "checked" : "") name="featureChk" value="@item.MenuFeatureCode" />
+                    <i class="input-helper"></i>
+                    @item.Name
+                </label>
+                @if (containChildren)
+                {
+                    <ul style="list-style-type:none">
+                        @RenderSelectedMenu(item.ChildrenMenus)
+                    </ul>
+                }
+            </div>
+        </li>
+}
+
+}
+
+
+
+<div class="row">
+    <div class="col-md-12 p-r-45 p-l-45">
+        <div class="card">
+            <form role="form" id="brandForm" method="post">
+                <div class="card-header">
+
+                    <div class="box-header p-b-0">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3>Cấu hình menu</h3>
+                            </div>
+                            <div class="col-md-6 text-right p-t-5">
+                                <ul class="actions">
+                                    <li class="m-r-10">
+                                        <a href="@this.Url.Action("Detail", "Brand", new { Id = this.Model.BrandId })" class="btn btn-success myComeback">Quay lại</a>
+                                    </li>
+                                    <li>
+                                        <button type="button" class="btn btn-primary" id="btn-submit-store">Hoàn tất</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="p-l-15">
+                        <div class="row">
+                            <button id="btn-Apply-All" type="button" style="margin-left:28px;" class="col-md-3 btn btn-primary" onclick="applyAll();">Áp dụng tất cả</button>
+                        </div>
+                        <br />
+                        <div class="col-md-12" id="ApplyStore">
+
+                        </div>
+                    </div>
+
+
+                    <ul class="main-menu">
+                        @RenderSelectedMenu(Model.SelectedMenu)
+                    </ul>
+                </div>
+                @Html.HiddenFor(q => q.FilterString)
+                @Html.HiddenFor(q => q.BrandId)
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+
+    //load Store Applied
+    $(function(){
+        $.getJSON('@Url.Action("LoadApplyStore")',{brandId : @Model.BrandId}, function (result){
+            var list  = result.applyStore;
+            var temp ="";
+            $.each(list, function(index, item) {
+                if (this.storeId)
+                    temp += "<div class='col-md-3 checkbox' > "+
+                         "<label><input class='storeShow ' name='cbx-applyStore' value='"+item.storeId+"' type='checkbox' />"+item.storeName+
+                         "<i class='input-helper'></i>"+
+                         "</label></div>";
+            });
+
+            $('#ApplyStore').html(temp);
+        });
+    });
+
+
+
+
+    $(document).ready(function () {
+        $('[name="featureChk"]').change(function () {
+            var checked = $(this).is(":checked");
+            var children = $(this).parent().siblings().find($('[name="featureChk"]'));
+            $(children).prop("checked", checked);
+        })
+    });
+
+    $('#btn-submit-store').click(function () {
+        getStoreFeatureCode();
+        var formData = new FormData($('#brandForm')[0]);
+        var applyStore = $('input[name=cbx-applyStore]:checked');
+        for (var i = 0; i < applyStore.length; i++) {
+            formData.append('storeArray[]',applyStore[i].value);
+        }
+        formData.append("brandId", $("#BrandId").val());
+        formData.append("filterStore", $("#FilterString").val());
+        $.ajax({
+            url: '@Url.Action("EditFillterMenuAllStore")',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage(result.message, 3);
+                    window.location.href = '@Url.Action("Index", "Brand")';
+                }
+            },
+            error: function (error) {
+                ShowMessage("Đã có lỗi xảy ra, xin vui lòng kiểm tra lại");
+            }
+        });
+    });
+
+    function applyAll(){
+        var applyStore = $('.storeShow:checked');
+        if (applyStore.length < $('.storeShow').length) {
+            $('.storeShow').prop('checked', true);
+        } else {
+            $('.storeShow').prop('checked', false);
+        }
+
+    }
+
+    function getStoreFeatureCode() {
+        var arraybit =[];
+        var max = -1;
+        $("input[name='featureChk']").each(function (index, elem) {
+            var code = $(elem).val();
+            if (code != "") {
+                var tmp = parseInt(code)
+                if (max < tmp) {
+                    max = tmp;
+                }
+            }
+        });
+        var max = max+1;
+        for (var i = 0; i < max; i++) {
+            arraybit.push("0");
+        }
+        $("input[name='featureChk']").each(function (index, elem) {
+            if ($(this).prop("checked")) {
+                var code = $(elem).val();
+                if (code != "") {
+                    arraybit[code] = "1";
+                }
+            }
+        });
+        var binary = "";
+        for (var i = 0; i < max; i++) {
+            binary = binary + arraybit[i];
+        }
+        $("#FilterString").val(binary);
+    }
+</script>
+
+
+

@@ -1,0 +1,265 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách thương hiệu</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <a href="@Url.Action("Create")" class="btn btn-primary btn-icon-text waves-effect">
+                    <i class="zmdi zmdi-plus"></i> Tạo thương hiệu
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <!-- Customer Table -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="allcust">
+                <!-- Datatable -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="BrandDatatable" class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label class="">STT</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tên thương hiệu</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Công ty</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Người liên hệ</label>
+                                    </th>
+                                    <th>
+                                        <label class="">SĐT</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Fax</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Website</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Ngày tạo</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Mô tả</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tùy chọn</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="assignStorePanel" class="modal fade" data-backdrop="static" data-keyboard="true"></div>
+<script>
+    function showAssign(id) {
+        $.ajax({
+            type: "GET",
+            //url: '#assignUser',
+            url: '@Url.Action("AssignStore")',
+            data: {
+                "id": id,
+            },
+            success: function (result) {
+                $('#assignStorePanel').html(result);
+                $('#assignStorePanel').modal('show');
+                //$("#modalBrandHeader").html(brandName);
+                $("#BrandID").val(id);
+                storeTable(id);
+            }
+        });
+    };
+    $(document).on('click', '#btnAssignStore', function () {
+        var formManager = new FormData($("#AssignStoreForm")[0]);
+        var selectedStore = [];
+        $('input[type=checkbox]').each(function () {
+            selectedStore.push({
+                ID: $(this).val(),
+                selected: $(this).prop('checked')
+            });
+        });
+        $.ajax({
+            url: '@Url.Action("AssignStoreBrand")',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {
+                "selectedStore": selectedStore,
+                "selectedBrandId": $("#BrandID").val(),
+            },
+            success: function (data) {
+                if (data.success) {
+                    //$('#asignUserPanel').modal('hide');
+                    $('#assignStorePanel').modal('hide');
+                    ShowAlert("Đã cập nhật quản lý thành công!", 2);
+                }
+            },
+        });
+
+        return false;
+
+    });
+    var storeTable = function (id) {
+        $("#StoreDatatable").dataTable({
+            //"bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "bStateSave": false,
+            "sAjaxSource": '@Url.Action("LoadBrandStore")',
+            "bProcessing": true,
+            "bFilter": true,
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfo": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sInfoEmpty": "Hiển thị 0 từ 0 của 0 dòng",
+            },
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "id", "value": id });
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1],
+                    "bSortable": false,
+                },
+            ],
+
+            "aoColumnDefs": [
+                {
+                    "aTargets": [2],
+                    'targets': 0,
+                    'searchable': false,
+                    'orderable': false,
+                    'className': 'dt-body-center',
+                    "bSortable": false,
+                },
+            ],
+            "bAutoWidth": false,
+        }).fnSetFilteringDelay(delaySearch);
+    };
+
+
+    $(document).ready(function () {       
+        BrandDataProcess();
+    });
+
+    function BrandDataProcess() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("IndexList", "Brand")',
+            success: function (result) {
+                //console.log(result.aaData);
+                InitBrandDatatable(result.aaData);
+            }
+        });
+    };
+
+    function InitBrandDatatable(data) {
+        $("#BrandDatatable").dataTable({         
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "bProcessing": true,
+            "iDisplayLength": 10,
+            "aLengthMenu": [10, 25, 50],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                    "bSortable": false,
+                    //"sClass": "text-center"
+                },
+                {
+                    "aTargets": [9],
+                    "mRender": function (data, type, row) {
+                        var brandId = row[9];
+                        var brandName = row[1];
+
+                        var assignButton = '<a class="btn btn-success btn-sm" ' +
+                            'onclick="showAssign(' + brandId + ')" ' +
+                            'data-toggle="tooltip" title="Phân cửa hàng"><i class="glyphicon glyphicon-home"></i></a>';
+                        var editButton = '<a class="btn btn-primary btn-sm" ' +
+                            'href="@(this.Url.Action("Edit"))/' + brandId + '" ' +
+                            'data-toggle="tooltip" title="Chỉnh sửa"><i class="glyphicon glyphicon-pencil"></i></a>';
+                        var deleteButton = '<button onclick="onDeleteButtonClick(this);" data-id="' + brandId + '" ' +
+                            'class="btn btn-danger btn-sm" data-toggle="tooltip" title="Xóa">' +
+                            '<i class="glyphicon glyphicon-trash"></i></button>';
+
+                        return assignButton + " " + editButton + " " + deleteButton;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                }
+            ],
+            "bAutoWidth": false,
+        });
+    }
+    function onDeleteButtonClick(btn) {
+        ShowConfirm("Hủy thương hiệu này?", function () {
+            var id = $(btn).attr("data-id");
+            //window.location.href = "this.Url.Action("Delete")/" + id;
+            $.ajax({
+                type: "POST",
+                //url: '#createStore',
+                url: '@Url.Action("DeactiveBrand")',
+                data: {
+                    id: id
+                },
+                success: function (result) {
+                    if (result.success) {
+                        ShowAlert("Hủy thương hiệu thành công!", 2);
+                        RefreshTable();
+                    }
+                    else {
+                        ShowAlert("Có lỗi xảy ra!", 1);
+                    }
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra!", 1);
+                }
+            });
+        });
+    }
+    function RefreshTable() {
+        var oTable = $("#BrandDatatable").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+</script>

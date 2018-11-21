@@ -1,0 +1,306 @@
+﻿@{
+    ViewBag.Title = "Báo cáo theo tháng";
+    //  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Báo cáo theo tháng</h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div>
+            <div class="col-md-6">
+                <!-- export to excel -->
+                <button type="submit" id="export" class="btn btn-primary btn-sm pull-right">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-12" style="margin-top: 19px;">                          
+                    <div class="input-group">
+                        <!-- Daterange picker -->
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group-btn FindButtonDateTime">
+                            <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                                <i class="left-icon fa fa-search"></i> Tìm
+                            </a>
+                        </div>
+                    <form id="form-create-session" class="form-inline" style="display:none">
+                        <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" />
+                        <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" />
+                    </form>
+                </div>
+
+        </div>
+    </div>
+
+
+    <div class="card-padding">
+        <!-- LINE CHART -->
+        <div id="container" style="min-width: 310px; height: 300px;"></div>
+
+
+        <div id="datatable">
+            <table id="monthRReport" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label class="">STT</label>
+                        </th>
+
+                        <th>
+                            <label class="">Số lượng hóa đơn(Mang đi)</label>
+                        </th>
+
+                        <th>
+                            <label class="">Số lượng hóa đơn(Tại store)</label>
+                        </th>
+
+                        <th>
+                            <label class="">Số lượng hóa đơn(Giao hàng)</label>
+                        </th>
+                        <th>
+                            <label class="">Tổng số hóa đơn</label>
+                        </th>
+                        <th>
+                            <label class="">Tổng giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<form class="hidden" id="formMonthReportExcel" action="@Url.Action("ExportMonthTableToExcel","StoreReport")">
+    <input id="startTime" name="startTime" />
+    <input id="endTime" name="endTime" />
+    <input id="storeId" name="storeId"/>
+</form>
+
+<form class="hidden" id="formMonthReportExcelTest" action="@Url.Action("ExportMonthTableToExceltest","StoreReport")">
+    <input id="startTime1" name="startTime" />
+    <input id="endTime1" name="endTime" />
+    <input id="storeId1" name="storeId" />
+</form>
+
+<script>
+    $(document).ready(function () {
+        function cb(start, end, label) {
+            var startTime = start.format('DD/MM/YYYY'),
+                endTime = end.format('DD/MM/YYYY');
+            var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $('#date-string').val(dateRange);
+            }
+            $('#sTime').val(startTime);
+            $('#eTime').val(endTime);
+            $('[data-role=small-date]').html(dateRange);
+        }
+        //show date time input
+        cb(moment().startOf('year'), moment(),' Năm nay');
+
+        $('#reportrange').daterangepicker({
+            startDate: moment().startOf('year'),
+            endDate: moment(),
+            'maxDate': moment(),
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                '7 ngày trước': [moment().subtract(6, 'days'), moment()],
+                '30 ngày trước': [moment().subtract(29, 'days'), moment()],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Năm nay':[moment().startOf('year'), moment()],
+                'Năm ngoái': [moment().subtract(1, 'year').startOf('year'), moment().subtract(1, 'year').endOf('year')]
+            }
+        }, cb);
+
+        hourReport();
+    });
+
+    function RefreshTable() {
+        var oTable = $("#monthRReport").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    };
+
+    var InitProDatatable = function(data) {
+        $('#datatable').html('<table id="monthRReport" class="table table-striped table-bordered table-hover">'
+                    +'<thead>'
+                    +'<tr>'
+                    +'<th>'
+                        +'<label class=""></label>'
+                    +'</th>'
+                    +'<th>'
+                        +'<label class="">Số lượng hóa đơn(Mang đi)</label>'
+                    +'</th>'
+                    +'<th>'
+                        +'<label class="">Số lượng hóa đơn(Tại store)</label>'
+                    +'</th>'
+                    +'<th>'
+                        +'<label class="">Số lượng hóa đơn(Giao hàng)</label>'
+                    +'</th>'
+                    +'<th>'
+                       +'<label class="">Tổng số hóa đơn</label>'
+                    +'</th>'
+                    +'<th>'
+                       +'<label class="">Tổng giảm giá</label>'
+                    +'</th>'
+                    +'<th>'
+                        +'<label class="">Doanh thu</label>'
+                    +'</th>'
+                    +'</tr>'
+                    +'</thead>'
+                    +'<tbody></tbody>'
+                    +'</table');
+
+        $("#monthRReport").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            'data':data,
+            "bProcessing": true,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+
+    $('#btnSearch').on('click', function () {
+        if ($("#eTime").val().length > 16 || $("#sTime").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            hourReport();
+        }
+    });
+
+    var hourReport = function () {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadMonthReport", "StoreReport")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(),'storeId': @ViewBag.storeId },
+            success: function (result) {
+                var startTime = $('#sTime').val();
+                var endTime = $('#eTime').val();
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+
+                $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+
+                InitProDatatable(result.datatable);
+                DoanhThuChart(result.dataChart);
+            }
+        });
+    };
+
+    //-------------
+    //- LINE CHART -
+    //--------------
+    function DoanhThuChart(dataChart)
+    {
+        $('#container').highcharts({
+            title: {
+                text: 'BIỂU ĐỒ HÓA ĐƠN',
+                x: -20 //center
+            },
+            subtitle: {
+                text: '',
+                x: -20
+            },
+            xAxis: {
+                categories: dataChart.MonthName
+            },
+            yAxis: {
+                title: {
+                    text: 'Hóa Đơn'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ' Hóa Đơn'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [
+                {
+                    name: 'TakeAway',
+                    data: dataChart.TakeAway,
+                },
+                {
+                    name: 'AtStore',
+                    data: dataChart.AtStore,
+                },
+                {
+                    name: 'Delivery',
+                    data: dataChart.Delivery,
+                }
+            ]
+        });
+    };
+
+    // export to excel
+    $(document).on('click', '#export', function () {
+        $('#startTime').val($('#sTime').val());
+        $('#endTime').val($('#eTime').val());
+        $('#storeId').val(@ViewBag.storeId);
+        $('#formMonthReportExcel').submit();
+    });
+
+    
+    $(document).on('click', '#exporttest', function () {
+       $.ajax({
+       type:"GET",
+       url:'@Url.Action("ExportMonthTableToExceltest","StoreReport")'
+       });
+    });
+</script>

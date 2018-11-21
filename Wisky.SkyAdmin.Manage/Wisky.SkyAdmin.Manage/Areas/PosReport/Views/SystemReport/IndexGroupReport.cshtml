@@ -1,0 +1,511 @@
+﻿@model IEnumerable<StoreViewModel>
+@{
+    ViewBag.Title = "Báo cáo nhóm cửa hàng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Báo cáo theo nhóm cửa hàng
+                </h3>
+                <h5 data-role="small-date"></h5>
+            </div>
+            <div class="col-md-6">
+                <div style="text-align: right">
+                    <button type="submit" id="exportAllStoreGroup" class="btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                    @*<button type="submit" id="exportOneStore" class="btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>*@
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row" style="margin-top: 19px;">
+            <div class="col-md-12">
+                <form id="form-create-session" class="form-inline">
+                    @*<div class="input-group myGroupChooseWeek">
+                            <label class="right-icon">Cửa hàng: &nbsp;</label>
+                            <select id="storeIdReport">
+                                <option value="0">Tất cả cửa hàng</option>
+                                @foreach (var item in Model)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </select>
+                        </div>*@
+                    <div class="input-group pull-right">
+                        @*<div id="reportrange" class="dateTime pull-right">
+                            <div class="fg-line m-t-5">
+                                <input id="date-string" readonly class="form-control width230 text-center">
+                                    <i class="fa fa-calendar"></i>
+                            </div>
+                            </div>*@
+                        @*<div class="fg-line m-t-5">
+                                <div id="reportrange" class="btn-datetime form-control">
+                                    <span></span>
+                                    <i class="fa fa-calendar"></i>
+                                    <b class="caret"></b>
+                                </div>
+                            </div>*@
+
+
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group-btn FindButtonDateTime">
+                            <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                                <i class="left-icon fa fa-search"></i> Tìm
+                            </a>
+                        </div>
+                    </div>
+                    <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card-padding">
+        <div id="container" style="min-width: 310px; height: 300px;"></div>
+        <div id="datatable">
+            <table id="groups-table" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label class="">STT</label>
+                        </th>
+                        <th>
+                            <label class="">Tên nhóm cửa hàng</label>
+                        </th>
+                        <th>
+                            <label class="">Tổng doanh thu</label>
+                        </th>
+                        <th>
+                            <label class="">Giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu sau giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">So sánh</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+
+    <div class="modal fade " tabindex="-1" id="store-comparison-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="width:90%">
+            <div style="width:100%; overflow-x:scroll">
+                <div class="modal-content" style="width: 100%;">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title text-center"></h4>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div class="row">
+
+                            <!-- Chart -->
+                            <div class="col-md-9">
+                                <div style="width:100%; overflow-x:scroll">
+                                    <div id="comparison" style="width: 800px; height: auto; margin: 0 auto"></div>
+                                </div>
+                            </div>
+                            <!-- Store list check box show here -->
+                            <div class="col-md-3">
+
+                                <!-- chart -->
+                                <div id="filter" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row"></div>
+                                </div>
+
+                                <!-- select & unselect button -->
+                                <div id="filter-option" class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style="margin-top: 10px;">
+                                    <button class="btn btn-primary btn-sm" id="filter-select-all">Chọn tất cả</button>
+                                    <button class="btn btn-success btn-sm" id="filter-unselect-all">Hủy chọn tất cả</button>
+                                </div><!-- Select all and Unselect all -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    <form class="hidden" id="formReportExcel" action="@Url.Action("ExportExcelGroupReport","SystemReport")">
+        <input name="startTime" />
+        <input name="endTime" />
+    </form>
+</div>
+
+<script>
+    $('#exportAllStoreGroup').on('click', null, function () {
+        $('[name=startTime]').val($('#sTime').val());
+        $('[name=endTime]').val($('#eTime').val());
+        $('#formReportExcel').submit();
+    });
+
+    //$('#exportOneStore').on('click', null, function () {
+    //    $('[name=startTime]').val($('#sTime').val());
+    //    $('[name=endTime]').val($('#eTime').val());
+    //    $('[name=storeIdReport]').val($('#storeIdReport').val());
+
+    //    $('#formReportExcel').submit();
+    //});
+
+    $(document).ready(function () {
+        setupDaterangepicker();
+        StoreGroupReport();
+
+        // comparison
+        var Comparisondata = [];
+
+        $('#filter').on('change', function () {
+
+            var filterStoreList = [];
+            var filterTotalAmount = [];
+            var filterFinalAmount = [];
+            var filterDiscount = [];
+
+            $('.store-name-filter:checked').each(function () {
+                filterStoreList.push($(this).val());
+                filterTotalAmount.push($(this).data('total'));
+                filterFinalAmount.push($(this).data('final'));
+                filterDiscount.push($(this).data('discount'));
+            });
+
+            Comparisondata.StoreNameList = filterStoreList;
+            Comparisondata.TotalAmountList = filterTotalAmount;
+            Comparisondata.FinalAmountList = filterFinalAmount;
+            Comparisondata.DiscountList = filterDiscount;
+
+            comparisonchart(Comparisondata);
+        });
+
+        // select & unselect click event
+        $('#filter-option').on('click', '#filter-select-all', function () {
+            $('.store-name-filter').prop('checked', 'checked');
+            $('#filter').trigger('change');
+        });
+
+        $('#filter-option').on('click', '#filter-unselect-all', function () {
+            $('.store-name-filter').removeAttr('checked');
+            $('#filter').trigger('change');
+        });
+
+        $(document).on('click', '.btnComparison', function () {
+            title = $(this).data('title');
+            //starTime = $(this).data('starttime');
+            groupId = $(this).data('groupid');
+            $('#filter .row').empty();
+
+            $.ajax({
+                url: '@this.Url.Action("LoadStoreInGroupComparison")',
+                type: 'GET',
+                data: { startTime: $('#sTime').val(), endTime: $('#eTime').val(), GroupID: groupId },
+                success: function (rs) {
+
+                    Comparisondata = rs.comparisonChart;
+                    comparisonchart(Comparisondata);
+
+                    var checkbox = function (index, val) {
+                        return $('<div/>', {
+                            'class': 'col-md-6',
+                            'html': [
+                                $('<input/>', {
+                                    'type': 'checkbox',
+                                    'value': val,
+                                    'class': 'nice-check nice-check-sm store-name-filter',
+                                    'id': 'filter-' + index,
+                                    'checked': 'checked'
+                                }),
+                                $('<label/>', {
+                                    'type': 'checkbox',
+                                    'for': 'filter-' + index,
+                                    'html': val
+                                }),
+                            ]
+                        });
+                    }
+
+                    $.each(Comparisondata.StoreNameList, function (index, value) {
+                        $('#filter .row').append(checkbox(index, value));
+                    });
+
+                    var listCheckbox = $('.store-name-filter');
+                    $.each(Comparisondata.TotalAmountList, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-total', value);
+                    });
+
+                    $.each(Comparisondata.FinalAmountList, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-final', value);
+                    });
+
+                    $.each(Comparisondata.DiscountList, function (index, value) {
+                        var check = listCheckbox.eq(index); // use function eq to list all store
+                        check.attr('data-discount', value);
+                    });
+                }
+            });
+
+            $('#store-comparison-modal').modal('show');
+            $('.modal-title').html(title);
+        });
+    });
+
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+
+        $("#sTime").val(startTime);
+        $("#eTime").val(endTime);
+        $("#dateRange").html(dateString);
+    };
+
+    function setupDaterangepicker() {
+        cb(moment().startOf('month'), moment().add(0, 'days'), "Tháng này");
+        $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'), "Tháng này");
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+    };
+
+
+    function RefreshTable() {
+        var oTable = $("#groups-table").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    };
+
+    var InitGroupDatatable = function (dataSet) {
+        $("#groups-table").dataTable({
+            //"bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": dataSet,
+            "ordering": true,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm ",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 2, 3, 4],
+                    "bSortable": true,
+                    "sClass": "text-center",
+                },
+                {
+                    "aTargets": [1],
+                    "bSearchable": true,
+                    "sClass": "text-center",
+                },
+                {
+                    'aTargets': [5],
+                    "mRender": function (data, type, row) {
+                        return '<a data-groupid="' + data + '" data-title="Nhóm cửa hàng ' + row[1] + '" class="btn btn-sm btn-info btnComparison"><span class="fa fa-tasks"></span></a>';
+                    }
+                }
+            ],
+            "bAutoWidth": true
+        });
+    };
+
+    $('#btnSearch').on('click', function () {
+        if ($("#eTime").val().length > 16 || $("#sTime").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        StoreGroupReport();
+    });
+
+    // select all store
+    var StoreGroupReport = function () {
+        $.ajax({
+            type: 'GET',
+            url: '@this.Url.Action("LoadGroupReportAllGroup")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val() },
+            success: function (result) {
+                $("#groups-table").dataTable().fnDestroy();
+                var dataSet = result.datatable
+                InitGroupDatatable(dataSet);
+                DoanhThuChart(result.dataChart)
+            },
+            error: function (result) {
+                alert(result);
+            }
+        });
+    }
+
+
+
+
+    //-------------
+    //- LINE CHART -
+    //--------------
+
+    function DoanhThuChart(dataChart) {
+        var seriesOptions = [],
+        seriesCounter = 0
+        $.each(dataChart._GroupName, function (i, name) {
+            seriesOptions[i] = {
+                name: dataChart._GroupName[i],
+                data: dataChart.listTotalGroup[i],
+            };
+        });
+        $('#container').highcharts({
+
+            title: {
+                text: 'BIỂU ĐỒ DOANH THU',
+                x: -20 //center
+            },
+            subtitle: {
+                text: '',
+                x: -20
+            },
+            xAxis: {
+                categories: dataChart._Day
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh Thu'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ' Doanh Thu'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: seriesOptions
+        });
+    };
+
+
+
+    //comparison chart
+    function comparisonchart(data) {
+
+        //$('#store-comparison-modal').on('show', function () {
+            $('#comparison').highcharts({
+                chart: {
+                    type: 'column'
+                },
+                title: {
+                    text: 'So sánh doanh thu'
+                },
+                subtitle: {
+                    text: $('[data-role=small-date]').html()
+                },
+                xAxis: {
+                    categories: data.StoreNameList
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'VNĐ'
+                    },
+                    stackLabels: {
+                        enabled: false,
+                        style: {
+                            fontWeight: 'bold',
+                            color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                        }
+                    }
+                },
+                legend: {
+                    align: 'center',
+                    x: -30,
+                    verticalAlign: 'bottom',
+                    y: 25,
+                    floating: true,
+                    backgroundColor: (Highcharts.theme && Highcharts.theme.background2) || 'white',
+                    borderColor: '#CCC',
+                    borderWidth: 0,
+                    shadow: false
+                },
+                //tooltip: {
+                //    headerFormat: '<b>{point.x}</b><br/>',
+                //    pointFormat: '{series.name}: {point.y} VNĐ<br/>'
+                //},
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.x + '</b><br/>' +
+                            this.series.name + ': ' + this.y + '<br/>' +
+                            'Doanh thu: ' + this.point.stackTotal;
+                    }
+                },
+                plotOptions: {
+                    column: {
+                        stacking: 'normal',
+
+                    }
+                },
+                series: [{
+                    name: 'Doanh thu sau giảm giá',
+                    data: data.FinalAmountList,
+                }, {
+                    name: 'Giảm giá',
+                    data: data.DiscountList,
+                }]
+            });
+            $('#comparison').each(function () { $(this).highcharts().reflow() });
+                //.highcharts().reflow();
+            //alert("hihi");
+        //});
+        
+    }
+
+
+    
+</script>

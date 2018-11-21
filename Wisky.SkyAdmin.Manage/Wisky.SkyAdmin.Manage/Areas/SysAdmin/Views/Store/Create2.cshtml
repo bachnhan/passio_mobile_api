@@ -1,0 +1,159 @@
+﻿@model StoreEditViewModel
+@{
+    ViewBag.Title = "Create2";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@this.Html.Partial("Editor", this.Model)
+<script>
+    $(document).ready(function () {
+        if ($('[name="result"]').prop("checked")) {
+            $('#checkboxHidden').val(true);
+        } else {
+            $('#checkboxHidden').val(false);
+        }
+        $('[name="result"]').change(function () {
+            if ($('[name="result"]').is(":checked")) {
+                $('#checkboxHidden').val(true);
+            } else {
+                $('#checkboxHidden').val(false);
+            }
+        })
+        $('[name="featureChk"]').change(function () {
+            var checked = $(this).is(":checked");
+            var children = $(this).parent().siblings().find($('[name="featureChk"]'));
+            $(children).prop("checked", checked);
+        })
+    });
+    @if (this.Model.OpenTime.HasValue) {
+        <text>$('#InputOpenTime').val('@this.Model.OpenTime.Value.ToShortTimeString()').change()</text>
+    }
+    @if (this.Model.CloseTime.HasValue)
+    {
+        <text>$('#InputCloseTime').val('@this.Model.CloseTime.Value.ToShortTimeString()').change()</text>
+    }
+    $(document).ready(function () {
+        $('#OpenTime').datetimepicker({
+            format: 'LT',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#CloseTime').datetimepicker({
+            format: 'LT',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+    });
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    };
+    function validateEmail(email) {
+        var re = /^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    };
+
+    function getStoreFeatureCode() {
+        var arraybit = [];
+        var max = -1;
+        $("input[name='featureChk']").each(function (index, elem) {
+            var code = $(elem).val();
+            if (code != "") {
+                var tmp = parseInt(code)
+                if (max < tmp) {
+                    max = tmp;
+                }
+            }
+        });
+        var max = max + 1;
+        for (var i = 0; i < max; i++) {
+            arraybit.push("0");
+        }
+        $("input[name='featureChk']").each(function (index, elem) {
+            if ($(this).prop("checked")) {
+                var code = $(elem).val();
+                if (code != "") {
+                    arraybit[code] = "1";
+                }
+            }
+        });
+        var binary = "";
+        for (var i = 0; i < max; i++) {
+            binary = binary + arraybit[i];
+        }
+        $("#StoreFeatureFilter").val(binary);
+    }
+
+    $(function () {
+
+        $('#btn-submit-store').click(function () {
+            getStoreFeatureCode();
+            if ($('[name="result"]').prop("checked")) {
+                $('#checkboxHidden').val(true);
+            } else {
+                $('#checkboxHidden').val(false);
+            }
+            $('[name="result"]').change(function () {
+                if ($('[name="result"]').is(":checked")) {
+                    $('#checkboxHidden').val(true);
+                } else {
+                    $('#checkboxHidden').val(false);
+                }
+            })
+
+            if ($('#Name').val() == '') {
+                ShowMessage("Vui lòng nhập tên cửa hàng", 3);
+                return;
+            }
+            else if ($("#ShortName").val() == "") {
+                ShowMessage("Vui lòng nhập tên viết tắt.", 3);
+                return;
+            }
+            else if ($('#Address').val() == '') {
+                ShowMessage("Vui lòng nhập địa chỉ", 3);
+                return;
+            }
+            else if ($("input[name='Email']").val() == "") {
+                ShowMessage("Vui lòng nhập email.", 3);
+                return;
+            }
+            else if (!validateEmail($("input[name='Email']").val())) {
+                ShowMessage("Email không hợp lệ.", 3);
+                return;
+            }
+            else if ($("input[name='Phone']").val() == "") {
+                ShowMessage("Vui lòng nhập số điện thoại.", 3);
+                return;
+            }
+            else if ($("input[name='OpenTime']").val() == "") {
+                ShowMessage("Vui lòng chọn giờ mở cửa.", 3);
+                return;
+            }
+            else if ($("input[name='CloseTime']").val() == "") {
+                ShowMessage("Vui lòng chọn giờ đóng cửa.", 3);
+                return;
+            } else {
+                var formData = $('#storeForm').serialize();
+
+                $.ajax({
+                    url: '@Url.Action("Create")',
+                    method: 'POST',
+                    data: formData,
+                    success: function (result) {
+                        if (result.success) {
+                            ShowMessage(result.message, 3);
+                            window.location.href = '@Url.Action("Detail", "Brand", new { Id = this.Model.BrandId })';
+                        }
+                    },
+                    error: function (error) {
+                        ShowMessage("Đã có lỗi xảy ra, xin vui lòng kiểm tra lại");
+                    }
+                });
+            }
+        })
+    });
+
+</script>

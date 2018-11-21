@@ -1,0 +1,43 @@
+﻿@model ImageCollectionDetailsViewModel
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+}
+@Html.Partial("Editor", Model)
+@section scripts {
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script>
+        $(function () {
+            SKYWEB.Admin.Gallery.init();
+
+            $("#btn-submit-collection").on("click", function () {
+                var data = {
+                    ImageCollection: {
+                        Id: "@(Model.ImageCollection.Id)"
+                    },
+                    Items: []
+                };
+                $(".removeable .gallery-item").each(function (i, e) {
+                    data.Items.push({
+                        "ImageUrl": $(e).find(".img-responsive").attr("src"),
+                        "Title": $(e).find(".caption input").val()
+                    })
+                })
+                $.ajax({
+                    url: '@this.Url.Action("Edit", new { parameters = currentStoreDomain.Directory })',
+                    "method": "POST",
+                    "contentType": "application/json",
+                    "data": JSON.stringify(data),
+                    "success": function (data) {
+                        window.location = "@(Url.Action("Index"))"
+                    },
+                    "error": function () {
+                        alert("Error occured!");
+                    }
+
+                })
+            });
+        });
+    </script>
+}

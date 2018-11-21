@@ -1,0 +1,348 @@
+﻿
+@{
+    ViewBag.Title = "ImportReportList";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Báo cáo nhập hàng theo ngày</h3>
+                <h5 class="smallDate" data-role="small-date">@ViewBag.ReviewDate</h5>
+            </div>
+            <div class="col-lg-6 pull-right text-right">
+                <div class="input-group">
+                    <!-- Daterange picker -->
+                    <input id="datestring" hidden />
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group-btn FindButtonDateTime">
+                        <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i> Tìm
+                        </a>
+                    </div>
+                </div>
+                <input type="hidden" id="sTime" />
+                <input type="hidden" id="eTime" />
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div id="inventory">
+            <table id="tablepaging" class="table table-bordered table-striped table-fixed-header">
+                <thead>
+                    <tr>
+                        <th><label>STT</label></th>
+                        <th><label>Tên nhà cung cấp</label></th>
+                        <th><label>Tổng tiền</label></th>
+                        <th><label>Tùy chọn</label></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2" style="text-align:left; font-weight: bold; font-size: large">Tổng cộng:</th>
+                        <th style="font-weight: bold; font-size: large"></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+<div id="importReportItem" class="modal fade"></div>
+@*<div class="page-content">
+        <div class="page-header">
+            <div class="row small-margin">
+                <div class="col-md-8">
+                    <h2>Báo cáo nhập hàng ngày <strong data-role="small-date">@ViewBag.ReviewDate</strong></h2>
+                </div>
+                <div class="col-lg-4 pull-right text-right">
+                    <div class="input-group">
+                        <div class="date-picker">
+                            <input type="text" id="date-string" readonly="">
+                            <a id="reportrange"><i class="fa fa-calendar"></i></a>
+                        </div><!-- /input-group -->
+                        <div class="input-group-btn">
+                            <a class="btn btn-success btn-sm" id="btnSearch">
+                                <i class="left-icon fa fa-search"></i>Tìm
+                            </a>
+                        </div>
+                    </div>
+                    <input type="hidden" id="sTime" />
+                    <input type="hidden" id="eTime" />
+                </div>
+            </div>
+        </div>
+        <div id="inventory">
+            <table id="tablepaging" class="table table-bordered table-striped table-fixed-header">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên nhà cung cấp</th>
+                        <th>Tổng tiền</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="2" style="text-align:left; font-weight: bold; font-size: large">Tổng cộng:</th>
+                        <th style="font-weight: bold; font-size: large"></th>
+                        <th></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>*@
+<style>
+    .input-group .input-group-btn > a.btn {
+        margin-top: 0px !important;
+    }
+</style>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+
+            $("#sTime").val(startTime);
+            $("#eTime").val(endTime);
+            $('[data-role=small-date]').html(dateString);
+        };
+        cb(moment(), moment(), "Hôm nay");
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+        $('#btnSearch').on('click', function () {
+            sStartDate = $("#sTime").val();
+            sEndDate = $("#eTime").val();
+            dStartDate = moment(sStartDate, 'DD/MM/YYYY');
+            dEndDate = moment(sEndDate, 'DD/MM/YYYY');
+
+            if (sStartDate.length > 16 || sEndDate.length > 16) {
+                ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                return;
+            }
+
+            if ((sStartDate.length > 0 && sEndDate.length == 0) || (sEndDate.length > 0 && sStartDate.length == 0) || (dStartDate > dEndDate)) {
+                ShowMessage("Thời gian bắt đầu và kết thúc không phù hợp", 3);
+                return;
+            }
+            if ($("#sTime").val() == '' || $("#eTime").val() == '') {
+                $('#dateRange').html('(' + moment().format('DD/MM/YYYY') + ')');
+            } else {
+                $('#dateRange').html('(' + $("#sTime").val() + ($("#sTime").val() === $("#eTime").val() ? '' : (' - ' + $("#eTime").val())) + ')');
+            }
+            //$('#sTime').data('daterangepicker').endDate.toISOString()
+            if (sStartDate == sEndDate) {
+                $('[data-role=small-date]').html(sStartDate);
+            }
+            else {
+                $('[data-role=small-date]').html(sStartDate + " - " + sEndDate);
+            }
+            RefreshTable();
+        });
+        //Format Money
+        Number.prototype.formatMoney = function (c, d, t) {
+            var n = this,
+                c = isNaN(c = Math.abs(c)) ? 2 : c,
+                d = d == undefined ? "." : d,
+                t = t == undefined ? "," : t,
+                s = n < 0 ? "-" : "",
+                i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                j = (j = i.length) > 3 ? j % 3 : 0;
+            return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+        };
+
+        $("#tablepaging").dataTable({
+            "bFilter": true,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadImportReportList")",
+            "bProcessing": true,
+            "bFilter": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "startTime", "value": $('#sTime').val() });
+                aoData.push({ "name": "endTime", "value": $('#eTime').val() });
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Tên nhà cung cấp",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfo": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sInfoEmpty": "Hiển thị 0 từ 0 của 0 dòng",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 2],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [0, 1, 2],
+                    "bSortable": false,
+                },
+                {
+                    "aTargets": [1],
+                    "mRender": function (data, type, row) {
+                        return "<p data-id='" + row[3] + "'>" + data + "</p>"
+                    }
+                },
+                {
+                    "aTargets": [3],
+                    "mRender": function (data, type, row) {
+                        var data = row[3];
+                        var result = "";
+
+                        result = "<button class='btn btn-sm btn-primary' title='Chi tiết' onclick='renderImportItemModal(" + data + ")'><i class='glyphicon glyphicon-eye-open'></i></button>";
+
+                        return result;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                }
+            ],
+            "bAutoWidth": false,
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(), data;
+
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                        i : 0;
+                };
+
+                // Total over all pages
+                total = api
+                    .column(2)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Total over this page
+                pageTotal = api
+                    .column(2, { page: 'current' })
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Update footer
+                $(api.column(2).footer()).html(
+                    pageTotal.formatMoney(0, '.', ',')
+                );
+            }
+        }).fnSetFilteringDelay(delaySearch);
+    });
+
+    function RefreshTable() {
+        var oTable = $("#tablepaging").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+
+    function renderImportItemDt(providerId) {
+        $("#table-item").dataTable({
+            "bFilter": true,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadImportReportItem")",
+            "bProcessing": true,
+
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "startTime", "value": $('#sTime').val() });
+                aoData.push({ "name": "endTime", "value": $('#eTime').val() });
+                aoData.push({ "name": "providerId", "value": providerId })
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5],
+                    "bSortable": false,
+                },
+                  {
+                      "aTargets": [0, 2, 3, 4],
+                      "sClass": "text-center",
+                  },
+            ],
+            "bAutoWidth": false,
+        });
+    }
+
+    function renderImportItemModal(id) {
+        var provider = $('p[data-id=' + id + ']').text();
+        $.ajax({
+            type: 'GET',
+            content: 'html',
+            data: {
+                startDate: $('#sTime').val(),
+                endDate: $('#eTime').val()
+            },
+            url: '@Url.Action("ImportReportItem")',
+            success: function (result) {
+                $('#importReportItem').html(result);
+                $('#provider').append(provider);
+                $('#importReportItem').modal('show');
+                renderImportItemDt(id);
+            },
+            error: function () {
+                ShowAlert('Có lỗi xảy ra', 3);
+            }
+        });
+    }
+</script>

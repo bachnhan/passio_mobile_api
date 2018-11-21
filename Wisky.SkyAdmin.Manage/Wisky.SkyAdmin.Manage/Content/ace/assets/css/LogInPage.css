@@ -1,0 +1,129 @@
+﻿@font-face{
+	font-family: "Segoe UI";
+	src: url('./segoeui_1.ttf') format('truetype');
+}
+@font-face{
+	font-family: "Segoe UI";
+	font-weight: bold;
+	src: url('./segoeuib_0.ttf') format('truetype');
+}
+@font-face{
+	font-family: "Segoe UI Light";
+	src: url('./segoeuil.ttf') format('truetype');
+}
+body {
+	margin: 0;
+	font-family: "Open Sans";
+	font-size: 14px;
+	/*background-color: #ffffff;*/
+	background: rgb(255,255,255); /* Old browsers */
+	/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+	background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIwJSIgeTI9IjEwMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI2ZmZmZmZiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNkY2RjZGMiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+	background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(220,220,220,1) 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(100%,rgba(220,220,220,1))); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(220,220,220,1) 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(220,220,220,1) 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%,rgba(220,220,220,1) 100%); /* IE10+ */
+	background: linear-gradient(to bottom, rgba(255,255,255,1) 0%,rgba(220,220,220,1) 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#dcdcdc',GradientType=0 ); /* IE6-8 */
+}
+
+html, body {
+	height: 100%;
+	width: 100%;
+}
+
+.login-panel {
+	position: relative;
+	margin: 0px auto;
+	padding: 20px;
+	width: 400px;
+	text-align: center;
+	transition: all 0.3s ease-in;
+	z-index: 5;
+}
+
+.login-input {
+	padding: 10px 20px;
+	background: #065f9a;
+	border-radius: 3px;
+	border: none;
+	font-family: "Open Sans";
+	font-size: 14px;
+	text-align: center;
+	color: #fff;
+	width: 255px;
+	height: 18px;
+}
+
+	.login-input::-webkit-input-placeholder {
+		color: #FFFFFD;
+		text-transform: uppercase;
+		font-size: 14px;
+		font-family: "Open Sans";
+		font-weight: bold;
+	}
+
+	.login-input::-moz-placeholder {
+		color: #91B0C2;
+		text-transform: uppercase;
+		font-size: 14px;
+		font-family: "Open Sans";
+		font-weight: bold;
+	}
+
+	.login-input:-ms-input-placeholder {
+		color: #91B0C2;
+		text-transform: uppercase;
+		font-size: 14px;
+		font-family: "Open Sans";
+		font-weight: bold;
+	}
+
+.login-btn {
+	border: solid 2px #065f9a;
+	padding: 6px 20px;
+	background: #fff;
+	border-radius: 3px;
+	color: #065f9a;
+	font-family: "Open Sans";
+	font-weight: bold;
+	font-size: 14px;
+	transition: all 0.3s ease-in;
+}
+
+.input-box {
+	padding: 9px 20px;
+	transition: all 0.3s ease-in;
+}
+
+fieldset {
+	border: none;
+	margin: 0;
+}
+
+p {
+	font-family: "Segoe UI Light";
+	font-size: 21px;
+	color: #065f9a;
+	margin: 0px;
+}
+
+.logo-container {
+	position: relative;
+	top: -10px;
+	margin: 0px auto;
+	width: 486px;
+}
+
+	.logo-container img {
+		width: 100%;
+	}
+
+.bottom-bg {
+	background: url('/../Content/images/login-bg.png') no-repeat center center;
+	width: 100%;
+	height: 239px;
+	position: fixed;
+	bottom: -35px;
+}

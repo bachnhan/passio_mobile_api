@@ -1,0 +1,360 @@
+﻿@{
+    ViewBag.Title = "Index";
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var storeId = ViewBag.storeId;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+    var store = Utils.GetStore(storeId);
+}
+
+<style>
+    .mid-v-align {
+        vertical-align: middle !important;
+    }
+
+    .label {
+        font-size: 100%;
+    }
+</style>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách sản phẩm</h3>
+            </div>
+
+            @if (storeId == 0 || store.Type == (int)StoreTypeEnum.Website)
+            {
+                <div class="col-md-4 text-right">
+                    <a href="@this.Url.Action("Create", new {parameters = currentStoreDomain.Directory})"
+                       class="btn btn-primary btn-icon-text waves-effect">
+                        <i class="zmdi zmdi-plus"></i> Thêm sản phẩm
+                    </a>
+                </div>
+            }
+        </div>
+        <hr />
+    </div>
+
+
+    <div class="card-padding">
+
+        <div style="padding-left:20px">
+            <div class="row m-b-20">
+                <div class="col-md-12">
+                    <h4>Nhóm sản phẩm:</h4>
+                    <div class="col-md-3">
+                    <select id="productGroupList">
+                        <option value="0">Tất cả</option>
+                    </select>
+                        </div>
+                    <div class="col-md-3">
+                            <button class="btn btn-primary" data-target="#filter-container" data-toggle="collapse">Bộ lọc </button>
+                        </div>
+                </div>
+                
+
+            </div>
+            <div class="col-md-12 collapse" id="filter-container">
+                <div class="row">
+                <h4>Loại sản phẩm: </h4>
+                <div class="group-radio-buttons myGroup-radio-buttons">
+                    <div class="col-md-3 pull-right">
+                        <input type="radio" name="filter-type" value="@((int) ProductTypeEnum.Combo)" class="nice-check" id="filter-type1" />
+                        <label for="filter-type1"><span>Combo</span></label>
+                    </div>
+                    <div class="col-md-3 pull-right">
+                        <input type="radio" name="filter-type" value="@((int) ProductTypeEnum.Extra)" class="nice-check" id="filter-type2" />
+                        <label for="filter-type2"><span>Extra</span></label>
+                    </div>
+                    <div class="col-md-3 pull-right">
+                        <input type="radio" name="filter-type" value="@((int) ProductTypeEnum.Single)" class="nice-check" id="filter-type3" />
+                        <label for="filter-type3"><span>Sản phẩm đơn</span></label>
+                    </div>
+                    <div class="col-md-3 pull-right">
+                        <input type="radio" name="filter-type" value="-1" class="nice-check" id="filter-type0" checked />
+                        <label for="filter-type0"><span>Tất cả</span></label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <h4>Tình trạng: </h4>
+                <div class="group-radio-buttons myGroup-radio-buttons">
+                    <div class="col-md-3">
+                        <input type="radio" name="filter-status" value="" class="nice-check" id="filter-status0" checked />
+                        <label for="filter-status0"><span>Tất cả</span></label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="radio" name="filter-status" value="True" class="nice-check" id="filter-status1" />
+                        <label for="filter-status1"><span>Đang bán</span></label>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="radio" name="filter-status" value="False" class="nice-check" id="filter-status2" />
+                        <label for="filter-status2"><span>Dừng bán</span></label>
+                    </div>
+                </div>
+
+            </div>
+                </div>
+            <!-- Product Table -->
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="allcust">
+                    <!-- Datatable -->
+                    <div class="row">
+                        <div class="col-md-12 p-t-20">
+                            <table id="UserDatatable" class="table table-striped table-bordered table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <label class="">STT</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Hình ảnh</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Tên sản phẩm</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Nhóm sản phẩm</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Loại sản phẩm</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Giá</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Trạng thái</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Tùy chọn</label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <template id="command-template" class="hidden">
+        <div>
+            <a class="btn btn-primary btn-sm"
+               data-toggle="tooltip" title="Edit">
+                <i class="fa fa-pencil"></i>
+            </a>
+            <button onclick="onDeleteButtonClick(this);" class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete">
+                <i class="fa fa-remove"></i>
+            </button>
+        </div>
+    </template>
+    <div class="modal fade" id="editAtStoreModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    <script>
+        $(document).ready(function () {
+            LoadPGList();
+            InitUserDatatable();
+        });
+
+        function LoadPGList() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("LoadProductGroupList", "Product")',
+                success: function (result) {
+                    for (var i = 0; i < result.productGroup.length; i++) {
+                        $('#productGroupList').append('<option value="' + result.productGroup[i].CateID + '">' + result.productGroup[i].CateName + '</option>')
+                    }
+                    $('#productGroupList').selectpicker('refresh');
+                }
+
+            });
+        }
+
+
+
+        function ProductDataProcess() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("IndexList", "Product")',
+                data: {
+                    'productGroup': $('#productGroupList').val(),
+                    'status':       $('input[name=filter-status]:checked').val()
+                },
+                success: function (result) {
+                    //console.log(result.aaData);
+                    InitUserDatatable(result.aaData);
+                }
+            });
+        };
+        $('#productGroupList').on('change', function () {
+            InitUserDatatable();
+            RefreshTableFilter("#UserDatatable", true);
+        });
+        $('input[name=filter-status]').on('change', function () {
+            InitUserDatatable();
+            RefreshTableFilter("#UserDatatable", true);
+        });
+        $('input[name=filter-type]').on('change', function () {
+            InitUserDatatable();
+            RefreshTableFilter("#UserDatatable", true);
+        });
+        function InitUserDatatable() {
+
+            $("#UserDatatable").dataTable({
+
+                "bSort": false,
+                "bServerSide": true,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("IndexList", "Product")",
+                "bProcessing": true,
+                "aLengthMenu": [10, 25, 50],
+                "bFilter": true,
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "productGroup", "value": $('#productGroupList').val() }),
+                    aoData.push({ "name": "status", "value": $('input[name=filter-status]:checked').val() }),
+                    aoData.push({ "name": "type", "value": $('input[name=filter-type]:checked').val() });
+                },
+                "oLanguage": {
+                    "sSearchPlaceholder": "Tên sản phẩm",
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3, 4, 5, 6, 7],
+                        "bSortable": false,
+                        "sClass": "text-center mid-v-align"
+                    },
+                    {
+                        "aTargets": [1],
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            return "<img class='img-responsive myImg-responsive' src='" + ((row[1] != null) ? row[1] : "~/Content/images/default_product.jpg") + "' onerror='this.onerror=null; this.src=\"@Url.Content("~/Content/images/default_product.jpg")\"'/>";
+                        }
+                    },
+                    {
+                        "aTargets": [2],
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            return "<div class='hover-title' data-title='"+data+"' style='width:100%'>"+data+"</div>";
+                        }
+                    },
+                    {
+                        "aTargets": [5],
+                        "mRender": function (data, type, row) {
+                            return toMoney(data, '', '');
+                        },
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var text = data ? '<span class="label label-success">Đang bán</span>' : '<span class="label label-danger">Dừng bán</span>'
+                            var icon = data ? "glyphicon-ok" : "glyphicon-remove";
+                            return text;
+                        },
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [7],
+                        "mRender": function (data, type, row) {
+                            var productId = data;
+                            var Id = @storeId;
+                            var editButton = '<button title="Chỉnh sửa" onclick="onEditAtStore(this);" data-id="' + productId + '" ' +
+                                'class="btn btn-primary btn-lg" data-toggle="tooltip" >' +
+                                '<i class="glyphicon glyphicon-pencil"></i></button>';
+                            var deleteButton = '<button title="Xóa" onclick="onDeleteButtonClick(this);" style="margin-left: -3px;" data-id="' + productId + '" ' +
+                                'class="btn btn-danger btn-lg" data-toggle="tooltip" >' +
+                                '<i class="glyphicon glyphicon-trash"></i></button>';
+                            var configProductStore = '<button title="Cấu hình sản phẩm tại cửa hàng" onclick="onUpdateProductStore(this);" style="margin-left: -3px;" data-id="' + productId + '" ' +
+                                'class="btn btn-success btn-lg" data-toggle="tooltip" >' +
+                                '<i class="	glyphicon glyphicon-wrench"></i></button>';
+
+                            return editButton + " " + configProductStore + " " + deleteButton;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    },
+
+                ],
+                "bAutoWidth": false,
+            }).fnSetFilteringDelay(delaySearch);;
+        }
+
+        //redraw datatable without reload
+        function reDrawDatatable(id) {
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+        }
+
+        //user datatable
+        function RefreshTable() {
+            reDrawDatatable("#UserDatatable");
+        }
+
+
+        function onDeleteButtonClick(btn) {
+            ShowConfirm("Bạn có chắc là mình muốn xóa sản phẩm này không??", function () {
+                var id = $(btn).attr("data-id");
+                $.ajax({
+                    url: "@this.Url.Action("Delete", new {parameters = currentStoreDomain.Directory})/" + id,
+                    type: 'POST',
+                    error: function () {
+                        ShowMessage(data.message, 1);
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            ShowAlert(data.message, 2, null)
+                            RefreshTable();
+                        } else {
+                            ShowMessage(data.message, 1);
+                        }
+                    }
+                });
+            });
+        }
+
+        function onEditAtStore(btn){
+            var id = $(btn).attr("data-id");
+            window.location.href = "@this.Url.Action("Edit", new {parameters = currentStoreDomain.Directory})/" + id;
+        }
+
+        function onUpdateProductStore(btn){
+            var id = $(btn).attr("data-id");
+            window.location.href = "@this.Url.Action("Index","ProductSetting", new {parameters = currentStoreDomain.Directory})?productId=" + id;
+        }
+
+    </script>
+

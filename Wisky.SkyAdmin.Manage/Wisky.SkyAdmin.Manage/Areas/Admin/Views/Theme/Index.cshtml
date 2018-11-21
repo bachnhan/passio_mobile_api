@@ -1,0 +1,221 @@
+﻿@using HmsService
+@{
+    ViewBag.Title = "Index";
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var storeId = 0;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+    var store = Utils.GetStore(storeId);
+    var themeOfCurrentStore = ViewBag.ThemeOfCurrentStore as List<StoreThemeViewModel>;
+}
+<link href="@Url.Content("~/Content/css/Galary.css")"
+      rel="stylesheet" type="text/css" />
+
+<div class="card">
+    <div class="card-header">
+        <input type="hidden" value="0" id="isError" />
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Giao diện website</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <a href="@this.Url.Action("Themes", new {parameters = currentStoreDomain.Directory})" class="btn btn-primary btn-icon-text waves-effect">
+                    <i class="zmdi zmdi-plus"></i> Chọn giao diện
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+            <div class="row">
+                <h4 style="margin-left: 30px;">Giao diện hiện tại</h4>
+                <div class="col-md-6">
+                        <div class="StoreTheme-container">
+                        </div>
+                </div>
+                <div class="col-md-6" style="padding-top:10px;">
+                    <div class="card">
+                        <div class="card-header ch-alt">
+                            <h2>
+                                <select name="select-current-store-theme" id="select-current-store-theme">
+                                    <option value="" disabled>-- Thay đổi theme --</option>
+                                    @foreach (var item in themeOfCurrentStore)
+                                    {
+                                        if (item.IsUsing)
+                                        {
+                                            <option value="@item.StoreThemeId" selected="selected" theme="@item.ThemeId" currentStyle="@item.CustomThemeStyle">@item.StoreThemeName - (Theme đang sử dụng)</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@item.StoreThemeId" theme="@item.ThemeId" currentStyle="@item.CustomThemeStyle">@item.StoreThemeName</option>
+                                        }
+                                    }
+                                </select>
+                                <input type="hidden" value="" id="lastSelected" />
+                            </h2>
+                            <ul class="actions">
+                                <li>
+                                    <a href="@this.Url.Action("Themes", new {parameters = currentStoreDomain.Directory})" class="btn btn-primary btn-icon-text waves-effect" target="_blank">
+                                        Xem trang chính <span class="glyphicon glyphicon-new-window"></span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-body">
+                            <h4>
+                                <i class="glyphicon glyphicon-cog"></i>
+                                Tùy chọn Theme
+                            </h4>
+                            <small style="margin-left:4%">
+                                Thay đổi hoàn toàn giao diện theme của bạn bằng những phong cách khác nhau.
+                            </small>
+                        </div>
+                        <div class="card-body">
+                            <select style="margin-left:4%" name="select-current-style-of-theme" id="select-current-style-of-theme">
+                                <option value="" disabled>-- Thay đổi theme style --</option>
+                            </select>
+                        </div>
+                        <div class="card-body">
+                            <button type="button" class="btn btn-primary waves-effect" id="save-change-using-theme" style="margin-left:4%">Lưu thay đổi</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        $(".hover").mouseleave(function () {
+            $(this).removeClass("hover");
+        });
+        $("#lastSelected").val($('#select-current-store-theme').val());
+        LoadCurrentThemeStyleForSelectedStoreTheme();
+
+        // set event onchange Store Theme
+        $("#select-current-store-theme").change(function () {
+            LoadCurrentThemeStyleForSelectedStoreTheme();
+
+        });
+        //
+        $(document).on("click", "#save-change-using-theme", function () {
+            SaveChangeUsingTheme();
+        });
+
+        // Open file theme
+        $(document).on("click", "#linkTheme", function () {
+            var path = $(this).attr("path");
+            OpenBrowser(path);
+        });
+
+        $(document).on("click", "#linkTheme_Image", function () {
+            var path = $(this).attr("path");
+            OpenBrowser(path);
+        });
+    });
+
+    function OpenBrowser(path) {
+        path = "C:/Users/HienLN/Desktop/aaaa.html";
+        //window.location = "C:/Users/HienLN/Desktop/aaaa.html";
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("openBrowser","Theme")",
+            data: { path: path },
+            success: function (result) {
+            },
+            error: function (error) {
+                //console.log(error);
+            }
+        });
+    }
+    function SaveChangeUsingTheme() {
+        var isError = $('#isError').val();
+        if (isError === '1') {
+            alert('An error occurred');
+            return;
+        }
+        var selectedStoreThemeId = $('#select-current-store-theme').val();
+        var selectedStyle = $('#select-current-style-of-theme').val();
+        if (selectedStoreThemeId === null && selectedStoreThemeId === 'undefined' && selectedStoreThemeId === '') {
+            alert('An error occurred');
+            return;
+        }
+        if (selectedStyle === null && selectedStyle === 'undefined' && selectedStyle === '') {
+            alert('An error occurred');
+            return;
+        }
+        var currentselected = $("#lastSelected").val();
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("UpdateChangeStoreTheme")",
+            dataType: 'json',
+            data: { selectedStoreThemeId: selectedStoreThemeId, selectedStyle: selectedStyle, currentStoreThemeId: currentselected },
+            success: function (result) {
+                if (result.success) {
+                    window.location.reload();
+                    $("lastSelected").val(selectedStoreThemeId);
+                } else {
+                    alert('An error occurred');
+                }
+            },
+            error: function (error) {
+                //console.log(error);
+            }
+        });
+    }
+
+
+    function LoadCurrentThemeStyleForSelectedStoreTheme() {
+        var currentStoreThemeId = $('#select-current-store-theme').val();
+
+        if (currentStoreThemeId === null && currentStoreThemeId === 'undefined' && currentStoreThemeId === '') {
+            alert('An error occurred');
+            //console.log('currentStoreThemeId hiện không có.');
+            return;
+        }
+        $.ajax({
+            type: "POST",
+            url: "@Url.Action("GetThemeStyleByThemeId")",
+            dataType: 'json',
+            data: { currentStoreThemeId: currentStoreThemeId },
+            success: function (result) {
+                if (result.success) {
+                    var currentStyle = result.currentStyle;
+                    $('#select-current-style-of-theme').html('');
+                    var renderData = "<option value='' disabled>-- Thay đổi theme style --</option>";
+                    // var imageData = " <img src='" + result.themeImage + "' width='100%' height='500'/>"
+
+                    var imageDataHtml = "<div id='all'>"
+                                        + "<div class='view view-first'>"
+                                        + "<img src='" + result.themeObj.ImageUrl + "' />"
+                                        + "<div class='mask'>"
+                                        + "<h2>" + result.themeObj.ThemeName + "</h2>"
+                                        + "<p>" + result.themeObj.Description + "</p>"
+                                        + "</div>"
+                                        + "</div>"
+                                        + "</div>";
+                    $.each(result.listThemeStyle, function (index, style) {
+                        if (currentStyle === style) {
+                            renderData += "<option value='" + style + "' selected='selected'>Style " + style + "</option>";
+                        } else {
+                            renderData += "<option value='" + style + "'>Style " + style + "</option>";
+                        }
+                    });
+                    $('#select-current-style-of-theme').html(renderData);
+                    $('.StoreTheme-container').html(imageDataHtml);
+                    $('#isError').val('0');
+                } else {
+                    $('#isError').val('1');
+                    alert('An error occurred');
+                }
+            },
+            error: function (error) {
+                //console.log(error);
+            }
+        });
+    }
+</script>

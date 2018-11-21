@@ -1,0 +1,251 @@
+﻿@model HmsService.ViewModels.CouponCampaignEditViewModel
+@{
+    ViewBag.Title = "Danh sách đợt khuyến mãi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách coupon</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <a href="@(Url.Action("CouponCampaignCreate"))" class="btn btn-primary btn-icon-text waves-effect addNewEmp">
+                    <i class="zmdi zmdi-plus"></i> Thêm coupon mới
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-body">
+        <div class="card-padding">
+            <div class="row">
+                <table id="CouponTable" class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr class="gray">
+                            <th>
+                                <label>Mã DKM</label>
+                            </th>
+                            <th>
+                                <label>Tên coupon</label>
+                            </th>
+                            <th>
+                                <label>Giá trị (VNĐ)</label>
+                            </th>
+                            <th>
+                                <label>Ngày bắt đầu</label>
+                            </th>
+                            <th>
+                                <label>Ngày kết thúc</label>
+                            </th>
+                            <th>
+                                <label>Trạng thái</label>
+                            </th>
+                            <th>
+                                <label>Thao tác</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="campaignDetail" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chi tiết chiến dịch</h4>
+            </div>
+            <div class="modal-body">
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section CouponCampaign{
+    <script>
+        $(function () {
+            $('#campaignDetail').on('show.bs.modal', function (e) {
+                //console.log(e);
+                var $me = $(this);
+                var $btn = $(e.relatedTarget);
+                var campaignId = $btn.attr('data-contract-id');
+                $.ajax({
+                    "type": "post",
+                    "url": "@(Url.Action("CouponCampaignDetail", "Coupon"))",
+                    "dataType": "html",
+                    "data": {
+                        id: campaignId
+                    },
+                    success: function (result) {
+                        $me.find('.modal-body').html(result);
+                    }
+                });
+            });
+        });
+        function removeCampaign(id) {
+            var rs = confirm("Xác nhận xóa đợt khuyến mãi?");
+            if (rs) {
+                $.ajax({
+                    "type": "post",
+                    "url": "@(Url.Action("CouponCampaignDelete", "Coupon"))",
+                    "data": {
+                        id: parseInt(id)
+                    },
+                    success: function (result) {
+                        location.href = '@Url.Action("CouponCampaign")';
+                    }
+                });
+            }
+        }
+        $(document).ready(function () {
+            CouponCampaignProcess();
+        });
+        function InitCouponCampaignDatatable(data) {
+            $("#CouponTable").dataTable({
+                "bFilter": true,
+                "bRetrieve": true,                
+                "bScrollCollapse": true,
+                "data": data,                
+                "bProcessing": true,
+                
+                //"fnServerParams": function (aoData) {
+                //    aoData.push({ "name": "locationId", "value": $('#LocationId').val() });
+                //},
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfoEmpty": "Không có dữ liệu",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                    "sSearchPlaceholder": "Tên coupon",
+
+                },
+
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3, 4, 5],
+                        "bSortable": false,
+                        "bSearchable": false,
+                    },
+                    {
+                        "aTargets": [1],
+                        "bSearchable": true
+                    },
+                    {
+                        "aTargets": [0, 3, 4],
+                        "sClass": "text-center"
+                    },
+
+                    //{
+                    //    "aTargets": [1],
+                    //    "mRender": function (data, type, row) {
+                    //        var data = row[1];
+                    //        var result = "<img src='" + data + "' />";
+
+                    //        return result;
+                    //    },
+                    //    "bSortable": false,
+                    //    "sClass": "text-center"
+                    //},
+                    {
+                        "aTargets": [5],
+                        "mRender": function (data, type, row) {
+                            var result = "";
+                            if (parseInt(row[5]) == 0) {
+                                result = "<span class='label myStatus requestCancel meStatus'>Chưa kích hoạt</span>";
+                            }
+                            else if (parseInt(row[5]) == 1) {
+                                result = "<span class='label myStatus yes meStatus'>Đang hoạt động</span>";
+                            }
+                            else {
+                                result = "<span class='label myStatus no meStatus'>Đã kết thúc</span>";
+                            }
+                            //return "<span style=\'font-weight:bold;\'>" + result + "</span>";
+                            return result;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    },                  
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+
+                            var data = row[0];
+                            var result = "";
+                            if (row[5] == 0) {
+                                result = "<a class='btn btn-primary' onclick='changeStatus(" + data + "," + row[5] + ")' id='status' name='Status'>Kích hoạt</a> " +
+                                    "<a href='Coupon/" + data + "' class='btn btn-lg btn-info' title='Chi tiết' onclick='showDetail(" + data + ")'><i class='zmdi zmdi-file-text'></i></a> " +
+                                    "<a href='CouponCampaignEdit/" + data + "' class='btn  btn-lg btn-success' title='Chỉnh sửa' onclick=''><i class='zmdi zmdi-edit'  aria-hidden='true'></i></a> " +
+                                    "<a class='btn btn-lg btn-danger' title='Xóa' onclick='removeCampaign(" + data + ")'><i class='fa fa-trash'></i></a> ";
+                            }
+                            else if (row[5] == 1) {
+                                result = "<a class='btn btn-primary' onclick='changeStatus(" + data + "," + row[5] + ")'>Kết thúc</a> " +
+                                    "<a href='Coupon/" + data + "' class='btn btn-lg btn-info' title='Chi tiết' onclick='showDetail(" + data + ")'><i class='zmdi zmdi-file-text'></i></a> " +
+                                    "<a href='CouponCampaignEdit/" + data + "' class='btn  btn-lg btn-success' title='Chỉnh sửa' onclick=''><i class='zmdi zmdi-edit'  aria-hidden='true'></i></a> " +
+                                    "<a class='btn btn-lg btn-danger' title='Xóa' onclick='removeCampaign(" + data + ")'><i class='fa fa-trash'></i></a> "
+                            }
+                            else {
+                                result = "<a class='btn btn-sm btn-primary' onclick='changeStatus(" + data + "," + row[5] + ")'>Kích hoạt</a> " +
+                                    "<a href='Coupon/" + data + "' class='btn btn-lg btn-info' title='Chi tiết' onclick='showDetail(" + data + ")'><i class='zmdi zmdi-file-text'></i></a> " +
+                                    "<a href='CouponCampaignEdit/" + data + "' class='btn btn-lg btn-success' title='Chỉnh sửa' onclick=''><i class='zmdi zmdi-edit'  aria-hidden='true'></i></a> " +
+                                    "<a class='btn btn-lg btn-danger' title='Xóa' onclick='removeCampaign(" + data + ")'><i class='fa fa-trash'></i></a> "
+                            }
+                            return result;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+        function CouponCampaignProcess() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("LoadCouponCampaign","Coupon")',
+                success: function (result) {
+
+                    //console.log(result.aaData);
+                    InitCouponCampaignDatatable(result.aaData);
+                }
+            });
+        };
+
+
+        function changeStatus(id, status) {
+            $.ajax({
+                type: "url",
+                method: "POST",
+                url: '@Url.Action("ChangeStatus", "Coupon")',
+                data: { id: id, status: status },
+                success: function (result) {
+                    location.href = '@Url.Action("CouponCampaign","Coupon")';                   
+
+                },
+
+                error: function (error) {
+                    alert("Error Occured");
+                }
+            });
+        }
+    </script>
+}
+
+

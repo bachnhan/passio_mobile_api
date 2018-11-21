@@ -1,0 +1,61 @@
+﻿<div class="block-header">
+    <h2>Thông tin chung về cửa hàng</h2>
+    <ul class="actions">
+
+        <li>
+            <button type="submit" id="okButton" class="btn btn-primary" onclick="editViewCountInfo()">Hoàn tất</button>
+        </li>
+    </ul>
+</div>
+<form role="form">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Thống kê truy cập</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label for="inputTitle" class="control-label">Đang online</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" id="online" value="">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDescription" class="control-label">Hôm nay</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" value="" id="today">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDescription" class="control-label">Tuần này</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" value="" id="thisWeek">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDescription" class="control-label">Tháng này</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" value="" id="thisMonth">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDescription" class="control-label">Tổng truy cập</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" value="" id="total">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            SKYWEB.Admin.ViewCounter.init();
+        });
+    </script>
+}

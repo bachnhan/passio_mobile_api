@@ -1,0 +1,63 @@
+﻿@model IEnumerable<StoreWebSettingViewModel>
+
+    @{
+    ViewBag.Title = "Website Settings";
+
+    var counter = 0;
+    }
+    <div class="card">
+        <form role="form" method="post" class="form-horizontal">
+            @this.Html.AntiForgeryToken()
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3>Thiết lập trang web</h3>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <ul>
+                            <li>
+                                <button type="submit" class="btn btn-primary" id="btn-submit-product">Hoàn tất</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <hr />
+            </div>
+
+            @if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+            {
+            <div class="card-body">
+                <div class="card-padding text-danger">
+                    @this.Html.ValidationSummary()
+                </div>
+            </div>
+            }
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="card-body">
+                        <div class="card-padding">
+                            @foreach (var item in this.Model)
+                            {
+                            var prefix = "Pairs[" + counter + "]";
+                            <input type="hidden" name="@(prefix).Id" value="@(item.Id)" />
+
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label" for="@(prefix).Value">@(item.Name)</label>
+                                <div class="col-sm-10">
+                                    <div class="fg-line">
+                                        <input id="@(prefix).Value" name="@(prefix).Value" value="@(item.Value)" class="form-control"
+                                               placeholder="@(item.Name)" />
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            ++counter;
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>

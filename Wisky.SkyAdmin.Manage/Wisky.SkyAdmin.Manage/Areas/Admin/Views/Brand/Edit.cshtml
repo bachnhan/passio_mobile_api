@@ -1,0 +1,149 @@
+﻿@model BrandViewModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <form id="editBrandForm" method="post">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Chỉnh sửa thương hiệu</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="@Url.Action("Index")" class="btn btn-success">Quay lại</a>
+                    <button type="button" onclick="confirmSubmit(this)" class="btn btn-primary">Hoàn tất</button>
+                </div>
+            </div>
+            <hr />
+        </div>
+        <div class="card-padding">
+            <div class="modal-body">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                @Html.HiddenFor(q => q.Id, new { id = "Id" })
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px; margin-top:12px; padding-top:20px; padding-bottom:22px;">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Tên thương hiệu<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.BrandName, new { id = "BrandName", @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Công ty<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.CompanyName, new { id = "CompanyName", @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Người liên hệ<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.ContactPerson, new { id = "ContactPerson", @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Điện thoại<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.PhoneNumber, new { id = "PhoneNumber", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Fax</label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Fax, new { id = "Fax", @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Website</label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Website, new { id = "Website", @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Mô tả</label>
+                                <div class="col-md-12">
+                                    <div class="fg-line">
+                                        @Html.TextAreaFor(q => q.Description, new { id = "Description", @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    }
+    function confirmSubmit(btn) {
+        if ($("input[name='BrandName']").val() == "") {
+            ShowMessage("Vui lòng nhập tên brand.", 3);
+            return;
+        }
+        else if ($("input[name='CompanyName']").val() == "") {
+            ShowMessage("Vui lòng nhập tên công ty.", 3);
+            return;
+        }
+        else if ($("input[name='ContactPerson']").val() == "") {
+            ShowMessage("Vui lòng nhập tên người liên hệ.", 3);
+            return;
+        }
+        else if ($("input[name='PhoneNumber']").val() == "") {
+            ShowMessage("Vui lòng nhập số điện thoại.", 3);
+            return;
+        }
+        else {
+            editBrand();
+        }
+    }
+    function editBrand() {
+        var formData = $('#editBrandForm').serialize();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("EditBrand")',
+            dataType: 'JSON',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage(result.message, 2);
+                    window.location.href = '@Url.Action("Index")';
+                }
+                else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+
+            error: function (error) {
+                ShowMessage(error.message,1);
+            }
+        });
+    }
+</script>

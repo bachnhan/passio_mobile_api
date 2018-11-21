@@ -1,0 +1,169 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<button id="fix1">Fix CustomerId Null</button>
+<button id="fix2">Fix Att1 Null</button>
+<button id="fixPayment">Fix Payment</button>
+<button id="fixOrder">Fix Order</button>
+<button id="fixOrderRist">Fail 3-1-2017</button>
+<button id="UpdateOrderFail">Update Fail 3-1-2017</button>
+<button id="FixCheckfinger">Fix Duplicate CheckFinger</button>
+<button id="FixMapping">Fix mapping</button>
+<button id="FixOrderMissingPayment">Fix Misspayment</button>
+<p id="fix-text">Result</p>
+<script>
+    $('#fix1').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FixBug1", "FixOrderDB")',
+            success: function (result) {
+                if (result.success) {
+                    $('#fix-text').html("Fix cusId: " + result.count + "/" + result.allOrder);
+                } else {
+                    ShowMessage("Lỗi", 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    });
+
+    $('#FixOrderMissingPayment').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FixOrderMissingPayment", "FixOrderDB")',
+            success: function (result) {
+                if (result.success) {
+                    $('#fix-text').html("TotalFix: " + result);
+                } else {
+                    ShowMessage("Lỗi", 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    });
+
+    $('#FixMapping').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FixMappingEmployee", "FixOrderDB")',
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage("Thành công", 2);
+                } else {
+                    ShowMessage("Lỗi", 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    });
+
+    $('#FixCheckfinger').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FixCheckFinger", "FixOrderDB")',
+            success: function (result) {
+                if (result.success) {
+                    $('#fix-text').html("Fix cusId: " + result.count + "/" + result.allOrder);
+                } else {
+                    ShowMessage("Lỗi", 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    });
+
+    $('#UpdateOrderFail').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("UpdateOrderFail", "FixOrderDB")',
+            success: function (result) {
+                if (result.success) {
+                    $('#fix-text').html("Done");
+                } else {
+                    ShowMessage("Lỗi", 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    });
+
+
+    $('#fixOrderRist').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("fixOrderRisk", "FixOrderDB")',
+            success: function (result) {
+                if (result.success) {
+                    $('#fix-text').html("Done");
+                } else {
+                    ShowMessage("Lỗi", 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    });
+
+    $('#fix2').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FixBug2", "FixOrderDB")',
+            success: function (result) {
+                if (result.success) {
+                    $('#fix-text').html("Fix Att1: " + result.count + "/" + result.allOrder);
+                } else {
+                    ShowMessage("Lỗi", 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    });
+
+    $('#fixPayment').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("FixPayment", "FixOrderDB")',
+            success: function (result) {
+                if (result.success) {
+                    $('#fix-text').html("Done");
+                } else {
+                    ShowMessage("Lỗi", 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    });
+    $('#fixOrder').click(function () {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("fixOrder", "FixOrderDB")',
+            success: function (result) {
+                if (result.success) {
+                    $('#fix-text').html("Done");
+                } else {
+                    ShowMessage("Lỗi", 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    });
+</script>

@@ -1,0 +1,702 @@
+﻿@model HmsService.ViewModels.VATOrderEditViewModel
+@{
+    ViewBag.Title = "AddVATOrder";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var brandId = Utils.GetBrandId();
+    var brandName = Utils.getBrandName(brandId);
+    var user = HttpContext.Current.User;
+}
+<style>
+    .btn.dropdown-toggle.btn-default {
+        border-bottom: none !important;
+        border-right: none !important;
+    }
+</style>
+<div class="card">
+    @this.Html.AntiForgeryToken()
+    <input type="hidden" name="ImageFontAwsomeCss" value="." />
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Thêm hóa đơn VAT mới</h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <a id="btn-comeback" href="@this.Url.Action("Index", "VATOrder")" class="btn btn-success waves-effect">Quay lại</a>
+                <button type="button" onclick="Create()" class="btn btn-primary" id="btn-submit-product">Hoàn tất</button>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <form id="editProductItemForm" method="post">
+            <div class="modal-body">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px; padding-bottom:22px;">
+                        <div class="col-md-12">
+                            <div class="card p-15-30">
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label col-md-4" for="BrandId">Thương hiệu: </label>
+                                        <div class="col-md-7">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" disabled value="@brandName" />
+                                                <input type="hidden" class="form-control" disabled value="@brandId" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6 pull-right">
+                                        <label class="control-label col-md-4" for="ProviderID">Đối tác<span style="color:red">*</span></label>
+                                        <div class="col-md-6">
+                                            @Html.DropDownListFor(q => q.Providers, this.Model.AvailableProvider, new { name = "ProviderID", @id = "ProviderID", @class = "selectpicker" })
+                                        </div>
+                                        <div class="col-md-1 text-right">
+                                            <a href="#" id="btnCreate" role="button" data-toggle="modal" data-target="#Modal-addNewCategory" class="btn btn-primary pull-right ">
+                                                <i class="zmdi zmdi-plus"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label col-md-4" for="vatPrice">Chi phí VAT: </label>
+                                        <div class="col-md-7">
+                                            <div class="fg-line">
+                                                <input type="text" id="vatPrice" class="form-control" disabled value="0" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6 pull-right">
+                                        <label class="control-label col-md-4" for="totalPrice">Tổng giá trị: </label>
+                                        <div class="col-md-7">
+                                            <div class="fg-line">
+                                                <input type="text" id="totalPrice" class="form-control" disabled value="0" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="control-label col-md-4" for="Type">Phương thức thanh toán: <span style="color:red">*</span></label>
+                                        <div class="col-md-7">
+                                            <select name="Type" id="Type" class="selectpicker">
+                                                <option value="1">Tiền mặt</option>
+                                                <option value="2">Qua thẻ</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-md-6 pull-right">
+                                        <label class="control-label col-md-4" for="Notes">Ghi chú: </label>
+                                        <div class="col-md-7">
+                                            <div class="fg-line">
+                                                <input type="text" name="Notes" class="form-control" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="form-group col-md-6 ">
+                                        <label class="control-label col-md-4" for="Order">Chọn hóa đơn: <span style="color:red">*</span></label>
+                                        <div class="col-md-6">
+                                            @Html.DropDownListFor(q => q.Orders, this.Model.AvailableOrder, new { name = "ProviderDropdown", @id = "providerListModal", @class = "selectpicker" })
+                                        </div>
+                                        <div class="col-md-1 text-right">
+                                            <button title="Thêm hóa đơn mẫu" type="button" class="btn btn-primary btn-sm pull-right" id="addOrder" value="">
+                                                <i class="zmdi zmdi-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-md-6 pull-right">
+                                        <label class="control-label col-md-4" for="invoiceNo">Số hóa đơn: <span style="color:red">*</span></label>
+                                        <div class="col-md-7">
+                                            <div class="fg-line m-t-8">
+                                                <input type="text" class="form-control" name="invoiceNo" required onkeyup="this.value = checkDigit(this.value)" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="row">
+                                    <h4 style="text-align:center">Thông tin hóa đơn mẫu</h4>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="scroll-div tableDiv-responsive" style="overflow-y: auto;">
+                                            <table id="providerListTable" class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>STT</th>
+                                                        <th>Mã hóa đơn</th>
+                                                        <th>Tổng cộng</th>
+                                                        <th>Thao tác</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody><tr><td colspan="4">Không có dữ liệu</td></tr></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="scroll-div tableDiv-responsive" style="overflow-y: auto;">
+                                            <table id="itemListTable" class="table table-striped table-bordered table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Tên sản phẩm</th>
+                                                        <th>Giá sản phẩm</th>
+                                                        <th>Số lượng</th>
+                                                        <th>Thao tác</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody><tr><td colspan="4">Không có dữ liệu</td></tr></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="card p-15-30">
+                                <h4>Thông tin hóa đơn VAT</h4>
+                                <div class="scroll-div tableDiv-responsive" style="overflow-y: auto;">
+                                    <table id="detailListTable" class="table table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Tên sản phẩm</th>
+                                                <th>Giá sản phẩm</th>
+                                                <th>Số lượng</th>
+                                                <th>Đơn vị tính</th>
+                                                <th>Thao tác</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody><tr><td colspan="5">Không có dữ liệu</td></tr></tbody>
+                                    </table>
+
+
+                                    <button title="Tạo item mới" type="button" class="btn btn-primary" id="addNewCell" value="" style="margin-top:5px">
+                                        <i class="zmdi zmdi-plus"></i> Thêm dòng mới
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!--Modal-->
+<div id="Modal-addNewCategory" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Thêm đối tác</h4>
+            </div>
+            <div class="modal-body">
+                <form id="CreateEditForm">
+                    <input type="hidden" name="FormMode" value="Create" />
+
+                    <div class="form-horizontal">
+                        <div id="FormError" class="alert alert-danger" style="display: none; padding: 10px; margin-left: 10px"></div>
+                        <div id="FormSuccess" class="alert alert-success" style="display: none; padding: 10px; margin-left: 10px"></div>
+                        <div class="form-group">
+                            @Html.Label("Tên đối tác", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-5">
+                                <div class="fg-line">
+                                    @Html.TextBox("providerName", "", new { @class = "col-sm-12" })
+                                    @Html.ValidationMessage("providerName", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.Label("Địa chỉ", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-5">
+                                <div class="fg-line">
+                                    @Html.TextBox("providerAddress", "", new { @class = "col-sm-12" })
+                                    @Html.ValidationMessage("providerAddress", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.Label("Số điện thoại", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-5">
+                                <div class="fg-line">
+                                    @Html.TextBox("providerPhone", "", new { @class = "col-sm-12" })
+                                    @Html.ValidationMessage("providerPhone", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.Label("Email", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-5">
+                                <div class="fg-line">
+                                    @Html.TextBox("Email", "", new { @class = "col-sm-12" })
+                                    @Html.ValidationMessage("Email", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.Label("Mã số thuế", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-5">
+                                <div class="fg-line">
+                                    @Html.TextBox("VATCode", "", new { @class = "col-sm-12" })
+                                    @Html.ValidationMessage("VATCode", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.Label("Số tài khoản", htmlAttributes: new { @class = "control-label col-md-4" })
+                            <div class="col-md-5">
+                                <div class="fg-line">
+                                    @Html.TextBox("accountNo", "", new { @class = "col-sm-12" })
+                                    @Html.ValidationMessage("accountNo", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <input name="Active" id="Active" type="hidden" value="" />
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-offset-4 col-md-8">
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="btnSubmit" class="btn btn-primary">Hoàn tất</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<script>
+    var unitDdl = '<select><option value="ly">ly</option><option value="chai">chai</option>'
++ '<option value="chén">chén</option><option value="tô">tô</option><option value="phần">phần</option>'
++ '<option value="cái">cái</option><option value="món">món</option><option value="dĩa">dĩa</option>'
++ '<option value="xuất">xuất</option></select>';
+
+    var total = 0;
+    var providerList = [];
+    var itemList = [];
+    var count = 1;
+    var isFirstLoad = true;
+    $(document).ready(function () {
+        $('#totalPrice').val("0");
+
+        $('#btn-comeback').fixedScroll(70);
+        $('#btn-submit-product').fixedScroll(70);
+    });
+    //Event Click addorder
+    $(document).on('click', "#addOrder", function () {
+        var option = $('#providerListModal option:selected');
+        for (var i = 0; i < providerList.length; i++) {
+            var rentId = getRentId(option[0].value);
+            if (providerList[i] == rentId) {
+                ShowMessage("Đã thêm hóa đơn này!", 1);
+                return;
+            }
+        }
+        rentId = getRentId(option[0].value);
+        var totalAmount = getTotalAmount(option[0].value);
+        var table = document.getElementById("providerListTable");
+
+        if ($("#providerListTable tbody tr td").html() === "Không có dữ liệu") {
+            $("#providerListTable tbody").html("");
+        }
+        var row = table.insertRow(count);
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+        var cell3 = row.insertCell(2);
+        var cell4 = row.insertCell(3);
+        cell1.innerHTML = count;
+        cell2.innerHTML = option[0].text;
+        cell3.innerHTML = toMoney(totalAmount, ',', '');
+        cell4.innerHTML = $("<button>", {
+            'id': option[0].value,
+            'class': 'btn btn-danger btn-md glyphicon glyphicon-trash',
+            'onclick': 'removeProvider(this,' + rentId + ')',
+        })[0].outerHTML;
+        providerList.push(rentId);
+        count++;
+        addItem(rentId);
+    });
+
+    $("#btnCreate").click(function () {
+        $('#providerName').val("");
+        $('#providerAddress').val("");
+        $('#providerPhone').val("");
+        $('#Email').val("");
+        $('#VATCode').val("");
+        $('#accountNo').val("");
+        $("input[name='FormMode']").val("Create");
+        $(".modal-title").html("Thêm đối tác");
+    });
+
+    //validate modal form
+    $("#btnSubmit").click(function () {
+        // clear error
+        $(".error-message").html("");
+        $("#FormError").hide();
+        $("#FormError").html("");
+        $("#FormSuccess").hide();
+        $("#FormSuccess").html("");
+
+        var hasError = false;
+
+        // validating
+        if ($("input[name='providerName']").val() == "") {
+            $("span[data-valmsg-for='providerName']").html("Tên đối tác không được bỏ trống");
+            hasError = true;
+        }
+
+        if ($("input[name='providerAddress']").val() == "") {
+            $("span[data-valmsg-for='providerAddress']").html("Địa chỉ của đối tác không được bỏ trống");
+            hasError = true;
+        }
+
+        var phone = $("input[name='providerPhone']").val();
+        if (phone == "") {
+            $("span[data-valmsg-for='providerPhone']").html("Số điện thoại đối tác không được bỏ trống");
+            hasError = true;
+        } else {
+            if (!/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/.test(phone)) {
+                $("span[data-valmsg-for='providerPhone']").html("Số điện thoại không hợp lệ");
+                hasError = true;
+            }
+        }
+
+        var email = $("input[name='Email']").val();
+        if (email == "") {
+            $("span[data-valmsg-for='Email']").html("Email đối tác không được bỏ trống");
+            hasError = true;
+        } else {
+            if (!/^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)) {
+                $("span[data-valmsg-for='Email']").html("Email không hợp lệ");
+                hasError = true;
+            }
+        }
+
+        if ($("input[name='VATCode']").val() == "") {
+            $("span[data-valmsg-for='VATCode']").html("Mã số thuế không được bỏ trống");
+            hasError = true;
+        }
+
+        if ($("input[name='accountNo']").val() == "") {
+            $("span[data-valmsg-for='accountNo']").html("Số tài khoản không được bỏ trống");
+            hasError = true;
+        }
+
+        // submit
+        if (!hasError) {
+            $("#CreateEditForm").submit();
+        }
+    });
+
+    // Initial submit form
+    $("#CreateEditForm").submit(function () {
+        var formData = new FormData($(this)[0]);
+        formData.append("ProviderName", $("input[name='providerName']").val());
+        formData.append("Address", $("input[name='providerAddress']").val());
+        formData.append("Phone", $("input[name='providerPhone']").val());
+        formData.append("Email", $("input[name='Email']").val());
+        formData.append("VATCode", $("input[name='VATCode']").val());
+        formData.append("AccountNo", $("input[name='accountNo']").val());
+        $.ajax({
+            url: '@Url.Action("CreateProvider")',
+            type: 'POST',
+            data: formData,
+            success: function (result) {
+                if (result) {
+                    $("#Modal-addNewCategory").modal("hide");
+                    $("#CreateEditForm")[0].reset();
+                    ShowMessage(result.message, 2);
+                    modalModified = true;
+                    $('#ProviderID').append(
+                            $('<option></option>').val(result.newdata[result.newdata.length - 1].Value).html(result.newdata[result.newdata.length - 1].Text)
+                        );
+                    $('#ProviderID').val(result.newdata[result.newdata.length - 1].Value);
+                    $('#ProviderID').selectpicker("refresh");
+                } else {
+                    $("#FormError").html(data.msg);
+                    $("#FormError").show();
+                }
+            },
+            cache: false,
+            contentType: false,
+            processData: false
+        });
+
+        return false;
+    });
+
+    // Button close on modal form
+    $("#btnModalClose").click(function () {
+        $("#Modal-addNewCategory").modal("hide");
+        if (modalModified) location.reload();
+    });
+
+    $(document).on('click', "#addNewCell", function () {
+
+        if ($('#detailListTable tbody tr td').html() === "Không có dữ liệu") {
+            $('#detailListTable tbody').html("");
+
+        }
+        if ($('#detailListTable tr').length <= 12) {
+            $('#detailListTable tbody').append('<tr><td><input type="text" class="form-control" required value=""/></td>'
+                                + '<td><input type="text" class="form-control" required onkeyup="this.value = checkDigit(this.value)" value="" onchange="updateTotalAmount()"/></td>'
+                                + '<td><input type="text" class="form-control" required onkeyup="this.value = checkDigit(this.value)" value="" onchange="updateTotalAmount()"/></td>'
+                                + '<td>' + unitDdl + '</td>'
+                                + '<td><button type="button" class="btn btn-danger btn-md glyphicon glyphicon-trash" onclick="removeDetail(this)"/></td></tr>');
+        } else {
+            alert("Chỉ được thêm 12 dòng");
+        }
+    });
+
+    function addItem(id) {
+        $.ajax({
+            url: "@Url.Action("getItemOfOrder", "VATOrder")",
+            type: 'GET',
+            data: {
+                'id': id,
+            },
+            dataType: 'json',
+            success: function (result) {
+                if (result.success == true) {
+                    if ($('#itemListTable tbody tr td').html() === "Không có dữ liệu") {
+                        $('#itemListTable tbody').html("");
+                    }
+                    var list = result.result;
+                    list.forEach(function (item) {
+                        $('#itemListTable tbody').append('<tr><td>' + item[0] + '</td><td>' + item[1] + '</td>'
+                            + '<td>' + item[2] + '</td><td><button type="button" id="' + item[3] + '" class="btn btn-info btn-md fa fa-hand-o-right"'
+                            + 'onclick="addDetail(this)"></button></td></tr>');
+                        itemList.push(item[3]);
+                    });
+                } else {
+                    ShowMessage("Có lỗi xẩy ra, vui lòng thử lại", 1);
+                }
+            },
+            error: function () {
+                ShowMessage("Có lỗi xẩy ra, vui lòng thử lại", 1);
+            }
+        })
+    }
+
+    function getRentId(value) {
+        var values = value.split('+');
+        return values[0];
+    }
+
+    function getTotalAmount(value) {
+        var values = value.split('+');
+        return values[1];
+    }
+
+    function removeProvider($btn, providerId) {
+        $($btn).closest('tr').remove();
+        count--;
+        for (var i = 0; i < providerList.length; i++) {
+            if (providerList[i] == providerId) {
+                providerList.splice(i, 1);
+            }
+        }
+        var table = document.getElementById("providerListTable");
+        var countCurrentRow = 0;
+        for (var i = 1; i < table.rows.length; i++) {
+            table.rows[i].cells[0].innerHTML = ++countCurrentRow;
+        }
+
+        //remove item lien quan den order
+        var tableElem = document.getElementById("itemListTable");
+        var position = 0, countEle = 0;
+        for (i = 0; i < itemList.length; i++) {
+            if (itemList[i] == providerId) {
+                if (position == 0) position = i + 1;
+                tableElem.deleteRow(position);
+                countEle++;
+            }
+        }
+        for (i = 0; i < countEle; i++) {
+            var index = itemList.indexOf(providerId);
+            itemList.splice(index, 1);
+        }
+    }
+
+    function removeDetail($btn) {
+        $($btn).closest('tr').remove();
+        updateTotalAmount();
+    }
+
+    function addDetail($btn) {
+        if ($('#detailListTable tbody tr td').html() === "Không có dữ liệu") {
+            $('#detailListTable tbody').html("");
+
+        }
+        var row = $($btn).closest('tr').clone();
+        for (var i = 0; i < 3; i++) {
+            if (i == 0) {
+                row.children()[i].innerHTML =
+                    '<input type="text" class="form-control" required value="'
+                + row.children()[i].innerHTML + '"/>';
+            } else {
+                row.children()[i].innerHTML =
+                    '<input type="text" class="form-control" required onkeyup="this.value = checkDigit(this.value)" value="'
+                + row.children()[i].innerHTML + '" onchange="updateTotalAmount()"/>';
+            }
+        }
+        row.children()[3].innerHTML = unitDdl;
+        row.append('<td><button type="button" class="btn btn-danger btn-md glyphicon glyphicon-trash" onclick="removeDetail(this)"/></td>');
+        $('#detailListTable tbody').append(row);
+        updateTotalAmount();
+    }
+
+    function updateTotalAmount() {
+        total = 0;
+        var tbl2 = $('#detailListTable tr').each(function (i) {
+            if (i > 0) {
+                x = $(this).children();
+                var itArr = [];
+                x.each(function () {
+                    itArr.push($(this).find('input').val());
+                });
+                total = total + (parseInt(itArr[1]) * parseInt(itArr[2]));
+            }
+        })
+        document.getElementById('totalPrice').value = toMoney(total, ',', '');
+        document.getElementById('vatPrice').value = toMoney(total * 0.1, ',', '');
+    }
+
+    function table2json() {
+        var json = '{';
+        var otArr = [];
+        var tbl2 = $('#detailListTable tr').each(function (i) {
+            x = $(this).children();
+            var itArr = [];
+            x.each(function () {
+                if (i > 0) {
+                    if ($(this).find('input').val() == undefined) {
+                        itArr.push('"' + $(this).find('select').val() + '"');
+                    } else {
+                        itArr.push('"' + $(this).find('input').val() + '"');
+                    }
+
+                } else {
+                    itArr.push('"' + $(this).text() + '"');
+                }
+            });
+            otArr.push('"' + i + '": [' + itArr.join(',') + ']');
+        })
+        json += otArr.join(",") + '}'
+
+        return json;
+    }
+
+    $(function () {
+        $('#datetimepicker').datetimepicker({
+            'maxDate': moment(),
+            format: 'DD/MM/YYYY',
+            defaultDate: moment(),
+        });
+
+    });
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    }
+    function Create() {
+        $(".error-message").html("");
+        $("#FormError").hide();
+        $("#FormError").html("");
+        $("#FormSuccess").hide();
+        $("#FormSuccess").html("");
+
+        var hasError = false;
+
+        //update total
+        updateTotalAmount();
+
+        // validating
+        if ($("input[name='invoiceNo']").val() == "") {
+            ShowMessage("Số hóa đơn không được bỏ trống", 3);
+            return;
+        }
+
+        if ($("input[name='checkInDate']").val() == "") {
+            ShowMessage("Ngày xuất hóa đơn không được bỏ trống", 3);
+            return;
+        }
+        if ($('#editProductItemForm')[0].checkValidity()) {
+            $.ajax({
+                url: '@Url.Action("checkInvoiceNo")',
+                method: 'POST',
+                data: { code: $("input[name='invoiceNo']").val() },
+                success: function (result) {
+                    if (result.success) {
+                        var formData = new FormData($('#editProductItemForm')[0]);
+                        var json = table2json();
+                        formData.append("VATOrderDetail", json);
+                        formData.append("Total", total);
+                        formData.append("VATAmount", total * 0.1);
+                        formData.append("CheckInPerson", "@(this.User.Identity.Name)");
+                        var option = $('#ProviderID option:selected');
+                        formData.append("ProviderID", option[0].value);
+                        for (var i = 0; i < providerList.length; i++)
+                            formData.append("SelectedProviders[]", providerList[i])
+
+
+                        $.ajax({
+                            url: "@this.Url.Action("Create")",
+                            type: "POST",
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (result) {
+                                if (result) {
+                                    ShowAlert(result.message, 2);
+                                    window.location.href = '@Url.Action("Index")';
+                                } else {
+                                    ShowAlert(result.message, 2);
+                                }
+                            }
+                        });
+                    } else {
+                        ShowMessage("Số hóa đơn đã tồn tại", 3);
+                        return;
+                    }
+                },
+                error: function (error) {
+                    ShowMessage("Đã có lỗi xảy ra, vui lòng kiểm tra lại", 3);
+                    return;
+                }
+            });
+        } else {
+            ShowMessage("Vui lòng kiểm tra các thông tin cần thiết", 3);
+            return;
+        }
+
+        $(document).ready(function () {
+            $('.selectpicker').selectpicker({
+                size: 10,
+            });
+        });
+    }
+</script>

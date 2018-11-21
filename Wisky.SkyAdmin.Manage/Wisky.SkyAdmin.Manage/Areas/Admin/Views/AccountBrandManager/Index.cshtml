@@ -1,0 +1,434 @@
+﻿
+@{
+    ViewBag.Title = "Quản lý người dùng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+           
+            <div class="col-md-8">
+                <h3>Quản lý người dùng</h3>
+            </div>
+            <div class="col-md-4">
+                <a href="@Url.Action("Create")" class="btn btn-primary pull-right ">
+                    <i class="zmdi zmdi-plus"></i>   Thêm Người Dùng
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <label class="right-icon pull-left" style="line-height: 25px;">Cửa hàng: &nbsp;</label>
+                <div class="col-md-3">
+                    <div class="fg-line">
+                        <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div id="assign-role-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Thay đổi chức vụ của tài khoản <strong id="assign-role-model-titile"></strong></h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="assign-modal-user-id" />
+                    <div class="row">
+                        @*@foreach (var r in (object[])ViewBag.RoleList)
+                            {
+                                <div class="col-md-4">
+                                    <div class="form-group checkbox">
+                                        <label>
+                                            <input type="checkbox" id="role-list" class="form-control" value="@(r.GetType().GetProperty("Name").GetValue(r, null))" data-id="@(r.GetType().GetProperty("Id").GetValue(r, null))" checked="">
+                                            <i class="input-helper"></i>
+                                            @(r.GetType().GetProperty("Name").GetValue(r, null))
+                                        </label>
+                                    </div>
+                                </div>
+                            }*@
+                        @foreach (var item in Enum.GetValues(typeof(HmsService.Models.RoleTypeEnum)))
+                        {
+                            if (item.ToString() != "Administrator" && item.ToString() != "BrandManager" && item.ToString() != "ActiveUser")
+                            {
+                                <div class="col-md-4">
+                                    <div class="form-group checkbox">
+                                        <label>
+                                            <input type="checkbox" id="role-list" class="form-control" value="@item" data-id="@((int)item)" checked="">
+                                            <i class="input-helper"></i>
+                                            @Utils.DisplayName((RoleTypeEnum)Enum.Parse(typeof(RoleTypeEnum), item.ToString()))
+
+                                        </label>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnSubmitAssign">Cập nhật vai trò</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div>
+
+    <!--Thay doi store cua nhan vien-->
+    <div id="user-assign-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+         aria-hidden="true">
+
+    </div>
+
+    <!-- Customer Table -->
+    <div class="card-padding">
+        <div class="row">
+            <div role="tabpanel" class="tab-pane active" id="allcust">
+                <!-- Datatable -->
+                <div class="col-md-12">
+                    <table id="UserDatatable" class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label class="">STT</label>
+                                </th>
+                                <th>
+                                    <label class="">Tên đăng nhập</label>
+                                </th>
+                                <th>
+                                    <label class="">Tên đầy đủ</label>
+                                </th>
+                                <th>
+                                    <label class="">Trạng thái</label>
+                                </th>
+                                <th>
+                                    <label class="">Chức vụ</label>
+                                </th>
+                                <th>
+                                    <label class="">Cửa hàng trực thuộc</label>
+                                </th>
+                                <th>
+                                    <label class="">Tuỳ Chọn</label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Thay doi chuc vu modal-->
+
+
+<script>
+    function setupListStoreFilter() {
+        $.ajax({
+            type: "GET",
+            url: "@(Url.Action("GetListStore", "AccountBrandManager"))",
+            success: function (data) {
+                var content = "";
+                content += "<option value='0'>" + "Hệ Thống" + "</option>";
+                for (var i = 0; i < data.listresult.length; ++i) {
+                    content += "<option value='" + data.listresult[i].storeId + "'>" + data.listresult[i].storeName + "</option>";
+                }
+                $("#listStoreId").html(content);
+                $("#listStoreId").selectpicker('refresh');
+                InitBrandDatatable();
+            },
+        error: function (error) {
+            alert("Error Occured")
+        }
+    });
+    }
+
+    $(document).ready(function () {
+        setupListStoreFilter();
+        $(document).on('click', '#assign-role-btn', function () {
+            var id = $(this).attr('data-id');
+            $('#assign-modal-user-id').val(id);
+            var roles = $('[id=role-list]');
+            var userRoles = $('[id=role-' + id + ']');
+
+            for (var i = 0; i < roles.length; i++) {
+                $(roles[i]).prop('checked', false);
+                for (var j = 0; j < userRoles.length; j++) {
+                    if ($(userRoles[j]).attr('data-id') == $(roles[i]).attr('data-id')) {
+                        $(roles[i]).prop('checked', true);
+                    }
+                }
+            }
+
+            $('#assign-role-modal').modal('show');
+        });
+
+        $(document).on('click', '#assign-user-btn', function () {
+            var id = $(this).attr('data-id');
+            //console.log(id);
+            $.ajax({
+                url: '@Url.Action("GetAssignedUser")',
+                type: 'POST',
+                data: {
+                    'id': id
+                },
+                dataType: 'html',
+                success: function (result) {
+                    $('#user-assign-modal').modal('show');
+                    $('#user-assign-modal').html(result);
+                },
+                error: function () {
+                    ShowMessage('Có lỗi xẩy ra, vui lòng thử lại', 1);
+                }
+            });
+        });
+
+        $('#btnSubmitAssign').on('click', function () {
+            var roles = $('[id=role-list]');
+            var newRoles = [];
+            for (var i = 0; i < roles.length; i++) {
+                if ($(roles[i]).prop('checked')) {
+                    newRoles.push($(roles[i]).val());
+                }
+            }
+            $.ajax({
+                url: '@Url.Action("UpdateRole")',
+                type: 'POST',
+                data: {
+                    'id': $('#assign-modal-user-id').val(),
+                    'newRoles': newRoles
+                },
+                dataType: 'json',
+                success: function (result) {
+                    if (result.success) {
+                        ShowMessage(result.message, 2, '@Url.Action("Index")');
+                        $('#assign-role-modal').modal('hide');
+                        $('#assign-role-model').html('');
+                        RefreshTable();
+                        //location.reload();
+                    } else {
+                        ShowMessage('Có lỗi xẩy ra, vui lòng thử lại', 1);
+                    }
+                },
+                error: function () {
+                    ShowMessage('Có lỗi xẩy ra, vui lòng thử lại', 1);
+                }
+            });
+        });
+
+        
+
+    });
+    $('#listStoreId').on('change', function () {
+        RefreshTable();
+    });
+    function Delete(id) {
+        ShowConfirm("Bạn xác nhận xóa người dùng này?", function () {
+            $.ajax({
+                url: '@Url.Action("Delete")',
+                data: {
+                    id: id
+                },
+                type: 'POST',
+                success: function (result) {
+                    if (result.success) {
+                        ShowAlert(result.message, 2, RefreshTable());
+                    }
+                    else {
+                        ShowAlert(result.message, 1);
+                    }
+
+                    //location.reload();
+                },
+                error: function (error) {
+                    ShowAlert(error.message, 1);
+                }
+            });
+        });
+    }
+
+
+    function InitBrandDatatable() {
+        $("#UserDatatable").dataTable({
+            "bSort": false,
+            "bServerSide": true,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "bProcessing": true,
+            "iDisplayLength": 10,
+            "aLengthMenu": [10, 25, 50],
+            "sAjaxSource": "@Url.Action("GetListAccountBrandManager", "AccountBrandManager")",
+            "fnServerParams": function (aoData) {
+                aoData.push(
+                    { "name": "storeIdCode", "value": $('#listStoreId').val() }
+                );
+            },
+            "oLanguage": {
+                "sSearchPlaceholder": "Tên",
+                "sSearch": "Tìm kiếm",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sInfoEmpty": "Hiển thị 0 từ 0 của 0 dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            //"fnServerParams": function (aoData) {
+
+            //},
+            "aoColumnDefs": [
+                 {
+                     "aTargets": [0, 3, 4, 5, 6],
+                     "bSortable": false,
+                     "bSearchable": false,
+                 },
+                {
+                    "aTargets": [0, 3],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [0, 1, 2],
+                    "bSortable": false,
+                },
+                 {
+                     "aTargets": [3],
+                     "bSortable": false,
+                     "mRender": function (data, type, row) {
+                         if (row[3] != "ActiveUser") {
+                             return "<i class=\"glyphicon glyphicon-remove\"></i>";
+                         }
+                         return "<i class=\"glyphicon glyphicon-ok\"></i>";
+                     }
+                 },
+                {
+                    "aTargets": [4],
+                    "mRender": function (data, type, row) {
+                        var roleTag = "";
+                        var data = row[4];
+                        for (var i = 0; i < data.length; i++) {
+                            roleTag += ($('<span/>', {
+                                'class': 'badge',
+                                'id': 'role-' + row[6],
+                                'style': 'background-color: #009FFF!important;',
+                                html: data[i].Name,
+                                'data-id': data[i].Id
+                            })[0].outerHTML);
+                            roleTag += ($('<br />', {})[0].outerHTML)
+                        }
+                        return roleTag;
+                    }
+                },
+                {
+                    "aTargets": [5],
+                    "bSortable": false,
+                    "mRender": function (data, type, row) {
+                        var result = "";
+                        var data = row[5];
+                        //for (var i = 0; i < data.length; i++) {
+                        //    result += data[i].Name + "<br/>";
+                        //}
+
+                        var numOfDisplayStores = 3;
+
+                        if (data.length <= numOfDisplayStores) {
+                            for (var i = 0; i < data.length; i++) {
+                                result += data[i].Name + "<br />";
+                            }
+                        } else {
+                            var acc = row[0];
+                            var i = 0;
+                            for (; i < data.length; i++) {
+                                if (i == numOfDisplayStores) {
+                                    result += "<span id='hidden-info-" + acc + "' style='display:none;'>";
+                                }
+                                result += data[i].Name + "<br />";
+                            }
+                            result += "</span>";
+                            result += "<a data-status='hide' id='acc-" + acc + "' href='javascript:showMoreText(" + acc + ")'>Show more</a>"
+                        }
+                        return result;
+                    },
+                },
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, row) {
+                        var roles = row[4];
+                        var isEmp = false;
+                        for (var i = 0; i < roles.length; i++) {
+                            if (roles[i] == "Nhân viên") // DisplayName
+                            {
+                                isEmp = true;
+                                break;
+                            }
+                        }
+                        var btnMappingStore
+                        if (isEmp) {
+                            btnMappingStore = "<a title='Kết nối tài khoản tới nhân viên' class='btn btn-info' id='assign-user-btn' data-id=\"" + data + "\"><i class='glyphicon glyphicon-home'></a>";
+                        }
+                        var data = row[6];
+                        //var result = "<a class='btn btn-sm btn-primary' onclick='edit(" + data + ")'>Edit</a>";
+                        var updateRole = "<a title='Cập nhập chức vụ' class='btn btn-success' id='assign-role-btn' data-id=\"" + data + "\"><i class='fa fa-user-plus'></i></a>";
+                        var edit = "<a title='Chỉnh sửa thông tin tài khoản' class='btn btn-primary' href='@this.Url.Action("Update")\/" + data + "\'><i class='glyphicon glyphicon-pencil'></i></a>";
+                        var deleteCustomer = "<a title='Xóa tài khoản' class='btn btn-danger ' onclick='Delete(\"" + data + "\")'><i class='glyphicon glyphicon-trash'></i></a>";
+                        var updateStore = "<a title='Phân quyền đăng nhập vào cửa hàng' class='btn btn-info' id='assign-user-btn' data-id=\"" + data + "\"><i class='glyphicon glyphicon-home'></a>";
+                        return edit + "  " + deleteCustomer + "<br />" + updateRole + " " + updateStore;
+                    },
+                    "bSortable": false,
+                },
+
+            ],
+            "bAutoWidth": false,
+        }).fnSetFilteringDelay(delaySearch);
+    }
+
+    //redraw datatable without reload
+    function reDrawDatatable(id) {
+        $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+            if (oSettings.oFeatures.bServerSide === false) {
+                var before = oSettings._iDisplayStart;
+                oSettings.oApi._fnReDraw(oSettings);
+                //iDisplayStart has been reset to zero - so lets change it back
+                oSettings._iDisplayStart = before;
+                oSettings.oApi._fnCalculateEnd(oSettings);
+            }
+
+            //draw the 'current' page
+            oSettings.oApi._fnDraw(oSettings);
+        };
+        $(id).dataTable().fnStandingRedraw();
+    }
+
+    //user datatable
+    function RefreshTable() {
+        reDrawDatatable("#UserDatatable");
+    }
+
+    ////user datatable
+    //function RefreshTable() {
+    //    var oTable = $("#UserDatatable").dataTable();
+    //    oTable._fnPageChange(0);
+    //    oTable._fnAjaxUpdate();
+    //};
+
+    function showMoreText(acc) {
+        var curAccount = document.getElementById('acc-' + acc);
+        var curCell = document.getElementById('hidden-info-' + acc);
+
+        if (curAccount.getAttribute('data-status') == 'hide') {
+            curCell.style = "display:block";
+            curAccount.setAttribute('data-status', 'show');
+            curAccount.innerHTML = 'Show less';
+        } else {
+            curCell.style = "display:none";
+            curAccount.setAttribute('data-status', 'hide');
+            curAccount.innerHTML = 'Show more';
+        }
+    }
+
+</script>

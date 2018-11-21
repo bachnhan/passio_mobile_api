@@ -1,0 +1,1726 @@
+﻿@using HmsService.Models;
+@{
+    var current = CurrentStatusEnum.Current.DisplayName();
+    var past = CurrentStatusEnum.Past.DisplayName();
+    var future = CurrentStatusEnum.Future.DisplayName();
+
+    var comelate = StatusAttendance.ComeLate.DisplayName();
+    var Bothviolate = StatusAttendance.Bothviolate.DisplayName();
+    var Miss = StatusAttendance.Miss.DisplayName();
+    var OnTime = StatusAttendance.OnTime.DisplayName();
+    var ReturnEarly = StatusAttendance.ReturnEarly.DisplayName();
+    var empId = ViewBag.empId;
+    var empName = ViewBag.empName;
+    var empPhone = ViewBag.empPhone;
+    var empAge = ViewBag.Age;
+    
+
+    var isbreakcount = (int)BreakCountEnum.IsBreakCount;
+    var isbreaknotcount = (int)BreakCountEnum.IsBreakNotCount;
+
+    var EarlyInMode = (int)InModeEnum.EarlyInMode;
+    var ExactlyInMode = (int)InModeEnum.ExactlyInMode;
+    var ConfirmInMode = (int)InModeEnum.ConfirmInMode;
+    var LateOutMode = (int)OutModeEnum.LateOutMode;
+    var ExactlyOutMode = (int)OutModeEnum.ExactlyOutMode;
+    var ConfirmOutMode = (int)OutModeEnum.ConfirmOutMode;
+}
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+
+    .mtab_content {
+        display: none;
+    }
+</style>
+<link rel="stylesheet" href="~/Content/jqwidgets/styles/jqx.base.css" type="text/css" />
+<link href="~/Content/calendarResource/calendar.css" rel="stylesheet" />
+<script type="text/javascript" src="~/Content/jqwidgets/jqxcore.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxbuttons.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxscrollbar.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxdata.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxdate.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxscheduler.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxscheduler.api.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxdatetimeinput.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxmenu.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxcalendar.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxtooltip.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxwindow.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxcheckbox.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxlistbox.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxdropdownlist.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxnumberinput.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxradiobutton.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/jqxinput.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/globalization/globalize.js"></script>
+<script type="text/javascript" src="~/Content/jqwidgets/globalization/globalize.culture.de-DE.js"></script>
+<script type="text/javascript" src="~/Content/scripts/demos.js"></script>
+
+<div class="card">
+    <div>
+        <div class="card-header">
+            <div class="box-header p-b-0">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 id="title-shift-model">@empName</h3>
+                        <h3 id="title-shift-model">@empAge tuổi</h3>
+                        <h3 id="title-shift-model">@empPhone</h3>
+                    </div>
+                </div>
+            </div>
+            <hr />
+        </div>
+        @*<div id="mtabs">
+                <ul id="tabList" class="nav nav-tabs ui-sortable-handle" style="margin-left:25px">
+                    <li style="margin-top:10px; background-color:#f9f9f9" class="waves-effect active"><a data-toggle="tab" href="#shiftTable">Tổng hợp lịch làm việc </a></li>
+                    <li style="margin-top:10px; background-color:#f9f9f9" class="waves-effect"><a data-toggle="tab" href="#checkFingerTable">Lịch Sử Điểm Danh</a></li>
+                    <li style="margin-top:10px; background-color:#f9f9f9" class="waves-effect"><a data-toggle="tab" href="#checkFingerCalendar">Chi tiết công việc trong tuần</a></li>
+                </ul>
+            </div>*@
+        <div id="mtabs_content_container">
+            <div id="shiftTable" class="mtab_content" style="display: block;">
+                <div class="card-padding">
+                    <div class="row" style="margin-top: -10px; margin-bottom: 10px">
+                        <div class="col-md-12 p-t-10">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#btnBoLoc" style="height: 37px; margin-top: 10px" onclick="toggleIcon()"><i id="icon" class="fa fa-plus"></i> Bộ lọc</button>
+                                <button type="button" class="btn btn-success" style="height: 37px; margin-top: 10px" onclick="callShowCreateModal()">
+                                    <i class="glyphicon glyphicon-plus"></i> THÊM LỊCH
+                                </button>
+                                <button type="button" class="btn btn-success" style="height: 37px; margin-top: 10px" onclick="callShowCreateModalFree()">
+                                    <i class="glyphicon glyphicon-plus"></i> ĐĂNG KÝ LỊCH
+                                </button>
+                            </div>
+
+                            @*<div class="col-md-6 pull-right p-r-10" style="margin-top: 10px">
+                    <div class="pull-right text-right myDatetimePicker">
+                        <div class="input-group">
+                            <div class="dateTime width230 pull-right">
+                                <div class="fg-line m-t-5">
+                                    <div id="time-range-picker">
+                                        <input id="date-string" readonly class="form-control text-center">
+                                        <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-group-btn FindButtonDateTime">
+                                <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                                    <i class="left-icon fa fa-search"></i> Tìm
+                                </a>
+                            </div>
+                        </div>
+                        <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                        <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                    </div>
+
+                </div>*@
+
+                            <div class="col-md-6 text-right m-t-15 ">
+                                <div class="input-group" style="margin-left: -15px; padding-right: 20px">
+                                    <!-- Dater picker -->
+                                    <div class="dateTime width230 pull-right">
+                                        <div class="fg-line m-t-5">
+                                            <div class="height-fix">
+                                                <div class="input-group date col-sm-12" id="chooseDayDiv">
+                                                    <input id="chooseDay" type="text" class="input-group-addon form-control" />
+                                                    <span class="input-group-addon myCerlenderSpan p-r-45">
+                                                        <span class="fa fa-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="input-group-btn FindButtonDateTime">
+                                        <a class="btn btn-primary FindDateTime" id="btnSearch" style="height: 39px;">
+                                            <i class="left-icon fa fa-search"></i> Tìm
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="collapse" id="btnBoLoc">
+                        <div class="group-radio-buttons myGroup-radio-buttons " style="padding-bottom: 10px">
+                            <div class="col-md-12" style="">
+                                <h4 style="margin-bottom:5px;font-weight:bold;">Tình trạng</h4>
+                            </div>
+                            <div class="row small-margin">
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="-1" class="nice-check" checked id="byAll" />
+                                    <label for="byAll"><span>Tất cả</span></label>
+                                </div>
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="@((int)StatusAttendance.ComeLate)" class="nice-check" id="byLate" />
+                                    <label for="byLate"><span>Đi trễ</span></label>
+                                </div>
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="@((int)StatusAttendance.ReturnEarly)" class="nice-check" id="byEarly" />
+                                    <label for="byEarly"><span>Về sớm</span></label>
+                                </div>
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="@((int)StatusAttendance.OnTime)" class="nice-check" id="byOnTime" />
+                                    <label for="byOnTime"><span>Đúng giờ</span></label>
+                                </div>
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="@((int)StatusAttendance.Miss)" class="nice-check" id="byMiss" />
+                                    <label for="byMiss"><span>Vắng</span></label>
+                                </div>
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="@((int)StatusAttendance.Bothviolate)" class="nice-check" id="byViolate" />
+                                    <label for="byViolate"><span>Đi Trễ Về Sớm</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="tab-content">
+                            <div class="tab-pane active">
+
+                                <div class="col-md-12">
+
+                                    <table id="shiftDatatable" class="table table-hover dataTable table-bordered nowrap" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th><label>STT</label></th>
+                                                <th><label>Ngày giờ làm việc</label></th>
+                                                <th><label>Giờ vào</label></th>
+                                                <th><label>Giờ ra</label></th>
+                                                <th><label>Tổng TG</label></th>
+                                                <th><label>Tình Trạng</label></th>
+                                                <th><label>Thời gian</label></th>
+                                                <th><label>Gửi yêu cầu</label></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="scheduler"></div>
+                    <input type="hidden" id="schedulerDate" value="" />
+                    <input type="hidden" id="schedulerFirstHour" value="" />
+                    <input type="hidden" id="schedulerLastHour" value="" />
+                </div>
+            </div>
+            <div id="checkFingerTable" class="mtab_content">
+                <div class="card-padding">
+                    <div class="row" style="margin-top:-10px;margin-bottom:10px">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-6 pull-right p-0" style="margin-top:10px">
+                                <div class="pull-right text-right myDatetimePicker">
+                                    <div class="input-group">
+                                        <div class="dateTime width230 pull-right">
+                                            <div class="fg-line m-t-5">
+                                                <div id="time-range-picker-check">
+                                                    <input id="date-string-check" readonly class="form-control text-center">
+                                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="input-group-btn FindButtonDateTime">
+                                            <a class="btn btn-primary btn-sm FindDateTime" id="btnSearchCheck" style="margin-top: -5px;">
+                                                <i class="left-icon fa fa-search"></i>  Tìm
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <input type="text" id="sTimeCheck" name="startTimeCk" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                                    <input type="text" id="eTimeCheck" name="endTimeCk" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="allcust">
+                                <!-- Datatable -->
+                                <div class="col-md-12">
+
+                                    <table id="detail-table" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th><label>STT</label></th>
+                                                <th><label>Ngày giờ check</label></th>
+                                                <th><label>Máy scan</label></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="checkFingerCalendar" class="mtab_content">
+                <div class="card-header">
+                    <div class="row" style="margin-bottom: 10px">
+                        <label style="margin-left:20px;"><i class="fa fa-tag" aria-hidden="true"></i> &nbsp;Chú thích:</label> <br> <br>
+                        <div class="col-md-2"><label class="label label-default" style="font-size: small; margin-left: 20px; background-color: #5BC0DE;">A</label> : Ca tương lai</div>
+                        <div class="col-md-2"><label class="label label-default" style="font-size: small; margin-left: 20px; background-color: #D9534F;">A</label> : Ca vắng</div>
+                        <div class="col-md-2"><label class="label label-default" style="font-size: small; margin-left: 20px; background-color: #F0AD4E;">A</label> : Ca vi phạm</div>
+                        <div class="col-md-2"><label class="label label-default" style="font-size: small; margin-left: 20px; background-color: #5CB85C;">A</label> : Ca chuẩn</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                        </div>
+                        <div class="col-md-6 pull-right p-0" style="margin-top:10px">
+                            <div class="pull-right text-right myDatetimePicker">
+                                <div class="input-group">
+                                    <div class="dateTime width230 pull-right">
+                                        <div class="fg-line m-t-5">
+                                            <div id="time-range-picker-calendar">
+                                                <input id="weeklyDatePicker" class="form-control text-center">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="input-group-btn FindButtonDateTime">
+                                        <a class="btn btn-primary btn-sm FindDateTime" id="btnSearchCalendar" style="margin-top: -5px;">
+                                            <i class="left-icon fa fa-search"></i>  Tìm
+                                        </a>
+                                    </div>
+                                </div>
+                                <input type="text" id="sTimeCa" name="startTimeCalendar" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                                <input type="text" id="eTimeCa" name="endTimeCalendar" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-padding">
+                    <header class="headings clearfix">
+                        <div class="weekdays clearfix" style="padding-left: 10%;">
+                            <div class="weekday heading">Monday</div>
+                            <div class="weekday heading non-visible">Tuesday</div>
+                            <div class="weekday heading non-visible">Wednesday</div>
+                            <div class="weekday heading non-visible">Thursday</div>
+                            <div class="weekday heading non-visible">Friday</div>
+                            <div class="weekend heading non-visible">Saturday</div>
+                            <div class="weekend heading">Sunday</div>
+                        </div>
+                    </header>
+                    <div class="navigator clearfix">
+                        <div class="col-xs-6 go-left"><a rel="nofollow" rel="noreferrer" href="" id="goLeft"><span class="glyphicon glyphicon-arrow-left"></span></a></div>
+                        <div class="col-xs-6 go-right"><a rel="nofollow" rel="noreferrer" href="" id="goRight"><span class="glyphicon glyphicon-arrow-right"></span></a></div>
+                    </div>
+                    <div class="container-fluid cearfix" id="weekly_calendar">
+
+                        <div class="columns clearfix dragscroll" style="overflow-y: scroll;height: 650px; cursor: grab; cursor : -o-grab; cursor : -moz-grab; cursor : -webkit-grab;">
+
+                            <div class="hour-column clearfix">
+                                <div class="hour">
+                                    <div class="hours">
+                                        <div class="hr">12 Am</div>
+                                        <div class="hr">1 Am</div>
+                                        <div class="hr">2 Am</div>
+                                        <div class="hr">3 Am</div>
+                                        <div class="hr">4 Am</div>
+                                        <div class="hr">5 Am</div>
+                                        <div class="hr">6 Am</div>
+                                        <div class="hr">7 Am</div>
+                                        <div class="hr">8 Am</div>
+                                        <div class="hr">9 Am</div>
+                                        <div class="hr">10 Am</div>
+                                        <div class="hr">11 Am</div>
+                                        <div class="hr">12 Pm</div>
+                                        <div class="hr">1 Pm</div>
+                                        <div class="hr">2 Pm</div>
+                                        <div class="hr">3 Pm</div>
+                                        <div class="hr">4 Pm</div>
+                                        <div class="hr">5 Pm</div>
+                                        <div class="hr">6 Pm</div>
+                                        <div class="hr">7 Pm</div>
+                                        <div class="hr">8 Pm</div>
+                                        <div class="hr">9 Pm</div>
+                                        <div class="hr">10 Pm</div>
+                                        <div class="hr">11 Pm</div>
+                                        <div class="hr">All day</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="event-column clearfix">
+                                <div class="week-grid clearfix" style="top: 0px">
+                                    <div class="hours-grid">
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                        <div class="grid"></div>
+                                    </div>
+                                </div>
+                                <div class="events clearfix">
+                                    <div class="event-outer clearfix" id="event-outer clearfix">
+                                        <div class="event-cont" id="Monday"></div>
+                                        <div class="event-cont" id="Tuesday"></div>
+                                        <div class="event-cont non-visible" id="Wednesday"></div>
+                                        <div class="event-cont non-visible" id="Thursday"></div>
+                                        <div class="event-cont today non-visible" id="Friday"></div>
+                                        <div class="event-cont non-visible" id="Saturday"></div>
+                                        <div class="event-cont non-visible" id="Sunday"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model container-->
+<input type="hidden" id="EmployeeId" />
+<!--Model container-->
+<div id="create-modal-container">
+    <div class="modal" id="create-edit-timeFrame-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="Title_Create_Edit">Thông tin ca</h4>
+                    </div>
+                    <div class="modal-body col-md-12">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Tên nhân viên : </label>
+                                    <label class="col-sm-8 control-label" id="NameEmp"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ bắt đầu : </label>
+                                    <label class="col-sm-8 control-label" id="HourOfStart"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ Kết thúc : </label>
+                                    <label class="col-sm-8 control-label" id="HourOfEnd"></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Tình trạng ca : </label>
+                                    <label class="col-sm-8 control-label" id="Status"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ vào : </label>
+                                    <label class="col-sm-8 control-label" id="DateOfStart"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ ra : </label>
+                                    <label class="col-sm-8 control-label" id="DateOfEnd"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model xac nhan lai diem danh - Gio Vao -->
+<div id="request-modal-edit-container">
+    <div class="modal" id="request-modal-edit" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document" style="width:800px;">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Gửi yêu cầu xác nhận lại điểm danh</h4>
+                        <input type="hidden" id="attId" />
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Khung giờ vào</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="ShiftMin" name="CheckInRequest" placeholder="Khung giờ vào" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Khung giờ ra</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="ShiftMax" name="CheckInRequestNew" placeholder="Khung giờ ra" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ vào (Sys)</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckInSystem" name="CheckInRequest" placeholder="Giờ vào trên hệ thống" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ ra (Sys)</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckOutSystem" name="CheckInRequestNew" placeholder="Giờ ra trên hệ thống" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ vào đã gửi</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckInRequest" name="CheckInRequest" placeholder="Giờ vào đã gửi" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ vào mới</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckInRequestNew" name="CheckInRequestNew" placeholder="Giờ vào mới">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ vào ra gửi</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckOutRequest" name="CheckOutRequest" placeholder="Giờ ra đã gửi" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ ra mới</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckOutRequestNew" name="CheckOutRequestNew" placeholder="Giờ ra mới">
+                                    </div>
+                                </div>
+                                @*<div class="form-group">
+                                        <label class="col-sm-4 control-label">Ghi chú</label>
+                                        <div class="col-sm-8">
+                                            <textarea rows="4" cols="78" class="form-control" id="TextAreaNoteCheckIn" name="TextAreaNoteCheckIn"></textarea>
+                                        </div>
+                                    </div>*@
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="submit" onclick="EditRequest()" class="btn btn-success btn-sm pull-right">Gửi yêu cầu</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model them lich-->
+<div id="create-modal-container2">
+    <div class="modal" id="create-attendance-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Thêm Lịch</h4>
+                    </div>
+                    <div class="modal-body col-md-12">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Thuộc nhóm</label>
+                                    <div class="col-sm-8">
+                                        <select id="listGroupIdInModalAddEmp" class="selectpicker" data-live-search="true" data-size="5"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Khung giờ</label>
+                                    <div class="col-sm-8">
+                                        <select id="listTimeFrameIdInModalAddEmp" class="selectpicker" data-live-search="true" data-size="5" onchange="reloadStart_End()"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Ngày phân công</label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group date col-sm-12" id="datetimepicker_Start">
+                                            <input id="TimeFrameDateOfStart" type="text" class="input-group-addon form-control" style="text-align:left" />
+                                            <span class="input-group-addon myCerlenderSpan p-r-45" style="z-index: 0;">
+                                                <span class="fa fa-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>                               
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @*luu duration de tinh endtime khi gui xuong controller*@
+                                    <input type="hidden" id="TimeFrameDurationCreateAtt" />
+
+                                    <label class="col-sm-4 control-label">Giờ bắt đầu</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="TimeFrameStartCreateAtt" name="TimeFrameStart" placeholder="Giờ bắt đầu ca" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ Kết thúc</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="TimeFrameEndCreateAtt" name="TimeFrameEnd" placeholder="Giờ kết thúc ca" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Tổng thời gian</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="totalTimeWork" name="TimeFrameDuration" placeholder="Tổng thời gian" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Thời gian nghỉ</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control " id="totalFreeTimeWork" name="TimeFrameDuration" placeholder="Thời gian giải lao" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="button" id="btnActionCreateAtt" onclick="createAttendance()" class="btn btn-success btn-sm pull-right">Hoàn Tất</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+<div id="create-modal-container2">
+    <div class="modal" id="create-free-attendance-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Đăng Ký Lịch</h4>
+                    </div>
+                    <div class="modal-body col-md-12">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Thuộc nhóm</label>
+                                    <div class="col-sm-8">
+                                        <select id="listGroupIdInModalAddEmpFree" class="selectpicker" data-live-search="true" data-size="5"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Khung giờ</label>
+                                    <div class="col-sm-8">
+                                        <select id="listTimeFrameIdInModalAddEmpFree" class="selectpicker" data-live-search="true" data-size="5" onchange="reloadStart_End_Free()"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Chọn tuần :</label>
+                                    <div class="col-sm-8">
+                                        <div class="dateTime col-sm-12 pull-right" style="padding-left:0px; padding-right:0px;">
+                                            <div class="fg-line m-t-5">
+                                                <div id="time-range-picker-calendar">
+                                                    <input id="weeklyDatePickerCreateAtte" class="form-control text-center">
+                                                    <span class="input-group-addon myCerlenderSpan p-r-45" style="z-index: 0;">
+                                                        <span class="fa fa-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="text" id="sTimeDate" name="startTimeCalendar" placeholder="Chọn giờ bắt đầu" hidden="hidden">
+                                    <input type="text" id="eTimeDate" name="endTimeCalendar" placeholder="Chọn giờ kết thúc" hidden="hidden">
+                                </div>
+                                <div class="form-group">
+                                        <label class="col-sm-4 control-label">Chọn thứ :</label>
+                                        <div class="col-sm-8">
+                                            <div class="row small-margin">
+                                                <div class="col-sm-4">
+                                                    <input class="source" type="checkbox" name="type" value="0" /><span><label> Thứ hai</label></span>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <input class="source" type="checkbox" name="type" value="1" /><label><span> Thứ ba</span></label>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <input class="source" type="checkbox" name="type" value="2" /><label><span> Thứ tư</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="row small-margin">
+                                                <div class="col-sm-4">
+                                                    <input class="source" type="checkbox" name="type" value="3" /><label><span> Thứ năm</span></label>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <input class="source" type="checkbox" name="type" value="4" /><label><span> Thứ sáu</span></label>
+                                                </div>
+                                                <div class="col-sm-4">
+                                                    <input class="source" type="checkbox" name="type" value="5" /><label><span> Thứ bảy</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="row small-margin">
+                                                <div class="col-sm-4">
+                                                    <input class="source" type="checkbox" name="type" value="6" /><label><span> Chủ nhật</span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @*luu duration de tinh endtime khi gui xuong controller*@
+                                    <input type="hidden" id="TimeFrameDurationCreateAtt" />
+
+                                    <label class="col-sm-4 control-label">Giờ bắt đầu</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="TimeFrameStartCreateAttFree" name="TimeFrameStart" placeholder="Giờ bắt đầu ca" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ Kết thúc</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="TimeFrameEndCreateAttFree" name="TimeFrameEnd" placeholder="Giờ kết thúc ca" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Tổng thời gian</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="totalTimeWorkFree" name="TimeFrameDuration" placeholder="Tổng thời gian" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Thời gian nghỉ</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control " id="totalFreeTimeWorkFree" name="TimeFrameDuration" placeholder="Thời gian giải lao" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="button" id="btnActionCreateAtt" onclick="createAttendance()" class="btn btn-success btn-sm pull-right">Hoàn Tất</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        setupChooseDate();
+        setupListGroup();
+        //setupTimeFrameGroup();
+        $('#CheckInRequestNew').datetimepicker({
+            sideBySide: true,
+            format: 'HH:mm',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+
+        $('#CheckOutRequestNew').datetimepicker({
+            sideBySide: true,
+            format: 'HH:mm',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+
+        $('#datetimepicker').datetimepicker({
+            format: 'DD/MM/YYYY',
+            defaultDate: moment(),
+        });
+        $('#datetimepicker_Start').datetimepicker({
+            format: 'DD/MM/YYYY',
+            defaultDate: moment(),
+        });
+        //setupDaterangepicker();
+        //setupDaterangepicker2();
+        $('[name=searchBy]').change(function () {
+            RefreshTable("#shiftDatatable");
+        });
+        initShiftDatatable();
+        $("#mtabs li").click(function () {
+            $("#mtabs li").removeClass('active');
+            $(this).addClass("active");
+            $(".mtab_content").hide();
+            var selected_tab = $(this).find("a").attr("href");
+            if (selected_tab == "#checkFingerTable") {
+                //$('#title-shift-model').text('Thông tin lịch sử điểm danh của ' + ' @empName');
+                if (flag == true) {
+                    loadCheckFinger();
+                    flag = false;
+                }
+            }
+            else if (selected_tab == "#checkFingerCalendar") {
+                //$('#title-shift-model').text('Thông tin làm việc trong tuần của ' +' @empName');
+            }
+            else {
+                //$('#title-shift-model').text('Thông tin làm việc của ' + ' @empName');
+            }
+            $(selected_tab).fadeIn();
+            return false;
+        });
+
+        //calendar
+        moment.locale('en', {
+            week: { dow: 1 } // Monday is the first day of the week
+        });
+
+        //Initialize the datePicker(I have taken format as mm-dd-yyyy, you can     //have your owh)
+        $("#weeklyDatePicker").datetimepicker({
+            format: 'DD/MM/YYYY'
+        });
+        $("#weeklyDatePicker").val("Tuần này");
+        //Get the value of Start and End of Week
+        $('#weeklyDatePicker').on('dp.change', function (e) {
+            var value = $("#weeklyDatePicker").val();
+            var firstDate = moment(value, "DD/MM/YYYY").day(1).format("DD/MM/YYYY");
+            var lastDate = moment(value, "DD/MM/YYYY").day(7).format("DD/MM/YYYY");
+            $("#weeklyDatePicker").val(firstDate + " - " + lastDate);
+            $("#sTimeCa").val(firstDate);
+            $("#eTimeCa").val(lastDate);
+        });
+        loadCalendar();                
+        showScheduler();
+        
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+            $("#weeklyDatePickerCreateAtte").val(dateString);
+            $("#sTimeDate").val(startTime);
+            $("#eTimeDate").val(endTime);
+            //$("#weeklyDatePickerCreateAtte").html(dateString);
+            var checkList = $('#create-free-attendance-modal [type=checkbox]');
+            for (var i = 0; i < 7; i++) {
+                checkList[i].checked = true;
+            }
+            //if (startTime == endTime) {
+            //    var checkList = $('#create-free-attendance-modal [type=checkbox]');
+            //    for (var i = 0; i < 7; i++) {
+            //        checkList[i].checked = true;
+            //    }
+            //    var n = (7 + (start.day() - 1)) % 7;
+            //    checkList[n].checked = true;
+            //} else {
+            //    var startDay = moment(startTime, "DD/MM/YYYY").day(0).format("DD/MM/YYYY"),
+            //        endDay = moment(endTime, "DD/MM/YYYY").day(0).format("DD/MM/YYYY");
+
+            //    if (startDay == endDay) {
+            //        var checkList = $('#create-free-attendance-modal [type=checkbox]');
+            //        for (var i = 0; i < 7; i++) {
+            //            checkList[i].checked = true;
+            //        }
+            //        var from = (7 + (moment(startTime, "DD/MM/YYYY").day() - 1)) % 7;
+            //        var to = (7 + (moment(endTime, "DD/MM/YYYY").day() - 1)) % 7;
+            //        for (var i = from; i <= to; i++) {
+            //            checkList[i].checked = false;
+            //        }
+            //    } else {
+            //        var checkList = $('#create-free-attendance-modal [type=checkbox]');
+            //        for (var i = 0; i < 7; i++) {
+            //            checkList[i].checked = false;
+            //        }
+            //    }
+            //}
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+
+            $("#sTime").val(startTime);
+            $("#eTime").val(endTime);
+            $("#date-string").html(dateString);
+        }
+        cb(moment(), moment());
+        $("#weeklyDatePickerCreateAtte").daterangepicker({
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        }, cb);
+    })
+</script>
+<link href="~/Content/calendarResource/calendarHour.css" rel="stylesheet" />
+<script type="text/javascript" src="https://cdn.rawgit.com/asvd/dragscroll/master/dragscroll.js"></script>
+
+<script>    
+    function getTimeRange(strDate) {
+        var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        date = new Date(strDate.split("/").reverse().join("-"));
+        var day = days[date.getDay()];
+        var dateArray = new Array();
+        switch (day) {
+            case 'Sunday':                            
+                dateArray.push(date);
+                var secondDate = new Date(date);
+                secondDate.setDate(secondDate.getDate() + 7);
+                dateArray.push(secondDate);
+                break;
+            case 'Monday':
+                var firstDate = new Date(date);
+                firstDate.setDate(firstDate.getDate() - 1);
+                dateArray.push(firstDate);
+                var secondDate = new Date(date);
+                secondDate.setDate(secondDate.getDate() + 6);
+                dateArray.push(secondDate);
+                break;
+            case 'Tuesday':
+                var firstDate = new Date(date);
+                firstDate.setDate(firstDate.getDate() - 2);
+                dateArray.push(firstDate);
+                var secondDate = new Date(date);
+                secondDate.setDate(secondDate.getDate() + 5);
+                dateArray.push(secondDate);
+                break;
+            case 'Wednesday':
+                var firstDate = new Date(date);
+                firstDate.setDate(firstDate.getDate() - 3);
+                dateArray.push(firstDate);
+                var secondDate = new Date(date);
+                secondDate.setDate(secondDate.getDate() + 4);
+                dateArray.push(secondDate);
+                break;
+            case 'Thursday':
+                var firstDate = new Date(date);
+                firstDate.setDate(firstDate.getDate() - 4);
+                dateArray.push(firstDate);
+                var secondDate = new Date(date);
+                secondDate.setDate(secondDate.getDate() + 3);
+                dateArray.push(secondDate);
+                break;
+            case 'Friday':
+                var firstDate = new Date(date);
+                firstDate.setDate(firstDate.getDate() - 5);
+                dateArray.push(firstDate);
+                var secondDate = new Date(date);
+                secondDate.setDate(secondDate.getDate() + 2);
+                dateArray.push(secondDate);
+                break;
+            default:
+                var firstDate = new Date(date);
+                firstDate.setDate(firstDate.getDate() - 6);
+                dateArray.push(firstDate);
+                var secondDate = new Date(date);
+                secondDate.setDate(secondDate.getDate() + 1);
+                dateArray.push(secondDate);                
+        }
+        return dateArray;
+    }
+    function showScheduler() {       
+        getShift();           
+        var strDate = $("#schedulerDate").val();
+        var dateArray = strDate.split(",");       
+
+        var strFirstHour = $('#schedulerFirstHour').val();
+        var firstHourArray = strFirstHour.split(",");
+
+        var strLastHour = $('#schedulerLastHour').val();
+        var lastHourArray = strLastHour.split(",");
+        
+        var appointments = new Array();
+        for (var i = 0; i < dateArray.length; i++) {            
+            var strChooseDate = dateArray[i].split("/");            
+            var chooseDay = parseInt(strChooseDate[0]);
+            var chooseMonth = parseInt(strChooseDate[1]);
+            var chooseYear = parseInt(strChooseDate[2]);
+
+            var strChooseFirstHour = firstHourArray[i].split(":");
+            var startHour = parseInt(strChooseFirstHour[0]);
+            var startMinute = parseInt(strChooseFirstHour[1]);
+
+            var strLastChooseHour = lastHourArray[i].split(":");
+            var endHour = parseInt(strLastChooseHour[0]);
+            var endMinute = parseInt(strLastChooseHour[1]);
+
+            var appointment = {
+                id: "id" + (i+1),
+                description: "George brings projector for presentations.",
+                location: "",
+                subject: "Quarterly Project Review Meeting",
+                calendar: "Room 1",
+                start: new Date(chooseYear, chooseMonth - 1, chooseDay, startHour, startMinute),
+                end: new Date(chooseYear, chooseMonth - 1, chooseDay, endHour, endMinute)
+            }
+            appointments.push(appointment);
+        }                                                  
+            var source =
+                {
+                    dataType: "array",
+                    dataFields: [
+                        { name: 'id', type: 'string' },
+                        { name: 'description', type: 'string' },
+                        { name: 'location', type: 'string' },
+                        { name: 'subject', type: 'string' },
+                        { name: 'calendar', type: 'string' },
+                        { name: 'start', type: 'date', cellsformat:'dd/MM/yyyy HH:mm' },
+                        { name: 'end', type: 'date', cellsformat: 'dd/MM/yyyy HH:mm' }
+                    ],
+                    id: 'id',
+                    localData: appointments
+            };
+       
+        var adapter = new $.jqx.dataAdapter(source);        
+
+        var strCurrentDate = $("#chooseDay").val();
+        var currentDate = strCurrentDate.split("/");
+        var currentDay = parseInt(currentDate[0]);
+        var currentMonth = parseInt(currentDate[1]);
+        var currentYear = parseInt(currentDate[2]);
+   
+        $("#scheduler").jqxScheduler({
+            date: new $.jqx.date(currentYear, currentMonth, currentDay),
+                width: getWidth("Scheduler"),
+                height: 600,
+                source: adapter,
+                view: 'agendaView',
+                showLegend: true,
+                ready: function () {
+                    $("#scheduler").jqxScheduler('ensureAppointmentVisible', 'id1');     
+                },
+                resources:
+                    {
+                        colorScheme: "scheme05",
+                        dataField: "calendar",
+                        source: new $.jqx.dataAdapter(source)
+                    },
+                appointmentDataFields:
+                    {
+                        from: "start",
+                        to: "end",
+                        id: "id",
+                        description: "description",
+                        location: "place",
+                        subject: "subject",
+                        resourceId: "calendar"
+                    },
+                views:
+                    [
+                        'weekView',
+                        'agendaView'
+                    ]
+
+        });        
+    };
+    function getShift() {        
+        var dateArray = getTimeRange($('#chooseDay').val());
+        var dateArray0 = new Date(dateArray[0]);
+        var startDay = (dateArray0.getDate() < 10) ? "0" + dateArray0.getDate() : dateArray0.getDate();
+        var addStartMonth = parseInt(dateArray0.getMonth()) + 1;
+        var startMonth = (dateArray0.getMonth() < 10) ? "0" + addStartMonth.toString() : addStartMonth.toString();
+        var startYear = dateArray0.getFullYear();
+        var startdate = startDay + "/" + startMonth + "/" + startYear;        
+
+
+        var dateArray1 = new Date(dateArray[1]);
+        var endDay = (dateArray1.getDate() < 10) ? "0" + dateArray1.getDate() : dateArray1.getDate();
+        var addEndMonth = parseInt(dateArray1.getMonth()) + 1;
+        var endMonth = (dateArray1.getMonth() < 10) ? "0" + addEndMonth.toString() : addEndMonth.toString();
+        var endYear = dateArray1.getFullYear();
+        var enddate = endDay + "/" + endMonth + "/" + endYear;
+        $.ajax({
+                type: "GET",
+                url: "@(Url.Action("LoadSessionAttendance", "EmployeeRequest"))",
+                data: {
+                    'employeeId': @empId,
+                    //'startDate': $('#chooseDay').val(),
+                    //'endDate': $('#chooseDay').val(),
+                    'startDate': startdate,
+                    'endDate': enddate,
+                    'status': $('input:radio[name=searchBy]:checked').val()
+            },
+            async: false,
+            success: function (data) {                
+                $('#schedulerDate').val(data.date);  
+                $('#schedulerFirstHour').val(data.firstHour);
+                $('#schedulerLastHour').val(data.lastHour);
+                },
+                error: function(error) {
+                    alert("Error Occured");
+                }
+            });
+    }
+        function setupListGroup() {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("GetAllEmpGroup", "EmployeeGroup"))",
+                success: function(data) {
+                    var content = "";
+
+                    content += "<option value='0'>" + "Chưa có nhóm" + "</option>";
+                    for (var i = 0; i < data.datatable.length; ++i) {
+                        content += "<option value='" + data.datatable[i][3] + "'>" + data.datatable[i][2] + "</option>";
+                    }
+                    $("#listGroupIdInModalAddEmp").html(content);
+                    $("#listGroupIdInModalAddEmp").selectpicker('refresh');
+                    $("#listGroupIdInModalAddEmpFree").html(content);
+                    $("#listGroupIdInModalAddEmpFree").selectpicker('refresh');
+                },
+                error: function(error) {
+                    alert("Error Occured");
+                }
+            });
+        }
+        function setupTimeFrameGroup() {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("GetAllTimeFrame", "TimeFrame"))",
+                data: {
+                    'groupID': $("#listGroupIdInModalAddEmp").val()
+                },
+                success: function(data) {
+                    var content = "";
+                    for (var i = 0; i < data.datatable.length; ++i) {
+                        content += "<option value='" +
+                            data.datatable[i][7] +
+                            "'>" +
+                            data.datatable[i][1] +
+                            "</option>";
+                    }
+                    $("#listTimeFrameIdInModalAddEmp").html(content);
+                    $("#listTimeFrameIdInModalAddEmp").selectpicker('refresh');
+                    reloadStart_End();
+                },
+                error: function(error) {
+                    alert("Error Occured");
+                }
+            });
+        }
+        function setupTimeFrameGroupFree() {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("GetAllTimeFrame", "TimeFrame"))",
+                data: {
+                    'groupID': $("#listGroupIdInModalAddEmpFree").val()
+                },
+                success: function(data) {
+                    var content = "";
+                    for (var i = 0; i < data.datatable.length; ++i) {
+                        content += "<option value='" +
+                            data.datatable[i][7] +
+                            "'>" +
+                            data.datatable[i][1] +
+                            "</option>";
+                    }
+                    $("#listTimeFrameIdInModalAddEmpFree").html(content);
+                    $("#listTimeFrameIdInModalAddEmpFree").selectpicker('refresh');
+                    reloadStart_End_Free();
+                },
+                error: function(error) {
+                    alert("Error Occured");
+                }
+            });
+        }
+        function reloadStart_End() {
+            if ($("#listTimeFrameIdInModalAddEmp").val() == null) {
+                $("#TimeFrameStartCreateAtt").val("");
+                $("#TimeFrameEndCreateAtt").val("");
+                return;
+            }
+
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("prepareEdit", "TimeFrame"))",
+                data: {
+                    'TimeFrameId': $("#listTimeFrameIdInModalAddEmp").val()
+                },
+                success: function(data) {
+                    $("#TimeFrameStartCreateAtt").val(data.rs.startTime);
+                    $("#TimeFrameEndCreateAtt").val(data.rs.endTime);
+                    $("#TimeFrameDurationCreateAtt").val(data.rs.duration);
+                    $("#totalTimeWork").val(data.rs.duration);
+                    $("#totalFreeTimeWork").val(data.rs.breakTime);
+                },
+                error: function(error) {
+                    alert("Error Occured");
+                }
+            });
+        }
+        function reloadStart_End_Free() {
+            if ($("#listTimeFrameIdInModalAddEmpFree").val() == null) {
+                $("#TimeFrameStartCreateAttFree").val("");
+                $("#TimeFrameEndCreateAttFree").val("");
+                return;
+            }
+
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("prepareEdit", "TimeFrame"))",
+                data: {
+                    'TimeFrameId': $("#listTimeFrameIdInModalAddEmpFree").val()
+                },
+                success: function(data) {
+                    $("#TimeFrameStartCreateAttFree").val(data.rs.startTime);
+                    $("#TimeFrameEndCreateAttFree").val(data.rs.endTime);
+                    $("#TimeFrameDurationCreateAttFree").val(data.rs.duration);
+                    $("#totalTimeWorkFree").val(data.rs.duration);
+                    $("#totalFreeTimeWorkFree").val(data.rs.breakTime);
+                },
+                error: function(error) {
+                    alert("Error Occured");
+                }
+            });
+        }
+        function toggleIcon() {
+            $('#icon').toggleClass("fa-plus");
+            $('#icon').toggleClass("fa-minus");
+        }
+        // chon loc ngày
+        function setupChooseDate() {
+            $('#chooseDayDiv').datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+
+            //initEmployeeDatatable();
+        }
+        // --- Load datatable
+        var flag = true;
+
+        //calendar
+
+        function setupDaterangepicker() {
+            cb(moment().startOf('day'), moment(), "Hôm nay");
+            $('#time-range-picker').daterangepicker({
+                "opens": "left",
+                "maxDate": moment(),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    'Hôm nay': [moment().startOf('day'), moment().endOf('day')],
+                    'Hôm qua': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
+                    'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                    'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+        }
+        function setupDaterangepicker2() {
+            cbcheck(moment().startOf('day'), moment(), "Hôm nay");
+            $('#time-range-picker-check').daterangepicker({
+                "opens": "left",
+                "maxDate": moment(),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    'Hôm nay': [moment().startOf('day'), moment().endOf('day')],
+                    'Hôm qua': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
+                    'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                    'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cbcheck);
+        }
+        $('#btnSearch').on('click', function () {
+            //loadCheckFinger();            
+            RefreshTable("#shiftDatatable");                
+            showScheduler();
+        });
+
+        $('#btnSearchCheck').on('click', function () {
+            loadCheckFinger();
+            //RefreshTable("#shiftDatatable");
+        });
+        $('#btnSearchCalendar').on('click', function () {
+            loadCalendar();
+
+        });
+        
+        function cbcheck(start, end, label) {
+            var startTimeCk = start.format("DD/MM/YYYY"),
+                endTimeCk = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTimeCk + (startTimeCk == endTimeCk ? "" : " - " + endTimeCk) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string-check').val(label);
+            } else {
+                $("#date-string-check").val(dateString);
+            }
+
+            $("#sTimeCheck").val(startTimeCk);
+            $("#eTimeCheck").val(endTimeCk);
+            $("#date-string-check").html(dateString);
+        }
+
+        //-------------------Datatable------------------
+        //redraw datatable without reload
+        function reDrawDatatable(id) {
+
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+        }
+
+        //user datatable
+        function RefreshTable(datatableId) {
+            reDrawDatatable(datatableId);
+        }
+        // Get DataAttendance Datatable
+        function initShiftDatatable() {
+            $("#shiftDatatable").dataTable({
+                "bSearchable": false,
+                "bSort": false,
+                "bServerSide": true,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("LoadSessionAttendance", "EmployeeRequest")",
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "employeeId", "value": @empId });
+                    aoData.push({ "name": "startDate", "value": $('#chooseDay').val() });
+                    aoData.push({ "name": "endDate", "value": $('#chooseDay').val() });
+                    aoData.push({ "name": "status", "value": $('input:radio[name=searchBy]:checked').val() });
+                },
+                "bProcessing": true,
+                "aLengthMenu": [10, 25, 50],
+                "bFilter": true,
+                "oLanguage": {
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3, 4, 5, 6, 7],
+                        "sClass": "text-center",
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [5],
+                        "mRender": function (data, type, row) {
+                            var html = "";
+                            if (data == '@((int)StatusAttendance.Miss)') {
+                                html = "<div class='label label-default'>@(Miss)</div>"
+                            }
+                            if (data == '@((int)StatusAttendance.Bothviolate)') {
+                                html = "<div class='label label-danger'>@(Bothviolate)</div>"
+                            }
+                            if (data == '@((int)StatusAttendance.ComeLate)') {
+                                html = "<div class='label label-warning'>@(comelate)</div>"
+                            }
+                            if (data == '@((int)StatusAttendance.ReturnEarly)') {
+                                html = "<div class='label label-warning'>@(ReturnEarly)</div>"
+                            }
+                            if (data == '@((int)StatusAttendance.OnTime)') {
+                                html = "<div class='label label-success'>@(OnTime)</div>"
+                            }
+                            return html;
+                        }
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var html = "";
+                            if (data == '@((int)CurrentStatusEnum.Future)') {
+                                html = "<div class='label label-primary'>@(future)</div>";
+                            }
+                            if (data == '@((int)CurrentStatusEnum.Current)') {
+                                html = "<div class='label label-success'>@(current)</div>";
+                            }
+                            if (data == '@((int)CurrentStatusEnum.Past)') {
+                                html = "<div class='label label-danger'>@(past)</div>";
+                            }
+                            return html;
+                        }
+                    },
+
+                    {
+                        "aTargets": [7],
+                        "mRender": function (data, type, row) {
+                            var isRequest = row[8];
+                            var request = "";
+                            var note = "";
+                            if (isRequest == '@((int)IsRequest.Approved)') {
+                                request = "<div class='label label-success'>Đã duyệt</div>";
+                                note = "<a title='Xem ghi chú lý do' class='btn btn-sm btn-primary' onclick='showNoteRequestModal(" + data + ")'><i class='fa fa-eye'></i></a>";
+                            } else if (isRequest == '@((int)IsRequest.Reject)') {
+                                request = "<div class='label label-danger'>Từ chối</div>";
+                                request += "<a title='Gửi yêu cầu xác nhận lại giờ vào - ra' class='btn btn-sm btn-primary' onclick='requestModal(" + data + ")'><i class='fa fa-paper-plane' aria-hidden='true'></i></a>";
+                                note = "<a title='Xem ghi chú lý do' class='btn btn-sm btn-primary' onclick='showNoteRequestModal(" + data + ")'><i class='fa fa-eye'></i></a>";
+                            } else if (isRequest == '@((int)IsRequest.Request)' || isRequest == '@((int)IsRequest.ApprovedNewAttendance)') {
+                                request = "<a title='Gửi yêu cầu xác nhận lại giờ vào - ra' class='btn btn-sm btn-primary' onclick='requestModal(" + data + ")'><i class='fa fa-paper-plane' aria-hidden='true'></i></a>";
+                            } else if (isRequest == '@((int)IsRequest.RejectNewAttendance)') {
+                                request = "<div class='label label-danger'>Từ chối phân công</div>";
+                                note = "<a title='Xem ghi chú lý do' class='btn btn-sm btn-primary' onclick='showNoteRequestModal(" + data + ")'><i class='fa fa-eye'></i></a>";
+                            } else {
+                                request = "<div class='label label-warning'>Chờ xử lý</div>";
+                            }
+
+                            return request + " " + note;
+                        }
+                    },
+                ],
+                "bAutoWidth": false                
+            }).fnSetFilteringDelay(delaySearch);            
+        }
+        function loadCheckFinger() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetAllCheckFinger", "EmployeeRequest")',
+                data: {
+                    'startTime':  $('#chooseDay').val(),
+                    'endTime':  $('#chooseDay').val(),
+                    'empId': @empId,
+                },
+
+                success: function (result) {
+                    initFingerCheckDatatable(result);
+                }
+            });
+        }
+        function initFingerCheckDatatable(data) {
+            $("#detail-table").dataTable().fnDestroy();
+            $("#detail-table").dataTable({
+                stateSave: true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Thành phần",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2],
+                        "sClass": "text-center",
+                        "bSortable": false,
+                    },
+
+                ],
+                "bAutoWidth": false,
+            });
+        }
+        // Calendar view/////////////////////////////////////////////////////////
+
+        function loadCalendar() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("LoadCalendarAttendance", "EmployeeRequest")',
+                data: {
+                    'empId': @empId,
+                    'startTime': $('#chooseDay').val(),
+                    'endTime': $('#chooseDay').val(),
+                },
+
+                success: function (result) {
+                    $(".remove").remove();
+                    addCalendar(result.rs);
+                }
+            });
+        }
+
+        function addCalendar(data) {
+            if (data.length > 0) {
+                for (i = 0; i < data.length; ++i) {
+                    var div = document.createElement('div');
+                    div.className = 'event-cont remove';
+                    for (j = 0; j < data[i].timeslot.length; ++j) {
+                        var a ="";
+                        var b ="";
+
+                        if (data[i].timeslot[j].Late != null) {
+                            a = '<label style="margin-left: 5px;" class="label label-danger">Đi trễ</label>'
+                        }
+                        if (data[i].timeslot[j].LeaveEarly != null) {
+                            b = '<label style="margin-left: 5px;" class="label label-primary">Về sớm</label>'
+                        }
+                        div.innerHTML += '<div onclick="ShowSlotModal(' + data[i].timeslot[j].idAttendance + ')" class="event" data-duration="' + data[i].timeslot[j].duration + '" data-start="' + data[i].timeslot[j].startHour + '" style="background: ' + data[i].timeslot[j].color + '">' + a + b +'</br><p style="padding-top: 10px;">' + data[i].timeslot[j].status + '</p></div>';
+                    }
+                    document.getElementById(data[i].date).appendChild(div);
+                }
+
+            }
+            $('.event').each(function () {
+                var $this = $(this);
+                var h = $this.attr('data-duration');
+                var pos = $this.attr('data-start');
+                $this.css({
+                    'height': h * 60,
+                    'top': pos * 60,
+                    'width' : "700%",
+                });
+            });
+
+            $(window).resize(function () {
+                if ($(window).width() < '650') {
+                    $('.event-column').css('margin-left', "60px");
+                } else {
+                    $('.event-column').css('margin-left', "0");
+                    $('.event-column').css('left', '0')
+                }
+            });
+
+
+            if ($(window).width() < '650') {
+                $('.event-column').css('margin-left', "60px");
+            }
+
+            $("#goRight").click(function (event) {
+                event.preventDefault();
+                var left = $('.event-column').css('left');
+                var leftVal = parseInt(left.replace("px", ""));
+                if (leftVal === 0) {
+                    $('.event-column').css('left', "-114px");
+                } else if (leftVal > '-570') {
+                    var newPos = (leftVal - 114);
+                    $('.event-column').css({
+                        left: newPos + 'px'
+                    });
+                }
+                $("#goLeft").css("opacity", "1");
+            });
+
+            $("#goLeft").click(function (event) {
+                event.preventDefault();
+
+                var left = $('.event-column').css('left');
+                var leftVal = parseInt(left.replace("px", ""));
+                if (leftVal === 0) {
+                    event.preventDefault();
+                } else if (leftVal >= '-684') {
+                    var newPos = (leftVal + 114);
+                    $('.event-column').css({
+                        left: newPos + 'px'
+                    });
+                }
+                $("#goLeft").css("opacity", "1");
+            });
+        }
+
+        //thong tin của ca
+        function ShowSlotModal(data) {
+            //$('#create-edit-timeFrame-modal').modal('show');
+            if (data != 0) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("DetailsAttendance", "EmployeeRequest")',
+                    data: {
+                        id: data
+                    },
+                    success: function (result) {
+                        $('#create-edit-timeFrame-modal').modal('show');
+                        document.getElementById('NameEmp').innerHTML = result.Name;
+                        document.getElementById('DateOfStart').innerHTML = result.StartTime;
+                        document.getElementById('DateOfEnd').innerHTML = result.EndTime;
+                        document.getElementById('Status').innerHTML = result.Status;
+                        document.getElementById('HourOfStart').innerHTML = result.StartHour;
+                        document.getElementById('HourOfEnd').innerHTML = result.EndHour;
+
+                    },
+                    error: function (error) {
+                        ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                    }
+                });
+            }
+
+        }
+
+        function requestModal(id)
+        {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("PrepareEditRequest", "EmployeeRequest"))",
+                data: {
+                    'attId': id
+                },
+                success: function(data) {
+                    $("#attId").val(data.rs.id);
+                    $("#ShiftMin").val(data.rs.shiftMin);
+                    $("#ShiftMax").val(data.rs.shiftMax);
+                    $("#CheckInSystem").val(data.rs.chekMax);
+                    $("#CheckOutSystem").val(data.rs.chekMin);
+                    $("#CheckInRequest").val(data.rs.requsetCheckIn);
+                    $("#CheckOutRequest").val(data.rs.requsetCheckOut);
+                    $("#request-modal-edit").modal("show");
+                },
+                error: function(error) {
+                    alert("Error Occured");
+                }
+            });
+        }
+
+        function EditRequest() {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("EditRequest", "EmployeeRequest"))",
+                data: {
+                    'attId': $("#attId").val(),
+                    'strDateRequestCheckIn': $("#CheckInRequestNew").val(),
+                    'strDateRequestCheckOut': $("#CheckOutRequestNew").val(),
+                    'strCurrentDate': $("#chooseDay").val(),
+
+                },
+                success: function(data) {
+                    if (data.rs) {
+                        ShowAlert("Gửi thành công", 2);
+                        $("#request-modal-edit").modal('hide');
+                        $("#CheckInRequestNew").val("");
+                        $("#CheckOutRequestNew").val("");
+                        RefreshTable("#shiftDatatable");
+                    } else {
+                        ShowAlert("Thất bại. Vui lòng thử lại", 1);
+                    }
+                },
+                error: function(error) {
+                    ShowAlert("Có lỗi xảy ra. Vui lòng thử lại sau", 1);
+                }
+            });
+        }
+
+        function callShowCreateModal()
+        {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("GetEmployeeInfo", "EmployeeRequest"))",
+                data: {
+                    'employeeId': @empId,
+                },
+                success: function (data) {
+                    $("#listGroupIdInModalAddEmp").val(data.groupid);
+                    $("#listGroupIdInModalAddEmp").selectpicker('refresh');
+                    setupTimeFrameGroup();
+                    $("#create-attendance-modal").modal('show');
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra. Vui lòng thử lại sau", 1);
+                }
+            });
+        }
+        function callShowCreateModalFree()
+        {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("GetEmployeeInfo", "EmployeeRequest"))",
+                data: {
+                    'employeeId': @empId,
+                },
+                success: function (data) {
+                    console.log(data.groupid);
+                    $("#listGroupIdInModalAddEmpFree").val(data.groupid);
+                    $("#listGroupIdInModalAddEmpFree").selectpicker('refresh');
+                    setupTimeFrameGroupFree();
+                    $("#create-free-attendance-modal").modal('show');
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra. Vui lòng thử lại sau", 1);
+                }
+            });
+        }
+        function createAttendance() {
+            //var dateArray = new Array();
+            //$("input:checkbox[name=type]:checked").each(function () {
+            //    dateArray.push($(this).val());
+            //});
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CreateMoreAttendanceAction", "EmployeeRequest")',
+                data: {
+                    empId: @empId,
+                    shiftMin: $('#TimeFrameStartCreateAtt').val(),
+                    shiftMax: $('#TimeFrameEndCreateAtt').val(),
+                    startDate: $('#TimeFrameDateOfStart').val(),
+                    empGroupId: $('#listGroupIdInModalAddEmp').val(),
+                    timeFrameId: $('#listTimeFrameIdInModalAddEmp').val(),
+                    breaktime: $('#totalFreeTimeWork').val(),
+                },
+                success: function(result) {
+                    if (result.rs == true) {
+                        ShowAlert("Thêm thành công", 2);
+                        $('#create-attendance-modal').modal('hide');
+                        //RefreshTable("#shiftDatatable");
+                    } else {
+                        ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+
+        function showNoteRequestModal(id) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ShowNoteRequest", "EmployeeRequest")',
+                data: {
+                    'attId': id
+                },
+                success: function(result) {
+                    ShowAlert(result.rs, 3);
+                },
+                error: function(error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+        function SetDuration() {
+            if ($('#TimeFrameStartCreateAtt').val() != "" && $('#TimeFrameEndCreateAtt').val() != "") {
+                var dateStart = moment($("#TimeFrameStartCreateAtt").val(), "hmm");
+                var dateEnd = moment($("#TimeFrameEndCreateAtt").val(), "hmm");
+                var timeSpan = dateEnd.subtract(dateStart);
+                $("#totalTimeWork").val(moment(timeSpan).format("HH:mm"));
+                if ($("#checkboxSample").prop("checked")) {
+                    $("#totalTimeWork").val(moment(timeSpan).format("HH:mm"));
+                }
+                else {
+                    var duration = moment($("#totalFreeTimeWork").val(), "hmm");
+                    var totalTime = timeSpan.subtract(duration);
+                    $("#totalTimeWork").val(moment(totalTime).format("HH:mm"));
+                }
+            }
+        }
+</script>

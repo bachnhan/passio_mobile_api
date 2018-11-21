@@ -1,0 +1,90 @@
+﻿@model HmsService.ViewModels.MembershipCardEditViewModel
+
+@{
+    ViewBag.Title = "Thêm thẻ thành viên";
+    //Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+}
+
+<div class="card">
+    <form id="createMembership" action="@this.Url.Action("Create")" method="POST">
+        <div class="card-header"> 
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>           
+            <h4><strong>Thêm thẻ thành viên</strong></h4>
+        </div>
+
+        <div class="card-body">
+            <div class="form-horizontal">
+                @*<div class="form-group">
+                    <label class="col-sm-4" for="CustomerList">
+                        Tên khách hàng
+                    </label>
+                    <div class="col-sm-8" tabindex="-1">
+                        <div style="background-color : white">
+                            @Html.DropDownListFor(model => model.CustomerId, new SelectList(Model.CustomerList, "Value", "Text"), new { @class = "selectpicker ", data_live_search = "true"})
+                        </div>
+                    </div>
+                </div>*@
+
+                <div class="form-group">
+                    <label class="col-sm-4">
+                        Mã thành viên
+                    </label>
+                    <div class="col-sm-8">
+                        @Html.TextBoxFor(model => model.MembershipCardCode, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.MembershipCardCode, "", new { @style = "color:red;font-size: 125%;padding-top: 0.5em;" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-4">
+                        Loại thành viên
+                    </label>
+                    <div class="col-sm-8">
+                        @Html.DropDownListFor(model => model.MembershipTypeId, new SelectList(Model.ListTypeMembership, "Value", "Text"), new { @class = "selectpicker ", data_live_search = "true" })
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="btn-submit-card" class="btn btn-primary">Hoàn tất</button>
+        </div>
+    </form>
+    </div>
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $('.selectpicker').selectpicker({
+                size: 10,
+            });
+        });
+        $('#btn-submit-card').click(function () {
+
+            var code = $('#MembershipCardCode').val();
+            //Validate
+                if ($("input[name='MembershipCardCode']").val() == "") {
+                    ShowMessage("Vui lòng nhập mã", 3);
+
+                } 
+                    else {
+                        $.ajax({
+                            url: '@Url.Action("CheckCode")',
+                            type: 'POST',
+                            data: {
+                                code: code,
+                            },
+                            success: function (result) {
+                                if (result.success) {
+                                    $("#createMembership").submit();
+                                    ShowMessage("Thêm thẻ thành viên thành công", 2);
+                                } else {
+                                    ShowMessage("Mã thẻ thành viên đã tồn tại. ", 1)
+                                }
+                            },
+                            error: function (error) {
+                                ShowMessage("Có lỗi xảy ra", 1);
+                            }
+                        })
+                    }
+        });
+    </script>

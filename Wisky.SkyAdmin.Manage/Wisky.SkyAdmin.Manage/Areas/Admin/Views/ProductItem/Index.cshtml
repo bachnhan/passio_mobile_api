@@ -1,0 +1,198 @@
+﻿@model IEnumerable<ProductItemCategoryViewModel>
+@{
+    ViewBag.Title = "Nguyên Liệu";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var currentStore = HmsService.Models.Utils.GetStore();
+    var storeName = currentStore?.ShortName;
+
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Quản lý nguyên liệu</h3>
+            </div>
+            <div class="col-md-4">
+                <a href="@this.Url.Action("Create", new { storeName = storeName })" class="btn btn-primary pull-right ">
+                    <i class="zmdi zmdi-plus"></i>   Thêm nguyên liệu
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+
+
+    <!-- Customer Table -->
+    <div class="card-padding">
+            <div class="form-group col-md-7 row">
+                <label for="selectItemCategory">Phân loại: </label>
+                <select class="selectpicker col-md-5" id="selectItemCategory">
+                    <option value="-1" selected>
+                        Tất cả
+                    </option>
+                    @foreach (var item in Model)
+                    {
+                        <option value="@item.CateID">@item.CateName</option>
+                    }
+                </select>
+            </div>
+        <div class="row">
+            <div role="tabpanel" class="tab-pane active" id="allcust">
+                <!-- Datatable -->
+                <div class="col-md-12">
+                    <table id="itemTable" class="table table-striped table-bordered table-hover" style="width: 100% !important">
+                        <thead>
+                            <tr>
+                                <th><label>STT</label></th>
+                                <th><label>Hình ảnh</label></th>
+                                <th><label>Tên nguyên liệu</label></th>
+                                <th><label>Đơn vị</label></th>
+                                <th><label>Giá</label></th>
+                                <th><label>Tùy chọn</label></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div> <!-- /Datatable -->
+            </div>
+        </div> <!-- /.row -->
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+
+        renderTable();
+
+    });
+        $('#selectItemCategory').on("change", function () {
+            RefreshTable();
+        });
+    function reDrawDatatable(id) {
+        $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+            if (oSettings.oFeatures.bServerSide === false) {
+                var before = oSettings._iDisplayStart;
+                oSettings.oApi._fnReDraw(oSettings);
+                //iDisplayStart has been reset to zero - so lets change it back
+                oSettings._iDisplayStart = before;
+                oSettings.oApi._fnCalculateEnd(oSettings);
+            }
+
+            //draw the 'current' page
+            oSettings.oApi._fnDraw(oSettings);
+        };
+        $(id).dataTable().fnStandingRedraw();
+        $(id).dataTable()._fnPageChange(0);
+        $(id).dataTable()._fnAjaxUpdate();
+    }
+
+    // refresh storegroup datatable
+    function RefreshTable() {
+        reDrawDatatable("#itemTable");
+    }
+    //function refreshWhenChangeCategory() {
+    //    var oTable = $("#itemTable").dataTable();
+    //    renderTable();
+    //}
+
+
+    function renderTable() {
+        $('#itemTable').dataTable({
+            //"dom": '<"top"f>rt<"bottom"ilp><"clear">',
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@this.Url.Action("LoadProductItemByCategory")",
+            "bProcessing": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "productCategoryId", "value": $('#selectItemCategory').val() });
+            },
+            "oLanguage": {
+                "sSearchPlaceholder":"Tên nguyên liệu",
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+
+            },
+            "bAutoWidth": false,
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 3, 4],
+                    "sClass": "text-center",
+                    "bSortable": false,
+                    "bSearchable": false,
+                },
+                {
+
+                    "aTargets": [1],
+                    "sClass": "text-center",
+                    "bSortable": false,
+                    "bSearchable": false,
+                    "mRender": function (data, type, o) {
+                        return "<img src='" + o[1] + "' width='50px' height='50px' onerror='window.HMS.ServiceItemHandler.resetDefaultImage(this)' />"
+                        + "<input type='hidden' id='CatID2' value='" + o[5] + "' />";
+                    } 
+
+                },
+                {
+                    "aTargets": [2],
+                    "bSortable": false,
+
+                },
+                {
+                    "aTargets": [5],
+                    "bSortable": false,
+                    "bSearchable": false,
+                    "mRender": function (data, type, o) {
+                        return " <a class='btn btn-sm btn-primary' title='Chỉnh sửa' href='@Url.Action("Edit","ProductItem")\/" + o[5] + "\'><i class='glyphicon glyphicon-pencil'></i></a>"
+                     + "  <button class='btn btn-danger btn-sm' title='Xóa' type='submit' onclick='deleteItem(this)' id='" + o[5] + "' ><i class='glyphicon glyphicon-trash'></i></button>";
+                    }
+                },
+
+            ],
+        }).fnSetFilteringDelay(delaySearch);
+    }
+    function deleteItem(x) {
+        ShowConfirm("Bạn có muốn xóa thành phần này?", function () {
+            $.ajax({
+                url: "@this.Url.Action("Delete")",
+                type: "POST",
+                data: { id: x.id },
+                error: function () {
+                    ShowMessage("Có lỗi xảy ra", 1);
+                },
+                success: function (result) {
+
+                    if (result.success) {
+                        ShowAlert("Xóa sản phẩm thành công", 2);
+                        //loadItemByCategory();
+                        RefreshTable();
+                    } else {
+                        ShowAlert("Không thể xóa. Tồn tại sản phẩm chứa nguyên liệu này!", 1);
+                    }
+                },
+                error: function (error) {
+                    ShowAlert("Xóa thất bại, xin vui lòng thử lại !", 1);
+                }
+            });
+        });
+    }
+    //function RefreshTable() {
+    //    // var catId = $('#selectItemCategory').find(':selected').attr('data-catid');
+    //    var oTable = $("#itemTable").dataTable();
+    //    // oTable._fnPageChange(0);
+
+    //    oTable._fnAjaxUpdate();
+    //};
+</script>

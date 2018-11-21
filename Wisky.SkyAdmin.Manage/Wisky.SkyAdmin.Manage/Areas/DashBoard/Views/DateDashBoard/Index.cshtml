@@ -1,0 +1,308 @@
+﻿
+@{
+    ViewBag.Title = "Home Page";
+    var storeId = ViewBag.storeId;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .tab-group {
+        list-style: none;
+        padding: 0;
+        margin: 0px;
+    }
+
+        .tab-group:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .tab-group li div {
+            display: block;
+            text-decoration: none;
+            padding: 15px;
+            background: rgba(160, 179, 176, 0.25);
+            color: #a0b3b0;
+            font-size: 20px;
+            float: left;
+            width: 50%;
+            text-align: center;
+            cursor: pointer;
+            -webkit-transition: .5s ease;
+            transition: .5s ease;
+        }
+
+            .tab-group li div:hover {
+                background: #3c4f59;
+                color: #ffffff;
+            }
+
+        .tab-group .active div {
+            background: rgb(15, 38, 50);
+            color: #ffffff;
+        }
+
+    .btnChange {
+        text-align: center;
+        float: left;
+        margin-top: 10px;
+        background-color: #244363 !important;
+        border-color: #244363;
+        color: white;
+        font-style: normal;
+    }
+
+    .clearfix {
+        cursor: pointer;
+    }
+
+        .clearfix:hover {
+            opacity: 1;
+        }
+
+    .active {
+        opacity: 0.9 !important;
+    }
+
+
+
+
+    .dashboard-tab {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        background-color: #244363 !important;
+        opacity: 0.65;
+        /*-webkit-box-shadow: 0 -3px 6px -1px rgba(0,0,0,.175);
+        -moz-box-shadow: 0 -3px 6px -1px rgba(0,0,0,.175);*/
+    }
+
+        .dashboard-tab > h3 {
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .dashboard-tab:not(.dashboard-active) {
+            -webkit-box-shadow: inset 0 -6px 12px -1px rgba(24,43,63,1);
+            -moz-box-shadow: inset 0 -6px 12px -1px rgba(24,43,63,1);
+        }
+
+    .dashboard-active {
+        background-color: rgb(253,253,253) !important;
+        opacity: 1;
+        -webkit-box-shadow: 0 -3px 6px -1px rgba(0,0,0,.15);
+        -moz-box-shadow: 0 -3px 6px -1px rgba(0,0,0,.15);
+    }
+
+        .dashboard-active > h3 {
+            color: #244363 !important;
+        }
+</style>
+
+<div class="card p-t-0 p-b-10">
+    @*<div class="col-md-12 bhoechie-tab-menu">*@
+    <div class="card-header p-b-0 p-t-0">
+        <div class="row month-header m-t-0" style="display:none">
+            <div class="col-md-8 col-xs-6">
+                <h3 style="padding-top: 10px;" id="title-month" ></h3>
+                <h5 data-role="small-date" id="monthRange"></h5>
+            </div>
+            <div class="col-lg-4 pull-right col-md-4 col-xs-4 month-header" style="display:none; padding-top:17px">
+                <div class="pull-right text-right myDatetimePicker">
+                    <div class="input-group">
+                        <!-- Daterange picker -->
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <input name="startYear1" id="startYear1" onchange="smallDateChange()" readonly class="date-picker-year form-control text-center" />
+                                @*<a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>*@
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a><a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                        <div class="input-group-btn FindButtonDateTime">
+                            <a class="btn btn-primary btn-sm FindDateTime btn-search" style="margin-top: -5px;">
+                                <i class="left-icon fa fa-search"></i> Tìm
+                            </a>
+                        </div>
+
+                    </div>
+                    @*<input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />*@
+                    <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                </div>
+            </div>
+        </div>
+        <div class="row date-header m-t-0">
+            <div class="col-md-8 col-xs-6">
+                <h3 style="padding-top: 10px;" id="title-date"></h3>
+                <h5 data-role="small-date" id="dateRange"></h5>
+            </div>
+            <div class="col-lg-4 pull-right col-md-4 col-xs-4 date-header" style="padding-top:17px;">
+                <div class="pull-right text-right myDatetimePicker">
+                    <div class="input-group">
+                        <!-- Daterange picker -->
+                        <input id="datestring" hidden />
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group-btn FindButtonDateTime">
+                            <a class="btn btn-primary btn-sm FindDateTime btn-search" style="margin-top: -5px;">
+                                <i class="left-icon fa fa-search"></i> Tìm
+                            </a>
+                        </div>
+
+                    </div>
+                    <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                </div>
+            </div>
+        </div>
+
+     
+    </div>
+    <div class="card-padding">
+
+        @*<div class="row">
+            <div class="col-md-6">
+                <div class="clearfix dashboard-tab text-center dashboard-active" id="changeToDate-btn">
+                    <h3 style="padding-top: 10px;">Tổng quan ngày</h3>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="clearfix dashboard-tab text-center" id="changeToMonth-btn">
+                    <h3 style="padding-top: 10px;">Tổng quan tháng</h3>
+                </div>
+            </div>
+        </div>*@
+        <ul class="tab-group row">
+            <li class="active" id="changeToDate-btn"><div>Tổng quan ngày</div></li>
+            <li class="tab" id="changeToMonth-btn"><div>Tổng quan tháng</div></li>
+        </ul>
+
+        <div class="card">
+
+            <div class="card-body">
+                @{Html.RenderAction("GetDashboardPartial", "DashBoard");}
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="startDate" />
+<input type="hidden" id="endDate" />
+@section scripts {
+    <script>
+        var domain = 'Date';
+        $(document).ready(function () {
+            if (@ViewBag.storeId == 0) { //Thêm tab cửa hàng khi load dữ liệu theo brand
+                $("#storeTab").parent().show();
+                $("ul#TabList").children("li.active").removeClass("active");
+                $(".tab-content").children("div.active").removeClass("active");
+                ////$("ul#TabList>li:first").before('<li class="waves-effect col-lg-3 active"><a data-toggle="tab" id="storeTab" href="#storeContent" title="Cửa hàng"><i class="fa fa-2x fa-home"></i> Cửa hàng</a></li>');
+                $("#storeContent").addClass("active");
+                $("#storeTab").parent().addClass("active");
+            } else {
+                if($("ul#TabList").find("#storeTab").length > 0){
+                    $("#storeTab").parent().hide();
+                }
+            }
+        });
+
+        $(function () {
+            HMS.Dashboard.init('Date');
+            HMS.Dashboard.setupDatePicker();
+            var month = $('#sTime').val().substring(3);
+            $('#startYear1').val(month);
+            $('#monthRange').html('(' + month + ')');;
+            $("#title-month").text("Tổng quan doanh thu tháng " + month);
+            //smallDateChange();
+            $('.date-picker-year').datepicker({
+                changeYear: true,
+                showButtonPanel: true,
+                format: 'mm/yyyy',
+                viewMode: "months",
+                orientation: "left",
+                endDate: new Date(),
+                autoclose: true,
+                minViewMode: "months",
+                onClose: function (dateText, inst) {
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(year, 1));
+                }
+            });
+            $(".date-picker-year").focus(function () {
+                $(".ui-datepicker-month").hide();
+            });
+        });
+        $('#changeToMonth-btn').on('click', function () {
+            domain = 'Month';
+            $(this).addClass('active');
+            $(this).siblings().removeClass('active');
+            $('.date-header').hide();
+            $('.month-header').show();
+            smallDateChange();
+            HMS.Dashboard.init('Month');
+        });
+        $('#changeToDate-btn').on('click', function () {
+            domain = 'Date';
+            $(this).addClass('active');
+            $(this).siblings().removeClass('active');
+            $('.month-header').hide();
+            $('.date-header').show();
+            $("#sTime").val($('#date-string').val().substring(1, 10));
+            $("#eTime").val($('#date-string').val().substring(1, 10));
+            $('#startDate').val($('#date-string').val().substring(1, 11));
+            $('#endDate').val($('#date-string').val().substring(1,11));
+            HMS.Dashboard.init('Date');
+        });
+        function smallDateChange() {
+            $('#monthRange').html('(' + $('#startYear1').val() + ')');
+            $("#sTime").val($('#startYear1').val());
+            var month = $('#startYear1').val().substring(0, 2);
+            //if (month == "02")
+            //    $("#eTime").val("29/" + $('#startYear1').val());
+            //if (month == "01" || month == "03" || month == "05" || month == "07"
+            //    || month == "08" || month == "10" || month == "12")
+            //    $("#eTime").val($('#startYear1').val());
+            //else {
+            $("#eTime").val($('#startYear1').val());
+            //}
+            //$("#date-string").html(dateString);
+            //$("#dateRange").html(dateString);
+            $('#startDate').val($("#sTime").val());
+            $('#endDate').val($("#eTime").val());
+        };
+        $('.btn-search').on('click', function () {
+            if (domain == 'Month') {
+                //debugger
+                //var startStr = $('#startDate').val(),
+                //endStr = $('#endDate').val(),
+                //endMonth = endStr.split('/')[0],
+                //endYear = endStr.split('/')[1];
+                //debugger
+                //var startDate = '01/' + startStr,
+                //today = moment().format('DD/MM/YYYY').toString();
+                //if (endStr == today.substring(3, 10)) {
+                //    endDate = today.substring(0, 3) + endStr;
+                //} else {
+                //    endDate = (new Date(endYear, endMonth, 0).getDate()) + '/' + endStr;
+                //}
+
+                //$('#sTime').val(startDate);
+                //$('#eTime').val(endDate);
+                //$('#dateRange').html("(" + startStr + (startStr == endStr ? '' : ' - ' + endStr) + ")");
+                HMS.Dashboard.init('Month');
+            } else {
+                $("#sTime").val($('#date-string').val().substring(1, 10));
+                $("#eTime").val($('#date-string').val().substring(1, 10));
+                $('#startDate').val($('#date-string').val().substring(1, 11));
+                $('#endDate').val($('#date-string').val().substring(1, 11));
+                HMS.Dashboard.init('Date');
+            }
+        });
+    </script>
+}

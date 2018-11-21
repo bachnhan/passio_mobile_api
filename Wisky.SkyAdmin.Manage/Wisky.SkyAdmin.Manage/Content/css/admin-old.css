@@ -1,0 +1,199 @@
+﻿/* RESET */
+body {
+    font-family: OpenSans;
+}
+
+.header-inner .logo a {
+    text-transform: none;
+}
+
+#header {
+    background-color: #00AA41;
+}
+
+.form-control:not(.fc-alt) {
+    padding: 6px 12px;
+    border: 1px solid #e0e0e0;
+}
+
+html:not(.ie9) .select:not(.fg-line):before {
+    top: 5px;
+    right: 8px;
+    height: calc(100% - 8px);
+}
+
+.tab-content {
+    padding-bottom: 0;
+}
+
+/* =============== GENERAL =============== */
+.main-menu li.active > a {
+    background-color: #edecec;
+    /*color: #fff;*/
+}
+
+.btn-remove {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    display: none;
+    z-index: 1;
+    box-shadow: none !important;
+    padding: 0;
+    color: red;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+/* Custom */
+.pair-group .btn,
+.variant-group .btn {
+    padding: 6px 0;
+    line-height: 20px;
+    font-weight: 800;
+}
+
+.variant-group .empty-msg:not(only-child) {
+    display: none;
+}
+
+.mutant-group .label {
+    font-size: 90%;
+    font-weight: normal;
+    line-height: 1.5;
+    min-width: 30%;
+    display: inline-block;
+}
+
+.thumb-sm {
+    width: 50px;
+    height: 50px;
+    border: 1px solid #ddd;
+}
+
+.icon-tag {
+    position: relative;
+}
+
+    .icon-tag:before {
+        content: 'đ';
+        position: absolute;
+        top: 8px;
+        right: 10px;
+    }
+
+    .icon-tag .form-control {
+        padding-right: 30px;
+    }
+
+/* Select2 Custom */
+.select2-container--default .select2-selection--multiple {
+    border: 1px solid #e0e0e0;
+    border-radius: 0;
+    min-height: 35px;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border: 1px solid #ccc;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    line-height: 1.6;
+    border-radius: 2px;
+}
+
+/* bootstrap-tagsinput Custom */
+.bootstrap-tagsinput {
+    width: 100%;
+    border-radius: 0;
+    min-height: 35px;
+    box-shadow: none;
+}
+
+    .bootstrap-tagsinput .label {
+        font-size: 90%;
+        font-weight: normal;
+        line-height: 2.2;
+    }
+
+.dropzone.custom-dropzone {
+    border: 2px dashed #0087F7;
+    border-radius: 5px;
+    background: white;
+}
+
+/* Map */
+#map {
+    height: 292px;
+}
+
+.placeHolder div {
+    background-color: white !important;
+    border: dashed 1px gray !important;
+}
+
+/*================= PRODUCT ======================*/
+.images-preview {
+    list-style-type: none;
+    padding: 0;
+}
+
+    .images-preview .photo-item {
+        margin-bottom: 10px;
+    }
+
+.images-preview .img-container {
+    border: solid 1px gray;
+    background-color: #000;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+    .images-preview .img-container img {
+        height: 100%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -moz-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        -o-transform: translate(-50%, -50%);
+        -webkit-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+    }
+
+    .images-preview .img-container.placeHolder {
+        border-style: dashed;
+        background-color: transparent;
+    }
+
+    .images-preview .img-container.placeHolder img {
+        display: none;
+    }
+
+.images-preview .photo-item:hover .btn-remove {
+    display: block;
+}
+
+.images-preview.avatar [class*=col] {
+    width: 100%;
+}
+
+.images-preview.avatar .photo-item:after {
+    content: 'Ảnh đại diện';
+    display: block;
+    margin-top: 5px;
+    width: 100%;
+    text-align: center;
+    font-style: italic;
+}
+
+.btn-search {
+    margin-top: 25px;
+}
+
+.actions > li > a, .actions > a {
+    width: 100%;
+}
+
+/* ======================= GALLERY ====================== */

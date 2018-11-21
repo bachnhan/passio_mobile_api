@@ -1,0 +1,294 @@
+﻿@model HmsService.ViewModels.CustomerViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container" style="width: calc(100%)">
+
+
+
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <h3>Quản lý tài khoản khách hàng: @this.Model.Name</h3>
+            </div>
+            <hr />
+        </div>
+        <div class="card-padding">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="pmo-block pmo-contact hidden-xs custom card-padding">
+                        <h3>Contact</h3>
+                        <ul>
+                            <li><i class="zmdi zmdi-phone"></i> @this.Model.Phone</li>
+                            @*<li><i class="zmdi zmdi-calendar"></i> @(this.Model.BirthDay)</li>*@
+                            <li><i class="zmdi zmdi-print"></i> @this.Model.Fax</li>
+                            <li><i class="zmdi zmdi-email"></i> @this.Model.Email</li>
+                            <li><i class="zmdi zmdi-globe"></i> @this.Model.Website</li>
+                            <li>
+                                <i class="zmdi zmdi-pin"></i>
+                                <address class="m-b-0 ng-binding">
+                                    @this.Model.Address
+                                </address>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-9">
+                    <div class="clearfix">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="row">
+                                    <h3>Danh sách tài khoản</h3>
+                                </div>
+                                <hr />
+                            </div>
+                            <div class="card-padding">
+                                <div class="row">
+                                    <a href='@Url.Action("Create","Account",new { Id = this.Model.CustomerID })' class='btn btn-sm btn-primary pull-right'><i class='glyphicon glyphicon-plus'></i> Thêm tài khoản</a>
+                                </div>
+                                <div class="row">
+                                    <table id="customer-account-table" class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <label class="">STT</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Mã tài khoản</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Tên tài khoản</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">TK mặc định</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Tùy chọn</label>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="pm-overview c-overflow mCustomScrollbar _mCS_3 mCS-autoHide" style="overflow: visible;">
+                        <div id="mCSB_3" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" tabindex="0">
+                            <div id="mCSB_3_container" class="mCSB_container mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr">
+
+                                <div class="pmo-block pmo-contact hidden-xs">
+                                    <h2>Contact</h2>
+
+                                    <ul>
+                                        <li><i class="zmdi zmdi-phone"></i> @this.Model.Phone</li>
+                                        @*<li><i class="zmdi zmdi-calendar"></i> @(this.Model.BirthDay)</li>
+                                        <li><i class="zmdi zmdi-print"></i> @this.Model.Fax</li>
+                                        <li><i class="zmdi zmdi-email"></i> @this.Model.Email</li>
+                                        <li><i class="zmdi zmdi-globe"></i> @this.Model.Website</li>
+                                        <li>
+                                            <i class="zmdi zmdi-pin"></i>
+                                            <address class="m-b-0 ng-binding">
+                                                @this.Model.Address
+                                            </address>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div><div id="mCSB_3_scrollbar_vertical" class="mCSB_scrollTools mCSB_3_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: block;"><div class="mCSB_draggerContainer"><div id="mCSB_3_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 587px; top: 0px; display: block; max-height: 695px;" oncontextmenu="return false;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_3_scrollbar_horizontal" class="mCSB_scrollTools mCSB_3_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_3_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;" oncontextmenu="return false;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div>
+                    </div>
+
+                    <div class="pm-body clearfix">
+                        <ul class="tab-nav tn-justified">
+                            <li class="active waves-effect"><a data-toggle="tab" href="#accounts">Danh sách tài khoản</a></li>
+                        </ul>
+
+                        <div class="tab-content">
+                            <div id="accounts" class="tab-pane fade in active">
+                                <div class="col-md-12">
+                                    <a href='@Url.Action("Create","Account",new { Id = this.Model.CustomerID })' class='btn btn-sm btn-primary pull-right'><i class='glyphicon glyphicon-plus'></i> Thêm tài khoản</a>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <table id="customer-account-table" class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            <label class="">STT</label>
+                                                        </th>
+                                                        <th>
+                                                            <label class="">Mã tài khoản</label>
+                                                        </th>
+                                                        <th>
+                                                            <label class="">Tên tài khoản</label>
+                                                        </th>
+                                                        <th>
+                                                            <label class="">Tài khoản mặc định</label>
+                                                        </th>
+                                                        <th>
+                                                            <label class=""></label>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>*@
+            </div>
+
+        </div>
+    </div>
+</div>
+    <script>
+        $(document).ready(function () {
+
+            //Init customer-store table
+            InitCustomerAccountDatatable();
+            RefreshCustomerAccountTable();
+        });
+
+        //customer-account-table
+        function RefreshCustomerAccountTable() {
+            var oTable = $("#customer-account-table").dataTable();
+        }
+        //thêm index = 1 vào url '/CRM/Account/GetCustomerAccountData
+        //thêm index = 1 vào href '/CRM/Customer/SetDefaultAccountWithId/'
+
+        function InitCustomerAccountDatatable() {
+            $("#customer-account-table").dataTable({
+                "bRetrieve": true,
+                "bServerSide": true,
+                "bScrollCollapse": true,
+                "bSort": false,
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "Id", "value": '@Model.CustomerID' });
+                },
+                "sAjaxSource": "@Url.Action("GetCustomerAccountData", "Account")",
+                "bProcessing": true,
+                "aLengthMenu": [10, 20, 100],
+                "oLanguage": {
+                    "sSearchPlaceholder":"Tên",
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfoEmpty": "Không có dữ liệu",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2],
+                        "bSortable": true
+                    },
+                    {
+                        "aTargets": [3],
+                        "mRender": function (data, type, row) {
+                            var data = row[3];
+                            if (('@this.Model.AccountID.HasValue')) {
+                                if (data == '@this.Model.AccountID') {
+                                    return '<a href="#" class="btn btn-sm btn-success disableSuccessBtn"><i class="zmdi zmdi-check-circle"></i></a>';
+                                }
+                                else {
+                                    return '<a href="#" class="btn btn-sm btn-warning disableWarningBtn"><i class="zmdi zmdi-minus-circle"></i></a>';
+                                }
+                            }
+                            else {
+                                return '<a href="#" class="btn btn-sm btn-warning disableWarningBtn"><i class="zmdi zmdi-minus-circle"></i></a>';
+                            }
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [4],
+                        "mRender": function (data, type, row) {
+                            var data = row[3];
+                            var setDefault = "";
+                            if (('@this.Model.AccountID.HasValue')) {
+                                if (data == '@this.Model.AccountID') {
+                                    setDefault = '<a href="@Url.Action("SetDefaultAccountWithId", "Customer")\/' + data + '" class="btn btn-sm btn-success" disabled="disabled">Đặt tài khoản mặc định</a>';
+                                }
+                                else {
+                                    setDefault = '<a href="@Url.Action("SetDefaultAccountWithId", "Customer")\/' + data + '" class="btn btn-sm btn-success">Đặt tài khoản mặc định</a>';
+                                }
+                            }
+                            else {
+                                setDefault = '<a href="@Url.Action("SetDefaultAccountWithId", "Customer")\/' + data + '" class="btn btn-sm btn-success">Đặt tài khoản mặc định</a>';
+                            }
+                            var detail = "<a href='@Url.Action("Detail","Account")\/" + data + "' class='btn btn-sm btn-primary'><i class='glyphicon glyphicon-info-sign'></i></a>"
+                            var edit = "<a href='@Url.Action("Edit","Account")\/" + data + "' class='btn btn-sm btn-primary'><i class='glyphicon glyphicon-pencil'></i></a>"
+
+                            return setDefault + ' ' + detail + ' ' + edit;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    }
+                ],
+                "bAutoWidth": false
+            }).fnSetFilteringDelay(800);
+        }
+
+        //function showCreateAccount(accountId) {
+        //    $.ajax({
+        //        type: "GET",
+        //        url: '#createAccount',
+        //        url: '/CRM/Account/Create',
+        //        data: {
+        //            Id: accountId
+        //        },
+        //        success: function (result) {
+        //            $('#myModal').modal('show')
+        //            $('#createAccountPanel').html(result);
+        //            $('#createAccountPanel').modal('show');
+        //            setModalHeaderWidth();
+        //        },
+        //        error: function (error) {
+        //            alert("Error Occured")
+        //        }
+        //    });
+        //}
+
+        //function showEditAccount(transactionId) {
+        //    $.ajax({
+        //        type: "GET",
+        //        url: '#editAccount',
+        //        url: '/CRM/Account/Edit',
+        //        data: {
+        //            Id: transactionId
+        //        },
+        //        success: function (result) {
+        //            $('#myModal').modal('show')
+        //            $('#editAccountPanel').html(result);
+        //            $('#editAccountPanel').modal('show');
+        //            setModalHeaderWidth();
+        //        },
+        //        error: function (error) {
+        //            alert("Error Occured")
+        //        }
+        //    });
+        //}
+
+        //function setModalHeaderWidth() {
+        //    //set width
+        //    $('#fixedHeader').css('width', $('#modal-dialog').width() + "px");
+        //    $(window).resize(function () {
+        //        $('#fixedHeader').css('width', $('#modal-dialog').width() + "px");
+        //    });
+        //}
+    </script>

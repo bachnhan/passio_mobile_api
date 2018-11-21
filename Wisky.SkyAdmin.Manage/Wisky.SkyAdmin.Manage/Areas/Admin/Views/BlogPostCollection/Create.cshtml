@@ -1,0 +1,30 @@
+﻿@model BlogPostCollectionEditViewModel
+@{
+    ViewBag.Title = "Tạo chuyên mục";
+}
+
+@this.Html.Partial("Editor", model: this.Model)
+<link href="~/Content/plugins/elFinder/css/elfinder.min.css" rel="stylesheet" />
+<link href="~/Content/plugins/elFinder/css/theme.css" rel="stylesheet" />
+<style>
+    #images-preview img {
+        margin-right: 10px;
+    }
+</style>
+
+@section scripts {
+
+    <link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/elfinder/css/theme.css" rel="stylesheet" />
+
+    <script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+
+    <script>
+        $(function () {
+            SKYWEB.Admin.Product.init();
+            SKYWEB.Admin.General.init();
+            SKYWEB.Admin.General.setupElfinderToCkeditor('inputDescription');
+        });
+
+    </script>
+}

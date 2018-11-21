@@ -1,0 +1,98 @@
+﻿@model Wisky.SkyAdmin.Manage.Areas.Admin.Models.ViewModels.ProductEditViewModel
+@{
+    ViewBag.Title = "Create Product General";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@this.Html.Partial("Editor", this.Model)
+
+@section scripts {
+
+    <link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/elfinder/css/theme.css" rel="stylesheet" />
+
+    <script src="~/Content/plugins/dropzone/dropzone.js"></script>
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#displayPriority").val(1000);
+        })
+        $(document).ready(function () {
+            SKYWEB.Admin.Product.addAdvanceSetting();
+        });
+
+
+        $(function () {
+            SKYWEB.Admin.Product.init();
+          
+            $('#btn-submit-product').click(function () {
+                var code = $('#Code').val();
+                var seoName = $('#SeoName').val();
+                if ($('#ProductName').val() == '')
+                {
+                    ShowMessage("Vui lòng nhập tên sản phẩm", 3);
+                    return;
+                }
+                else if ($('#Code').val() == '') {
+                    ShowMessage("Vui lòng nhập mã sản phẩm", 3);
+                    return;
+                }          
+                else
+                {
+                    $.ajax({
+                        url: '@Url.Action("CheckCode")',
+                        type: 'POST',
+                        data: {
+                            code: code,
+                            seoName: seoName
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                var $form = $('form');
+
+                                var specNames = $form.find("[name='Specifications.Name']");
+                                var specValues = $form.find("[name='Specifications.Value']");
+
+                                for (var i = 0; i < specNames.length; i++) {
+                                    var $specName = $(specNames[i]);
+                                    var $specValue = $(specValues[i]);
+
+                                    $specName.removeAttr('required');
+                                    $specValue.removeAttr('required');
+
+                                    var specName = $specName.val();
+                                    var specValue = $specValue.val();
+
+                                    if (specName && !specValue) {
+                                        $specValue.attr('required', 'required');
+                                        $form.find(':submit').click();
+                                    } else if (!specName && specValue) {
+                                        $specName.attr('required', 'required');
+                                        $form.find(':submit').click();
+                                    }
+                                }
+
+                                $form.find("[name='Specifications.Name']").each(function (i, e) {
+                                    $(e).attr("name", "Specifications[" + i + "].Name");
+                                });
+
+                                $form.find("[name='Specifications.Value']").each(function (i, e) {
+                                    $(e).attr("name", "Specifications[" + i + "].Value");
+                                });
+
+                                $form.find(':submit').click();
+                                ShowMessage("Thêm sản phẩm mới thành công", 2);
+                            }
+                        },
+                        error: function (error) {
+                                ShowMessage("Có lỗi xảy ra", 1);
+                        }
+                    })
+                }
+            });
+  
+        });
+    </script>
+}

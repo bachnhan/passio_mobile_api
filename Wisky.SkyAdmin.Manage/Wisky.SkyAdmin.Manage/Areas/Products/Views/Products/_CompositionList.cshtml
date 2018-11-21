@@ -1,0 +1,131 @@
+﻿@model IEnumerable<HmsService.ViewModels.ProductItemViewModel>
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&key=AIzaSyDwJA7jUX5F9KR44NAKvfJsxn-9cjQwzZk"></script>
+<div id="forScroll" class="row small-margin" style="height:590px; overflow-y: auto; overflow: hidden; outline:none ;padding: 0">
+    @foreach (var item in Model)
+    {
+        <div class="col-md-3" style="cursor: pointer; padding: 0;" onclick="showProductDetailModal(@item.ItemID)">
+            <div class="service-item service-item-sm no-border">
+                <div class="ratio-wrapper ratio-wrapper-1-1">
+                    <div class="ratio-item">
+                        <a class="img-container" data-spinner="plus">
+                            <img src="/Content/images/Default_product_img.jpg"
+                                 onerror="window.HMS.ServiceItemHandler.resetDefaultImage(this)">
+                            <div class="title">
+                                <label data-role="name">@item.ItemName</label><br>
+                                <label data-role="quantityUnit">@item.Quantity @item.Unit</label>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                
+                @*<div class="ace-spinner touch-spinner">
+                        <div class="input-group">
+                            <div class="spinner-buttons input-group-btn spinner-left">
+                                <button class="btn btn-danger btn-minus btn-xs" data-spinner="minus" onclick='minus("input-"+@item.ItemID)'>
+                                    <i class="fa fa-minus smaller-75"></i>
+                                </button>
+                            </div>
+                            <input type="text" class="input-sm input-quantity form-control" value="1" maxlength="6" id="input-@item.ItemID" />
+                            <div class="spinner-buttons input-group-btn spinner-right">
+                                <button class="btn btn-success btn-order btn-xs" data-type="spinner" data-action="add-composition" data-id="@item.ItemID" onclick='addComposition(this, "input-"+@item.ItemID)'>
+                                    <i class="fa fa-check smaller-75"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    }
+    </div>
+
+<div id="productDetailModal" class="modal fade" role="dialog" aria-hidden="true">
+</div>
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#forScroll").niceScroll({
+            cursorcolor: "black",
+            cursoropacitymin: 0.3,
+            background: "#bbb",
+            cursorborder: "1",
+            autohidemode: true,
+            cursorfixedheight: 100
+        });
+        $('#ascrail2000').show();
+    });
+
+    function showProductDetailModal(itemId) {
+        $('#productDetailModal').modal('show');
+        $.ajax({
+            url: "@Url.Action("ViewProductDetail", "Products")",
+            data: {
+                productId: $("#productid").val(),
+                itemId: itemId
+            },
+            success: function (result) {
+                $('#productDetailModal').html(result);
+            }
+        });
+    }
+
+    function validate(evt) {
+        var theEvent = evt || window.event;
+        var key = theEvent.keyCode || theEvent.which;
+        key = String.fromCharCode(key);
+        var regex = /[0-9]|\./;
+        if (!regex.test(key)) {
+            theEvent.returnValue = false;
+            if (theEvent.preventDefault) theEvent.preventDefault();
+        }
+    }
+    function minus(id) {
+        //console.log(document.getElementById(id).value);
+        var number = document.getElementById(id).value;
+        if (number >= 1) {
+            number = number - 1;
+            document.getElementById(id).value = number;
+        }
+    }
+    @*function addComposition(btn, id) {
+        var idDetail = $(btn).attr("data-id");
+        var quantity = document.getElementById(id).value;
+        if (document.getElementById(id).value == 0 || isNaN(quantity)) {
+            ShowMessage("Vui lòng nhập số cụ thể!", 3);
+        }
+        else {
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("CreateComposition"))",
+                "data": {
+                    productId: $("#productid").val(),
+                    itemId: $(btn).attr("data-id"),
+                    quantity: parseFloat(quantity)
+                },
+                success: function (result) {
+                    if (result.success) {
+                        $.ajax({
+                            url: "@Url.Action("ListItemByPro", "Products")",
+                            data: {
+                                productID: $("#productid").val(),
+                            },
+                            success: function (result) {
+                                //console.log("Finish");
+                                $('#divChooseItem').html(result);
+                                document.getElementById(id).value = 1;
+                            }
+                        });
+                        //RefreshTable();
+                    } else {
+                        ShowMessage("Thêm thành phần thất bại, xin vui lòng thử lại !", 1);
+                    }
+                },
+                error: function (error) {
+                    ShowMessage(error.message, 1);
+                }
+
+            });
+        }
+    }*@
+</script>

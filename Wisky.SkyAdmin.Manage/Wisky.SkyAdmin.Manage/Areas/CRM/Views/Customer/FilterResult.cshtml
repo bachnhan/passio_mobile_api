@@ -1,0 +1,180 @@
+﻿@{
+    ViewBag.Title = "Kết quả lọc";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Kết Quả Lọc</h3>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" id="exportCSV" class="btn btn-primary btn-sm pull-right">
+                    <i class="fa fa-download"></i>
+                    Tải về danh sách
+                </button>
+            </div>
+        </div>
+        <hr />
+
+    </div>
+
+    <div class="card-body">
+        <div class="card-padding">
+            <div class="row">
+                <div class="tab-content" style="padding-top:initial">
+                    <div role="tabpanel" class="tab-pane active" id="allcust">
+                        <!-- Datatable -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table id="UserDatatable" class="table table-striped table-bordered table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <strong>STT</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Tên khách hàng</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Email</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Điện thoại</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Số lần đến</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Lần đến gần nhất</strong>
+                                            </th>
+                                            <th>
+                                                <strong>Tùy chọn</strong>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <div class="modal-footer" style="padding:initial">
+                                    <a href="@this.Url.Action("CustomerFilter")">
+                                        <div id="create-advertising" type="button" class="btn btn-primary pull-left waves-effect">
+                                            <i class="left-icon fa fa-arrow-circle-left"></i> Quay về
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form hidden id="formCustList" action="@Url.Action("ExportCustomerList","Customer")">
+                <input type="hidden" name="searchVal" id="searchVal" value="" />
+                <input type="hidden" name="filterId" id="filterId" value="@ViewBag.filterID" />
+                <input type="hidden" name="customerTypeId" id="customerTypeId" value="-1" />
+            </form>          
+        </div>
+    </div>
+</div>
+@section Scripts{
+
+    <script>
+
+        $(document).ready(function () {
+            InitUserDatatable();
+        });
+
+        function InitUserDatatable() {
+            $("#UserDatatable").dataTable({
+                "bFilter": true,
+                "bRetrieve": true,
+                "bServerSide": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("LoadFilterResult")",
+                "bProcessing": true,
+                "bFilter": true,
+                "oLanguage": {
+                    "sSearchPlaceholder": "Tên khách hàng",
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfoEmpty": "Không có dữ liệu",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "fnServerParams": function (aoData) {
+                    aoData.push(
+                        { "name": "filterID", "value": @ViewBag.filterID}
+                    );
+                },
+
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 4, 5, 6],
+                        "className": "dt-center"
+                    },
+                    {
+                        "aTargets": [1],
+                        "mRender": function (data, type, row) {
+                            var name = row[1];
+                            var data = row[6];
+                            var detail = "<a href='@Url.Action("CustomerDetail")\/" + data + "\'>" + name + "</a>";
+                            return detail;
+                        },
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var data = row[6];
+                            //var result = "<a class='btn btn-sm btn-primary' onclick='edit(" + data + ")'>Edit</a>";
+                            // var detail = "<a class='btn btn-sm btn-primary' href='@Url.Action("CustomerDetail")\/" + data + "\'><i class='glyphicon glyphicon-eye-open'></i></a>";
+                            var edit = "<a class='btn btn-sm btn-primary' href='@Url.Action("Edit")\/" + data + "\'><i class='glyphicon glyphicon-pencil'></i></a>";
+                            // var deleteCustomer = "<a class='btn btn-sm btn-primary' href='@Url.Action("Delete")\/" + data + "\'><i class='glyphicon glyphicon-remove'></i></a>";
+                            return  edit;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    }
+
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+        //redraw datatable without reload
+        function reDrawDatatable(id) {
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+        }
+
+        //user datatable
+        function RefreshTable() {
+            reDrawDatatable("#UserDatatable");
+        }
+
+        // export csv
+        $(document).on('click', '#exportCSV', function () {
+            $('#searchVal').val($('.dataTables_filter input').val());
+            $('#formCustList').submit();
+        });
+    </script>
+
+}

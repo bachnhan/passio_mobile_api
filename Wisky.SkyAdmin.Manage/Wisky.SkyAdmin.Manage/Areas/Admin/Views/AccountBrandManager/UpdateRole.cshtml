@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "Cập nhật chức vụ";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="block-header">
+    <div class="col-lg-12">
+        <div class="col-md-8">
+            <h2>Cập nhật chức vụ của tài khoản: @ViewBag.User.UserName</h2>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="allcust">
+            <input type="hidden" id="assign-modal-user-id" />
+            @foreach (var r in (object[])ViewBag.RoleList)
+            {
+                <div class="col-md-4">
+                    <input id="role-list" name="chkRole" type="checkbox" data-id="@(r.GetType().GetProperty("Id").GetValue(r, null))" value="@(r.GetType().GetProperty("Name").GetValue(r, null))" />
+                    @(r.GetType().GetProperty("Name").GetValue(r, null))
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        var id = $('#role-list').attr('data-id');
+        $('#assign-modal-user-id').val(id);
+        var roles = $('[id=role-list]');
+        var userRoles = $('[id=role-' + id + ']');
+        for (var i = 0; i < roles.length; i++) {
+            $(roles[i]).prop('checked', false);
+            for (var j = 0; j < userRoles.length; j++) {
+                if ($(userRoles[j]).attr('data-id') == $(roles[i]).attr('data-id')) {
+                    $(roles[i]).prop('checked', true);
+                }
+            }
+        }
+    });
+</script>

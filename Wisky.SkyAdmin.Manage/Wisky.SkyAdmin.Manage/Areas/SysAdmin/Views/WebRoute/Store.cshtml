@@ -1,0 +1,169 @@
+﻿@model int?
+
+<style>
+    .actions > li > a, .actions > a {
+        width: 30px;
+        cursor: pointer;
+    }
+</style>
+
+<div class="block-header">
+    <h2>Routes</h2>
+    <ul class="actions">
+        <li>
+            <a><i class="fa fa-check"></i></a>
+        </li>
+        <li>
+            <a onclick="onAddRouteButtonClick(); event.preventDefault();"><i class="fa fa-plus"></i></a>
+        </li>
+    </ul>
+</div>
+
+<div id="pnl-routes">
+
+</div>
+
+<template id="template-route">
+    <div class="pnl-route row">
+        <hr />
+
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-header ch-alt">
+                    <h2 class="checkbox">
+                        <label>
+                            <input type="checkbox" />
+                            <i class="input-helper"></i>
+                            Copy Above
+                        </label>
+                    </h2>
+                    <ul class="actions">
+                        <li>
+                            <a><i class="fa fa-arrow-up"></i></a>
+                            <a><i class="fa fa-arrow-down"></i></a>
+                            <a><i class="fa fa-remove"></i></a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-body card-padding">
+                    <div class="form-horizontal">
+                        <input type="hidden" name="Position" />
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Pattern</label>
+                            <div class="col-sm-10">
+                                <input class="form-control" name="Pattern" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">View Name</label>
+                            <div class="col-sm-4">
+                                <input class="form-control" name="ViewName" />
+                            </div>
+                            <label class="col-sm-2 control-label">Layout Name <em>Optional</em></label>
+                            <div class="col-sm-4">
+                                <input class="form-control" name="ViewName" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="block-header">
+                <h2>View Models</h2>
+                <ul class="actions">
+                    <li><a onclick="onAddViewModelButtonClick(this); event.preventDefault();"><i class="fa fa-plus"></i></a></li>
+                </ul>
+            </div>
+
+            <div class="pnl-models">
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="template-route-model">
+    <div class="pnl-route-model">
+        <div class="card">
+            <div class="card-header ch-alt">
+                <h2><input class="form-control" placeholder="Variable Name" name="Name" style="width: 50%;" /></h2>
+                <ul class="actions">
+                    <li><a><i class="fa fa-remove"></i></a></li>
+                </ul>
+            </div>
+            <div class="card-body card-padding">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <div class="col-sm-6">
+                            <select class="selectpicker"></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-6">
+                            <input class="form-control" placeholder="Parameter Name" name="Parameter" />
+                        </div>
+                        <div class="col-sm-6">
+                            <input class="form-control" placeholder="Default Value" name="DefaultValue" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+@section scripts {
+
+    <script>
+        var routeTemplate;
+        var routeModelTemplate;
+
+        $(function () {
+            routeTemplate = $("#template-route").html();
+            routeModelTemplate = $("#template-route-model").html();
+
+            $.ajax({
+                url: "@this.Url.Action("StoreRoutes")",
+                data: { id: @(this.Model.Value) },
+                method: "POST",
+
+                success: function(data) {
+                    parseData(data);
+                },
+
+                error: function() {
+                    ShowMessage("Error, please try again.",1);
+                    window.location.reload();
+                }
+            });
+        });
+
+        function parseData(data) {
+            var pnlRoute = $(routeTemplate);
+
+            $("#pnl-routes").append(pnlRoute);
+        }
+
+        function onAddViewModelButtonClick(btn) {
+            var e = $(btn);
+            var pnlRoute = e.closest(".pnl-route");
+            var pnlViewModel = pnlRoute.find(".pnl-models");
+
+            pnlViewModel.append($(routeModelTemplate));
+        }
+
+        function onAddRouteButtonClick() {
+            var pnlRoutes = $("#pnl-routes");
+
+            pnlRoutes.append($(routeTemplate));
+        }
+
+        function onRemoveModelButtonClick(btn) {
+            var e = $(btn);
+            var pnlModel = e.closest(".pnl-model");
+            pnlModel.remove();
+        }
+    </script>
+
+}

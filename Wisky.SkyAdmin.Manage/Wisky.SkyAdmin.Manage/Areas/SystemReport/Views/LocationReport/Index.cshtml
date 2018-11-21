@@ -1,0 +1,1344 @@
+﻿
+<div class="card-header">
+    <div class="row">
+        <div class="col-md-6">
+            <h3 id="reportTitle">Báo cáo doanh thu theo khu vực</h3>
+            <h5 data-role="small-date" id="dateRange"></h5>
+        </div>
+    </div>
+    <hr />
+</div>
+<ul id="TabList" class="tab-nav tn-justified" style="overflow: hidden;width: 100%">
+    <li class="active waves-effect col-lg-6"><a data-toggle="tab" id="buildTabAll" href="#all"><i class="fa fa-globe"></i> Hệ Thống</a></li>
+    <li class="waves-effect col-lg-6"><a data-toggle="tab" id="buildTabStore" href="#storesTab"><i class="fa fa-home"></i> Cửa hàng</a></li>
+    <li class="waves-effect col-lg-6"><a data-toggle="tab" id="buildTabGroup" href="#storesGroupTab"><i class="fa fa-users"></i> Nhóm cửa hàng</a></li>
+</ul>
+<div class="tab-content">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-2 p-l-0 p-r-0">
+                <label class="control-label p-t-5">Mức báo cáo:</label>
+            </div>
+            <div class="col-md-7">
+                <div class="group-radio-buttons col-md-12 p-l-0">
+                    <div class="medium-radio-button-width col-md-6 p-l-0">
+                        <input type="radio" name="level" value="1" class="nice-check" id="filter" checked />
+                        <label for="filter"><span>Theo Tỉnh/Thành phố</span></label>
+                    </div>
+                    <div class="medium-radio-button-width col-md-6 p-l-0">
+                        <input type="radio" name="level" value="2" class="nice-check" id="filter2" />
+                        <label for="filter2"><span>Theo Quận/Huyện</span></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="all" class="tab-pane fade in active">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="input-group pull-right" style="margin-left: -15px;">
+                    <!-- Daterange picker -->
+                    <div class="dateTime width230">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange1" class="height-fix">
+                                <input id="startYear1" size="23" readonly class="form-control text-center pull-right">
+                                <a class="myCelenderA" id=""> <i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <form id="form-create-session" class="form-inline" style="display:none">
+                        <input type="text" id="sTime1" name="startTime1" placeholder="Chọn giờ bắt đầu" />
+                        <input type="text" id="eTime1" name="endTime1" placeholder="Chọn giờ kết thúc" />
+                    </form>
+                    <form id="form-create-session" class="form-inline" style="display:none">
+                        <input type="text" id="sTime2" name="startTime2" placeholder="Chọn giờ bắt đầu" />
+                        <input type="text" id="eTime2" name="endTime2" placeholder="Chọn giờ kết thúc" />
+                    </form>
+                    <form id="form-create-session" class="form-inline" style="display:none">
+                        <input type="text" id="sTime3" name="startTime3" placeholder="Chọn giờ bắt đầu" />
+                        <input type="text" id="eTime3" name="endTime3" placeholder="Chọn giờ kết thúc" />
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- level select -->
+                <div class="province col-md-4 p-l-0" style="display: inline-flex">
+                    <div class="col-md-5 p-l-0">
+                        <label>Tỉnh/Thành phố:&nbsp;</label>
+                    </div>
+                    <div class="col-md-7">
+                        <select id="provinceCombobox" class="selectpicker" data-size="7" data-live-search="true"></select>
+                    </div>
+                </div>
+                <div class="district col-md-4" style="display: none">
+                    <div class="col-md-5">
+                        <label>Quận/Huyện:&nbsp;</label>
+                    </div>
+                    <div class="col-md-7">
+                        <select id="districtCombobox" class="selectpicker" data-size="7" data-live-search="true"></select>
+                    </div>
+                </div>
+                <!-- export to excel -->
+                <div class="col-md-pull-4">
+                    <button type="submit" id="export1" class="width230 btn btn-primary btn-sm pull-right">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="containerCol1" style="min-width: 310px;height:400px;padding:7px;display:none;transition: visibility 0s, opacity 0.5s linear;"></div>
+        <div id="datatable1" style="padding-top:5px; overflow-x: scroll; cursor: grab; cursor :-o-grab; cursor :-moz-grab; cursor:-webkit-grab; width: 100%;" class="dragscroll">
+
+        </div>
+        <form class="hidden" id="formMonthReportExcel1" action="@Url.Action("ExportLocationTableToExcelFollowTempForBrand","LocationReport")">
+            <input id="startTime1" name="startTime" />
+            <input id="endTime1" name="endTime" />
+            <input id="level1" name="level" />
+            <input id="provinceID1" name="provinceID" />
+            <input id="districtID1" name="districtID" />
+        </form>
+    </div>
+    <div id="storesTab" class="tab-pane fade in">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Cửa hàng:&nbsp;</label>
+                        <div class="styled-select blue semi-square">
+                            <select id="storeCombobox"></select>
+                        </div>
+                    </div>
+                    <!-- Daterange picker -->
+                    <div class="col-md-6">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange2" class="height-fix">
+                                    <input id="startYear2" size="23" readonly class="form-control text-center pull-right">
+                                    <a class="myCelenderA" id=""> <i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- level select -->
+                <div class="province col-md-4 p-l-0" style="display: inline-flex">
+                    <div class="col-md-5 p-l-0">
+                        <label>Tỉnh/Thành phố:&nbsp;</label>
+                    </div>
+                    <div class="col-md-7">
+                        <select id="provinceCombobox2" class="selectpicker" data-size="7" data-live-search="true"></select>
+                    </div>
+                </div>
+                <div class="district col-md-4" style="display: none">
+                    <div class="col-md-5">
+                        <label>Quận/Huyện:&nbsp;</label>
+                    </div>
+                    <div class="col-md-7">
+                        <select id="districtCombobox2" class="selectpicker" data-size="7" data-live-search="true"></select>
+                    </div>
+                </div>
+                <!-- export to excel -->
+                <div class="col-md-pull-4">
+                    <button type="submit" id="export2" class="width230 btn btn-primary btn-sm pull-right">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        @*<div id="container2" data-show="show" style="min-width: 150px; height: 300px; display:none;padding:7px;"></div>*@
+        <div id="containerCol2" style="min-width: 310px;height:400px;padding:7px;display:none;transition: visibility 0s, opacity 0.5s linear;"></div>
+        <div id="datatable2" style="padding-top: 5px; overflow-x: scroll; cursor: grab; cursor :-o-grab; cursor :-moz-grab; cursor:-webkit-grab; width: 100%;" class="dragscroll">
+
+        </div>
+        <form class="hidden" id="formMonthReportExcel2" action="@Url.Action("ExportLocationTableToExcelFollowTempForStore","LocationReport")">
+            <input id="startTime2" name="startTime" />
+            <input id="endTime2" name="endTime" />
+            <input id="selectedStoreId2" name="selectedStoreId" />
+            <input id="level2" name="level" />
+            <input id="districtID2" name="districtID" />
+            <input id="provinceID2" name="provinceID" />
+        </form>
+
+    </div>
+    <div id="storesGroupTab" class="tab-pane fade in">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-4 p-l-0">
+                    <div class="col-md-5 p-l-0">
+                        <label>Nhóm cửa hàng:&nbsp;</label>
+                    </div>
+                    <div class="col-md-7">
+                        <select id="storeGroupCombobox"></select>
+                    </div>
+                </div>
+                <!-- Daterange picker -->
+                <div class="col-md-8 p-r-0">
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange3" class="height-fix">
+                                <input id="startYear3" size="23" readonly class="form-control text-center pull-right">
+                                <a class="myCelenderA" id=""> <i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <!-- level select -->
+                <div class="province col-md-4 p-l-0" style="display: inline-flex">
+                    <div class="col-md-5 p-l-0">
+                        <label>Tỉnh/Thành phố:&nbsp;</label>
+                    </div>
+                    <div class="col-md-7">
+                        <select id="provinceCombobox3" class="selectpicker" data-size="7" data-live-search="true"></select>
+                    </div>
+                </div>
+                <div class="district col-md-4" style="display: none">
+                    <div class="col-md-5">
+                        <label>Quận/Huyện:&nbsp;</label>
+                    </div>
+                    <div class="col-md-7">
+                        <select id="districtCombobox3" class="selectpicker" data-size="7" data-live-search="true"></select>
+                    </div>
+                </div>
+                <!-- export to excel -->
+                <div class="col-md-pull-4">
+                    <button type="submit" id="export3" class="width230 btn btn-primary btn-sm pull-right">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div id="containerCol3" style="min-width: 310px;height:400px;padding:7px;display:none;transition: visibility 0s, opacity 0.5s linear;"></div>
+
+        <div id="datatable3" style="padding-top:5px; overflow: scroll; cursor: grab; cursor :-o-grab; cursor :-moz-grab; cursor:-webkit-grab; width: 100%;" class="dragscroll">
+
+        </div>
+        <form class="hidden" id="formMonthReportExcel3" action="@Url.Action("ExportLocationTableToExcelFollowTempForGroup","LocationReport")">
+            <input id="startTime3" name="startTime" />
+            <input id="endTime3" name="endTime" />
+            <input id="selectedGroupId" name="selectedGroupId" />
+            <input id="level3" name="level" />
+            <input id="districtID3" name="districtID" />
+            <input id="provinceID3" name="provinceID" />
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript" src="https://cdn.rawgit.com/asvd/dragscroll/master/dragscroll.js"></script>
+<script>
+    $(document).ready(function () {
+        GetProvinceList();
+        GetDistrictListOnReady();
+        GetStoreList();
+        GetStoreGroupList();
+    });
+    function cb1(start, end, label) {
+        //Prepare start time and end time format
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#startYear1').val(label);
+        } else {
+            $('#startYear1').val(dateString);
+        }
+
+        $('#sTime1').val(startTime);
+        $('#eTime1').val(endTime);
+
+        //Chage date at page header
+        $('[data-role=small-date]').html(dateString);
+
+        $('#startYear1 span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+        loadDataOnChangeAll();
+    };
+    function cb2(start, end, label) {
+        //Prepare start time and end time format
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime != endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#startYear2').val(label);
+        } else {
+            $('#startYear2').val(dateString);
+        }
+
+        $('#sTime2').val(startTime);
+        $('#eTime2').val(endTime);
+
+        //Chage date at page header
+        $('[data-role=small-date]').html(dateString);
+
+        $('#startYear2 span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+        loadDataOnChangeStores();
+    };
+    function cb3(start, end, label) {
+        //Prepare start time and end time format
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#startYear3').val(label);
+        } else {
+            $('#startYear3').val(dateString);
+        }
+
+        $('#sTime3').val(startTime);
+        $('#eTime3').val(endTime);
+
+        //Chage date at page header
+        $('[data-role=small-date]').html(dateString);
+
+        $('#startYear3 span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+        loadDataOnChangeStoreGroups();
+    };
+    function setupDaterangerpicker1() {
+        cb1(moment(), moment(), "Hôm nay");
+        $('#reportrange1').daterangepicker({
+
+            startDate: moment(),
+            endDate: moment(),
+            minDate: '01/01/2012',
+            maxDate: moment(),
+            dateLimit: { days: 365 },
+            showDropdowns: true,
+            showWeekNumbers: true,
+            timePicker: false,
+            timePickerIncrement: 1,
+            timePicker12Hour: true,
+            //parentEl: '.modal-body',
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().add(0, 'month').startOf('month'), moment().add(0, 'month').endOf('month')],
+                'Tháng trước': [moment().add(-1, 'month').startOf('month'), moment().add(-1, 'month').endOf('month')]
+            },
+            opens: 'left',
+            drops: 'down',
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-primary',
+            cancelClass: 'btn-success',
+            separator: ' to ',
+            locale: {
+                format: 'DD/MM/YYYY',
+                applyLabel: 'Chọn',
+                cancelLabel: 'Hủy',
+                fromLabel: 'Từ',
+                toLabel: 'Đến',
+                customRangeLabel: 'Tùy chọn',
+                daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                firstDay: 1
+            }
+        }, cb1);
+    }
+    function setupDaterangerpicker2() {
+        cb2(moment(), moment(), "Hôm nay");
+        $('#reportrange2').daterangepicker({
+            startDate: moment(),
+            endDate: moment(),
+            minDate: '01/01/2012',
+            maxDate: moment(),
+            dateLimit: { days: 365 },
+            showDropdowns: true,
+            showWeekNumbers: true,
+            timePicker: false,
+            timePickerIncrement: 1,
+            timePicker12Hour: true,
+            //parentEl: '.modal-body',
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().add(0, 'month').startOf('month'), moment().add(0, 'month').endOf('month')],
+                'Tháng trước': [moment().add(-1, 'month').startOf('month'), moment().add(-1, 'month').endOf('month')]
+            },
+            opens: 'left',
+            drops: 'down',
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-primary',
+            cancelClass: 'btn-success',
+            separator: ' to ',
+            locale: {
+                format: 'DD/MM/YYYY',
+                applyLabel: 'Chọn',
+                cancelLabel: 'Hủy',
+                fromLabel: 'Từ',
+                toLabel: 'Đến',
+                customRangeLabel: 'Tùy chọn',
+                daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                firstDay: 1
+            }
+        }, cb2);
+    }
+    function setupDaterangerpicker3() {
+        cb3(moment(), moment(), "Hôm nay");
+        $('#reportrange3').daterangepicker({
+            startDate: moment(),
+            endDate: moment(),
+            minDate: '01/01/2012',
+            maxDate: moment(),
+            dateLimit: { days: 365 },
+            showDropdowns: true,
+            showWeekNumbers: true,
+            timePicker: false,
+            timePickerIncrement: 1,
+            timePicker12Hour: true,
+            //parentEl: '.modal-body',
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().add(0, 'month').startOf('month'), moment().add(0, 'month').endOf('month')],
+                'Tháng trước': [moment().add(-1, 'month').startOf('month'), moment().add(-1, 'month').endOf('month')]
+            },
+            opens: 'left',
+            drops: 'down',
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-primary',
+            cancelClass: 'btn-success',
+            separator: ' to ',
+            locale: {
+                format: 'DD/MM/YYYY',
+                applyLabel: 'Chọn',
+                cancelLabel: 'Hủy',
+                fromLabel: 'Từ',
+                toLabel: 'Đến',
+                customRangeLabel: 'Tùy chọn',
+                daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                firstDay: 1
+            }
+        }, cb3);
+    }
+
+    function RefreshTable() {
+        var oTable = $("#locationTable").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    };
+    function GetProvinceList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadProvinceList", "LocationReport")',
+            success: function (result) {
+                for (var i = 0; i < result.province.length; i++) {
+                    $('#provinceCombobox').append('<option value="' + result.province[i].ProvinceCode + '">' + result.province[i].ProvinceName + '</option>')
+                }
+                $('#provinceCombobox').val(79);
+                $('#provinceCombobox').selectpicker('refresh');
+                for (var i = 0; i < result.province.length; i++) {
+                    $('#provinceCombobox2').append('<option value="' + result.province[i].ProvinceCode + '">' + result.province[i].ProvinceName + '</option>')
+                }
+                $('#provinceCombobox2').val(79);
+                $('#provinceCombobox2').selectpicker('refresh');
+                for (var i = 0; i < result.province.length; i++) {
+                    $('#provinceCombobox3').append('<option value="' + result.province[i].ProvinceCode + '">' + result.province[i].ProvinceName + '</option>')
+                }
+                $('#provinceCombobox3').val(79);
+                $('#provinceCombobox3').selectpicker('refresh');
+                setupDaterangerpicker1();
+            }
+
+        });
+    }
+    function GetDistrictListOnReady() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadDistrictList", "LocationReport")',
+            data: { 'provinceID': 79,},
+            success: function (result) {
+                for (var i = 0; i < result.districtLength; i++) {
+                    $('#districtCombobox').append('<option value="' + result.districtCode[i] + '">' + result.districtName[i] + '</option>')
+                }
+                $('#districtCombobox').val(760);
+                $('#districtCombobox').selectpicker('refresh');
+                for (var i = 0; i < result.districtLength; i++) {
+                    $('#districtCombobox2').append('<option value="' + result.districtCode[i] + '">' + result.districtName[i] + '</option>')
+                }
+                $('#districtCombobox2').val(760);
+                $('#districtCombobox2').selectpicker('refresh');
+                for (var i = 0; i < result.districtLength; i++) {
+                    $('#districtCombobox3').append('<option value="' + result.districtCode[i] + '">' + result.districtName[i] + '</option>')
+                }
+                $('#districtCombobox3').val(760);
+                $('#districtCombobox3').selectpicker('refresh');
+            }
+
+        });
+    }
+    function GetDistrictList1() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadDistrictList", "LocationReport")',
+            data: { 'provinceID': $('#provinceCombobox').val(),},
+            success: function (result) {
+                $('#districtCombobox').empty();
+                for (var i = 0; i < result.districtLength; i++) {
+                    $('#districtCombobox').append('<option value="' + result.districtCode[i] + '">' + result.districtName[i] + '</option>')
+                }
+                $('#districtCombobox').selectpicker('refresh');
+            }
+        });
+    }
+    function GetDistrictList2() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadDistrictList", "LocationReport")',
+            data: { 'provinceID': $('#provinceCombobox2').val(),},
+            success: function (result) {
+                $('#districtCombobox2').empty();
+                for (var i = 0; i < result.districtLength; i++) {
+                    $('#districtCombobox2').append('<option value="' + result.districtCode[i] + '">' + result.districtName[i] + '</option>')
+                }
+                $('#districtCombobox2').selectpicker('refresh');
+            }
+        });
+    }
+     function GetDistrictList3() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadDistrictList", "LocationReport")',
+            data: { 'provinceID': $('#provinceCombobox3').val(),},
+            success: function (result) {
+                $('#districtCombobox3').empty();
+                for (var i = 0; i < result.districtLength; i++) {
+                    $('#districtCombobox3').append('<option value="' + result.districtCode[i] + '">' + result.districtName[i] + '</option>')
+                }
+                $('#districtCombobox3').selectpicker('refresh');
+            }
+        });
+    }
+    function GetStoreList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStoreList", "TimeReport")',
+            success: function (result) {
+                for (var i = 0; i < result.store.length; i++) {
+                    $('#storeCombobox').append('<option value="' + result.store[i].ID + '">' + result.store[i].Name + '</option>')
+                }
+            }
+
+        });
+    }
+    function GetStoreGroupList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStoreGroupList", "TimeReport")',
+            success: function (result) {
+                if (result.storeGroup.length == 0) {
+                    $('#buildTabGroup').hide();
+                }
+                else {
+                    for (var i = 0; i < result.storeGroup.length; i++) {
+                        $('#storeGroupCombobox').append('<option value="' + result.storeGroup[i].GroupID + '">' + result.storeGroup[i].GroupName + '</option>')
+                    }
+                    $('#storeGroupCombobox').selectpicker('refresh');
+                }
+            }
+
+        });
+    }
+    var InitProDatatable1 = function (data) {
+        var firstHtmlDatatable =
+            '<table id="locationTableAll" class="table table-condensed table-striped table-bordered table-hover">'
+            + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+            + '<tr>'
+            + '<th>'
+            + '<label class="">STT</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Quận/Huyện</label>'
+            + '</th>';
+        var lastHtmlDatatable =
+            '<th>'
+            + '<label class="">Tổng số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tiền giảm giá</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu sau giảm giá</label>'
+            + '</th>'
+            + '</tr>' + '</thead>' + '<tbody></tbody>' + '</table';
+        var bodyHtml = "";
+        for (var i = 6; i < 23; i++) {
+            bodyHtml += '<th>' + '<label class="">' + i + ':00 - ' + (i+1) + ':00</label>' + '</th>';
+        }
+        $('#datatable1').html(firstHtmlDatatable + bodyHtml + lastHtmlDatatable);
+
+        $("#locationTableAll").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            'data': data,
+            "bProcessing": true,
+            "bPaginate": false,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+    var InitProDatatable2 = function (data) {
+        var firstHtmlDatatable =
+            '<table id="locationTableStore" class="table table-condensed table-striped table-bordered table-hover">'
+            + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+            + '<tr>'
+            + '<th>'
+            + '<label class="">STT</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Quận/Huyện</label>'
+            + '</th>';
+        var lastHtmlDatatable =
+            '<th>'
+            + '<label class="">Tổng số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tiền giảm giá</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu sau giảm giá</label>'
+            + '</th>'
+            + '</tr>' + '</thead>' + '<tbody></tbody>' + '</table';
+        var bodyHtml = "";
+        for (var i = 6; i < 23; i++) {
+            bodyHtml += '<th>' + '<label class="">' + i + ':00 - ' + (i + 1) + ':00</label>' + '</th>';
+        }
+        $('#datatable2').html(firstHtmlDatatable + bodyHtml + lastHtmlDatatable);
+
+        $("#locationTableStore").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            'data': data,
+            "bProcessing": true,
+            "bPaginate": false,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+    var InitProDatatable3 = function (data) {
+        var firstHtmlDatatable =
+            '<table id="locationTableGroup" class="table table-condensed table-striped table-bordered table-hover">'
+            + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+            + '<tr>'
+            + '<th>'
+            + '<label class="">STT</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Quận/Huyện</label>'
+            + '</th>';
+        var lastHtmlDatatable =
+            '<th>'
+            + '<label class="">Tổng số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tiền giảm giá</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu sau giảm giá</label>'
+            + '</th>'
+            + '</tr>' + '</thead>' + '<tbody></tbody>' + '</table';
+        var bodyHtml = "";
+        for (var i = 6; i < 23; i++) {
+            bodyHtml += '<th>' + '<label class="">' + i + ':00 - ' + (i + 1) + ':00</label>' + '</th>';
+        }
+        $('#datatable3').html(firstHtmlDatatable + bodyHtml + lastHtmlDatatable);
+
+        $("#locationTableGroup").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            'data': data,
+            "bProcessing": true,
+            "bPaginate": false,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+    var InitProDatatable4 = function (data) {
+        var firstHtmlDatatable =
+            '<table id="districtTableAll" class="table table-condensed table-striped table-bordered table-hover">'
+            + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+            + '<tr>'
+            + '<th>'
+            + '<label class="">STT</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Phường/Xã</label>'
+            + '</th>';
+        var lastHtmlDatatable =
+            '<th>'
+            + '<label class="">Tổng số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tiền giảm giá</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu sau giảm giá</label>'
+            + '</th>'
+            + '</tr>' + '</thead>' + '<tbody></tbody>' + '</table';
+        var bodyHtml = "";
+        for (var i = 6; i < 23; i++) {
+            bodyHtml += '<th>' + '<label class="">' + i + ':00 - ' + (i + 1) + ':00</label>' + '</th>';
+        }
+        $('#datatable1').html(firstHtmlDatatable + bodyHtml + lastHtmlDatatable);
+
+        $("#districtTableAll").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            'data': data,
+            "bProcessing": true,
+            "bPaginate": false,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+    var InitProDatatable5 = function (data) {
+        var firstHtmlDatatable =
+            '<table id="districtTableStore" class="table table-condensed table-striped table-bordered table-hover">'
+            + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+            + '<tr>'
+            + '<th>'
+            + '<label class="">STT</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Phường/Xã</label>'
+            + '</th>';
+        var lastHtmlDatatable =
+            '<th>'
+            + '<label class="">Tổng số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tiền giảm giá</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu sau giảm giá</label>'
+            + '</th>'
+            + '</tr>' + '</thead>' + '<tbody></tbody>' + '</table';
+        var bodyHtml = "";
+        for (var i = 6; i < 23; i++) {
+            bodyHtml += '<th>' + '<label class="">' + i + ':00 - ' + (i + 1) + ':00</label>' + '</th>';
+        }
+        $('#datatable2').html(firstHtmlDatatable + bodyHtml + lastHtmlDatatable);
+
+        $("#districtTableStore").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            'data': data,
+            "bProcessing": true,
+            "bPaginate": false,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+    var InitProDatatable6 = function (data) {
+        var firstHtmlDatatable =
+            '<table id="districtTableGroup" class="table table-condensed table-striped table-bordered table-hover">'
+            + '<thead style="white-space: nowrap; text-overflow: ellipsis;">'
+            + '<tr>'
+            + '<th>'
+            + '<label class="">STT</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Phường/Xã</label>'
+            + '</th>';
+        var lastHtmlDatatable =
+            '<th>'
+            + '<label class="">Tổng số bill</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tiền giảm giá</label>'
+            + '</th>'
+            + '<th>'
+            + '<label class="">Tổng doanh thu sau giảm giá</label>'
+            + '</th>'
+            + '</tr>' + '</thead>' + '<tbody></tbody>' + '</table';
+        var bodyHtml = "";
+        for (var i = 6; i < 23; i++) {
+            bodyHtml += '<th>' + '<label class="">' + i + ':00 - ' + (i + 1) + ':00</label>' + '</th>';
+        }
+        $('#datatable3').html(firstHtmlDatatable + bodyHtml + lastHtmlDatatable);
+
+        $("#districtTableGroup").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            'data': data,
+            "bProcessing": true,
+            "bPaginate": false,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+    //seach button + store on change
+    function loadDataOnChangeProvinces() {
+        if ($("#eTime1").val().length > 16 || $("#sTime1").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            $('#provinceID').val($('#provinceCombobox').val());
+            if($('input[name=level]:checked').val() == 1) {
+                locationReportAll();
+                GetDistrictList1();
+            }
+            else {
+                GetDistrictList1();
+            }
+        }
+    };
+    function loadDataOnChangeProvinces2() {
+        if ($("#eTime2").val().length > 16 || $("#sTime2").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            $('#provinceID').val($('#provinceCombobox2').val());
+            if ($('input[name=level]:checked').val() == 1) {
+                locationReportStore();
+                GetDistrictList2();
+            }
+            else {
+                GetDistrictList2();
+            }
+        }
+    };
+    function loadDataOnChangeProvinces3() {
+        if ($("#eTime3").val().length > 16 || $("#sTime3").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            $('#provinceID').val($('#provinceCombobox3').val());
+            if ($('input[name=level]:checked').val() == 1) {
+                locationReportGroup();
+                GetDistrictList3();
+            }
+            else {
+                GetDistrictList3();
+            }
+        }
+    };
+    function loadDataOnChangeDistricts() {
+        if ($("#eTime1").val().length > 16 || $("#sTime1").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            $('#provinceID').val($('#provinceCombobox').val());
+            $('#districtID').val($('#districtCombobox').val());
+            districtReportAll();
+        }
+    };
+    function loadDataOnChangeDistricts2() {
+        if ($("#eTime2").val().length > 16 || $("#sTime2").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            $('#provinceID').val($('#provinceCombobox2').val());
+            $('#districtID').val($('#districtCombobox2').val());
+            districtReportStore();
+        }
+    };
+    function loadDataOnChangeDistricts3() {
+        if ($("#eTime3").val().length > 16 || $("#sTime3").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            $('#provinceID').val($('#provinceCombobox3').val());
+            $('#districtID').val($('#districtCombobox3').val());
+            districtReportGroup();
+        }
+    };
+    function loadDataOnChangeAll() {
+        if ($("#eTime1").val().length > 16 || $("#sTime1").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            $('#selectedStoreId').val($('#allStores').val());
+            if ($('input[name=level]:checked').val() == 1) {
+                locationReportAll();
+            }
+            else {
+                districtReportAll();
+            }
+        }
+    };
+    function loadDataOnChangeStores() {
+        if ($("#eTime2").val().length > 16 || $("#sTime2").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            $('#selectedStoreId').val($('#storeCombobox').val());
+            if ($('input[name=level]:checked').val() == 1) {
+                locationReportStore();
+            }
+            else {
+                districtReportStore();
+            }
+        }
+    };
+    function loadDataOnChangeStoreGroups() {
+        if ($("#eTime3").val().length > 16 || $("#sTime3").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            $('#selectedStoreId').val($('#storeGroupCombobox').val());
+            if ($('input[name=level]:checked').val() == 1) {
+                locationReportGroup();
+            }
+            else {
+                districtReportGroup();
+            }
+        }
+    };
+    $('#provinceCombobox').on('change', function () {
+        loadDataOnChangeProvinces();
+    });
+    $('#provinceCombobox2').on('change', function () {
+        loadDataOnChangeProvinces2();
+    });
+    $('#provinceCombobox3').on('change', function () {
+        loadDataOnChangeProvinces3();
+    });
+    $('#storeCombobox').on('change', function () {
+        loadDataOnChangeStores();
+    });
+    $('#storeGroupCombobox').on('change', function () {
+        loadDataOnChangeStoreGroups();
+    });
+    $('#districtCombobox').on('change', function () {
+        loadDataOnChangeDistricts();
+    });
+    $('#districtCombobox2').on('change', function () {
+        loadDataOnChangeDistricts2();
+    });
+    $('#districtCombobox3').on('change', function () {
+        loadDataOnChangeDistricts3();
+    });
+    //search report
+    function locationReportAll() {
+
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadLocationReportForBrand", "LocationReport")',
+            data: { 'startTime': $('#sTime1').val(), 'endTime': $('#eTime1').val(), 'provinceID': $('#provinceCombobox').val(), },
+            success: function (result) {
+                var startTime = $('#sTime1').val();
+                var endTime = $('#eTime1').val();
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                if (dateRange != "") {
+
+                    $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                }
+                else {
+                    $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                }
+                InitProDatatable1(result.datatable);
+            }
+        });
+    };
+    function locationReportStore() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadLocationReportForStore", "LocationReport")',
+            data: { 'startTime': $('#sTime2').val(), 'endTime': $('#eTime2').val(), 'selectedStoreId': $('#storeCombobox').val(), 'provinceID': $('#provinceCombobox2').val(), },
+            success: function (result) {
+                var startTime = $('#sTime2').val();
+                var endTime = $('#eTime2').val();
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                if (dateRange != "") {
+
+                    $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                }
+                else {
+                    $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                }
+                InitProDatatable2(result.datatable);
+            }
+        });
+    };
+    function locationReportGroup() {
+
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadLocationReportForGroup", "LocationReport")',
+            data: { 'startTime': $('#sTime3').val(), 'endTime': $('#eTime3').val(), 'selectedGroupId': $('#storeGroupCombobox').val(), 'provinceID': $('#provinceCombobox3').val(),},
+            success: function (result) {
+                var startTime = $('#sTime3').val();
+                var endTime = $('#eTime3').val();
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                if (dateRange != "") {
+
+                    $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                }
+                else {
+                    $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                }
+                InitProDatatable3(result.datatable);
+            }
+        });
+    };
+    function districtReportAll() {
+
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadDistrictReportForBrand", "LocationReport")',
+            data: { 'startTime': $('#sTime1').val(), 'endTime': $('#eTime1').val(), 'provinceID': $('#provinceCombobox').val(), 'districtID': $('#districtCombobox').val(),},
+            success: function (result) {
+                var startTime = $('#sTime1').val();
+                var endTime = $('#eTime1').val();
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                if (dateRange != "") {
+
+                    $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                }
+                else {
+                    $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                }
+                InitProDatatable4(result.datatable);
+            }
+        });
+    };
+    function districtReportStore() {
+
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadDistrictReportForStore", "LocationReport")',
+            data: { 'startTime': $('#sTime2').val(), 'endTime': $('#eTime2').val(), 'provinceID': $('#provinceCombobox').val(), 'districtID': $('#districtCombobox').val(), 'selectedStoreId': $('#storeCombobox').val(),},
+            success: function (result) {
+                var startTime = $('#sTime2').val();
+                var endTime = $('#eTime2').val();
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                if (dateRange != "") {
+
+                    $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                }
+                else {
+                    $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                }
+                InitProDatatable5(result.datatable);
+            }
+        });
+    };
+    function districtReportGroup() {
+
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadDistrictReportForGroup", "LocationReport")',
+            data: { 'startTime': $('#sTime3').val(), 'endTime': $('#eTime3').val(), 'provinceID': $('#provinceCombobox').val(), 'districtID': $('#districtCombobox').val(), 'selectedGroupId': $('#storeGroupCombobox').val(),},
+            success: function (result) {
+                var startTime = $('#sTime3').val();
+                var endTime = $('#eTime3').val();
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+                if (dateRange != "") {
+
+                    $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+                }
+                else {
+                    $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+                }
+                InitProDatatable6(result.datatable);
+            }
+        });
+    };
+    // export to excel
+    $(document).on('click', '#export1', function () {
+        $('#startTime1').val($('#sTime1').val());
+        $('#endTime1').val($('#eTime1').val());
+        //$('#storeId').val(ViewBag.storeId);
+        $('#level1').val($('input[name=level]:checked').val());
+        $('#provinceID1').val($('#provinceCombobox').val());
+        $('#districtID1').val($('#districtCombobox').val());
+        $('#formMonthReportExcel1').submit();
+    });
+    $(document).on('click', '#export2', function () {
+        $('#startTime2').val($('#sTime2').val());
+        $('#endTime2').val($('#eTime2').val());
+        //$('#storeId').val(ViewBag.storeId);
+        $("#selectedStoreId2").val($('#storeCombobox').val());
+        $('#level2').val($('input[name=level]:checked').val());
+        $('#provinceID2').val($('#provinceCombobox2').val());
+        $('#districtID2').val($('#districtCombobox2').val());
+        $('#formMonthReportExcel2').submit();
+    });
+    $(document).on('click', '#export3', function () {
+        $('#startTime3').val($('#sTime3').val());
+        $('#endTime3').val($('#eTime3').val());
+        //$('#storeId').val(ViewBag.storeId);
+        $('#selectedGroupId').val($('#storeGroupCombobox').val());
+        $('#level3').val($('input[name=level]:checked').val());
+        $('#provinceID3').val($('#provinceCombobox3').val());
+        $('#districtID3').val($('#districtCombobox3').val());
+        $('#formMonthReportExcel3').submit();
+    });
+
+   //BUILD TAB
+    $('#buildTabAll').one('click', function (e) {
+        setupDaterangerpicker1();
+        locationReportAll();
+    });
+    $('#buildTabStore').one('click', function (e) {
+        setupDaterangerpicker2();
+        locationReportStore();
+    });
+    $('#buildTabGroup').one('click', function (e) {
+        setupDaterangerpicker3();
+        locationReportGroup();
+    });
+    $('#buildTabStore').on('click', function (e) {
+        $('#containerCol1').hide();
+        $('#containerCol3').hide();
+        var startTime = $('#sTime2').val();
+        var endTime = $('#eTime2').val();
+        var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+        if (dateRange != "") {
+
+            $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+        }
+        else {
+            $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+        }
+    });
+    $('#buildTabAll').on('click', function (e) {
+        $('#containerCol2').hide();
+        $('#containerCol3').hide();
+        var startTime = $('#sTime1').val();
+        var endTime = $('#eTime1').val();
+        var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+        if (dateRange != "") {
+
+            $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+        }
+        else {
+            $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+        }
+    });
+    $('#buildTabGroup').on('click', function (e) {
+        $('#containerCol1').hide();
+        $('#containerCol2').hide();
+        var startTime = $('#sTime3').val();
+        var endTime = $('#eTime3').val();
+        var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+        if (dateRange != "") {
+
+            $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+        }
+        else {
+            $('[data-role=small-date]').html('(01/01/' + new Date().getFullYear() + ' - 31/12/' + new Date().getFullYear() + ')');
+        }
+    });
+
+    //Select Level of Report
+    $('input[name=level]').on('change', function () {
+        if ($('input[name=level]:checked').val() == 1) {
+            $('.district').hide();
+        }
+        else {
+            $('.district').show();
+        }
+    });
+</script>
+
+<style>
+    .tab-pane > .row > .col-md-12 {
+        margin-top: 19px;
+        /*padding-right: 0px;*/
+        margin-bottom: 0.4em;
+    }
+
+    .tab-pane > .col-md-12 form {
+        min-height: 33px;
+    }
+
+    .styled-select {
+        width: 180px;
+        display: inline-flex;
+    }
+</style>

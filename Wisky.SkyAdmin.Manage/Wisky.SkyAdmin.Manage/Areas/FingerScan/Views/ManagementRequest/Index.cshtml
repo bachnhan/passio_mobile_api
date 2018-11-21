@@ -1,0 +1,479 @@
+﻿@using HmsService.Models
+@{
+    var current = CurrentStatusEnum.Current.DisplayName();
+    var past = CurrentStatusEnum.Past.DisplayName();
+    var future = CurrentStatusEnum.Future.DisplayName();
+
+    var comelate = StatusAttendance.ComeLate.DisplayName();
+    var bothviolate = StatusAttendance.Bothviolate.DisplayName();
+    var miss = StatusAttendance.Miss.DisplayName();
+    var onTime = StatusAttendance.OnTime.DisplayName();
+    var returnEarly = StatusAttendance.ReturnEarly.DisplayName();
+}
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+
+    .mtab_content {
+        display: none;
+    }
+</style>
+<link href="~/Content/calendarResource/calendar.css" rel="stylesheet" />
+<div class="card">
+    <div>
+        <div class="card-header">
+            <div class="box-header p-b-0">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3 id="title-shift-model">Xác nhận điểm danh</h3>
+                    </div>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+        <div id="mtabs_content_container">
+            <div id="shiftTable" class="mtab_content" style="display: block;">
+                <div class="card-padding">
+                    <div class="row" style="margin-top: -10px; margin-bottom: 10px">
+                        <div class="col-md-12 p-t-10">
+                            <div class="col-md-6">
+                                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#btnBoLoc" style="height: 37px; margin-top: 10px" onclick="toggleIcon()"><i id="icon" class="fa fa-plus"></i> Bộ lọc</button>
+                                @*<button type="button" class="btn btn-success" style="height: 37px; margin-top: 10px" onclick="callShowCreateModal()">
+                                        <i class="glyphicon glyphicon-plus"></i> THÊM LỊCH
+                                    </button>*@
+                            </div>
+
+                            <div class="col-md-6 text-right m-t-15 ">
+                                <div class="input-group" style="margin-left: -15px; padding-right: 20px">
+                                    <!-- Dater picker -->
+                                    <div class="dateTime width230 pull-right">
+                                        <div class="fg-line m-t-5">
+                                            <div class="height-fix">
+                                                <div class="input-group date col-sm-12" id="chooseDayDiv">
+                                                    <input id="chooseDay" type="text" class="input-group-addon form-control" />
+                                                    <span class="input-group-addon myCerlenderSpan p-r-45">
+                                                        <span class="fa fa-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="input-group-btn FindButtonDateTime">
+                                        <a class="btn btn-primary FindDateTime" id="btnSearch" style="height: 39px;">
+                                            <i class="left-icon fa fa-search"></i> Tìm
+                                        </a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="collapse" id="btnBoLoc">
+                        <div class="group-radio-buttons myGroup-radio-buttons " style="padding-bottom: 10px">
+                            <div class="col-md-12" style="">
+                                <h4 style="margin-bottom:5px;font-weight:bold;">Tình trạng</h4>
+                            </div>
+                            <div class="row small-margin">
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="-1" class="nice-check" checked id="byAll" />
+                                    <label for="byAll"><span>Tất cả</span></label>
+                                </div>
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="@((int)StatusAttendance.ComeLate)" class="nice-check" id="byLate" />
+                                    <label for="byLate"><span>Đi trễ</span></label>
+                                </div>
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="@((int)StatusAttendance.ReturnEarly)" class="nice-check" id="byEarly" />
+                                    <label for="byEarly"><span>Về sớm</span></label>
+                                </div>
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="@((int)StatusAttendance.OnTime)" class="nice-check" id="byOnTime" />
+                                    <label for="byOnTime"><span>Đúng giờ</span></label>
+                                </div>
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="@((int)StatusAttendance.Miss)" class="nice-check" id="byMiss" />
+                                    <label for="byMiss"><span>Vắng</span></label>
+                                </div>
+                                <div class="col-md-4" style="padding-left:100px">
+                                    <input type="radio" name="searchBy" value="@((int)StatusAttendance.Bothviolate)" class="nice-check" id="byViolate" />
+                                    <label for="byViolate"><span>Đi Trễ Về Sớm</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="tab-content">
+                            <div class="tab-pane active">
+                                <!-- Datatable -->
+                                <div class="col-md-12">
+
+                                    <table id="shiftDatatable" class="table table-hover dataTable table-bordered nowrap" cellspacing="0">
+                                        <thead>
+                                            <tr>
+                                                <th><label>STT</label></th>
+                                                <th><label>Nhân viên</label></th>
+                                                <th><label>Ngày giờ làm việc</label></th>
+                                                <th><label>Giờ vào</label></th>
+                                                <th><label>Giờ ra</label></th>
+                                                @*<th><label>Tổng TG</label></th>*@
+                                                <th><label>Tình Trạng</label></th>
+                                                <th><label>Thời gian</label></th>
+                                                <th><label>Giờ vào yêu cầu</label></th>
+                                                <th><label>Giờ ra yêu cầu</label></th>
+                                                <th><label>Tùy chọn</label></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="note-modal-replyRequest-container">
+    <div class="modal" id="note-modal-replyRequest" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document" @*style="width:800px;"*@>
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Cập nhật thành công - Thêm Ghi chú</h4>
+                        <input type="hidden" id="attIdReplyRequestModal"/>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row p-l-45 p-r-45">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Ghi chú lý do</label>
+                                    <div class="col-sm-8">
+                                        <textarea rows="4" cols="78" class="form-control" id="TextAreaNote" name="TextAreaNote"></textarea>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Bỏ qua</button>
+                        <button type="submit" id="btnAction" onclick="UpdateNoteRequest()" class="btn btn-success btn-sm pull-right">Hoàn Tất Ghi Chú</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        function setupChooseDate() {
+            $('#chooseDayDiv').datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+        }
+
+        $('#btnSearch').on('click', function () {
+            RefreshTable("#shiftDatatable");
+        });
+
+        $(document).ready(function() {
+            setupChooseDate();
+            initShiftDatatable();
+        });
+        //-------------------Datatable------------------
+        //redraw datatable without reload
+        function reDrawDatatable(id) {
+
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+        }
+
+        //user datatable
+        function RefreshTable(datatableId) {
+            reDrawDatatable(datatableId);
+        }
+
+        // Get DataAttendance Datatable
+        function initShiftDatatable() {
+            $("#shiftDatatable").dataTable({
+                "bSearchable": false,
+                "bSort": false,
+                "bServerSide": true,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("LoadSessionAttendance", "ManagementRequest")",
+                "fnServerParams": function (aoData) {
+                    @*aoData.push({ "name": "employeeId", "value": @empId });*@
+                    aoData.push({ "name": "startDate", "value": $('#chooseDay').val() });
+                    aoData.push({ "name": "endDate", "value": $('#chooseDay').val() });
+                    aoData.push({ "name": "status", "value": $('input:radio[name=searchBy]:checked').val() });
+                },
+                "bProcessing": true,
+                "aLengthMenu": [10, 25, 50],
+                "bFilter": true,
+                "oLanguage": {
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                        "sClass": "text-center",
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [5],
+                        "mRender": function (data, type, row) {
+                            var html = "";
+                            if (data == '@((int)StatusAttendance.Miss)') {
+                                html = "<div class='label label-default'>@(miss)</div>";
+                            }
+                            if (data == '@((int)StatusAttendance.Bothviolate)') {
+                                html = "<div class='label label-danger'>@(bothviolate)</div>";
+                            }
+                            if (data == '@((int)StatusAttendance.ComeLate)') {
+                                html = "<div class='label label-warning'>@(comelate)</div>";
+                            }
+                            if (data == '@((int)StatusAttendance.ReturnEarly)') {
+                                html = "<div class='label label-warning'>@(returnEarly)</div>";
+                            }
+                            if (data == '@((int)StatusAttendance.OnTime)') {
+                                html = "<div class='label label-success'>@(onTime)</div>";
+                            }
+                            return html;
+                        }
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var html = "";
+                            if (data == '@((int)CurrentStatusEnum.Future)') {
+                                html = "<div class='label label-primary'>@(future)</div>";
+                            }
+                            if (data == '@((int)CurrentStatusEnum.Current)') {
+                                html = "<div class='label label-success'>@(current)</div>";
+                            }
+                            if (data == '@((int)CurrentStatusEnum.Past)') {
+                                html = "<div class='label label-danger'>@(past)</div>";
+                            }
+                            return html;
+                        }
+                    },
+
+                    {
+                        "aTargets": [9],
+                        "mRender": function (data, type, row) {
+                            var isRequest = row[10];
+                            var approved = "";
+                            var reject = "";
+                            if (isRequest == '@((int)IsRequest.Request)') {
+                                approved = "<a title='Duyệt' class='btn btn-sm btn-success' onclick='approvedRequestModal(" + data + ")'><i class='fa fa-check' aria-hidden='true'></i></a>";
+                                reject = "<a title='Từ chối' class='btn btn-sm btn-danger' onclick='rejectRequestModal(" + data + ")'><i class='fa fa-times' aria-hidden='true'></i></a>";
+                            } else if (isRequest == '@((int)IsRequest.RequestNewAttendance)') {
+                                approved =
+                                    "<a title='Duyệt yêu cầu phân công mới' class='btn btn-sm btn-warning' onclick='approvedRequestNewAttendanceModal(" +
+                                    data +
+                                    ")'><i class='fa fa-check' aria-hidden='true'></i></a>";
+                                reject =
+                                    "<a title='Từ chối yêu cầu phân công mới' class='btn btn-sm btn-warning' onclick='rejectRequestNewAttendanceModal(" +
+                                    data +
+                                    ")'><i class='fa fa-times' aria-hidden='true'></i></a>";
+                            } else if (isRequest == '@((int)IsRequest.RejectNewAttendance)') {
+                                return "<div class='label label-danger'>Đã từ chối ca</div>" + " " + "<a title='Ghi chú lý do' class='btn btn-sm btn-primary' onclick='showNoteRequestModal(" + data + ")'><i class='fa fa-pencil'></i></a>";
+                            } else if (isRequest == '@((int)IsRequest.ApprovedNewAttendance)') {
+                                return "<div class='label label-success'>Đã duyệt ca</div>" + " " + "<a title='Ghi chú lý do' class='btn btn-sm btn-primary' onclick='showNoteRequestModal(" + data + ")'><i class='fa fa-pencil'></i></a>";
+                            } else if (isRequest == '@((int)IsRequest.Approved)') {
+                                return "<div class='label label-success'>Duyệt điểm danh</div>" + " " + "<a title='Ghi chú lý do' class='btn btn-sm btn-primary' onclick='showNoteRequestModal(" + data + ")'><i class='fa fa-pencil'></i></a>";
+                            } else if (isRequest == '@((int)IsRequest.Reject)') {
+                                return "<div class='label label-danger'>Từ chối điểm danh</div>" + " " + "<a title='Ghi chú lý do' class='btn btn-sm btn-primary' onclick='showNoteRequestModal(" + data + ")'><i class='fa fa-pencil'></i></a>";
+                            }
+                            return approved + " " + reject;
+                        }
+                    },
+
+                ],
+                "bAutoWidth": false
+            }).fnSetFilteringDelay(delaySearch);
+
+        }
+        function approvedRequestModal(id) {
+            ShowConfirm("Bạn có muốn duyệt yêu cầu lại của nhân viên này?",
+                function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("CheckRequest", "ManagementRequest")',
+                        data: {
+                            'attId':  id,
+                            'type' : '@((int)IsRequest.Approved)'
+                        },
+
+                        success: function (result) {
+                            if (result.rs == true) {
+                                ShowAlert("Cập nhật thành công", 2);
+                                showNoteRequestModal(id);
+                                RefreshTable("#shiftDatatable");
+                            } else {
+                                ShowAlert("Chưa cập nhật được. Vui lòng thử lại", 1);
+                            }
+                        },
+                        error: function (error) {
+                            ShowAlert("Có lỗi xảy ra. Vui lòng thử lại sau.", 1);
+                        }
+                   });
+                });
+        }
+
+        function rejectRequestModal(id) {
+            ShowConfirm("Bạn có muốn từ chối yêu cầu điểm danh lại của nhân viên này?",
+                function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("CheckRequest", "ManagementRequest")',
+                        data: {
+                            'attId':  id,
+                            'type' : '@((int)IsRequest.Reject)'
+                        },
+
+                        success: function (result) {
+                            if (result.rs == true) {
+                                ShowAlert("Cập nhật thành công", 2);
+                                showNoteRequestModal(id);
+                                RefreshTable("#shiftDatatable");
+                            } else {
+                                ShowAlert("Chưa cập nhật được. Vui lòng thử lại", 1);
+                            }
+                        },
+                        error: function (error) {
+                            ShowAlert("Có lỗi xảy ra. Vui lòng thử lại sau.", 1);
+                        }
+                     });
+                });
+        }
+
+        function approvedRequestNewAttendanceModal(id) {
+            ShowConfirm("Bạn có muốn duyệt yêu cầu phân công mới này?",
+               function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("CheckRequest", "ManagementRequest")',
+                        data: {
+                            'attId':  id,
+                            'type' : '@((int)IsRequest.ApprovedNewAttendance)'
+                        },
+
+                        success: function (result) {
+                            if (result.rs == true) {
+                                ShowAlert("Cập nhật thành công", 2);
+                                showNoteRequestModal(id);
+                                RefreshTable("#shiftDatatable");
+                            } else {
+                                ShowAlert("Chưa cập nhật được. Vui lòng thử lại", 1);
+                            }
+                        },
+                        error: function (error) {
+                            ShowAlert("Có lỗi xảy ra. Vui lòng thử lại sau.", 1);
+                        }
+                    });
+               });
+        }
+
+        function rejectRequestNewAttendanceModal(id) {
+            ShowConfirm("Bạn có muốn từ chối yêu cầu phân công mới này?",
+                function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("CheckRequest", "ManagementRequest")',
+                        data: {
+                            'attId':  id,
+                            'type' : '@((int)IsRequest.RejectNewAttendance)'
+                        },
+
+                        success: function (result) {
+                            if (result.rs == true) {
+                                ShowAlert("Cập nhật thành công", 2);
+                                RefreshTable("#shiftDatatable");
+                                showNoteRequestModal(id);
+                            } else {
+                                ShowAlert("Chưa cập nhật được. Vui lòng thử lại", 1);
+                            }
+                        },
+                        error: function (error) {
+                            ShowAlert("Có lỗi xảy ra. Vui lòng thử lại sau.", 1);
+                        }
+                    });
+                });
+        }
+
+        function showNoteRequestModal(id) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetNoteRequest", "ManagementRequest")',
+                data: {
+                    'attId': id
+                },
+
+                success: function (result) {
+                    $("#note-modal-replyRequest").modal('show');
+                    $("#TextAreaNote").val(result.rs);
+                    $("#attIdReplyRequestModal").val(id);
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra. Vui lòng thử lại sau.", 1);
+                }
+            });
+            
+        }
+        function UpdateNoteRequest() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("UpdateNoteRequest", "ManagementRequest")',
+                data: {
+                    'attId': $("#attIdReplyRequestModal").val(),
+                    'note': $("#TextAreaNote").val()
+                },
+
+                success: function (result) {
+                    if (result.rs == true) {
+                        ShowAlert("Cập nhật thành công", 2);
+                        $("#TextAreaNote").val("");
+                        $("#note-modal-replyRequest").modal('hide');
+                    } else {
+                        ShowAlert("Chưa cập nhật được. Vui lòng thử lại", 1);
+                    }
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra. Vui lòng thử lại sau.", 1);
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,265 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Danh sách nhóm thành viên
+                </h3>
+            </div>
+            <div class="col-md-6">
+                <a data-toggle="modal" id="btnCreate" role="button" onclick="showCreateGroupPanel()" class="btn btn-primary btn-sm pull-right">
+                    <i class="zmdi zmdi-plus" hidden></i> Thêm nhóm thành viên
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-padding">
+        
+        <table id="membership-group-table" class="table table-striped table-bordered table-hover">
+            <thead style="white-space:nowrap; text-overflow:ellipsis;">
+                <tr>
+                    <th>
+                        <label class="">STT</label>
+                    </th>
+                    <th>
+                        <label class="">Mã nhóm thành viên</label>
+                    </th>
+                    <th>
+                        <label class="">Tên nhóm thành viên</label>
+                    </th>
+                    <th>
+                        <label class="">Tùy chọn</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<div id="createGroupPanel" class="modal fade">
+    <div id="modalEdit" class="modal-dialog" style="width: 700px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4>Tạo nhóm</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            Mã nhóm:
+                        </label>
+                        <div class="col-sm-9">
+                            <input id="newGroupCode" type="text" class="form-control" />
+                        </div>
+                    </div>
+                    @*<input id="editGroupId" type="text" hidden />*@
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            Tên nhóm:
+                        </label>
+                        <div class="col-sm-9">
+                            <input id="newGroupName" type="text" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="validateCreate()" class="btn btn-primary">Tạo</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="editGroupPanel" class="modal fade">
+    <div id="modalEdit" class="modal-dialog" style="width: 700px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4>Cập nhật nhóm</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    @*<div class="form-group">
+                            <label class="col-sm-3 control-label">
+                                Mã nhóm:
+                            </label>
+                            <div class="col-sm-9">
+                              <input id="editGroupCode" type="text" class="form-control" />
+                            </div>
+                        </div>*@
+                    <input id="editGroupId" type="text" hidden />
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">
+                            Tên nhóm:
+                        </label>
+                        <div class="col-sm-9">
+                            <input id="editGroupName" required type="text" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="validateEdit()" class="btn btn-primary">Cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        InitGroupDataTable();
+
+    });
+    function InitGroupDataTable() {
+        $("#membership-group-table").dataTable({
+            "bSort": false,
+            "bFilter": true,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": '@Url.Action("LoadGroupMembership","GroupMembershipCard")',
+            "bProcessing": true,
+            //"fnServerParams": function (aoData) {
+            //    aoData.push(
+            //        { "name": "", "value":  }
+
+            //    );
+            //},
+            "oLanguage": {
+                "sSearchPlaceholder": "Tên nhóm",
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+               
+                "sProcessing": "Đang xử lý...",
+                "sInfo": "Hiển thị _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sInfoEmpty": "Hiển thị 0 từ 0 của 0 dòng",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1],
+                    "sClass": "text-center",
+                    "bSearchable": false
+                },
+                {
+                    "aTargets": [2],
+                    "sClass": "text-center",
+                    "bSearchable": true,
+                },
+                {
+                    "aTargets": [3],
+                    "mRender": function (data, type, row) {
+                        var data = row[3];
+                        var edit = "<a onclick='showEditGroupPanel(" + row[3] + ")' title='Chỉnh sửa' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-pencil'></i></a>"
+                        var asign = "<a href='@Url.Action("MembershipAssign", "GroupMembershipCard")?groupCode=" + row[1] + "' title='Thêm thẻ' class='btn btn-success btn-assign btn-sm'><i class='zmdi zmdi-card-membership'></i></a>"
+                        //var remove = "<a href='javascript:deleteGroup(" + row[3] + ")' title='Hủy nhóm' class='btn btn-sm btn-danger'><i class='glyphicon glyphicon-trash'></i></a>"
+                        return edit + ' ' + asign;
+                        //+ ' ' + remove;
+                    }
+                },
+
+            ],
+            "bAutoWidth": false,
+
+        }).fnSetFilteringDelay(delaySearch);
+    }
+    function showCreateGroupPanel() {
+        $("#createGroupPanel").modal("show");
+    }
+
+    function showEditGroupPanel(groupID) {
+        $('#editGroupId').val(groupID);
+        $("#editGroupPanel").modal("show");
+    }
+    function validateCreate() {
+        if ($('#newGroupCode').val() == "") {
+            ShowMessage("Vui lòng nhập mã nhóm.", 3);
+            return;
+        }
+        if ($('#newGroupName').val() == "") {
+            ShowMessage("Vui lòng nhập tên nhóm.", 3);
+            return;
+        }
+        else {
+            submitCreate();
+        }
+    }
+    function validateEdit() {
+        if ($('#editGroupName').val() == "") {
+            ShowMessage("Vui lòng nhập tên nhóm.", 3);
+            return;
+        }
+        else {
+            submitEdit();
+        }
+    }
+    function submitCreate() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Create")',
+            dataType: 'JSON',
+            data: {
+                'name': $('#newGroupName').val(),
+                'code': $('#newGroupCode').val(),
+            },
+            success: function (result) {
+                if (result) {
+                    if (result.success == true) {
+                        ShowMessage(result.message, 2, '@Url.Action("Index")');
+                        RefreshTable();
+                        $('#createGroupPanel').modal('hide');
+                    }
+                    else {
+                        ShowMessage(result.message, 1);
+                    }
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+
+            //error: function (error) {
+            //    ShowMessage(error.message,1);
+            //}
+        });
+    }
+    function submitEdit() {
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Edit")',
+            dataType: 'JSON',
+            data: {
+                'groupId': $('#editGroupId').val(),
+                'name': $('#editGroupName').val(),
+            },
+            success: function (result) {
+                if (result) {
+                    ShowMessage(result.message, 2, '@Url.Action("Index")');
+                    RefreshTable();
+                    $('#editGroupPanel').modal('hide');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+
+            //error: function (error) {
+            //    ShowMessage(error.message,1);
+            //}
+        });
+    }
+    function RefreshTable() {
+        $("#membership-group-table").dataTable()._fnPageChange(0);
+        $("#membership-group-table").dataTable()._fnAjaxUpdate();
+    }
+</script>

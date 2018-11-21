@@ -1,0 +1,276 @@
+﻿
+@{
+    ViewBag.Title = "Khách hàng gần đây";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Khách Hàng Gần Đây</h3>
+            </div>
+        </div>
+        <hr/>
+    </div>
+    <div class="card-body">
+        <!-- Store chooser -->
+        <div class="btn-group">
+            <button type="button" id="btn-stores" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" style="overflow-y : scroll; height: 300px; max-height: 300px" id="store-menu"></ul>
+        </div>
+        <input type="hidden" id="storeId" name="storeId" value="-1" />
+
+
+
+        <!-- Daterange picker -->
+        <div class="col-md-offset-3 dateTime pull-right">
+            <div class="fg-line m-t-5">
+                <div id="reportrange" class="btn-datetime form-control">
+                    <i class="fa fa-calendar"></i>
+                    <span></span> <b class="caret"></b>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Customer Table -->
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="allcust">
+                <!-- Datatable -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="UserDatatable" class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label class="">Số thứ tự</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tên khách hàng</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Giới tính</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Điện thoại</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Số lần đến</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Lần đến gần nhất</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+
+    <script>
+
+        $(document).ready(function () {
+            loadAllStore();
+
+            setupDaterangepicker();
+            //InitUserDatatable();
+
+        });
+
+        //Load Store
+        function loadAllStore() {
+
+            $.ajax({
+                url: '@Url.Action("LoadAllStore")',
+                type: "POST",
+                success: function (result) {
+                    if (result != null && result.length > 0) {
+                        //render to store dropdown
+                        $('#store-menu').html();
+                        $('#store-menu').append("<li onclick=\"changeStore(-1, \'Tất cả cửa hàng\')\"><a href=\'#\'>Tất cả cửa hàng</a></li>");
+                        for (var i = 0; i < result.length; i++) {
+                            $('#store-menu').append("<li onclick=\"changeStore(" + result[i].StoreId + ", \'" + result[i].Name + "\')\"><a href=\'#\'>" + result[i].Name + "</a></li>");
+                        }
+
+                        //default store
+                        $('#btn-stores').html('Tất cả cửa hàng &#9660');
+                        $('#storeId').val(-1);
+
+                        //finish load store
+                        InitUserDatatable();
+
+                    } else {
+                        $('#btn-stores').html('Không tìm thấy cửa hàng nào');
+                        $('#storeId').val(-2);
+                    }
+                },
+                error: function (error) {
+                    alert("Có lỗi xảy ra, vui lòng thử lại. Nếu lỗi tiếp tục tiếp diễn xin vui lòng liên hệ admin");
+                }
+            });
+        }
+
+        function changeStore(storeId, storeName) {
+            $('#btn-stores').html(storeName + " &#9660");
+            $('#storeId').val(storeId);
+
+            RefreshTable();
+
+        }
+
+
+
+
+
+        //init dateRange picker
+        function setupDaterangepicker() {
+            $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+            $('#reportrange').daterangepicker({
+                format: 'DD/MM/YYYY',
+                startDate: moment().add(-30, 'days'),
+                endDate: moment().add(0, 'days'),
+                minDate: '01/01/2012',
+                maxDate: '31/12/2100',
+                dateLimit: { days: 365 },
+                showDropdowns: true,
+                showWeekNumbers: true,
+                timePicker: false,
+                timePickerIncrement: 1,
+                timePicker12Hour: true,
+                parentEl: '.modal-body',
+                ranges: {
+                    'Today': [moment.utc().startOf('day'), moment.utc().endOf('day')],
+                    'Yesterday': [moment.utc().startOf('day').add(-1, 'days'), moment.utc().endOf('day').add(-1, 'days')],
+                    'This Week': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                    'Last Week': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                    'This Month': [moment().add(0, 'month').startOf('month'), moment().add(0, 'month').endOf('month')],
+                    'Last Month': [moment().add(-1, 'month').startOf('month'), moment().add(-1, 'month').endOf('month')]
+                },
+                opens: 'left',
+                drops: 'down',
+                buttonClasses: ['btn', 'btn-sm'],
+                applyClass: 'btn-primary',
+                cancelClass: 'btn-default',
+                separator: ' to ',
+                locale: {
+                    applyLabel: 'Submit',
+                    cancelLabel: 'Cancel',
+                    fromLabel: 'From',
+                    toLabel: 'To',
+                    customRangeLabel: 'Custom',
+                    daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'],
+                    monthNames: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+                    firstDay: 1
+                }
+            }, function (start, end, label) {
+                //console.log(start.toISOString(), end.toISOString(), label);
+
+                $('#reportrange span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+            });
+
+            $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
+                RefreshTable();
+            });
+        }
+
+        function InitUserDatatable() {
+            $("#UserDatatable").dataTable({
+                "bFilter": true,
+                "bRetrieve": true,
+                "bServerSide": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("GetListRecentCustomer")",
+                "bProcessing": true,
+                "bFilter": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfoEmpty": "Không có dữ liệu",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "fnServerParams": function (aoData) {
+                    aoData.push(
+                        { "name": "storeId", "value": $('#storeId').val() },
+                        { "name": "customerTypeId", "value": $('#customerTypeId').val() },
+                        { "name": "startDate", "value": $('#reportrange').data('daterangepicker').startDate.toISOString() },
+                        { "name": "endDate", "value": $('#reportrange').data('daterangepicker').endDate.toISOString() }
+                    );
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3, 4, 5],
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [1],
+                        "mRender": function (data, type, row) {
+                            var name = row[1];
+                            var data = row[6];
+                            var detail = "<a href='@Url.Action("CustomerDetail")\/" + data + "\'>" + name + "</a>";
+                            return detail;
+                        },
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var data = row[6];
+                            //var result = "<a class='btn btn-sm btn-primary' onclick='edit(" + data + ")'>Edit</a>";
+                            var detail = "<a class='btn btn-sm btn-primary' href='@Url.Action("CustomerDetail")\/" + data + "\'><i class='glyphicon glyphicon-eye-open'></i></a>";
+                            var edit = "<a class='btn btn-sm btn-warning' href='@Url.Action("Edit")\/" + data + "\'><i class='glyphicon glyphicon-pencil'></i></a>";
+                            //var deleteCustomer = "<a class='btn btn-sm btn-primary' href='@Url.Action("DeleteCustomer")\/" + data + "\'><i class='glyphicon glyphicon-remove'></i></a>";
+                            return edit;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    }
+
+                ],
+                "bAutoWidth": false,
+            }).fnSetFilteringDelay(800);
+        }
+
+        //redraw datatable without reload
+        function reDrawDatatable(id) {
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+        }
+
+        //user datatable
+        function RefreshTable() {
+            reDrawDatatable("#UserDatatable");
+        }
+
+    </script>
+
+}

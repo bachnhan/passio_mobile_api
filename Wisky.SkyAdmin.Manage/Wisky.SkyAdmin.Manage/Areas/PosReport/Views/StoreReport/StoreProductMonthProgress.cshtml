@@ -1,0 +1,509 @@
+﻿@{
+    ViewBag.Title = "StoreProductDateProgress";
+    //  Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>
+                    Diễn tiến sản phẩm theo tháng
+                </h3>
+                <h5 class="smallDate" data-role="small-date" id="dateRange"></h5>
+            </div>
+        </div>
+        <hr />
+        <div class="row" style="margin-top: 19px;">
+            <div class="col-md-5">
+
+                <div class="form-group">
+                    <label class="col-md-3 control-label myGroupChooseWeekFromTo">Từ</label>
+                    <div class="col-md-9 input-group date" id="fromMonthPicker">
+                        <input id="startDate" type='text' class="form-control" />
+                        <span class="input-group-addon myCerlenderSpan">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="control-label myGroupChooseWeekFromTo col-md-3">Đến</label>
+                    <div class='input-group date col-md-9' id="toMonthPicker">
+                        <input id="endDate" type='text' class="form-control" />
+                        <span class="input-group-addon myCerlenderSpan">
+                            <span class="glyphicon glyphicon-calendar"></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <!-- STORE DATE -->
+            <div>
+                <input type="hidden" id="sTime" />
+                <input type="hidden" id="eTime" />
+            </div><!-- STORE DATE END -->
+            <div class="col-md-1">
+                <div class="input-group-btn">
+                    <a class="btn btn-primary btn-sm" id="btnSearch">
+                        <i class="left-icon fa fa-search"></i>   Tìm
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card-padding">
+        <div id="groupCategoryReport">
+            <table id="groupCategoryReportDatatable" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label class="">Tên sản phẩm</label>
+                        </th>
+                        <th>
+                            <label class="">Ngành hàng</label>
+                        </th>
+                        <th>
+                            <label class="">Tùy chọn</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div><!-- PRODUCT TABLE END -->
+        <!-- MODAL FOR SHOWING PRODUCT PROGRESS -->
+        <div class="modal fade " tabindex="-1" id="product-detail-report-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <!-- MODAL HEAD -->
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title text-center"></h4>
+                    </div><!-- MODAL HEAD END -->
+                    <!-- MODAL BODY -->
+                    <div class="modal-body">
+                        <!-- PROGRESS CHART -->
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div id="container" style="width: 860px; height: auto; margin: 0px auto; display: block;"></div><!-- PROGRESS CHART END -->
+                            </div>
+                        </div>
+                        <!-- PROGRESS DETAIL TABLE -->
+                        <div id="product-report-detail-table-area">
+                            <table class="table table-bordered table-hover" id="product-report-detail-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tháng</th>
+                                        <th>Số lượng</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div><!-- PROGRESS DETAIL TABLE END -->
+                    </div><!-- MODAL BODY END -->
+                </div>
+            </div>
+        </div><!-- MODAL FOR SHOWING PRODUCT PROGRESS END -->
+    </div>
+</div>
+@*<div class="page-content">
+        <!-- PAGE HEADER -->
+        <div class="page-header">
+            <div class="row">
+                <!-- HEADER NAME -->
+                <div class="col-md-6">
+                    <h1>
+                        Diễn tiến sản phẩm theo tháng<small data-role="small-date" id="dateRange"></small>
+                    </h1>
+                </div><!-- HEADER NAME END -->
+                <!-- SEARCH -->
+                <div class="col-md-6">
+                    <!-- MONTH PICKER -->
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Từ</label>
+                                <div class='input-group date col-md-9' id="fromMonthPicker">
+                                    <input id="startDate" type='text' class="form-control" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label class="control-label col-md-3">Đến</label>
+                                <div class='input-group date col-md-9' id="toMonthPicker">
+                                    <input id="endDate" type='text' class="form-control" />
+                                    <span class="input-group-addon">
+                                        <span class="glyphicon glyphicon-calendar"></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- SEARCH BUTTON -->
+                        <div class="col-md-2 text-right">
+                            <div class="input-group-btn">
+                                <a class="btn btn-success btn-sm" id="btnSearch">
+                                    <i class="left-icon fa fa-search"></i>Tìm
+                                </a>
+                            </div>
+                        </div><!-- SEARCH BUTTON END -->
+                    </div><!-- MONTH PICKER END -->
+                    <!-- STORE DATE -->
+                    <div>
+                        <input type="hidden" id="sTime" />
+                        <input type="hidden" id="eTime" />
+                    </div><!-- STORE DATE END -->
+                </div><!-- SEARCH END -->
+            </div>
+        </div><!-- PAGE HEADER END -->
+        <!-- PRODUCT TABLE -->
+        <div id="groupCategoryReport">
+            <table id="groupCategoryReportDatatable" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label class="">Tên sản phẩm</label>
+                        </th>
+                        <th>
+                            <label class="">Ngành hàng</label>
+                        </th>
+                        <th>
+                            <label class="">Chi tiết</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div><!-- PRODUCT TABLE END -->
+        <!-- MODAL FOR SHOWING PRODUCT PROGRESS -->
+        <div class="modal fade " tabindex="-1" id="product-detail-report-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <!-- MODAL HEAD -->
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <h4 class="modal-title text-center"></h4>
+                    </div><!-- MODAL HEAD END -->
+                    <!-- MODAL BODY -->
+                    <div class="modal-body">
+                        <!-- PROGRESS CHART -->
+                        <div id="container" style="margin:0 auto;width:1188px;height:auto"></div><!-- PROGRESS CHART END -->
+                        <!-- PROGRESS DETAIL TABLE -->
+                        <div id="product-report-detail-table-area">
+                            <table class="table table-bordered table-hover" id="product-report-detail-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tháng</th>
+                                        <th>Số lượng</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div><!-- PROGRESS DETAIL TABLE END -->
+                    </div><!-- MODAL BODY END -->
+                </div>
+            </div>
+        </div><!-- MODAL FOR SHOWING PRODUCT PROGRESS END -->
+    </div>*@
+
+<script>
+    $(function () {
+        $('#groupCategoryReport').on('click', '.btnDetail', function () {
+            var dateRange = $('#dateRange').html();
+
+            $.ajax({
+                url: '@Url.Action("LoadDetailProductMonthProgress", "StoreReport")',
+                type: 'Get',
+                data: { startTime: $('#sTime').val(), endTime: $('#eTime').val(), storeId: @ViewBag.storeId, productId: $(this).data('pid')},
+                success: function (rs) {
+                    // Create table of product.
+                    InitDetailProDatatable(rs.dataTable);
+                    // If progress in one month don't show the chart. Only show for month range larger than 1.
+                    if(dateRange.indexOf('-') > -1) {
+                        $('#container').show();
+                        SetUpChart(rs.dataChart);
+                    } else {
+                        $('#container').hide();
+                    }
+                    //Change modal title to macth the product that was clicked.
+                    $('.modal-title').html($(this).data('pname'));
+                    $('#product-detail-report-modal').modal('show');
+                }
+            });
+        });
+
+        $(document).on('click', '#btnSearch', function () {
+            var startStr = $('#startDate').val(),
+                endStr = $('#endDate').val(),
+                endMonth = endStr.split('/')[0],
+                endYear = endStr.split('/')[1];
+
+            var startDate = '01/' + startStr,
+            today = moment().format('DD/MM/YYYY').toString();
+            if (endStr == today.substring(3, 10)) {
+                endDate = today.substring(0, 3) + endStr;
+            } else {
+                endDate = (new Date(endYear, endMonth, 0).getDate()) + '/' + endStr;
+            }
+
+            $('#sTime').val(startDate);
+            $('#eTime').val(endDate);
+            $('#dateRange').html("(" + startStr + (startStr == endStr? '':' - ' + endStr) + ")");
+
+            ProductDataProcess();
+        });
+
+        // Month picker
+        $('#fromMonthPicker').datetimepicker({
+            viewMode: 'months',
+            format: 'MM/YYYY',
+            defaultDate: moment().subtract(2, "months"),
+            maxDate: moment()
+        });
+
+        $('#toMonthPicker').datetimepicker({
+            viewMode: 'months',
+            format: 'MM/YYYY',
+            defaultDate: moment(),
+            maxDate: moment()
+        });
+
+        var startStr = $('#startDate').val(),
+            endStr = $('#endDate').val(),
+            endMonth = endStr.split('/')[0],
+            endYear = endStr.split('/')[1];
+
+        var startDate = '01/' + startStr,
+        today = moment().format('DD/MM/YYYY').toString();
+        if (endStr == today.substring(3, 10)) {
+            endDate = today.substring(0, 3) + endStr;
+        } else {
+            endDate = (new Date(endYear, endMonth, 0).getDate()) + '/' + endStr;
+        }
+
+        $('#sTime').val(startDate);
+        $('#eTime').val(endDate);
+        $('#dateRange').html("(" + startStr + (startStr == endStr? '':' - ' + endStr) + ")");
+
+        ProductDataProcess();
+    });
+
+    //$('#startDate').on('input',function(){
+    //    var startStr = $('#startDate').val(),
+    //        endStr = $('#endDate').val(),
+    //        endMonth = endStr.split('/')[0],
+    //        endYear = endStr.split('/')[1];
+
+    //    var startDate = '01/' + startStr,
+    //    today = moment().format('DD/MM/YYYY').toString();
+    //    if (endStr == today.substring(3, 10)) {
+    //        endDate = today.substring(0, 3) + endStr;
+    //    } else {
+    //        endDate = (new Date(endYear, endMonth, 0).getDate()) + '/' + endStr;
+    //    }
+
+    //    $('#sTime').val(startDate);
+    //    $('#eTime').val(endDate);
+    //    $('#dateRange').html("(" + startStr + (startStr == endStr? '':' - ' + endStr) + ")");
+    //});
+
+    //$('#endDate').on('input',function(){
+    //    var startStr = $('#startDate').val(),
+    //        endStr = $('#endDate').val(),
+    //        endMonth = endStr.split('/')[0],
+    //        endYear = endStr.split('/')[1];
+
+    //    var startDate = '01/' + startStr,
+    //    today = moment().format('DD/MM/YYYY').toString();
+    //    if (endStr == today.substring(3, 10)) {
+    //        endDate = today.substring(0, 3) + endStr;
+    //    } else {
+    //        endDate = (new Date(endYear, endMonth, 0).getDate()) + '/' + endStr;
+    //    }
+
+    //    $('#sTime').val(startDate);
+    //    $('#eTime').val(endDate);
+    //    $('#dateRange').html("(" + startStr + (startStr == endStr? '':' - ' + endStr) + ")");
+    //});
+
+    function ProductDataProcess ()
+    {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadProductCategoriesProgress", "StoreReport")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(),'storeId':@ViewBag.storeId },
+            success: function (result) {
+
+                //console.log(result.aaData);
+                InitProDatatable(result.aaData);
+            }
+        });
+    };
+
+    $('#groupCategoryReport').html('<table id="groupCategoryReportDatatable" class="table table-striped table-bordered table-hover">'
+            +'<thead>'
+            +'<tr>'
+            +'<th>'
+            +'<label class="">Tên sản phẩm</label>'
+            +'</th>'
+            +'<th>'
+            +'<label class="">Ngành hàng</label>'
+            +'</th>'
+            +'<th>'
+            +'<label class="">Tùy chọn</label>'
+            +'</th>'
+            +'</tr>'
+            +'</thead>'
+            +'<tbody></tbody>'
+            +'</table>');
+    function InitProDatatable(data) {
+        $("#groupCategoryReportDatatable").datatablevpn({
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "bProcessing": true,
+            "iDisplayLength": 25,
+            "aLengthMenu": [25, 50, 100],
+
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2],
+                    "bSortable": false
+                },
+                {
+                    "visible": false, "targets": 1
+                },
+                {
+                    "aTargets": [2],
+                    "mRender": function (data,type, o) {
+                        return '<a data-pname="' + o[0] + '" data-pid="'+ o[3] +'" class="btn btn-sm btn-primary btnDetail"><span class="glyphicon glyphicon-eye-open"></span></a>';
+                    },
+                }
+            ],
+            "bAutoWidth": true,
+            "order": [[1, 'asc']],
+            "drawCallback": function (settings) {
+                var api = this.api();
+                var rows = api.rows({ page: 'current' }).nodes();
+                var last = null;
+
+                api.column(1, { page: 'current' }).data().each(function (group, i) {
+                    if (last !== group) {
+                        $(rows).eq(i).before(
+                            '<tr><td class="bg-warning" colspan="2">' + group + '</td></tr>'
+                        );
+
+                        last = group;
+                    }
+                });
+            },
+            "bAutoWidth": false
+        });
+    };
+
+    function refreshCategoryReportTable() {
+        var oTable = $("#groupCategoryReportDatatable").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+
+    function InitDetailProDatatable(data) {
+        //console.log(data); // For debuging
+        // Reset dataTable
+        $('#product-report-detail-table-area').html('<table class="table table-bordered table-hover" id="product-report-detail-table">'
+                        + '<thead>'
+                            + '<tr>'
+                                + '<th>Tháng</th>'
+                                + '<th>Số lượng</th>'
+                            + '</tr>'
+                        + '</thead>'
+                        + '<tbody></tbody>'
+                    + '</table>');
+
+        $("#product-report-detail-table").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "dom": 'l<t>p',
+            "iDisplayLength": 10,
+            "aLengthMenu": [10, 15, 30, 50],
+            "oLanguage": {
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " ",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1],
+                    "bSortable": false
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+
+    function SetUpChart(data)
+    {
+        //console.log(data);
+        $('#container').highcharts({
+            title: {
+                text: 'Số lượng',
+                x: -20 //center
+            },
+            xAxis: {
+                categories: data.xAxis
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [{
+                name: 'Số lượng',
+                data: data.yAxis
+            }]
+        });
+    }
+</script>

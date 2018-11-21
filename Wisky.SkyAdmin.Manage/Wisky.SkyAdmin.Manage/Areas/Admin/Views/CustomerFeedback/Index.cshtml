@@ -1,0 +1,108 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    //Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách lời nhắn từ khách hàng</h3>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <table id="lst-items" class="table table-striped table-vmiddle">
+            <thead>
+                <tr>
+                    <th data-column-id="Title">Tiêu đề</th>
+                    <th data-column-id="Fullname">Họ và tên</th>
+                    <th data-column-id="Phone">Số điện thoại</th>
+                    <th data-column-id="Email">Email</th>
+                    <th data-column-id="Content">Nội dung</th>
+                    <th data-column-id="commands" ata-sortable="false" data-formatter="Commands">Tùy chọn</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<template id="command-template" class="hidden">
+    <div>
+        <a onclick="onDetailButtonClick(this);" class="btn btn-primary btn-sm" data-role="Detail"
+           data-toggle="tooltip" title="Chi tiết">
+            <i class="fa fa-eye"></i>
+        </a>
+        <button onclick="onDeleteButtonClick(this);" class="btn btn-danger btn-sm" data-role="Delete"
+                data-toggle="tooltip" title="Xóa">
+            <i class="glyphicon glyphicon-trash"></i>
+        </button>
+    </div>
+</template>
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(function () {
+            var commandTemplate = $("#command-template").html();
+
+            $("#lst-items").bootgrid({
+                rowCount: [10, 20, 50, ],
+
+                ajax: true,
+                url: "@this.Url.Action("IndexList", new { parameters = currentStoreDomain.Directory })",
+                labels: {
+                    noResults: "Không có dữ liệu",
+                    search: "Tìm kiếm",
+                    infos: "Hiển thị {{ctx.start}} tới {{ctx.end}} của {{ctx.total}} dòng",
+                    refresh: "Làm mới",
+                    loading: "Đang tải"
+                },
+                formatters: {
+                    "Commands": function (column, row) {
+                        var template = $(commandTemplate);
+
+                        template.find("[data-role=Detail]").attr("data-id", row.Id);
+                        template.find("[data-role=Delete]").attr("data-id", row.Id);
+
+                        return template[0].outerHTML;
+                    }
+                },
+            });
+        });
+
+
+
+        function onDeleteButtonClick(btn) {
+            if (confirm("Bạn có chắc là mình muốn xóa tin nhắn này không?")) {
+                var id = $(btn).attr("data-id");
+                window.location.href = "@this.Url.Action("Delete", new { parameters = currentStoreDomain.Directory })/" + id;
+            }
+        }
+
+        function onDetailButtonClick(btn) {
+            var idDetail = $(btn).attr("data-id");
+            $.ajax({
+                url: "@Url.Action("Detail")",
+                data: { id: idDetail },
+                success: function (result) {
+                    $('#myModal').modal('show');
+                    $('.modal-content').html(result);
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,74 @@
+﻿@model Wisky.SkyAdmin.Manage.Models.Identity.LoginViewModel
+
+@{
+    this.Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Log In</title>
+
+    <link href="~/Content/template/template-material/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
+    <link href="~/Content/template/template-material/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
+
+    <link href="~/Content/template/template-material/css/app.min.1.css" rel="stylesheet">
+    <link href="~/Content/template/template-material/css/app.min.2.css" rel="stylesheet">
+    <link href="~/Content/css/material-design-iconic-font.css" rel="stylesheet" />
+    <link href="~/Content/css/material-design-iconic-font.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/font-awesome-4.5.0/css/font-awesome.css" rel="stylesheet" />
+</head>
+<body class="login-content">
+
+    <!-- Login -->
+    <div class="lc-block toggled" id="l-login">
+        <form method="post">
+            @this.Html.AntiForgeryToken()
+
+            @if (!this.ViewData.ModelState.IsValid)
+            {
+                <div class="input-group m-b-20">
+                    <p class="text-danger">@(this.Html.ValidationSummary())</p>
+                </div>
+            }
+
+            <div class="input-group m-b-20">
+                <span class="input-group-addon"><i class="zmdi zmdi-account"></i></span>
+                <div class="fg-line">
+                    <input type="text" class="form-control" placeholder="Username" name="@this.Html.NameFor(q => q.Username)" value="@(this.Model.Username)" required>
+                </div>
+            </div>
+
+            <div class="input-group m-b-20">
+                <span class="input-group-addon"><i class="zmdi zmdi-male"></i></span>
+                <div class="fg-line">
+                    <input type="password" class="form-control" placeholder="Password" name="@this.Html.NameFor(q => q.Password)" value="@(this.Model.Password)" required>
+                </div>
+            </div>
+
+            <div class="clearfix"></div>
+
+            <button type="submit" class="btn btn-login btn-danger btn-float"><i class="zmdi zmdi-arrow-right"></i></button>
+        </form>
+    </div>
+
+    <script src="~/Content/js/jquery-1.9.1.js"></script>
+    <script src="~/Content/js/bootstrap.min.js"></script>
+
+    <script src="~/Content/template/template-material/vendors/bower_components/Waves/dist/waves.min.js"></script>
+
+    <!-- Placeholder for IE9 -->
+    <!--[if IE 9 ]>
+        <script src="vendors/bower_components/jquery-placeholder/jquery.placeholder.min.js"></script>
+    <![endif]-->
+
+    <script src="~/Content/template/template-material/js/functions.js"></script>
+
+</body>
+</html>

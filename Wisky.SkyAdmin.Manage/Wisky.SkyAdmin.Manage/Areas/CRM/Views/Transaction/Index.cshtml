@@ -1,0 +1,748 @@
+﻿@using HmsService
+@using HmsService.Models
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    int NewTransaction = (int)TransactionStatus.New;
+    int ApprovedTransaction = (int)TransactionStatus.Approve;
+    int CancelTransaction = (int)TransactionStatus.Cancel;
+}
+<style>
+    .label {
+        font-size: 90%;
+        padding: 7px;
+        display: block;
+    }
+
+    .pointer:hover {
+        cursor: pointer;
+        background-color: #e88a00;
+    }
+
+    .widget-rev {
+        background-color: darkslategrey;
+    }
+
+    .widget-rev-odd {
+        background-color: rgba(44, 73, 73, 1);
+    }
+
+    .widget-as {
+        background-color: rgba(200, 81, 81, 1);
+    }
+
+
+    .widget-as-odd {
+        background-color: rgba(191, 79, 79, 1);
+    }
+
+    .widget-del {
+        background-color: rgba(204, 155, 30, 1);
+    }
+
+    .widget-del-odd {
+        background-color: rgba(195, 148, 29, 1);
+    }
+
+    .clearfix > * {
+        color: #fff;
+    }
+
+    .padding15 {
+        padding-bottom: 15px;
+        padding-top: 15px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Quản lý giao dịch</h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 col-xs-6">
+                <div class="padding15 margin-in-col widget-rev-odd">
+                    <div class="clearfix">
+                        <center>
+                            <i class="fa fa-4x fa-usd"></i>
+                            <br />
+                            Giao dịch tăng
+                        </center>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-rev">
+                    <div class="clearfix">
+                        <div>Giao dịch thực (Tổng giao dịch - Tổng điều chỉnh)</div>
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="final_TotalRollbackedIncreaseRevenue"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-rev-odd">
+                    <div class="clearfix">
+                        <div>Giao dịch điều chỉnh</div>
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="total_RollbackIncreaseRevenue"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-rev">
+                    <div class="clearfix">
+                        <div>Tổng giá trị</div>
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="total_IncreaseRevenue"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-rev-odd">
+                    <div class="clearfix">
+                        <div>Chưa duyệt</div>
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="final_TotalRevenueIncrease"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-rev">
+                    <div class="clearfix">
+                        <div>Tổng GD hủy</div>
+                        <div class="pull-right">
+                            <small>VNĐ/GD</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="total_CancelIncrease"></h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-xs-6">
+                <div class="padding15 margin-in-col widget-del-odd">
+                    <div class="clearfix">
+                        <center>
+                            <i class="fa fa-4x fa-exchange"></i>
+                            <br />
+                            Giao dịch giảm
+                        </center>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-del">
+                    <div class="clearfix">
+                        <div>Giao dịch thực (Tổng giao dịch - Tổng điều chỉnh)</div>
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="final_TotalRollbackedDecreaseRevenue"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-del-odd">
+                    <div class="clearfix">
+                        <div>Giao dịch điều chỉnh</div>
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="total_RolbackDecreaseRevenue"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-del">
+                    <div class="clearfix">
+                        <div class="clearfix">
+                            <div>Tổng Giá trị</div>
+                            <div class="pull-right">
+                                <small>VNĐ</small>
+                            </div>
+                            <h2 style="margin-bottom:0; margin-top:0;" id="total_DecreaseRevenue"></h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-del-odd">
+                    <div class="clearfix">
+                        <div>Chưa duyệt</div>
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="final_TotalRevenueDecrease"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-del">
+                    <div class="clearfix">
+                        <div>Tổng GD hủy</div>
+                        <div class="pull-right">
+                            <small>VNĐ/GD</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="total_CancelDecrease"></h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-xs-6">
+                <div class="padding15 margin-in-col widget-as-odd">
+                    <div class="clearfix">
+                        <center>
+                            <i class="fa fa-4x fa-bar-chart"></i>
+                            <br />
+                            Thống kê GD
+                        </center>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-as">
+                    <div class="clearfix">
+                        <div>Số lượng GD thật (Số lượng GD - GD điều chỉnh)</div>
+                        <div class="pull-right">
+                            <small>Tăng/Giảm</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="totalNumberIn_De_Rollbacked"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-as-odd">
+                    <div class="clearfix">
+                        <div>Tổng số giao dịch</div>
+                        <div class="pull-right">
+                            <small>GD</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="finalNumber_Transaction"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-as">
+                    <div class="clearfix">
+                        <div>Giao dịch điều chỉnh</div>
+                        <div class="pull-right">
+                            <small>Tăng/Giảm</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="totalNumberIn_De_Rollback"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-as-odd">
+                    <div class="clearfix">
+                        <div>Số lượng GD Tăng/Giảm</div>
+                        <div class="pull-right">
+                            <small>Tăng/Giảm</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="totalNumberIn_De_Transaction"></h2>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-as">
+                    <div class="clearfix">
+                        <div>Số giao dịch đầu</div>
+                        <div class="pull-right">
+                            <small>VND/GD</small>
+                        </div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="totalNumber_FirstTrans"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-padding p-0">
+            <!-- Customer Table -->
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="right-icon pull-left" style="line-height: 25px;">Cửa hàng: &nbsp;</label>
+                    <div class="col-md-3">
+                        <div class="fg-line">
+                            <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7"></select>
+                        </div> 
+                    </div>
+                    <div class="input-group pull-right">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line">
+                                <div id="dateRange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" id="sTime" />
+                        <input type="hidden" id="eTime" />
+                    </div>
+                </div>
+
+            </div>
+            <div class="row m-t-5">
+                <div class="col-md-2 pull-left">
+                    <button class="btn btn-primary" id="filter-toggle" data-target="#filter-container" data-toggle="collapse" onclick="toggleIcon()"><i id="icon" class="fa fa-plus"></i> Bộ lọc</button>
+                </div>
+                <button type="submit" id="exportExcel" class="width230 m-r-15  btn btn-primary btn-sm pull-right">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>
+            </div>
+            <div class="collapse" id="filter-container">
+                <div class="row m-t-10">
+                    <div class="col-md-9">
+                        <div class="col-md-2 p-l-0 p-r-0">
+                            <label class="control-label p-t-5">Trạng thái:</label>
+                        </div>
+                        <div class="group-radio-buttons col-md-10 p-l-0">
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="status-filter" value="-1" class="nice-check" id="no-filter" checked />
+                                <label for="no-filter"><span>Tất cả</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="status-filter" value="@((int)TransactionStatus.New)" class="nice-check" id="filter" />
+                                <label for="filter"><span>Chưa duyệt</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="status-filter" value="@((int)TransactionStatus.Approve)" class="nice-check" id="filter2" />
+                                <label for="filter2"><span>Đã duyệt</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="status-filter" value="@((int)TransactionStatus.Cancel)" class="nice-check" id="filter3" />
+                                <label for="filter3"><span>Đã hủy</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row m-t-10">
+                    <div class="col-md-9">
+                        <div class="col-md-2 p-l-0 p-r-0">
+                            <label class="control-label p-t-5">Loại giao dịch:</label>
+                        </div>
+                        <div class="group-radio-buttons col-md-10 p-l-0">
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="mode-filter" value="-1" class="nice-check" id="no-filter2" checked />
+                                <label for="no-filter2"><span>Tất cả</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="mode-filter" value="@((int)TransactionTypeEnum.Default)" class="nice-check" id="filter6" />
+                                <label for="filter6"><span>Bình Thường</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="mode-filter" value="@((int)TransactionTypeEnum.RollBack)" class="nice-check" id="filter7" />
+                                <label for="filter7"><span>GD điều chỉnh</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="mode-filter" value="@((int)TransactionTypeEnum.ActiveCard)" class="nice-check" id="filter8" />
+                                <label for="filter8"><span>ActiveCard</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="row m-t-10">
+                    <div class="col-md-9">
+                        <div class="col-md-2 p-l-0 p-r-0">
+                            <label class="control-label p-t-5">Hình thức</label>
+                        </div>
+                        <div class="group-radio-buttons col-md-10 p-l-0">
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="type-filter" value="-1" class="nice-check" id="no-filter1" checked />
+                                <label for="no-filter1"><span>Tất cả</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="type-filter" value="0" class="nice-check" id="filter4" />
+                                <label for="filter4"><span>Tăng</span></label>
+                            </div>
+                            <div class="medium-radio-button-width col-md-3 p-l-0">
+                                <input type="radio" name="type-filter" value="1" class="nice-check" id="filter5" />
+                                <label for="filter5"><span>Giảm</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <!-- Datatable -->
+            <div class="row m-t-25">
+                <div class="col-md-12">
+                    <table id="TransactionDatatable" class="table table-striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label class="">STT</label>
+                                </th>
+                                <th>
+                                    <label class="">Mã thẻ thành viên</label>
+                                </th>
+                                <th>
+                                    <label class="">Khách hàng</label>
+                                </th>
+                                <th>
+                                    <label class="">Giá trị (VNĐ)</label>
+                                </th>
+                                <th>
+                                    <label class="">Ngày tạo</label>
+                                </th>
+                                <th>
+                                    <label class="">Ghi chú</label>
+                                </th>
+                                
+                                <th>
+                                    <label class="">Cửa Hàng</label>
+                                </th>
+                                <th>
+                                    <label class="">Trạng thái</label>
+                                </th>
+
+                                <th>
+                                    <label class="">UserId</label>
+                                </th>
+                                <th>
+                                    <label class="">Tùy chọn</label>
+                                </th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="editTransaction" class="modal fade" data-backdrop="static" data-keyboard="true"></div>
+        <div id="verifyTransaction" class="modal fade">
+            <div class="modal-dialog modal-md">
+                <div class="modal-content" style="width: 80%">
+                    <div class="modal-header">
+                        <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h3 class="modal-title">Xác nhận giao dịch</h3>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row text-center">
+                            <input type="hidden" id="transactionId" data-id="" />
+                            <div class="col-md-6"><button onclick='verifyTransaction(true)' class="btn btn-success">Duyệt Giao dịch</button></div>
+                            <div class="col-md-6"><button onclick='verifyTransaction(false)' class="btn btn-danger">Hủy Giao dịch</button></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<form class="hidden" id="ExportTransactionExcel" action="@Url.Action("ExportToExcel")">
+    <input id="startTimeOne" name="startDate" />
+    <input id="endTimeOne" name="endDate" />
+    <input id="storeId" name="storeIdCode" />
+</form>
+
+<script>
+
+    $(document).on('click', '#exportExcel', function () {
+        $('#startTimeOne').val($('#sTime').val());
+        $('#endTimeOne').val($('#eTime').val());
+        $('#storeId').val($('#listStoreId').val());
+        $('#ExportTransactionExcel').submit();
+        //alert(123);
+    });
+
+    $(document).ready(function () {
+        setupListStoreFilter();
+
+    });
+
+    function setupListStoreFilter() {
+        $.ajax({
+            type: "GET",
+            url: "@(Url.Action("GetListStore", "Transaction"))",
+            success: function (data) {
+                var content = "";
+                content += "<option value='0'>" + "Hệ Thống" + "</option>";
+                for (var i = 0; i < data.listresult.length; ++i) {
+                    content += "<option value='" + data.listresult[i].storeId + "'>" + data.listresult[i].storeName + "</option>";
+                }
+                $("#listStoreId").html(content);
+                $("#listStoreId").selectpicker('refresh');
+                SetupDaterangePicker();
+            },
+            error: function (error) {
+                alert("Error Occured")
+            }
+        });
+    }
+    function RefreshTransactionDatatable() {
+        var oTable = $("#TransactionDatatable").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+    function SetupDaterangePicker() {
+        cb(moment(), moment(), "Hôm nay");
+        $('#dateRange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+    }
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+
+        $("#sTime").val(startTime);
+        $("#eTime").val(endTime);
+        $('[data-role=small-date]').html(dateString);
+        getTotalTransaction();
+        InitTransactionDatatable();
+        //RefreshTransactionDatatable();
+        //RefreshDatatable();
+    }
+
+
+    function showEditTransaction(transactionId,accountId) {
+        $.ajax({
+            type: "GET",
+            url: "@(Url.Action("Edit", "Transaction"))",
+            data: { id: transactionId },
+            success: function (result) {
+                infoMembershipCard(accountId);
+                $('#editTransaction').html(result);
+                $('#editTransaction').modal('show');
+                //setModalHeaderWidth();
+            },
+            error: function (error) {
+                alert("Error Occured")
+            }
+        });
+    }
+    function infoMembershipCard(data) {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CheckMembershipCardCode", "Transaction")',
+            data: { 'membershipCardCode': data },
+            success: function (result) {
+                if (result.success) {
+                    $('#membership-card-code').val(result.Customer.MembershipCardCode);
+                    $('#account-name').val(result.AccountName);
+                    $('#customer-name').val(result.Customer.Name);
+                    $('#customer-phone').val(result.Customer.Phone);
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra!", 1);
+            }
+        });
+    };
+
+    $('input[name=status-filter]').on('change', function () {
+        RefreshTransactionDatatable();
+    });
+
+    $('#listStoreId').on('change', function () {
+        getTotalTransaction();
+        InitTransactionDatatable();
+    });
+
+    $('input[name=type-filter]').on('change', function () {
+        RefreshTransactionDatatable();
+    });
+    $('input[name=mode-filter]').on('change', function () {
+        RefreshTransactionDatatable();
+    });
+
+    function toggleIcon() {
+        $('#icon').toggleClass("fa-plus");
+        $('#icon').toggleClass("fa-minus");
+    }
+    function getTotalTransaction() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadTotalTransaction", "Transaction")',
+            data: {
+                'storeIdCode': $('#listStoreId').val(),
+                'startDate': $('#sTime').val(),
+                'endDate': $('#eTime').val()
+            },
+            success: function (result) {
+                $('#total_IncreaseRevenue').text(toMoney(result.revenueIncrease, ',', ''));
+                $('#total_RollbackIncreaseRevenue').text(toMoney(result.revenueIncreaseRollback, ',', ''));
+                $('#final_TotalRollbackedIncreaseRevenue').text(toMoney(result.revenueIncrease - result.revenueIncreaseRollback - result.revenueDecreaseRollback, ',', ''));
+                $('#final_TotalRevenueIncrease').text(toMoney(result.revenueIncreaseOptimize- result.revenueIncrease, ',', ''));
+                $('#total_CancelIncrease').text(toMoney(result.revenueIncreaseCancel, ',', '') + "/" + result.numberIncreaseCancel);
+                $('#total_DecreaseRevenue').text(toMoney(result.revenueDecrease, ',', ''));
+                $('#total_RolbackDecreaseRevenue').text(toMoney(result.revenueDecreaseRollback, ',', ''));
+                $('#final_TotalRollbackedDecreaseRevenue').text(toMoney(result.revenueDecrease - result.revenueIncreaseRollback - result.revenueDecreaseRollback, ',', ''));
+                $('#final_TotalRevenueDecrease').text(toMoney(result.revenueDecreaseOptimize - result.revenueDecrease, ',', ''));
+                $('#total_CancelDecrease').text(toMoney(result.revenueDecreaseCancel, ',', '') + "/" + result.numberDecreaseCancel);
+                $('#finalNumber_Transaction').text(result.numberIncrease + result.numberDecrease);
+                $('#totalNumberIn_De_Transaction').text(result.numberIncrease + "/" + result.numberDecrease);
+                $('#totalNumberIn_De_Rollback').text(result.numberIncreaseRollback + "/" + result.numberDecreaseRollback);
+                var numberIncreaseRollbacked = result.numberIncrease - result.numberDecreaseRollback;
+                var numberDecreaseRollbacked = result.numberDecrease - result.numberIncreaseRollback;
+                $('#totalNumberIn_De_Rollbacked').text(numberIncreaseRollbacked + "/" + numberDecreaseRollbacked);
+                $('#totalNumber_FirstTrans').text(toMoney(result.revenueActiveCard, ',', '') + "/" + result.numberActiveCard);
+            }
+            //DoanhThuChart1(result.dataChart)
+        });
+    }
+
+    function InitTransactionDatatable() {
+        $("#TransactionDatatable").dataTable({
+            "bSort": false,
+            "bRetrieve": false,
+            "bDestroy": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadTransaction","Transaction")",
+            "bDeferRender": true,
+            "bProcessing": true,
+
+            "fnServerParams": function (aoData) {
+                aoData.push(
+                    { "name": "transactionType", "value": $('input[name=type-filter]:checked').val() },
+                    { "name": "transactionStatus", "value": $('input[name=status-filter]:checked').val() },
+                    { "name": "transactionMode", "value": $('input[name=mode-filter]:checked').val() },
+                    { "name": "storeIdCode", "value": $('#listStoreId').val() },
+                    { "name": "startDate", "value": $('#sTime').val() },
+                    { "name": "endDate", "value": $('#eTime').val() }
+                );
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Mã thẻ",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 4, 5, 6, 7],
+                    "className": "dt-center"
+
+                },
+                {
+                    "aTargets": [2],
+                    "order": ["asc"],
+                    "mRender": function (name, type, row) {
+                        var data = row[10];
+                        var detail = "<a href='@Url.Action("CustomerDetail", "Customer")\/" + data + "\'>" + name + "</a>";
+                        return detail;
+                    }
+                },
+                {
+                    "aTargets": [3],
+                    "className": "text-right",
+                    "bSortable": false,
+                    "mRender": function (data, type, row) {
+                        var increase = '';
+                        var color = '';
+                        var icon = '';
+                        if (row[11]) {
+                            color = 'green';
+                            icon = 'fa fa-level-up';
+                        } else {
+                            color = 'orange';
+                            icon = 'fa fa-level-down';
+                            decrease = '-'
+                        }
+                        return "<strong style='color:" + color + "'><i class='" + icon + "'></i> " + increase + toMoney(data, ',', '') + "</strong>";
+                    }
+                },
+                {
+                    "aTargets": [7],
+                    "bSortable": false,
+                    "mRender": function (data, type, row) {
+                        var html = "";
+                        if (data == '@NewTransaction') {
+                            html = "<div title='Bấm vào để xác nhận' onclick='ShowVerification(" + row[9] + ")' class='label label-warning pointer'>Chưa duyệt</div>";
+                        }
+                        else if (data == '@ApprovedTransaction') {
+                            html = "<div class='label label-success'>Đã duyệt</div>"
+                        }
+                        else {
+                            html = "<div class='label label-danger'>Đã hủy</div>"
+                        }
+                        return html;
+                    }
+
+                },
+                {
+                    "aTargets": [9],
+                    "mRender": function (data, type, row) {
+                        var newTransaction = row[7];
+                        var membershipCardId = row[12] + "";
+                        var edit = "";
+                        if (newTransaction == '@NewTransaction') {
+                            edit = "<a title='Chỉnh sửa' class='btn btn-sm btn-primary' onclick='showEditTransaction(" + data + "," + membershipCardId + ")'><i class='glyphicon glyphicon-pencil'></i></a>";
+                        } else {
+                            edit = "<a title='Chi tiết' class='btn btn-sm btn-primary' onclick='showEditTransaction(" + data + "," + membershipCardId + ")'><i class='glyphicon  glyphicon-eye-open'></i></a>";
+                        }
+                        //var result = "<a class='btn btn-sm btn-primary' onclick='edit(" + data + ")'>Edit</a>";
+                        @*var detail = "<a title='Chi tiết'class='btn btn-sm btn-success'href='@Url.Action("CustomerDetail")\/" + data + "\'><i class='glyphicon glyphicon-eye-open'></i></a>";*@
+
+                        // var deleteCustomer = "<a class='btn btn-sm btn-danger' onclick='Delete(" + data + ") '><i class='glyphicon glyphicon-trash'></i></a>";
+                        return edit;// + " " + deleteCustomer;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center",
+                }
+            ],
+            "bAutoWidth": false,
+        }).fnSetFilteringDelay(800);
+
+    }
+
+    function verifyTransaction(isApproved) {
+        var id = $('#transactionId').data('id');
+        $('#verifyTransaction').modal('hide');
+        var title;
+        var message;
+        var style;
+        if (isApproved) {
+            title = "Xác nhận giao dịch";
+            message = "Giao dịch đã được duyệt";
+            style = "success";
+        } else {
+            title = "Xác nhận giao dịch";
+            message = "Giao dịch đã bị hủy";
+            style = "warning";
+        }
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Approve")',
+            data: { transactionId: id, isApproved: isApproved },
+            success: function (result) {
+                if (result.success) {
+                    swal(title, message, style);
+                    RefreshTransactionDatatable();
+                }
+            },
+            error: function () {
+                swal(":(", "Có lỗi xảy ra", "error");
+            }
+        });
+
+
+
+    }
+
+    function ShowVerification(id) {
+        $('#verifyTransaction').modal('show');
+        $('#transactionId').data('id', id);
+    }
+
+</script>

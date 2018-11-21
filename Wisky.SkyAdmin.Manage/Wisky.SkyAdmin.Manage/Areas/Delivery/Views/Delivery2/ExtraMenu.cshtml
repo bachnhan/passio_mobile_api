@@ -1,0 +1,356 @@
+﻿@model HmsService.ViewModels.ProductViewModel
+
+@{
+    ViewBag.Title = "ExtraMenu";
+}
+@{
+    Layout = null;
+}
+
+
+<style>
+    .noselect {
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Chrome/Safari/Opera */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Non-prefixed version, currently
+                                  not supported by any browser */
+    }
+
+    .extra-btn-plus {
+        border-radius: 50%;
+        width: 37px;
+        height: 37px;
+        margin-top: -8px;
+        line-height: 23px;
+    }
+
+    .extra-plus {
+        top: 14%;
+        position: absolute;
+        right: 0;
+        left: 0;
+    }
+
+    .extra-btn-minus {
+        border-radius: 50%;
+        width: 24px;
+        margin-top: -19px;
+        margin-left: 20px;
+        height: 24px;
+        background: white;
+        display: none;
+    }
+
+        .extra-btn-minus.active {
+            display: block;
+        }
+
+    .extra-minus {
+        position: absolute;
+        right: 0;
+        left: 0;
+    }
+
+    div.btn-tab.active {
+        background: #333333;
+        color: white;
+        border-color: #333333;
+    }
+
+    .btn-for-extra {
+        height: 50px;
+    }
+    .extraNameDiplay{
+        font-size:13px;
+        margin-left: 20px;
+    }
+</style>
+
+<div class="modal-dialog modal-lg" style="width:55%;">
+    <div class="modal-content">
+        <div class="modal-header" style="background:#285943;">
+            <div class="row">
+                <div class="card-header" style="padding: 0px 18px;">
+
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">
+                            ×
+                        </span>
+                    </button>
+                    <h3 style="color:#D7FFF1;font-weight:bold;">
+                        Thông tin sản phẩm
+                    </h3>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-body" style="overflow:hidden;">
+            <div class="card-body">
+                <div class="col-md-5">
+                    <div>
+                        <img style="height:26%;" src="/Content/images/Default_product_img.jpg"
+                             onerror="window.HMS.ServiceItemHandler.resetDefaultImage(this)">
+
+                    </div>
+
+                </div>
+                <div class="col-md-7">
+                    <h4>@Model.ProductName <small id="moneyProductDisplay"></small></h4>
+                    <div>
+                        <div class="col-md-3 row" style="margin-right:24px;">Số lượng</div>
+
+                        <a class="fa fa-minus noselect" onclick="minusPQuantity();" aria-hidden="true" style="cursor:pointer;"></a>
+                        <input type="text" class="noselect" id="productQuantity" value="1" style="border: none;
+                                        border-radius:50%;font-size: 18px;width: 30px;margin:0px 20px;text-align:center;"
+                               readonly />
+                        <a class="fa fa-plus noselect" onclick="plusPQuantity();" aria-hidden="true" style="cursor:pointer;"></a>
+
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <h4>
+                        Dùng thêm
+                    </h4>
+                    @foreach (var extraGroup in Model.ExtraGroup)
+                    {
+                        <div class="btn btn-sm btn-white btn-tab" data-toggle="tab" onclick="changeActive(this);" href="#@extraGroup.CateID">
+                            <i class="left-icon fa fa-glass"></i>
+                            @extraGroup.CateName
+                        </div>
+                    }
+
+                    <div class="tab-content">
+                        @foreach (var extraGroup in Model.ExtraGroup)
+                        {
+                            <div id="@extraGroup.CateID" class="tab-pane fade" style="margin-top:30px;">
+                                @foreach (var extra in Model.ExtraProduct)
+                                {
+                                    if (extra.CatID == extraGroup.CateID)
+                                    {
+                                        <div class="col-md-6 btn-for-extra">
+                                            <div class="col-md-2">
+                                                <div class="btn btn-sm extra-btn-plus" onclick="extraPlus(@extra.ProductID,this,@extra.Price, '@extra.ProductName');">
+                                                    <i class="fa fa-plus fa-2x extra-plus"></i>
+                                                </div>
+                                                <div class="extra-btn-minus btn" onclick="extraMinus(@extra.ProductID,this, @extra.Price, '@extra.ProductName');">
+                                                    <i class="fa fa-minus extra-minus"></i>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-5">
+                                                <div>@extra.ProductName</div>
+                                            </div>
+                                            <div class="col-md-5">
+                                                <small>
+                                                    @Utils.ToMoney(extra.Price) VND
+
+
+                                                </small>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+
+                            </div>
+
+                        }
+                    </div>
+                    @*<div class="btn btn-sm btn-white">
+                            <i class="left-icon fa fa-glass"></i>
+                            Topping thức uống
+                        </div>*@
+                </div>
+
+
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <div class="text-left col-md-6">
+                <div class="form-group" style="margin-left:17px;">
+                    <label class="control-label">
+                        <i class="left-icon fa fa-money"></i>
+                        Thành tiền:
+                        <span class="total-price ng-binding" id="finalProductPrice">100,000 VND</span>
+                    </label>
+                </div>
+            </div>
+
+
+            <div class="text-right col-md-6">
+                <div><button data-dismiss="modal" onclick="AddProduct();" style="margin-right: 11.55%;" type="button" class="btn btn-primary">Hoàn tất</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var ProductMoney = @Model.Price;
+    var ProductFinalMoney = @Model.Price;
+
+    var extra = {
+        Id: new Array(),
+        Quantity: new Array(),
+        Money: new Array(),
+        Name: new Array(),
+    }
+    $(document).ready(function () {
+
+        $('#moneyProductDisplay').html("("+toMoney(@Model.Price, ",","") + " VND)");
+        $('#finalProductPrice').html(toMoney(@Model.Price, ",","") + " VND");
+
+
+
+
+    });
+
+    $('#productQuantity').on('change',function(){
+        //ProductFinalMoney = toMoney(ProductMoney* $('#productQuantity').val(), ",", "");
+        finalMoneyForProduct();
+
+    });
+
+    function plusPQuantity() {
+        var quantity = parseInt($('#productQuantity').val()) + 1;
+        $('#productQuantity').val(quantity);
+        $('#productQuantity').trigger('change')
+    }
+
+    function minusPQuantity() {
+        var quantity = 0;
+        if ($('#productQuantity').val() != 1)
+            quantity = parseInt($('#productQuantity').val()) - 1;
+        else
+            quantity = 1;
+
+        $('#productQuantity').val(quantity);
+        $('#productQuantity').trigger('change')
+    }
+
+    function extraPlus(id, div, money, name){
+        var btnMinus = $(div).parents('.col-md-2').find('.extra-btn-minus');
+        if(isNaN($(div).html()) == true){
+            $(div).html("1");
+            btnMinus.addClass('active');
+        }
+        else{
+            $(div).html(parseInt($(div).html()) + 1);
+        }
+        extraChangeMoney(id, money,'+', name);
+    }
+
+    function extraMinus(id, div, money, name){
+        var display = $(div).parents('.col-md-2').find('.extra-btn-plus');
+        if(1 == parseInt(display.html()) || isNaN(display.html()) == true){
+            display.html("<i class='fa fa-plus fa-2x extra-plus'></i>");
+            $(div).removeClass('active');
+        }
+        else{
+            display.html(parseInt(display.html()) - 1);
+        }
+        extraChangeMoney(id, money,'-', name);
+    }
+
+    function extraChangeMoney(id, money, operator, name){
+        var index = extra.Id.indexOf(id);
+        if(operator == "+"){
+            if(index != -1){
+                extra.Quantity[index] += 1;
+            }else{
+                extra.Id.push(id);
+                extra.Quantity.push(1);
+                extra.Money.push(money);
+                extra.Name.push(name);
+            }
+        }
+        else{
+            if(index != -1){
+                if(extra.Quantity[index] > 1){
+                    extra.Quantity[index] -= 1;
+                }else{
+                    // i = 1;
+                    //   vị trí i sẽ là vị trí trước số cần xóa
+                    //   1: số lượng số để xóa với vị trí tính bắt đầu từ i
+                    // ví dụ: [ 3, 5, 1 ].splice(i, 1) --> [3 , 1]
+                    extra.Id.splice(index, 1);
+                    extra.Quantity.splice(index, 1);
+                    extra.Money.splice(index, 1);
+                    extra.Name.splice(index, 1);
+                }
+            }
+        }
+        finalMoneyForProduct();
+    }
+
+
+
+
+    function finalMoneyForProduct(){
+        ProductFinalMoney = ProductMoney* $('#productQuantity').val();
+        for (var i = 0; i < extra.Id.length; i++) {
+            ProductFinalMoney += extra.Quantity[i] * extra.Money[i] * $('#productQuantity').val();
+        }
+        $('#finalProductPrice').html(toMoney(ProductFinalMoney, ",","")+ " VND");
+    }
+
+    function changeActive(btn){
+
+        $('.btn-tab').removeClass('active');
+        $(btn).addClass('active');
+
+    }
+
+    function AddProduct(){
+
+        var extraArray  = new Array();
+        var extraDisplayName = "";
+        for (var i = 0; i < extra.Id.length; i++) {
+            extraArray.push({Id: extra.Id[i], Quantity:  extra.Quantity[i], Money: extra.Money[i], Name: extra.Name[i]});
+            extraDisplayName += "<div class='extraNameDiplay'>" + extra.Quantity[i] + 
+                " x " + extra.Name[i] + 
+                " ("+ toMoney(extra.Money[i],",","") + " VND)</div>"
+        }
+
+        var data = {
+            discount: 0.0,
+            id: @Model.ProductID,
+            name: "@Model.ProductName",
+            price: @Model.Price,
+            type: @Model.ProductType,
+            extra: extraArray,
+            quantity: parseInt($('#productQuantity').val()),
+        };
+
+
+
+
+        var orderId = window.OnlineOrder.addOrderDetail(data);
+        var $tmpItemRow = $($('#tmpServiceItemRow').html().trim());
+        $.each(data, function (i, e) {
+            var $key = $tmpItemRow.find('[data-role="' + i + '"]');
+            if ($key != undefined) {
+                $key.html(e);
+            }
+        });
+
+        $tmpItemRow.attr('data-id', orderId);
+        $tmpItemRow.attr('data-role', 'order-detail');
+        $tmpItemRow.find('[data-role="name"]').html(data.name+"" + extraDisplayName);
+        $tmpItemRow.find('[data-role="total"]').html(toMoney(ProductFinalMoney, ',', ''));
+        $tmpItemRow.find('[data-role="discount"]').hide();
+        $tmpItemRow.find('[data-role="discount-amount"]').hide();
+        // Add new item as row into dataTable
+        $('#orderItemDatatable > tbody').append($tmpItemRow);
+
+
+        $('#total-Item').html('Giảm giá hóa đơn : ' + window.OnlineOrder.Order.DiscountPercent + " % "
+            + '<br/>Tổng cộng : ' + toMoney(window.OnlineOrder.getTotalNoDiscount(), ',', ''));
+
+    }
+
+
+</script>

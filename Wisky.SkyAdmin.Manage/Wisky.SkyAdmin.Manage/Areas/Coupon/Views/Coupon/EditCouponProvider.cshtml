@@ -1,0 +1,22 @@
+﻿@model HmsService.ViewModels.CouponProviderEditViewModel
+
+<div class="modal-dialog">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h3 class="modal-title">Sửa nhà cung cấp</h3>
+        </div>
+        <div class="modal-body">
+            <form id="editCoupon" action="EditCouponProvider" method="post">
+                @Html.TextBoxFor(q => q.Id, new { type = "hidden" })
+                <label>Vui lòng chọn nhà cung cấp:</label>
+                @this.Html.TextBoxFor(q => q.ProviderName, new { @class = "form-control", @id = "providerName" })
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button data-dismiss="modal" class="btn btn-danger">Đóng</button>
+            <a onclick="editDuplicateProvider()" class="btn btn-primary">Xác nhận</a>
+        </div>
+    </div>
+</div>

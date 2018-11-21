@@ -1,0 +1,33 @@
+﻿@using HmsService.ViewModels;
+@{
+    var user = HttpContext.Current.User;
+}
+
+
+<li>
+    <a href="@Url.Action("Index","Brand", new { area= "SysAdmin" })"><i class="zmdi zmdi-coffee"></i> Quản lí Thương Hiệu</a>
+</li>
+<li>
+    <a href="@Url.Action("Index","Store", new { area= "SysAdmin" })"><i class="zmdi zmdi-coffee"></i> Danh sách cửa hàng</a>
+</li>
+<li>
+    <a href="@Url.Action("Index","SysAccount", new { area= "SysAdmin" })"><i class="zmdi zmdi-account"></i> Quản lí Tài Khoản</a>
+</li>
+<li>
+    <a href="@Url.Action("Index","Theme", new { area = "SysAdmin"  })"><i class="zmdi zmdi-account"></i> Quản lí Theme</a>
+</li>
+<li>
+    <a href="@Url.Action("Index","ReDateReport", new { area = "SysAdmin"  })"><i class="zmdi zmdi-account"></i> Quản lý Báo cáo</a>
+</li>
+<li>
+    <a href="@Url.Action("Index","PosFile", new { area = "SysAdmin"  })"><i class="zmdi zmdi-account"></i> Quản lý POS file</a>
+</li>
+<li>
+    <a href="@Url.Action("Index","Order", new { area = "SysAdmin"  })"><i class="zmdi zmdi-mood"></i> Quản lý Order</a>
+</li>
+<li>
+    <a href="@Url.Action("ConfigMenuBrand","MenuConfig", new { area = "SysAdmin"  })"><i class="zmdi zmdi-account"></i> Quản lý menu Brand</a>
+</li>
+<li>
+    <a href="@Url.Action("ConfigMenuStore","MenuConfig", new { area = "SysAdmin"  })"><i class="zmdi zmdi-account"></i> Quản lý menu Store</a>
+</li>

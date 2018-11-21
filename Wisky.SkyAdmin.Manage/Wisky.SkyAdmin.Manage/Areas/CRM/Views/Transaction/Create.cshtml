@@ -1,0 +1,230 @@
+﻿@model HmsService.ViewModels.TransactionEditViewModel
+
+@{
+    ViewBag.Title = "Tạo giao dịch";
+    Layout = null;
+}
+
+@Html.ValidationSummary()
+<div class="modal-dialog modal-md">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h3 class="modal-title">Thêm giao dịch</h3>
+        </div>
+        <form id="formTransaction" method="post">
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px;">
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="Amount">Tài khoản<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @*<select class="selectpicker" id="selectedAccount" style="display:block!important" onload="selectPicker()" onchange="selectPickerChoose()">
+                                        @foreach (var item in Model.ActiveAccounts)
+                                        {
+                                            <option value="@item.AccountID">@item.AccountName</option>
+                                        }
+                                    </select>*@
+                                @Html.DropDownListFor(q => q.AccountId, (Model.ActiveAccounts).Select(e => new SelectListItem { Text = e.AccountName, Value = e.AccountID.ToString() }), new { id = "transactionAccountId", @class = "form-control fg-line" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="RecentAmount" id="labelRecentAmount">Số tiền hiện tại<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                <input class="form-control fg-line" id="RecentAmount" readonly/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="Amount" id="labelAmount">Số tiền<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.Amount, new { @type = "number", @min = 0, id = "Amount", @class = "form-control fg-line", placeholder = "Nhập số tiền", required = "required", oninput = "correctAmount()", Value = ""})
+                            </div>
+                        </div>
+                        <div class="form-group" hidden>
+                            <label class="control-label col-md-4" for="AccountName">Tiền tệ<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.DropDownListFor(q => q.CurrencyCode, Enum.GetNames(typeof(Currency)).Select(e => new SelectListItem { Text = e }), new { @class = "form-control fg-line" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="FCAmount">FCAmount<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.FCAmount, new { @type = "number", @min = 0, id = "FCAmount", @class = "form-control fg-line", required = "required", oninput = "correctFCAmount()", Value = "", @readonly = "readonly" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Ngày giao dịch</label>
+                            <div class="col-md-6">
+                                <input class="form-control fg-line" type="text" name="Date" value="@(String.Format("{0:MM/dd/yyyy}",DateTime.Now))" readonly style="background-color:#ffffff; color:#000000;" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="Notes">Ghi chú</label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.Notes, new { id = "Notes", @class = "form-control fg-line", placeholder = "Nhập chú thích nếu có" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="IsIncreaseTransaction">Loại giao dịch</label>
+                            <div class="col-md-6">
+                                <select class="form-control fg-line" name="IsIncreaseTransaction" id="IsIncreaseTransaction">
+                                    <option value="true">Tăng</option>
+                                    <option value="false">Giảm</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" class="btn btn-primary">Đóng</a>
+                <button type="button" onclick="createTransaction()" class="btn btn-success">Thêm</button>
+            </div>
+        </form>
+    </div>
+</div>
+<style>
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+</style>
+<script>
+    function CheckAccount() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CheckAccount","Transaction")',
+            data: {'accountId' : $('#transactionAccountId').val()},
+            //async: false,
+            success: function (result) {
+                if (result.typeId == 1) {
+                    $('#labelAmount').html('Số tiền thêm');
+                    document.getElementById("Amount").setAttribute("placeholder", 'nhập số tiền');
+                    $('#labelRecentAmount').html('Số tiền hiện tại');
+                }
+                if (result.typeId == 2) {
+                    $('#labelAmount').html('Số sản phẩm thêm');
+                    document.getElementById("Amount").setAttribute("placeholder", 'nhập số sản phẩm');
+                    $('#labelRecentAmount').html('Số sản phẩm hiện tại');
+                }
+                if (result.typeId == 3) {
+                    $('#labelAmount').html('Số điểm');
+                    document.getElementById("Amount").setAttribute("placeholder", 'nhập số điểm');
+                    $('#labelRecentAmount').html('Số điểm hiện tại');
+                }
+                document.getElementById('RecentAmount').setAttribute('value', result.balance);
+            },
+        });
+    };
+    $('#transactionAccountId').change(CheckAccount());
+    $('#transactionAccountId').change(function () {
+        CheckAccount();
+    });
+    $('#Amount').keyup(function () {
+        FCAmountEvent();
+    });
+    $('#IsIncreaseTransaction').change(function () {
+        FCAmountEvent();
+    });
+    function FCAmountEvent() {
+        if ($('#IsIncreaseTransaction').val() == 'true' ) {
+            var i = parseInt($('#Amount').val()) + parseInt($('#RecentAmount').val());
+        } else{
+            var i = parseInt($('#RecentAmount').val()) - parseInt($('#Amount').val());
+        }
+        $('#FCAmount').val(i);
+    }
+    
+    $(function () {
+        @if (Model.Date != DateTime.MinValue) {
+            <text>
+
+        var start = moment('@Model.Date.ToString("MM/dd/yyyy")').format("DD/MM/YYYY");
+        </text>
+        }
+        else
+        {
+            <text>
+        var start = moment().add(0, 'days');
+        $('#reportrange span').html(start.format('DD/MM/YYYY'));
+        //$('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        </text>
+        }
+        $('input[name="Date"]').daterangepicker({
+            format: "MM/DD/YYYY",
+            singleDatePicker: true,
+            showDropdowns: true,
+            startDate: moment(),
+            locale: {
+                "format": "DD/MM/YYYY"
+            }
+        },
+        function (start, end, label) {
+            var years = moment().diff(start, 'years');
+            $('#reportrange span').html(start.format('DD/MM/YYYY'));
+        });
+    });
+
+    @if(this.Model.IsIncreaseTransaction == true)
+    {
+        <text>
+    $('#IsIncreaseTransaction').val("true");
+    </text>
+    }
+    else
+    {
+        <text>
+    $('#IsIncreaseTransaction').val("false");
+    </text>
+    }
+    function correctAmount() {
+        var amount = $('#Amount').val().replace(/[^\d]/g, '');
+        $('#Amount').val(amount);
+    }
+
+    function correctFCAmount() {
+        var amount = $('#FCAmount').val().replace(/[^\d]/g, '');
+        $('#FCAmount').val(amount);
+    }
+
+    function createTransaction() {
+        var formData = $("#formTransaction").serialize();
+        $.ajax({
+            type: "Post",
+            url: '@(Url.Action("Create", "Transaction"))',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    // Đóng modal
+                    $('#createTransactionPanel').modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+
+                    // Kiểm tra tài khoản mặc định có giống tài khoản đang giao dịch hay không,
+                    // nếu phải thì update lại balance sau khi giao dịch.
+                    var defaultId = $('#defaultAccountId').val();
+                    var transId = $('#transactionAccountId').val();
+
+                    if (defaultId == transId) {
+                        $("#defaultAccountBalance").val(result.balance);
+
+                        if (result.balance == '') {
+                            result.balance = '0';
+                        }
+                        $("#dAccBalance").html('Số dư tài khoản: ' + result.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                        $("#defaultAccountBalance2").html(result.balance.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                    }
+
+                    ShowMessage(result.message, 2);
+                    RefresTransactionTable();
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+
+
+            },
+            error: function (error) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    }
+</script>

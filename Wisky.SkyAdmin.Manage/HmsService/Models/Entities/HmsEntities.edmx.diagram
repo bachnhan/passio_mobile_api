@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="046713dc98d74e2c87334e332696233b" Name="Diagram1" ZoomLevel="52">
+        <EntityTypeShape EntityType="HmsEntities.GroupMembershipCard" Width="1.5" PointX="3" PointY="108.375" />
+        <AssociationConnector Association="HmsEntities.FK_GroupMembershipCard_Brand" />
+        <AssociationConnector Association="HmsEntities.FK_MembershipCard_GroupMembershipCard" />
+        <EntityTypeShape EntityType="HmsEntities.Customer" Width="1.5" PointX="3" PointY="23" />
+        <EntityTypeShape EntityType="HmsEntities.DateReport" Width="1.5" PointX="5.25" PointY="25.625" />
+        <EntityTypeShape EntityType="HmsEntities.ImageCollectionItem" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="HmsEntities.InventoryDateReportItem" Width="1.5" PointX="7.75" PointY="6.75" />
+        <EntityTypeShape EntityType="HmsEntities.Notification" Width="1.5" PointX="9.75" PointY="5.75" />
+        <EntityTypeShape EntityType="HmsEntities.Order" Width="1.5" PointX="5.25" PointY="5.25" />
+        <EntityTypeShape EntityType="HmsEntities.Pos" Width="1.5" PointX="0.75" PointY="11.875" />
+        <EntityTypeShape EntityType="HmsEntities.Store" Width="1.5" PointX="3" PointY="4.875" />
+        <EntityTypeShape EntityType="HmsEntities.Voucher" Width="1.5" PointX="10" PointY="1.5" />
+        <AssociationConnector Association="HmsEntities.FK_Order_Customer" />
+        <AssociationConnector Association="HmsEntities.FK_DateReport_Store" />
+        <AssociationConnector Association="HmsEntities.FK_Order_Store" />
+        <AssociationConnector Association="HmsEntities.FK_Store_POS" />
+        <EntityTypeShape EntityType="HmsEntities.MembershipCard" Width="1.5" PointX="5.25" PointY="37.25" />
+        <AssociationConnector Association="HmsEntities.FK_MembershipCard_Customer" />
+        <AssociationConnector Association="HmsEntities.FK_Voucher_MembershipCard" />
+        <EntityTypeShape EntityType="HmsEntities.Promotion" Width="1.5" PointX="7.75" PointY="12.125" />
+        <AssociationConnector Association="HmsEntities.FK_Voucher_Promotion" />
+        <EntityTypeShape EntityType="HmsEntities.BlogPostCollection" Width="1.5" PointX="5.25" PointY="0.75" />
+        <AssociationConnector Association="HmsEntities.FK_BlogPostCollection_BlogPostCollection" />
+        <AssociationConnector Association="HmsEntities.FK_BlogPostCollection_Store" />
+        <EntityTypeShape EntityType="HmsEntities.PromotionDetail" Width="1.5" PointX="10.375" PointY="11" />
+        <AssociationConnector Association="HmsEntities.FK_Voucher_PromotionDetail" />
+        </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

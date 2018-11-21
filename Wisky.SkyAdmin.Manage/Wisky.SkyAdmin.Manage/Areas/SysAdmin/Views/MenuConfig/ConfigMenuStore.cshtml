@@ -1,0 +1,324 @@
+﻿@model ConfigMenuViewmodel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+@helper RenderSelectedMenu(IEnumerable<SelectedMenuItem> menuItems)
+{
+foreach (var item in menuItems)
+{
+    bool containChildren = item.ChildrenMenus.Any();
+
+        <li class="col-md-12">
+            <div class="checkbox">
+                <button data-id="@(item.IdMenu)" name="buttonMenu" class="fa fa-pencil btn btn-sm btn-info">Sửa</button>
+                <button data-id="@(item.IdMenu)" name="buttonMenuRemover" class="fa fa-trash btn btn-sm btn-danger">xóa</button>
+                <label>
+                    @item.Name
+                </label>
+                @if (containChildren)
+                {
+                    <ul style="list-style-type:none">
+                        @RenderSelectedMenu(item.ChildrenMenus)
+                    </ul>
+                }
+            </div>
+        </li>
+}
+
+}
+
+<div class="row">
+    <div class="col-md-12 p-r-45 p-l-45">
+        <div class="card">
+            <div class="card-header">
+                <div class="box-header p-b-0">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>Thiết lập menu store</h3>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <ul class="actions">
+                                <li class="m-r-10">
+                                    <a class="btn btn-primary" id="createMenu">Tạo Menu</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body card-padding">
+                <div class="row">
+                    <ul class="main-menu">
+                        @RenderSelectedMenu(Model.SelectedMenu)
+                    </ul>
+                </div>
+
+            </div>
+            <input type="hidden" id="currentSelectedItem" />
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="EditModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="modalUserHeader">Thông tin menu item</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="attribute-panel">
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">Tên menu</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control" id="nameItem" value="" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">Area</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control" id="AreaId" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">Controller</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control" id="controllerId" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">Action</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control" id="AcctionId" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">IconCss</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control" id="IconCss" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">Display Order</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="number" class="form-control" id="DisplayOrder" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">Menu cha</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <select class="selectpicker" id="ParrentMenu" data-live-search="true" data-size="10">
+                                        <option value="0" selected="selected" data-parent="1">Notthing</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" value="" id="detailId" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: none;">
+                <button type="button" class="btn btn-primary" id="btnsubmit">Cập Nhật</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<script>
+
+    $(document).ready(function () {
+        LoadParentMenuBrand();
+        $('[name="buttonMenu"]').on("click", function () {
+            ClearDataModal();
+            var data = $(this).data("id");
+            $("#currentSelectedItem").val(data);
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetDetailMenu", "MenuConfig")',
+                data: {
+                    menuId: $("#currentSelectedItem").val()
+                },
+                success: function (result) {
+                    $("#nameItem").val(result.menu.MenuText);
+                    $("#AreaId").val(result.menu.Area);
+                    $("#controllerId").val(result.menu.Controller);
+                    $("#AcctionId").val(result.menu.Action);
+                    $("#IconCss").val(result.menu.IconCss);
+                    $("#DisplayOrder").val(result.menu.DisplayOrder);
+                    $("#ParrentMenu").val(result.menu.ParentMenuId);
+                    $('#ParrentMenu').selectpicker('refresh');
+                    $("#EditModal").modal("show");
+                }
+            });
+
+        })
+
+        $('[name="buttonMenuRemover"]').on("click", function () {
+            var data = $(this).data("id");
+            ShowConfirm("Bạn có muốn xóa menu ?", function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("DeleteMenuConfig", "MenuConfig")',
+                    data: {
+                        idmenu: data
+                    },
+                    success: function (result) {
+                        if (result.success) {
+                            location.reload();
+                        } else {
+                            ShowMessage("Whoops something went wrong!", 1);
+                        }
+                    }
+                });
+            });
+        })
+
+
+        $("#btnsubmit").on("click", function () {
+            var currentId = $("#currentSelectedItem").val();
+            if (currentId) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UpdateMenuItem", "MenuConfig")',
+                    data: {
+                        menutext: $("#nameItem").val(),
+                        area: $("#AreaId").val(),
+                        controller: $("#controllerId").val(),
+                        action: $("#AcctionId").val(),
+                        iconCss: $("#IconCss").val(),
+                        displayOrder: $("#DisplayOrder").val(),
+                        parrentId: $("#ParrentMenu").val(),
+                        currentMenuId: currentId
+                    },
+                    success: function (result) {
+                        if (result.success == true) {
+                            $('#EditModal').modal('hide');
+                            swal({
+                                title: "Thành công",
+                                text: "Cập nhật menu thành công",
+                                type: "success"
+                            }, function () {
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 100);
+                                return;
+                            });
+                        } else {
+                            ShowMessage("Whoops something went wrong!", 1);
+                        }
+                    }
+                });
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("CreateMenuItemStore", "MenuConfig")',
+                    data: {
+                        menutext: $("#nameItem").val(),
+                        area: $("#AreaId").val(),
+                        controller: $("#controllerId").val(),
+                        action: $("#AcctionId").val(),
+                        iconCss: $("#IconCss").val(),
+                        displayOrder: $("#DisplayOrder").val(),
+                        parrentId: $("#ParrentMenu").val(),
+                    },
+                    success: function (result) {
+                        if (result.success == true) {
+                            $('#EditModal').modal('hide');
+                            swal({
+                                title: "Thành công",
+                                text: "Tạo menu thành công",
+                                type: "success"
+                            }, function () {
+                                setTimeout(function () {
+                                    location.reload();
+                                }, 100);
+                                return;
+                            });
+                        } else {
+                            ShowMessage("Whoops something went wrong!", 1);
+                        }
+                    }
+                });
+            }
+        });
+
+        $("#createMenu").on("click", function () {
+            ClearDataModal();
+            $("#EditModal").modal("show");
+        });
+    });
+
+    function LoadParentMenuBrand() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GetMenuParentStore", "MenuConfig")',
+            success: function (result) {
+                for (var i = 0; i < result.listParrent.length; i++) {
+                    $('#ParrentMenu').append('<option data-parent = "' + result.listParrent[i].ParentMenuId + '" value="' + result.listParrent[i].Id + '">' + result.listParrent[i].MenuText + '</option>')
+                    $('#ParrentMenu').selectpicker('refresh');
+                }
+            }
+        });
+    }
+
+    function ClearDataModal() {
+        $("#nameItem").val("");
+        $("#AreaId").val("");
+        $("#controllerId").val("");
+        $("#AcctionId").val("");
+        $("#IconCss").val("");
+        $("#DisplayOrder").val("");
+        $("#ParrentMenu").val(0);
+        $("#detailId").val("");
+        $("#currentSelectedItem").val("");
+    }
+
+
+</script>
+

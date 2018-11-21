@@ -1,0 +1,30 @@
+﻿@model HmsService.ViewModels.CustomerTypeEditViewModel
+
+@{
+    Layout = null;
+}
+<div class="modal-dialog">
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            <h3 class="modal-title">Sửa loại khách hàng</h3>
+        </div>
+        <div class="modal-body">
+            <form id="editCustomerType" action="@Url.Action("EditCustomerType","CustomerType")" method="post">
+                @Html.HiddenFor(q => q.ID)
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="control-label col-sm-3" for="customerType1">Loại khách hàng:</label>
+                        <div class="col-sm-8">
+                            @this.Html.TextBoxFor(q => q.CustomerType1, new { @class = "form-control", @id = "editCustomerType1" })
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a onclick="editDuplicateCustomerType()" class="btn btn-primary">Xác nhận</a>
+        </div>
+    </div>
+</div>

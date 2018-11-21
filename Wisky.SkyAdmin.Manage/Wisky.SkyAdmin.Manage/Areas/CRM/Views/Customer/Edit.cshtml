@@ -1,0 +1,320 @@
+﻿@model CustomerEditViewModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&key=AIzaSyDwJA7jUX5F9KR44NAKvfJsxn-9cjQwzZk"></script>
+
+<div class="card">
+    <form id="EditCustomerForm" @*action="@this.Url.Action("Edit")"*@ method="post">
+        @Html.TextBoxFor(q => q.CustomerID, new { @type = "hidden" })
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-8">
+                    <h3>Cập nhật khách hàng: @this.Model.Name.ToUpper()</h3>
+                </div>
+                <div class="col-md-4">
+                    <div class="pull-right">
+                        <a id="btn-comeback" href="@Request.UrlReferrer">
+                            <div id="create-advertising" type="button" class="btn btn-success">Quay về</div>
+                        </a>
+                        <button id="submitButton" type="submit" class="btn btn-primary">Cập nhật</button>
+                    </div>
+                </div>
+            </div>
+            <hr />
+        </div>
+        <div class="row">
+            <div class="col-md-12 p-l-45 p-r-45">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin cá nhân</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Name">Tên <span style="color:red">*</span></label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.Name,
+                                        new { id = "Name", @class = "form-control", required = "required", maxlength = "30" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="CustomerCode">Mã khách hàng <span style="color:red">*</span></label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.CustomerCode,
+                                        new { id = "CustomerCode", @class = "form-control", required = "required", maxlength = "30" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Type">Loại</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line" style="background-color : white">
+                                        @Html.DropDownListFor(q => q.CustomerTypeId, Model.AvailableType, new { @class = "selectpicker" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Gender">Giới Tính</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line" style="background-color : white">
+                                        @Html.DropDownList("Gender", new SelectList(Model.AvailableGender, "Value", "Text"), new { @class = "selectpicker" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="BirthDay">Ngày Sinh</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        <input class="form-control" type="text" id="" name="BirthDay" value="@String.Format("{0:MM-dd-yyyy}", this.Model.BirthDay)" />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Phone">Điện Thoại <span style="color:red">*</span></label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.Phone,
+                                        new { id = "Phone", @class = "form-control", required = "required", data_mask = "000-00-0000000", placeholder = "vd: 000-00-0000000", maxlength = "14", autocomplete = "off", oninput = "correctPhone()" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="IDCard">CMND</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.IDCard,
+                                        new { id = "IDCard", @class = "form-control", maxlength = "12", oninput = "correctIDCard()", })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Email">Email@*<span style="color:red">*</span>*@</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.Email,
+                                        new { id = "Email", @class = "form-control", required = "required", maxlength = "30" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">                            
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Address">Địa Chỉ @*<span style="color:red">*</span>*@</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.Address,
+                                        new { id = "Address", @class = "form-control", required = "required", maxlength = "50" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="District">Quận @*<span style="color:red">*</span>*@</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.District,
+                                        new { id = "District", @class = "form-control", required = "required", maxlength = "30" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="City">Thành Phố @*<span style="color:red">*</span>*@</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.City,
+                                        new { id = "City", @class = "form-control", required = "required", maxlength = "30" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div id="map-canvas" style="width: 100%; height: 300px;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin bổ sung</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Fax">Fax</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.Fax,
+                                        new { id = "Fax", @class = "form-control", maxlength = "14", autocomplete = "off", oninput = "correctPhone()" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="ContactPerson">Người Liên Hệ</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.ContactPerson,
+                                        new { id = "ContactPerson", @class = "form-control", maxlength = "250" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Website">Website</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.Website,
+                                        new { id = "Website", @class = "form-control", maxlength = "100" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="ContactPersonNumber">SĐT Người Liên Hệ</label>
+                                <div class="col-md-8">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(model => model.ContactPersonNumber,
+                                        new { id = "ContactPersonNumber", @class = "form-control", maxlength = "14", autocomplete = "off", oninput = "correctPhone()" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </form>
+</div>
+<style>
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+</style>
+<script src="~/Content/frontend/js/skyplus-customer-addr.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var birhtDay;
+        $('input[name="BirthDay"]').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+        },
+        function (start, end, label) {
+            var years = moment().diff(start, 'years');
+        });
+
+        $('#btn-comeback').parent().fixedScroll(70);
+
+        
+
+        
+    })
+
+    function editCustomer() {
+        var formData = $('#EditCustomerForm').serialize();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Edit")',
+            dataType: 'JSON',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    ShowAlert(result.message, 2);
+                    window.location.href = '@Request.UrlReferrer';
+                } else {
+                    ShowMessage("Có lỗi xảy ra! Cập nhật khách hàng không thành công", 1);
+                }
+            },
+
+            error: function (error) {
+                ShowMessage("Có lỗi xảy ra!", 1);
+            }
+        });
+    }
+
+
+    //autocorrect phone field
+    function correctPhone() {
+        var phoneNum = $('#Phone').val().replace(/[^\d]/g, '');
+        var faxNum = $('#Fax').val().replace(/[^\d]/g, '');
+        var contactNum = $('#ContactPersonNumber').val().replace(/[^\d]/g, '');
+        phoneNum = phoneNum.replace(/^00/, '0');
+
+        $('#Phone').val(phoneNum);
+        $('#Fax').val(faxNum);
+        $('#ContactPersonNumber').val(contactNum);
+    }
+
+    //autocorrect CMND field
+    function correctIDCard() {
+        var idCard = $('#IDCard').val().replace(/[^\d]/g, '');
+        $('#IDCard').val(idCard);
+    }
+
+    $('#submitButton').click(function () {
+        if ($("input[name='CustomerCode']").val() == "") {
+            ShowMessage("Mã khách hàng không được bỏ trống", 1);
+            return;
+        }
+
+        if ($("input[name='Name']").val() == "") {
+            ShowMessage("Tên khách hàng không được bỏ trống", 1);
+            return;
+        }
+        var phoneNumber = $("input[name='Phone']").val();
+        if (phoneNumber == "") {
+            ShowMessage("Số điện thoại không được bỏ trống", 1);
+            return;
+        }
+        //} else if (!phoneNumber.match(/^([0-9]{10,12})$/)) {
+        //    ShowMessage("Số điện thoại không không hợp lệ", 3);
+        //    return;
+        //}
+
+        /* Remove email, adrress, district, city
+        if ($("input[name='Email']").val() == "") {
+            ShowMessage("Email không được bỏ trống", 1);
+            return;
+        }
+
+
+        if ($("input[name='Address']").val() == "") {
+            ShowMessage("Địa chỉ không được bỏ trống", 1);
+            return;
+        }
+
+        if ($("input[name='District']").val() == "") {
+            ShowMessage("Quận không được bỏ trống", 1);
+            return;
+        }
+
+        if ($("input[name='City']").val() == "") {
+            ShowMessage("Thành phố không được bỏ trống", 1);
+            return;
+        }
+        */
+
+        editCustomer();
+
+    });
+    //$('btn-comeback').on('click', function () {
+    //    history.go(-2);
+    //});
+
+    
+</script>

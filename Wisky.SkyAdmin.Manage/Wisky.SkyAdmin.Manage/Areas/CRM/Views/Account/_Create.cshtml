@@ -1,0 +1,384 @@
+﻿@model AccountEditViewModel
+
+@{
+    Layout = null;
+}
+
+<style>
+    .select2-container--default .select2-selection--single {
+        border: 1px solid #ccc;
+        border-radius: 0px;
+        height: 36px;
+    }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            right: 4px;
+        }
+
+    .select2-container .select2-choice {
+        border: none !important;
+        background-image: none !important;
+    }
+
+        .select2-container .select2-choice .select2-arrow {
+            border-left: none !important;
+            background-image: none !important;
+            background: none !important;
+        }
+
+    .select2-dropdown-open .select2-choice {
+        background-color: rgba(0,0,0,0) !important;
+    }
+
+    .select2-container-active .select2-choice,
+    .select2-container-active .select2-choices {
+        -webkit-box-shadow: none !important;
+        box-shadow: none !important;
+    }
+</style>
+
+
+<div class="modal-dialog">
+    <form id="createAccount" method="post">
+        @Html.ValidationSummary()
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close btn btn-danger" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3>Thêm tài khoản</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px;">
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="AccountCode">Mã số thẻ<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.AccountCode, new { id = "AccountCode", @class = "form-control fg-line", placeholder = "Nhập mã số thẻ", required = "required", maxlength = "30" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="AccountName">Tên tài khoản<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.AccountName, new { id = "AccountName", @class = "form-control fg-line", placeholder = "Nhập tên tài khoản", required = "required", maxlength = "20" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-4" for="AccountNameEnglish">Tên tiếng anh<span style="color:red"></span></label>
+                            <div class="col-md-6">
+                                @Html.TextBoxFor(q => q.AccountNameEnglish, new { id = "AccountNameEnglish", @class = "form-control fg-line", placeholder = "Nhập tên tiếng anh", maxlength = "30" })
+                            </div>
+                        </div>
+                        @if (true)
+                        {//this.Model.CustomerID>0
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="CustomerId">Dành cho khách hàng<span style="color:red"></span></label>
+                                <div class="col-md-6">
+                                    @*@Html.DropDownListFor(q => q.CustomerID, this.Model.AvailableCustomer, new { @class = "form-control selectpicker dropup", data_live_search = "true", style = "overflowy:true;", @id = "select2Dropdown", @disabled = "disabled"})*@
+                                    @Html.TextBox("Name", Model.Customer.Name, new { @class = "form-control fg-line", @readonly = true, maxlength = "30" })
+                                    @Html.HiddenFor(q => q.CustomerID)
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="CustomerId">Dành cho khách hàng<span style="color:red"></span></label>
+                                <div class="col-md-6">
+                                    @Html.DropDownListFor(q => q.CustomerID, this.Model.AvailableCustomer, new { @class = "form-control selectpicker dropup", data_live_search = "true", style = "overflowy:true;", @id = "select2Dropdown" })
+                                </div>
+                            </div>
+                        }
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Ngày bắt đầu - Ngày hết hạn</label>
+                            <div class="col-md-6 dateTime">
+                                <div class="fg-line">
+                                    <div id="reportrange" class="btn-datetime pull-right form-control">
+                                        <i class="fa fa-calendar"></i>
+                                        <span></span> <b class="caret"></b>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="StartDate" name="StartDate" value="@(String.Format("{0:dd-MM-yyyy}",this.Model.StartDate))" />
+                            <input type="hidden" id="FinishDate" name="FinishDate" value="@(String.Format("{0:dd-MM-yyyy}",this.Model.FinishDate))" />
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-md-4 toggle-switch" data-ts-color="green">
+                                <label for="IsDetailAccount" class="ts-label">Chi tiết tài khoản</label>
+                            </div>
+                            <div class="toggle-switch col-md-6" data-ts-color="green" style="padding-left: 15px">
+                                <input id="IsDetailAccount" name="IsDetailAccount" type="checkbox" value="true" hidden="hidden" />
+                                <label for="IsDetailAccount" class="ts-helper"></label>
+                            </div>
+                        </div>
+
+                        <div id="detail-account-field" style="display:none">
+                            <!--Banking-->
+                            <div class="form-group">
+                                <div class="col-md-3 col-md-offset-1 toggle-switch" data-ts-color="green">
+                                    <label for="IsCredit" class="ts-label">Thẻ ngân hàng</label>
+                                </div>
+                                <div class="col-md-6 toggle-switch" data-ts-color="green">
+                                    <input id="IsCredit" name="IsCredit" type="checkbox" value="true" hidden="hidden" maxlength = "30" />
+                                    <label for="IsCredit" class="ts-helper"></label>
+                                </div>
+                            </div>
+                            <div id="bank-field" style="display:none">
+                                <div class="form-group" id="bank-name-field">
+                                    <label class="col-md-4 control-label"><i>Tên ngân hàng </i></label>
+                                    <div class="col-md-6">
+                                        <div class="fg-line">
+                                            @Html.TextBoxFor(q => q.BankName, new { id = "BankName", @class = "form-control fg-line", placeholder = "Nhập tên ngân hàng", maxlength = "30" })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" id="bank-account-no-field">
+                                    <label class="col-md-4 control-label"><i>Số tài khoản </i></label>
+                                    <div class="col-md-6">
+                                        @Html.TextBoxFor(q => q.BankAccountNo, new { id = "BankAccountNo", @class = "form-control fg-line", placeholder = "Nhập mã số thẻ", maxlength = "30" })
+                                    </div>
+                                </div>
+                                <div class="form-group" id="owner-name-field">
+                                    <label class="control-label col-md-4" for="OwnerName">Tên chủ thẻ<span style="color:red"></span></label>
+                                    <div class="col-md-6">
+                                        @Html.TextBoxFor(q => q.OwnerName, new { id = "OwnerName", @class = "form-control fg-line", placeholder = "Nhập tên chủ sở hữu thẻ", maxlength = "30" })
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Asset-->
+                            <div class="form-group">
+                                <div class="col-md-3 col-md-offset-1 toggle-switch" data-ts-color="green">
+                                    <label for="IsAsset" class="ts-label">Có tài sản</label>
+                                </div>
+                                <div class="col-md-6 toggle-switch" data-ts-color="green">
+                                    <input id="IsAsset" name="IsAsset" type="checkbox" value="true" hidden="hidden" />
+                                    <label for="IsAsset" class="ts-helper"></label>
+                                </div>
+                            </div>
+                            <div class="form-group" id="balance-field" style="display:none">
+                                <label class="col-md-4 control-label"><i>Tiền hiện có </i></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Balance, new { @type = "number", @min = 0, id = "Balance", @class = "form-control fg-line", placeholder = "Nhập tiền hiện có", oninput = "correctBalance()" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                <button type="button" onclick="duplicateAccountCode()" class="btn btn-success">Tạo</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+@*<script src="~/Content/assets/chosen/js/chosen.jquery.min.js"></script>*@
+
+<style>
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+    .toggle-switch {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+</style>
+<script>
+
+    $('#IsCredit').change(function () {
+        if ($(this).prop('checked')) {
+            $('#BankName').attr("required", "");
+            $('#BankAccountNo').attr("required", "");
+            $('#OwnerName').attr("required", "");
+        } else {
+            $('#BankName').removeAttr("required", "");
+            $('#BankAccountNo').removeAttr("required", "");
+            $('#OwnerName').removeAttr("required", "");
+        }
+        $('#bank-field').slideToggle();
+    });
+    $('#IsAsset').change(function () {
+        $('#balance-field').slideToggle();
+        if ($(this).prop('checked')) {
+            $('#Balance').attr("required", "");
+        }
+        else {
+            $('#Balance').removeAttr("required", "");
+        }
+    });
+    $('#IsDetailAccount').change(function () {
+        $('#detail-account-field').slideToggle();
+    });
+
+    $(document).ready(function () {
+        setupDaterangepicker();
+        var modelStartDateHasValue = '@Html.Raw(Model.StartDate.HasValue)';
+        $("#select2Dropdown").select2({ width: '100%' });
+
+
+        if(modelStartDateHasValue == "True") {
+            var start = '@Model.StartDate.GetValueOrDefault().ToString("MM/dd/yyyy")';
+            var end = '@Model.FinishDate.GetValueOrDefault().ToString("MM/dd/yyyy")';
+            $('#reportrange span').html(moment(start).format('MM/DD/YYYY') + ' - ' + moment(end).format('MM/DD/YYYY'));
+            var startDate = $('#reportrange').data('daterangepicker').startDate.toISOString();
+            var finishDate = $('#reportrange').data('daterangepicker').endDate.toISOString();
+            $('#StartDate').val(startDate);
+            $('#FinishDate').val(finishDate);
+        }
+
+    });
+
+    function initSelectCustomer() {
+        $(".select_customer").chosen({
+            disable_search_threshold: 10,
+            no_results_text: "Oops, nothing found!",
+            width: "95%"
+        });
+    }
+
+    function setupDaterangepicker() {
+        var modelStartDateHasValue = '@Html.Raw(Model.StartDate.HasValue)';
+        if (modelStartDateHasValue) {
+            var start = moment('@Model.StartDate.GetValueOrDefault().ToString("MM/dd/yyyy")').format("DD/MM/YYYY");
+            var end = moment('@Model.FinishDate.GetValueOrDefault().ToString("MM/dd/yyyy")').format("DD/MM/YYYY");
+        }
+        else
+        {
+            var start = moment().add(0, 'days');
+            var end = moment().add(0, 'days');
+        //$('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        }
+        //$('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        $('#reportrange').daterangepicker({
+            "minDate": moment(),
+            "maxDate": '31/12/2100',
+            "locale": {
+                "format": "DD/MM/YYYY",
+                "separator": " - ",
+                "showDropdowns": true,
+                "showWeekNumbers": true,
+                "timePicker": false,
+                "timePicker12Hour": true,
+                "autoUpdateInput": false,
+                "parentEl": '.modal-body',
+                "applyLabel": "Apply",
+                "cancelLabel": "Cancel",
+                "fromLabel": "From",
+                "toLabel": "To",
+                "opens": "left",
+                "customRangeLabel": "Custom",
+                "daysOfWeek": [
+                    "Su",
+                    "Mo",
+                    "Tu",
+                    "We",
+                    "Th",
+                    "Fr",
+                    "Sa"
+                ],
+                "monthNames": [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December"
+                ],
+                "firstDay": 1
+            },
+            "startDate": start,
+            "endDate": end,
+            "opens": "center"
+        }, function (start, end, label) {
+            //console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+            $('#reportrange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+        });
+
+        $('#reportrange').on("show.daterangepicker", function (ev, picker) {
+            $('.daterangepicker.dropdown-menu.show-calendar.openscenter').css('top', $('#reportrange').offset().top);
+        })
+
+        $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
+            startDate = picker.startDate.toISOString();
+            endDate = picker.endDate.toISOString();
+            $('#StartDate').val(startDate);
+            $('#FinishDate').val(endDate);
+            $('.daterangepicker.dropdown-menu.show-calendar.openscenter').css('top', '192px');
+
+        });
+    }
+
+    function correctBalance() {
+        var balance = $('#Balance').val().replace(/[^\d]/g, '');
+        $('#Balance').val(balance);
+    }
+
+    function duplicateAccountCode() {
+        if ($("input[name='AccountCode']").val() == "") {
+            ShowMessage("Mã số thẻ không được bỏ trống", 3);
+            return;
+        }
+        if ($("input[name='AccountName']").val() == "") {
+            ShowMessage("Tên tài khoản không được bỏ trống", 3);
+            return;
+        }
+
+        var code = document.getElementById("AccountCode").value;
+        var name = document.getElementById("AccountName").value;
+        $.ajax({
+            "type": "post",
+            "url": "@(Url.Action("ValidateAccount","Account"))",
+            "data": {
+                AccountCode: code,
+                AccountName: name
+            },
+            success: function (result) {
+
+                if (result.success) {
+                    //document.getElementById('createAccount').submit();
+                    var formData = $("#createAccount").serialize();
+
+                    $.ajax({
+                        "type": "post",
+                        "url": "@(Url.Action("Create", "Account"))",
+                        "data": formData,
+                        success: function (result) {
+                            $('#createAccountPanel').modal('hide');
+                            $('body').removeClass('modal-open');
+                            $('.modal-backdrop').remove();
+                            ShowMessage(result.message, 2);
+                            if ($("#defaultAccountId").val() == null ||  $("#defaultAccountId").val()==""){
+                                location.reload();
+                            }
+
+                        },
+                        error: function (error) {
+                            ShowMessge("Error Occured", 1);
+                        }
+                    });
+                }
+                else{
+                    if (result.message == "duplicate code") {
+                        ShowMessge("Mã tài khoản này đã tồn tại", 3);
+                    }
+                    else if (result.message == "duplicate name") {
+                        ShowMessge("Mã tài khoản này đã tồn tại", 3);
+                    }
+                    else if (result.message == "duplicate both") {
+                        ShowMessge("Mã tài khoản này đã tồn tại", 3);
+                    }
+               }
+            }
+        });
+    }
+</script>

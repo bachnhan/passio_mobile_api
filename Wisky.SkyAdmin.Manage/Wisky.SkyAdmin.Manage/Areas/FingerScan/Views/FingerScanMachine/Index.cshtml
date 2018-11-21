@@ -1,0 +1,366 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+</style>
+@* ------ Biến FLAG hidden dùng chứa val() check hành động Thêm hoăc Sửa *@
+@* ------ Biến TMP hidden dùng làm biến tạm đỡ FingerScanMachineId (data) khi bấm nút sửa*@
+<input type="hidden" id="FLAG" />
+<input type="hidden" id="TMP" />
+@*--------------------------------------*@
+
+<div class="card">
+    <div class="card-header">
+        <div class="box-header p-b-0">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Quản lý máy vân tay</h3>
+                </div>
+                <div class="col-md-6 text-right p-t-5">
+                    <button class="btn btn-success btn-sm pull-right" onclick="callShowCreateModal()">
+                        <i class="glyphicon glyphicon-plus"></i> THÊM MÁY MỚI
+                    </button>
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="allcust">
+                    <!-- Datatable -->
+                    <div class="col-md-12">
+
+                        <table id="finger-print-machine-table" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                            <thead>
+                            <tr>
+                                <th><label>STT</label></th>
+                                <th><label>Mã Máy</label></th>
+                                <th><label>Tên Máy</label></th>
+                                <th><label>Địa chỉ IP</label></th>
+                                <th><label>Nhãn hiệu</label></th>
+                                <th><label>Ngày sản xuất</label></th>
+                                <th><label>Tùy chọn</label></th>
+                            </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model container-->
+<div id="create-modal-container">
+    <div class="modal" id="create-edit-fingerScanMachine-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="Title_Create_Edit">Title (Thêm - Sửa)</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="hidden" id="FingerScanMachineId" />
+                            <label class="col-sm-3 control-label">Mã máy</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="FingerScanMachineCode" name="FingerScanMachineCode" placeholder="Mã máy">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Tên máy</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="FingerScanMachineName" name="FingerScanMachineName" placeholder="Tên máy">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Địa chỉ IP</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="FingerScanMachineIP" name="FingerScanMachineIP" placeholder="Địa chỉ IP">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Nhãn Hiệu</label>
+                            <div class="col-sm-9">
+                                <input class="form-control" id="FingerScanMachineBrand" name="FingerScanMachineBrand" placeholder="Nhãn Hiệu"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Ngày Sản xuất</label>
+                            <div class="col-md-9">
+                                <input class="form-control" type="text" id="FingerScanMachineDateOfMa" value="" placeholder="@DateTime.Now.Date.ToString("dd/MM/yyyy")"/>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="submit" id="btnAction" onclick="actionFingerPrintMachine()" class="btn btn-success btn-sm pull-right">(Thêm mới - Hoàn Tất)</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+    <script>
+        // --- Load datatable
+        $(document).ready(function() {
+            loadFingerScanMachineTable();
+            $("#FingerScanMachineDateOfMa").daterangepicker({
+                singleDatePicker: true,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                startDate: moment(),
+                showDropdowns: true
+            });
+        });
+        
+        function loadFingerScanMachineTable() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetFingerScanMachine")',
+
+                success: function(result) {
+                    initFingerPrintMachineDatatable(result.datatable);
+                }
+            });
+        }
+
+        function initFingerPrintMachineDatatable(data) {
+            $("#finger-print-machine-table").dataTable().fnDestroy();
+            $("#finger-print-machine-table").dataTable({
+                stateSave: true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Tìm kiếm",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 3, 4, 5],
+                        "sClass": "text-center",
+                        "bSortable": false,
+                    },
+                    
+                    {
+                        "aTargets": [6],
+                        "mRender": function(data, type, row) {
+                            var edit =
+                                "<a title='Chỉnh sửa' class='btn btn-sm btn-primary' onclick='callShowEditModal(" +
+                                    data +
+                                    ")'><i class='glyphicon glyphicon-pencil'></i></a>";
+                            var del = "<a title='Xóa' class='btn btn-sm btn-danger' onclick='deleteFingerScanMachine(" +
+                                data +
+                                ")'><i class='glyphicon glyphicon-trash'></i></a>";
+                            return edit + " " + del;
+                        },
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+        //------------- Goi hàm show modal
+        function callShowCreateModal() {
+            $('#FLAG').val('ADD');
+            showModal();
+        }
+
+        function callShowEditModal(data) {
+            $('#FLAG').val('FIX');
+            $('#TMP').val(data);
+            showModal();
+
+        }
+
+        // --- Show Modal them thanh phan
+        function resetData() {
+            $('#FingerScanMachineName').val(""),
+            $('#FingerScanMachineCode').val(""),
+            $('#FingerScanMachineIP').val(""),
+            $('#DescripFingerScanMachineBrandtion').val(""),
+            $('#FingerScanMachineBrand').val(""),
+            $('#FingerScanMachineDateOfMa').val("")
+        }
+
+        function showModal() {
+            var check = $('#FLAG').val();
+            if (check == "ADD") {
+                resetData();
+                $('#Title_Create_Edit').text("Thêm máy mới");
+                $('#btnAction').text("Thêm mới");
+                showCreateModal();
+            } else if (check == "FIX") {
+                $('#btnAction').text("Hoàn tất");
+                $('#Title_Create_Edit').text("Sửa thông tin máy");
+                showEditModal($('#TMP').val());
+            }
+        }
+
+        function showCreateModal() {
+            $('#create-edit-fingerScanMachine-modal').modal('show');
+        }
+
+        function showEditModal(machineId) {
+            debugger
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("prepareEdit")',
+                data: {
+                    FingerScanMachineId: machineId
+                },
+                success: function (result) {
+
+                    $('#create-edit-fingerScanMachine-modal').modal('show'); 
+                    $('#FingerScanMachineId').val(result.rs.machineId);
+                    $('#FingerScanMachineCode').val(result.rs.machineCode);
+                    $('#FingerScanMachineName').val(result.rs.machineName);
+                    $('#FingerScanMachineIP').val(result.rs.ip);
+                    $('#FingerScanMachineBrand').val(result.rs.brandOfMachine);
+                    $("#FingerScanMachineDateOfMa").val(result.rs.dateOfManufacture);
+                },
+                error: function(error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            })
+        }
+        //----- action: thêm và sửa FingerScanMachine -------------
+
+        function actionFingerPrintMachine() {
+            var check = $('#FLAG').val();
+            if (check == "ADD") {
+                createFingerPrintMachine();
+            } else if (check == "FIX") {
+                editFingerPrintMachine();
+            }
+        }
+
+        function createFingerPrintMachine() {
+            if ($('#FingerScanMachineName').val().trim() == "" || $('#FingerScanMachineName').val() == null) {
+                ShowAlert("Tên không được bỏ trống. Vui lòng nhập lại", 1);
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("CreateFingerScanMachine")',
+                    data: {
+                        code: $('#FingerScanMachineCode').val(),
+                        name: $('#FingerScanMachineName').val(),
+                        ip: $('#FingerScanMachineIP').val(),
+                        brand: $('#FingerScanMachineBrand').val(),
+                        dateOfMa: $("#FingerScanMachineDateOfMa").val()
+                    },
+                    success: function(result) {
+                        if (result == 1) {
+                            ShowAlert("Thêm thành công", 2);
+                            $('#create-edit-fingerScanMachine-modal').modal('hide');
+                            resetData();
+                            loadFingerScanMachineTable();
+                        } else if (result == 2) {
+                            ShowAlert("Mã máy đã tồn tại. Vui lòng nhập mã khác", 1);
+                        } else {
+                            ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                        }
+                    },
+                    error: function(error) {
+                        ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                    }
+                })
+            }
+        }
+
+        function editFingerPrintMachine() {
+            if ($('#FingerScanMachineName').val().trim() == "" || $('#FingerScanMachineName').val() == null) {
+                ShowAlert("Tên không được bỏ trống. Vui lòng nhập lại", 1);
+            } else {
+                
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("EditFingerScanMachine")',
+                    data: {
+                        id: $('#FingerScanMachineId').val(),
+                        code: $('#FingerScanMachineCode').val(),
+                        name: $('#FingerScanMachineName').val(),
+                        ip: $('#FingerScanMachineIP').val(),
+                        brand: $('#FingerScanMachineBrand').val(),
+                        dateOfMaStr: $("#FingerScanMachineDateOfMa").val()
+                    },
+                    success: function(result) {
+                        if (result == 1) {
+                            ShowAlert("Sửa thành công", 2);
+                            $('#create-edit-fingerScanMachine-modal').modal('hide');
+                            resetData();
+                            loadFingerScanMachineTable();
+                        } else if (result == 2) {
+                            ShowAlert("Mã máy đã tồn tại. Vui lòng nhập mã khác", 1);
+                        } else {
+                            ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                        }
+                    },
+                    error: function(error) {
+                        ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                    }
+                })
+            }
+        }
+
+        //------------- Xóa FingerScanMachine
+        function deleteFingerScanMachine(id) {
+            ShowConfirm("Bạn có muốn xóa máy quét vân tay này?",
+                function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("DeleteFingerScanMachine")',
+                        data: { FingerScanMachineId: id },
+
+                        success: function(data) {
+                            if (data) {
+                                ShowAlert("Xóa thành công", 2);
+                                loadFingerScanMachineTable();
+                            } else {
+                                ShowAlert("Thất bại. Vui lòng thử lại", 1);
+                            }
+
+
+                        },
+                        error: function(error) {
+                            showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                        }
+                    });
+                })
+        }
+
+    </script>
+}

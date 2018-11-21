@@ -1,0 +1,185 @@
+﻿@model HmsService.ViewModels.ProviderViewModel
+@{
+    ViewBag.Title = "Danh sách nhóm khuyến mãi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách nhóm khuyến mãi</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                @*<a class="btn btn-primary btn-icon-text waves-effect addNewEmp" href="@Url.Action("Create")">
+                        <i class="zmdi zmdi-plus"></i> Thêm nhà cung cấp
+                    </a>*@
+                <button class="btn btn-primary btn-icon-text waves-effect addNewEmp" data-action="open-modalCostCategory" data-type="create">
+                    <i class="zmdi zmdi-plus"></i>Thêm nhóm khuyến mãi
+                </button>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-padding">
+        <table id="GroupTable" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr class="gray">
+                    <th class="">STT</th>
+                    <th class="">Nhóm khuyến mãi</th>
+                    <th class="">Mô tả</th>
+                    <th class="">Tùy chọn</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+
+</div>
+<div class="modal fade" id="modalCostCategory">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+
+    $(document).ready(function () {
+        InitCustomerTypeDatatable();
+    });
+
+    function InitCustomerTypeDatatable() {
+        $("#GroupTable").dataTable({
+            "bFilter": true,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadGroup")",
+            "bProcessing": true,
+            "bFilter": true,
+
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                },
+                "sSearchPlaceholder": "Nhóm doanh thu/chi"
+            },
+            "aoColumnDefs": [
+                
+                {
+                    "aTargets": [0, 1, 2, 3],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [3],
+                    "mRender": function (data, type, row) {
+                        var data = row[3];
+                        $edit = $('<button/>', {
+                            'title':'Chỉnh sửa',
+                            'class': 'btn btn-sm btn-primary',
+                            'data-action': 'open-modalCostCategory',
+                            'data-type': 'edit',
+                            'data-id': data,
+                            'html': '<i class="glyphicon glyphicon-pencil"></i>'
+                        });
+                       // var editProvider = "<a data-action='open-modalCostCategory' @*href='@Url.Action("Edit")\/" + data + "\'*@ data-toggle='modal' class='btn btn-sm btn-primary' ><i class='glyphicon glyphicon-pencil'></i></a>  ";
+                        var deleteProvider = "<a title='Xóa' class='btn btn-sm btn-danger' onclick='deleteProvider(" + data + ")'><i class='glyphicon glyphicon-trash'></i></a>";
+
+                        return $edit[0].outerHTML +" "+ deleteProvider;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                }
+            ],
+            "bAutoWidth": false,
+        }).fnSetFilteringDelay(delaySearch);
+    }
+
+    $(document).on('click', '[data-action="open-modalCostCategory"]', function (e) {
+       
+        var me = $(e.currentTarget);
+        var type = me.attr('data-type');
+        var modal = $('#modalCostCategory');
+        modal.modal('show');
+        if (type == 'create') {
+            $.ajax({
+                url: '@Url.Action("Create","Group")',
+                type: 'GET',
+                dataType: 'html',
+                success: function (result) {
+                    modal.find('.modal-content').html(result);
+                }
+            });
+        } else {
+            $.ajax({
+                url: '@Url.Action("Edit", "Group")',
+                type: 'GET',
+                data: { id: me.attr('data-id') },
+                dataType: 'html',
+                success: function (result) {
+                    modal.find('.modal-content').html(result);
+                }
+            });
+        }
+    });
+
+
+    function deleteProvider(id) {
+        ShowConfirm("Bạn có chắc xóa dòng này?", function () {
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("Delete", "Group"))",
+                "data": {
+                    id: parseInt(id)
+                },
+                success: function (result) {
+
+                    if (result.success) {
+
+                        ShowAlert("Xóa thành công", 2);
+                        RefreshTable();
+                    } else {
+                        ShowAlert("Xóa thất bại, xin vui lòng thử lại !", 1);
+                    }
+                },
+                error: function (error) {
+                    ShowAlert("Xóa thất bại, xin vui lòng thử lại !", 1);
+                }
+            });
+        });
+    }
+
+    //redraw datatable without reload
+    function reDrawDatatable(id) {
+        $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+            if (oSettings.oFeatures.bServerSide === false) {
+                var before = oSettings._iDisplayStart;
+                oSettings.oApi._fnReDraw(oSettings);
+                //iDisplayStart has been reset to zero - so lets change it back
+                oSettings._iDisplayStart = before;
+                oSettings.oApi._fnCalculateEnd(oSettings);
+            }
+
+            //draw the 'current' page
+            oSettings.oApi._fnDraw(oSettings);
+        };
+        $(id).dataTable().fnStandingRedraw();
+    }
+    //user datatable
+    function RefreshTable() {
+        reDrawDatatable("#GroupTable");
+    }
+</script>

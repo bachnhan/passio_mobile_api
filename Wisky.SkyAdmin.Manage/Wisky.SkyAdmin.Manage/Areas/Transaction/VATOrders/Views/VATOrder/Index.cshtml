@@ -1,0 +1,410 @@
+﻿@model HmsService.ViewModels.VATOrderViewModel
+@using Wisky.SkyAdmin.Manage
+@{
+    ViewBag.Title = "Index";
+    var brandId = Utils.GetBrandId();
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 id="date"></h3>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <div class="input-group date" id="datetimepicker" style="float: right">
+                        <input id="date-time" type="text" class="form-control myInputCelender" />
+                        <span class="input-group-addon myCerlenderSpan">
+                            <span class="fa fa-calendar"></span>
+                        </span>
+                    </div>
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>     Tìm
+                        </a>
+                    </div>
+                </div>               
+            </div>
+
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-padding">
+        <a href="@Url.Action("AddVATOrder", brandId)" class="btn btn-primary pull-right">
+            <i class="zmdi zmdi-plus"></i>     Tạo mới hóa đơn VAT
+        </a>
+
+
+        <table id="tblOrderDetail" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <label class="">STT</label>
+                    </th>
+                    <th>
+                        <label class="">Mã hóa đơn</label>
+                    </th>
+                    <th>
+                        <label class="">Số lượng</label>
+                    </th>
+                    <th>
+                        <label class="">Tổng cộng</label>
+                    </th>
+                    <th>
+                        <label class="">Chi phí VAT</label>
+                    </th>
+                    <th>
+                        <label class="">Hình thức thanh toán</label>
+                    </th>
+                    <th>
+                        <label class="">Thời gian</label>
+                    </th>
+                    <th>
+                        <label class="">Cashier</label>
+                    </th>
+                    <th>
+                        <label class="">Chi tiết</label>
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+    <div class="modal fade " tabindex="-1" id="order-detail-report-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Chi tiết hóa đơn</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="clearfix" style="margin-bottom: 20px;">
+                        <div id="delivery">
+                            <div class="col-md-12">
+                                <label class="control-label text-left text-bold col-md-6 text-right">Tên công ty:</label>
+                                <div class="col-md-6">
+                                    <label class="control-label text-left" data-role="provider-name"></label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="control-label text-left text-bold col-md-6 text-right">Địa chỉ:</label>
+                                <div class="col-md-6">
+                                    <label class="control-label text-left" data-role="provider-address"></label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="control-label text-left text-bold col-md-6 text-right">Điện thoại:</label>
+                                <div class="col-md-6">
+                                    <label class="control-label text-left" data-role="provider-phone"></label>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="control-label text-left text-bold col-md-6 text-right">Mã hóa đơn:</label>
+                                <div class="col-md-6">
+                                    <label class="control-label text-left" data-role="invoiceno"></label>                                  
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="control-label text-left text-bold col-md-6 text-right">Cashier:</label>
+                            <div class="col-md-6">
+                                <label class="control-label text-left " data-role="cashier">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="control-label text-left text-bold col-md-6 text-right">Thời gian đặt:</label>
+                            <div class="col-md-6">
+                                <label class="control-label text-left " data-role="order-time">
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="control-label text-left text-bold col-md-6 text-right">Phương thức thanh toán:</label>
+                            <div class="col-md-6">
+                                <label class="control-label text-left" data-role="type">
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-md-offset-7">
+                        <button type="submit" id="exportPdf" class="btn btn-primary btn-sm pull-right">
+                            <i class="fa fa-download"></i>
+                            Xuất ra file PDF
+                        </button>
+                    </div>
+                    <div class="col-md-5 col-md-offset-7">
+                        <button type="submit" id="printPdf" class="btn btn-primary btn-sm pull-right">
+                            <i class="fa fa-download"></i>
+                            In hóa đơn VAT
+                        </button>
+                    </div>
+                    <table class="table table-bordered table-hover" id="order-report-detail-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Đơn vị tính</th>
+                                <th>Giá sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Chi phí VAT</th>
+                            </tr>
+                        </thead>
+                    </table>
+                   <form class="hidden" id="formDetailReportExcel" action="@Url.Action("ExportVATInvoice","VATOrder")">
+                        <input type="hidden" name="invoiceId" id="invoiceID" value="" />
+                        <input type="hidden" name="mode" id="mode" value="" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .myInputCelender {
+        height: 37px;
+    }
+
+    .input-group .input-group-btn > a.btn {
+        margin-top: 0px !important;
+    }
+</style>
+
+<script>
+    $(function () {
+        $('#datetimepicker').datetimepicker({
+            'maxDate': moment(),
+            format: 'DD/MM/YYYY',
+            defaultDate: moment(),
+        });
+    });
+
+    $('#btnSearch').click(function () {
+        RefreshOrderTable();
+        $('#date').text('');
+        $('#date').append('Hoá đơn ngày ' + $('#date-time').val());
+    });
+
+    var orderDetailTable = null;
+    var currentId = -1;
+    $(document).ready(function () {
+        InitOrderDatatable();
+        $('#date').append('Hoá đơn ngày ' + $('#date-time').val());
+        $('#product-list').select2();
+        $('#searchResult').on("click", function (e) {
+            RefreshOrderTable();
+        });
+
+        $('#clearResult').on("click", function (e) {
+            $('#product-list').select2('val', []);
+            $('#largerPrice').val('');
+            $('#smallerPrice').val('');
+            RefreshOrderTable();
+        });
+
+        $("#showSearch").click(function () {
+            $("#searchFunction").fadeToggle();
+        });
+
+        $("#searchFunction").hide();
+    });
+
+    function RefreshOrderTable() {
+        var oTable = $("#tblOrderDetail").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+    $(document).ready(function () {
+        InitOrderDatatable();
+    });
+    function InitOrderDatatable() {
+        $("#tblOrderDetail").dataTable({
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadVATOrder")",
+            "bProcessing": true,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "bFilter": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "_date", "value": $('#date-time').val() });
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                },
+                "sSearchPlaceholder": "Mã hóa đơn"
+            },
+            "aoColumnDefs": [
+               {
+                   "aTargets": [0, 2, 3, 4, 5, 6, 7, 8],
+                   "sClass": "text-center"
+               },
+               {
+                   "aTargets": [0, 1, 2, 4, 6, 8],
+                   "bSortable": false
+               },
+               {
+                   "aTargets": [3],
+                   "mRender": function (data, type, row) {
+                       var data = row[3];
+                       return toMoney(data, ',', '');
+                   }
+               },
+               {
+                   "aTargets": [4],
+                   "mRender": function (data, type, row) {
+                       var data = row[4];
+                       return toMoney(data, ',', '');
+                   }
+               },
+               {
+                   "aTargets": [5],
+                   "mRender": function (data, type, row) {
+                       var status = "";
+                       var color = "";
+                       var colorS = "";
+                       data = row[5];
+                       switch (data) {
+                           case 1:
+                               data = "Tiền mặt";
+                               break;
+                           case 2:
+                               data = "Qua thẻ";
+                               break;
+                       }
+                       return data;
+                   }
+               },
+               {
+                   "aTargets": [8],
+                   "mRender": function (data, type, row) {
+                       var data = row[9];
+                       var btn = $('<a/>', {
+                           'class': 'btn btn-sm btn-primary',
+                           'html': $('<i/>', {
+                               'class': 'glyphicon glyphicon-eye-open'
+                           }),
+                           'data-provider-name': row[10],
+                           'data-provider-address': row[11],
+                           'data-provider-phone': row[12],
+                           'data-invoiceno': row[1],
+                           'data-cashier': row[7],
+                           'data-order-time': row[6],
+                           'data-type': row[5],
+                           'data-id': row[8],
+                           'data-role': 'detail'
+                       });
+                       return btn[0].outerHTML;
+                   }
+               }
+
+            ],
+            "bAutoWidth": false
+        });
+    }
+
+    $(document).on('click', '[data-role=detail]', function () {
+        currentId = $(this).data('id');
+        $("#invoiceID").val(currentId);
+        $('#order-detail-report-modal').modal('show');
+        $('#order-detail-report-modal [data-role=provider-name]').html($(this).data('provider-name'));
+        $('#order-detail-report-modal [data-role=provider-address]').html($(this).data('provider-address'));
+        $('#order-detail-report-modal [data-role=provider-phone]').html($(this).data('provider-phone'));
+        $('#order-detail-report-modal [data-role=invoiceno]').html($(this).data('invoiceno'));
+        $('#order-detail-report-modal [data-role=cashier]').html($(this).data('cashier'));
+        $('#order-detail-report-modal [data-role=order-time]').html($(this).data('order-time'));
+        switch ($(this).data('type')) {
+            case 1:
+                $('#order-detail-report-modal [data-role=type]').html("Tiền mặt")
+                break;
+            case 2:
+                $('#order-detail-report-modal [data-role=type]').html("Qua thẻ")
+                break;
+        }
+
+        VATOrderDetailTable();
+        RefreshTableOrderDetail();
+    });
+
+
+    var VATOrderDetailTable = function () {
+        $('#order-report-detail-table').dataTable({
+            "bFilter": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadVATOrderDetail")",
+            "bProcessing": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "id", "value": currentId });
+            },
+            "oLanguage": {
+                "sSearch": "Tên Phòng:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+
+            },
+            "aoColumnDefs": [
+                { "aTargets": [0, 1, 2, 3, 4, 5], "bSortable": false },
+                { "aTargets": [3, 4], "sClass": "text-center" },
+                {
+                    "aTargets": [2],
+                    "fnRender": function (o) {
+                        var money = o.aData[2];
+                        return toMoney(money, ',', '.');
+                    }
+                },
+                {
+                    "aTargets": [6],
+                    "sClass": "hidden",
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+    };
+
+    function RefreshTableOrderDetail() {
+        var oTable = $("#order-report-detail-table").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+    // export pdf
+    $(document).on('click', '#exportPdf', function () {
+        $("#mode").val(1);
+        $('#formDetailReportExcel').submit();
+    });
+
+    // print pdf
+    $(document).on('click', '#printPdf', function () {
+        var id = $("#invoiceID").val();
+        var url = '@Url.Action("ExportVATInvoice")' + '?invoiceId=' + id + '&mode=2';
+
+        window.open(url,'_blank').print();
+    });
+</script>

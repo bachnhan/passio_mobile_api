@@ -1,0 +1,293 @@
+﻿
+@{
+    ViewBag.Title = "DetailArea";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var nameArea = ViewBag.NameArea;
+    var areaId = ViewBag.AreaId;
+}
+<input type="hidden" value="@(areaId)" id="parrent_Area"/>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách khu vực của @(nameArea)</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <a id="btn_Back" href="@Url.Action("Index","AreaDelivery")"
+                   class="btn btn-success btn-icon-text waves-effect">
+                    <i class="fa fa-hand-o-left"></i> Quay lại
+                </a>
+                <a id="btn_creatArea"
+                   class="btn btn-primary btn-icon-text waves-effect">
+                    <i class="zmdi zmdi-plus"></i> Tạo khu vực
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <!-- Customer Table -->
+        <div class="row">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="allcust">
+                    <!-- Datatable -->
+                    <div class="col-md-12">
+                        <table id="AreaTable" class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label class="">STT</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tên khu vực</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Delivery Price</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tùy chọn</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="EditModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="modalUserHeader"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="attribute-panel">
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">Tên khu vực</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control" id="are_Name" value="" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">Giá Cơ bản</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control number currency" id="basePrice" />
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" value="" id="detailId" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: none;">
+                <button type="button" class="btn btn-primary" id="btnsubmit">Cập Nhật</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            InitUserDatatable();
+        });
+
+        $('.currency').blur(function () {
+            var data = $(this).val();
+
+            $(this).val(toMoney(data, ',', 'đ'));
+        });
+
+        // validate number
+        $(".number").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                // Allow: Ctrl+A, Command+A
+                (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                // Allow: home, end, left, right, down, up
+                (e.keyCode >= 35 && e.keyCode <= 40)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
+
+        $('#AreaTable tbody').on('click', '#Edit', function () {
+            var table = $('#AreaTable').DataTable();
+            var data = table.row($(this).parents('tr')).data();
+            openEditModel(data);  // @*Id cua Model*@
+        });
+
+        $("#btn_creatArea").on('click', function () {
+            openCreateModel();  // @*Id cua Model*@
+        });
+
+
+        function openEditModel(data) {
+            $("#modalUserHeader").text("Chỉnh sửa khu vực " + data[2]);
+            $('#EditModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $("#are_Name").val(data[1]);
+            $("#basePrice").val(toMoney(Math.round(data[2]), ',', 'đ'));
+            $("#detailId").val(data[3]);
+            $('#EditModal').modal('show');
+        };
+
+        function openCreateModel() {
+
+            $("#modalUserHeader").text("Tạo khu vực mới");
+            $('#EditModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+            $("#are_Name").val("");
+            $("#basePrice").val(toMoney(0, ',', 'đ'));
+            $("#detailId").val("");
+            $('#EditModal').modal('show');
+        };
+
+        function RefreshTable() {
+            var oTable = $("#AreaTable").dataTable();
+            oTable._fnPageChange(0)
+            oTable._fnAjaxUpdate();
+        }
+
+        $(document).on("click","#btnsubmit",function(){
+            var str =$('#basePrice').val();
+            var baseprice =str.replace(/[,.đ]/g,'');
+            var areaName = $("#are_Name").val();
+            var createModal = $("#detailId").val();
+            var parrentArea = $("#parrent_Area").val();
+            if (createModal){ // Update
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UpdateArea", "AreaDelivery")',
+                    data: {detailId : createModal, baseprice: baseprice, areaName : areaName},
+                    success: function(result){
+                        if (result.success == true){
+                            RefreshTable();
+                            $('#EditModal').modal('hide');
+                            ShowMessage(result.message, 2);
+                        } else {
+                            ShowMessage("Whoops something went wrong!", 1);
+                        }
+                    }
+                });
+            } else {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("CreateChildArea", "AreaDelivery")',
+                    data: { baseprice: baseprice, areaName: areaName, parentArea: parrentArea },
+                    success: function(result){
+                        if (result.success == true){
+                            RefreshTable();
+                            $('#EditModal').modal('hide');
+                            ShowMessage("Thành công", 2);
+                        } else {
+                            ShowMessage("Whoops something went wrong!", 1);
+                        }
+                    }
+                });
+            }
+        });
+        // validate percent
+
+        function InitUserDatatable() {
+            $("#AreaTable").dataTable({
+                "bSort": false,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@this.Url.Action("GetListChildArea", "AreaDelivery")",
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "areaId", "value": $("#parrent_Area").val() });
+                },
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Tên khu vực",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+
+                },
+                "aoColumnDefs": [
+                    {
+                        "bSearchable": false,
+                        "aTargets": [0, 2, 3],
+                        "bSearchable": false,
+                        "sClass": "text-center"
+                    },
+                     {
+                         "aTargets": [1],
+                         "bSearchable": true,
+                         "sClass": "text-center"
+                     },
+                     {
+                         "aTargets": [2],
+                         "mRender": function (data, type, row) {
+                             return toMoney(data, ',', 'đ');
+                         },
+                         "sClass": "text-center"
+                     },
+                     {
+                         "aTargets": [3],
+                         "mRender": function (data, type, row) {
+                             var editButton = '<button class="fa fa-pencil btn btn-sm btn-info" type="button" data-action="edit-child-general" data-status="0" id="Edit">' +
+                                '  Sửa</button>';
+                             return editButton;
+                         },
+                         "sClass": "text-center"
+                     }
+                ],
+                "bAutoWidth": false,
+            });
+
+        }
+    </script>
+    <style>
+        .dl-horizontal dd {
+            margin-left: 186px;
+        }
+
+        .label {
+            font-size: 100%;
+        }
+    </style>
+}
+
+

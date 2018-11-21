@@ -1,0 +1,187 @@
+﻿@model HmsService.ViewModels.ThemeViewModel
+@{
+    ViewBag.Title = "Chỉnh sửa Theme";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+<link href="~/Content/plugins/elfinder/css/theme.css" rel="stylesheet" />
+<div class="card">
+    @Html.ValidationSummary()
+    <form id="editTheme" method="post" onsubmit="return validate()">
+        @this.Html.HiddenFor(q => q.ThemeId)
+        @this.Html.HiddenFor(q => q.Active)
+        @this.Html.HiddenFor(q => q.CreatedBy)
+        @this.Html.HiddenFor(q => q.CreatedDate)
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-8">
+                    <h3 class="margin-bottom30">Chỉnh sửa Theme: <strong>@Model.ThemeName</strong></h3>
+                </div>
+                <div class="col-md-4 text-right">
+                    <ul class="actions">
+                        <li class="m-r-10">
+                            <a href="@this.Url.Action("Index", "Theme")" class="btn btn-success myComeback">Quay lại</a>
+                        </li>
+                        <li>
+                            <button type="submit" class="btn btn-primary" id="btn-submit-theme">Hoàn tất</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+        @if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+        {
+            <div class="card">
+                <div class="card-body card-padding text-danger">
+                    @this.Html.ValidationSummary()
+                </div>
+            </div>
+        }
+
+        <div class="row">
+            <div class="col-md-7 p-l-45">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin chính</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="form-group clearfix">
+                            <label for="inputTitle" class="control-label">Tên Theme</label>
+                            <div class="fg-line">
+                                <input type="text" name="ThemeName" id="ThemeName" class="form-control" required="" value="@Model.ThemeName" oninput="this.value=this.value.replace(/[#*&!`%~^[$\]\\]/g,'');">
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label for="inputTitle" class="control-label">Thư mục Theme</label>
+                            <div class="fg-line">
+                                @this.Html.TextBoxFor(q => q.ThemeFolderUrl, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label for="inputTitle" class="control-label">Theme style</label>
+                            <div class="fg-line">
+                                @this.Html.TextBoxFor(q => q.ThemeStyle, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="form-group clearfix">
+                            <label class="control-label">Mô tả</label>
+                            <div class="fg-line">
+                                @this.Html.TextAreaFor(q => q.Description, new { @class = "form-control", Rows = 6 })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5 p-r-45">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Hình ảnh đại diện</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="row sm-margin">
+                            <div class="col-md-4">
+                                <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                                    <li class="col-md-4 photo-item removeable img-vpos">
+                                        <div class="ratio-wrapper ratio-wrapper-1-1">
+                                            <div class="ratio-item">
+                                                <div class="img-container"><img src="@Model.ImageUrl" /></div>
+                                                <input type="hidden" name="SelectedImages" value="@Model.ImageUrl" />
+                                                <span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>
+                                            </div>
+                                        </div>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </div>
+                        <div>
+                            @Html.TextBoxFor(q => q.ImageUrl, new { @class = "form-control", @id = "PicURL", @type = "hidden" })
+                            <div style="display: none">
+                                <input type="file" hidden id="uploadImage" accept="image/*" class="btn btn-sm btn-success uploadImageToBlob" />
+                            </div>
+                            <button type="button" id="btnUploadImage" class="btn btn-sm btn-success">
+                                <i class="icon-upload"></i>Browse
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </form>
+</div>
+<script>
+
+    $(document).ready(function () {
+        $("#btnUploadImage").on('click', function () {
+            $('#uploadImage').click();
+        });
+
+        $("#uploadImage").on('change', function () {
+
+            var file, img;
+            if ((file = this.files[0])) {
+                img = new Image();
+                img.onload = function () {
+                    sendFile(file);
+                };
+                img.onerror = function () {
+                    ShowMessage("Not a valid file:" + file.type, 1);
+                };
+                var _URL = window.URL || window.webkitURL;
+                img.src = _URL.createObjectURL(file);
+            }
+        });
+
+        function sendFile(file) {
+            var formData = new FormData();
+            formData.append('file', $('#uploadImage')[0].files[0]);
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("UploadImage", "UploadImage")',
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                            '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                            '<div class="ratio-item"><div class="img-container"><img src="' + result.imageUrl + '"/></div>' +
+                        '<input type="hidden" name="SelectedImages" value="' + result.imageUrl + '"/>'
+                        + '<span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                        '</div></div></li>';
+                        $("#avatar-preview").html(htmlInnerData);
+                        $("#PicURL").val(result.imageUrl);
+                    }
+                },
+                processData: false,
+                contentType: false,
+                error: function () {
+                    ShowMessage("Có lỗi xảy ra!", 1);
+                }
+            });
+        }
+    });
+    function delImg() {
+        $("#PicURL").val("");
+        $("#avatar-preview").html("");
+    }
+    function validate() {
+        var errorFree = true;
+
+        if ($('#ThemeName').val() == "") {
+            errorFree = false;
+            swal({ title: "Tên theme không được để trống", text: "Vui lòng bổ sung", timer: 2500, type: "error" });
+        }
+        if ($('#ThemeFolderUrl').val() == "") {
+            errorFree = false;
+            swal({ title: "Thư mục theme không được để trống", text: "Vui lòng bổ sung", timer: 2500, type: "error" });
+        }
+        if ($('#ThemeStyle').val() == "") {
+            errorFree = false;
+            swal({ title: "Theme style không được để trống", text: "Vui lòng bổ sung", timer: 2500, type: "error" });
+        }
+        if (!errorFree) {
+            return false;
+        }
+    }
+
+</script>

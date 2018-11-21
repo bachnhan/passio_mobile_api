@@ -1,0 +1,297 @@
+﻿@model HmsService.ViewModels.PosFileViewModel
+
+@{
+
+}
+
+<style>
+    .pair-group .btn,
+    .variant-group .btn {
+        font-weight: 500 !important;
+    }
+
+    .col-md-4 {
+        padding-top: 10px;
+    }
+
+    .btn-group.bootstrap-select > .btn.dropdown-toggle {
+        padding: 6px;
+    }
+</style>
+
+<div class="card">
+    @this.Html.AntiForgeryToken()
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                @if (this.Model.Id == 0)
+                {
+                    <h3 class="margin-bottom30">Tạo POS file</h3>
+                }
+                else
+                {
+                    <h3 class="margin-bottom30">Chỉnh sửa POS file: <strong>@this.Model.FileName</strong></h3>
+                }
+            </div>
+            <div class="col-md-6 text-right">
+                <ul class="actions">
+                    <li class="m-r-10">
+                        <a href="@this.Url.Action("Index", "PosFile")" class="btn btn-success myComeback">Quay lại</a>
+                    </li>
+                    <li>
+                        <button type="button" class="btn btn-primary" id="btn-submit">Hoàn tất</button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="row">
+        <div class="card-body card-padding">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Thông tin chính</h2>
+                </div>
+                <div class="card-body card-padding row">
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="file-name" class="control-label col-md-4">Tên file</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <input class="form-control" value="@this.Model.FileName" id="file-name" name="file-name" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="Product_Code" class="control-label col-md-4">Phiên bản</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <input class="form-control" value="@this.Model.Version" id="file-version" name="file-version" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group row">
+                            <label for="Product_Code" class="control-label col-md-4">Thương hiệu</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <select class="selectpicker" id="brandId" title="Chọn 1 thương hiệu"></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="file-name" class="control-label col-md-4">Cửa hàng</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <select class="selectpicker" id="storeId" title="Chọn 1 cửa hàng"></select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <h2 class="col-md-2">POS config</h2>
+                        @if (this.Model.Id == 0)
+                        {
+                            <div class="col-md-3 col-md-offset-6 p-r-20">
+                                <div class="fg-line">
+                                    <select class="selectpicker" id="config" title="Chọn 1 POS file mẫu"></select>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <a href="#" class="btn btn-primary waves-effect pull-right" id="btn-clone">Sao chép</a>
+                            </div>
+                        }
+                    </div>
+                    <hr/>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-horizontal">
+                        <div class="pair-panel">
+                            @if (this.Model.PosConfigs != null)
+                            {
+                                foreach (var config in this.Model.PosConfigs)
+                                {
+                                    <div class="pair-group form-group xs-margin">
+                                        <div class="col-sm-4">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" name="config-key" placeholder="Key" value="@(config.Key)">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control" name="config-value" placeholder="Value" value="@(config.Value)">
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            <button type="button" class="btn btn-danger form-control myForm" data-action="remove-pair-group">
+                                                <i class="glyphicon glyphicon-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-info btn-icon-text waves-effect" data-action="add-pair-group">
+                                    <i class="zmdi zmdi-plus"></i>Thêm
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template Pair Group -->
+<template id="templatePairGroup">
+    <div class="pair-group form-group xs-margin">
+        <div class="col-sm-4">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="config-key" placeholder="Key" />
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="fg-line">
+                <input type="text" class="form-control" name="config-value" placeholder="Value" />
+            </div>
+        </div>
+        <div class="col-sm-2">
+            <button type="button" class="btn btn-danger form-control myForm" data-action="remove-pair-group">
+                <i class="glyphicon glyphicon-trash"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Template Photo Block -->
+<template id="tmpPhotoBlock">
+    <li class="col-md-4 photo-item removeable">
+        <div class="ratio-wrapper ratio-wrapper-1-1">
+            <div class="ratio-item">
+                <div class="img-container">
+                    <img />
+                </div>
+            </div>
+        </div>
+    </li>
+</template>
+
+<script>
+    $(document).ready(function () {
+        GetAllPosFile();
+
+        var isCreating = '@(this.Model.Id == 0 ? "true" : "false")';
+
+        if (isCreating == "true") {
+            var brandList = @Html.Raw(Json.Encode(ViewBag.BrandList));
+
+            var brandContent = "";
+
+            for (var i = 0; i < brandList.length; i++) {
+                brandContent += "<option value='" + brandList[i].Id + "'>" + brandList[i].Name + "</option>";
+            }
+
+            $('#brandId').html(brandContent);
+            $('#brandId').val('');
+            $('#storeId').val('');
+            $('#brandId').selectpicker('refresh');
+            $('#storeId').selectpicker('refresh');
+
+            $('#brandId').on('change', function() {
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("GetStoreList")',
+                    data: {"brandId" : $('#brandId').val()},
+                    success: function(result) {
+                        if(result.success) {
+                            var storeContent = "";
+
+                            for (var i = 0; i < result.StoreList.length; i++) {
+                                storeContent += "<option value='" + result.StoreList[i].ID + "'>" + result.StoreList[i].Name + "</option>";
+                            }
+
+                            $('#storeId').html(storeContent);
+                            $('#storeId').val('');
+                            $('#storeId').selectpicker('refresh');
+                        } else {
+                            ShowMessage(result.message, 3);
+                        }
+                    },
+                    error: function() {
+                        ShowMessage("Có lỗi xảy ra", 1);
+                    }
+                });
+            });
+        } else {
+            $('#storeId').html("<option value='" + @(ViewBag.currentStore == null ? "" : ViewBag.currentStore.ID) + "'>" + '@(ViewBag.currentStore == null ? "" : ViewBag.currentStore.Name)' + "</option>");
+            $('#brandId').html("<option value='" + @(ViewBag.currentBrand == null ? "" : ViewBag.currentBrand.Id) + "'>" + '@(ViewBag.currentBrand == null ? "" : ViewBag.currentBrand.BrandName)' + "</option>");
+            $('#brandId').val(@(ViewBag.currentBrand == null ? "" : ViewBag.currentBrand.Id));
+            $('#storeId').val(@(ViewBag.currentStore == null ? "" : ViewBag.currentStore.ID));
+            $('#brandId').selectpicker('refresh');
+            $('#storeId').selectpicker('refresh');
+            $('#brandId').attr('disabled', 'disabled');
+            $('#storeId').attr('disabled', 'disabled');
+        }
+
+        $('#btn-clone').on('click', function() {
+            $.ajax ({
+                url: '@Url.Action("GetAllConfig")',
+                type: 'GET',
+                data: { posFileId: $('#config').val() },
+                success: function(result) {
+                    if(result.success) {
+                        $('.pair-panel').html('');
+                        for(var i = 0; i < result.list.length; i++) {
+                            var $newPairGroup = $('#templatePairGroup').html().trim();
+                            $('.pair-panel').append($newPairGroup);
+                            $('.pair-panel > .pair-group:nth-child(' + (i + 1) + ') input').first().val(result.list[i].Key);
+                            $('.pair-panel > .pair-group:nth-child(' + (i + 1) + ') input').last().val(result.list[i].Value);
+                        }
+                        var $newPairGroup = $('#templatePairGroup').html().trim();
+                        $('.pair-panel').append($newPairGroup);
+                    }
+                },
+                error: function() {
+                    ShowMessage("Có lỗi xảy ra", 1);
+                }
+            });
+        });
+
+        $('#btn-submit').parent().parent().css('z-index', '6');
+        $('.myComeback').fixedScroll(70);
+        $('#btn-submit').fixedScroll(70);
+    });
+
+    function GetAllPosFile() {
+        $.ajax ({
+            type: 'GET',
+            url: '@Url.Action("GetAllPosFile")',
+            success: function(result) {
+                if(result.success) {
+                    var fileContent = "";
+
+                    for (var i = 0; i < result.list.length; i++) {
+                        fileContent += "<option value='" + result.list[i][3] + "'>" + result.list[i][1] + "</option>";
+                    }
+
+                    $('#config').html(fileContent);
+                    $('#config').val('');
+                    $('#config').selectpicker('refresh');
+                }
+            },
+            error: function() {
+
+            }
+        });
+    }
+</script>

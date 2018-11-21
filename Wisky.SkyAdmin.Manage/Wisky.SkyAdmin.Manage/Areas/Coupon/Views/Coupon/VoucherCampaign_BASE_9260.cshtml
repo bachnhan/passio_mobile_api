@@ -1,0 +1,181 @@
+﻿@model Skyplus.Models.VoucherCampaignEditViewModel
+@{
+    ViewBag.Title = "Danh sách đợt khuyến mãi";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h1>Danh sách đợt khuyến mãi</h1>
+            </div>
+            <div class="col-md-4 text-right">
+                <a href="@(Url.Action("VoucherCampaignCreate"))" class="btn btn-primary btn-icon-text waves-effect addNewEmp">
+                    <i class="zmdi zmdi-plus"></i> Thêm đợt khuyến mãi mới
+                </a>
+            </div>
+        </div>
+    </div>
+    <table id="voucherTable" class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr class="gray">
+                <th class="">Mã DKM</th>
+                <th class="">Tên</th>
+                <th class="">Giá trị (VNĐ)</th>
+                <th class="">Ngày bắt đầu</th>
+                <th class="">Ngày kết thúc</th>
+                <th class="">Trạng thái</th>
+                <th class="">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+<div class="modal fade" id="campaignDetail" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chi tiết chiến dịch</h4>
+            </div>
+            <div class="modal-body">
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section VoucherCampaign{
+    <script>
+        $(function () {
+            $('#campaignDetail').on('show.bs.modal', function (e) {
+                //console.log(e);
+                var $me = $(this);
+                var $btn = $(e.relatedTarget);
+                var campaignId = $btn.attr('data-contract-id');
+                $.ajax({
+                    "type": "post",
+                    "url": "@(Url.Action("VoucherCampaignDetail", "Voucher"))",
+                    "dataType": "html",
+                    "data": {
+                        id: campaignId
+                    },
+                    success: function (result) {
+                        $me.find('.modal-body').html(result);
+                    }
+                });
+            });
+        });
+        function removeCampaign(id) {
+            var rs = confirm("Xác nhận xóa nhà cung cấp voucher?");
+            if (rs) {
+                $.ajax({
+                    "type": "post",
+                    "url": "@(Url.Action("VoucherCampaignDelete", "Voucher"))",
+                    "data": {
+                        id: parseInt(id)
+                    },
+                    success: function (result) {
+                        location.href = '/CRM/Voucher/VoucherCampaign';
+                    }
+                });
+            }
+        }
+        $(document).ready(function () {
+            InitVoucherCampaignDatatable();
+        });
+        function InitVoucherCampaignDatatable() {
+            $("#voucherTable").dataTable({
+                "bFilter": true,
+                "bRetrieve": true,
+                "bServerSide": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("LoadVoucherCampaign")",
+                "bProcessing": true,
+                "bFilter": true,
+                //"fnServerParams": function (aoData) {
+                //    aoData.push({ "name": "locationId", "value": $('#LocationId').val() });
+                //},
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3, 4, 5],
+                        "bSortable": false,
+                    },
+                    //{
+                    //    "aTargets": [1],
+                    //    "mRender": function (data, type, row) {
+                    //        var data = row[1];
+                    //        var result = "<img src='" + data + "' />";
+
+                    //        return result;
+                    //    },
+                    //    "bSortable": false,
+                    //    "sClass": "text-center"
+                    //},
+                    {
+                        "aTargets": [5],
+                        "mRender": function (data, type, row) {
+                            var result = "";
+                            if (parseInt(row[5]) == 0) {
+                                result = "Chưa kích hoạt";
+                            }
+                            else if (parseInt(row[5]) == 1) {
+                                result = "Đang hoạt động";
+                            }
+                            else {
+                                result = "Đã kết thúc";
+                            }
+                            return "<span style=\'font-weight:bold;\'>" + result + "</span>";
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    },
+                    //{
+                    //    "aTargets": [6],
+                    //    "mRender": function (data, type, row) {
+                    //        return row[6];
+                    //    },
+                    //    "bSortable": false,
+                    //    "sClass": "text-center"
+                    //},
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var data = row[0];
+                            var result = "";
+                            if (row[5] == 0) {
+                                result = "<a class='btn btn-icon btn-primary' onclick=''>Kích hoạt</a>" +
+                                    "<a href='VoucherCampaignDetail/" + data + "' class='btn btn-icon btn-sm waves-effect waves-circle waves-float' data-toggle='modal' data-target='#campaignDetail' data-contract-id='" + data + "' title='Chi tiết' onclick='showDetail(" + data + ")'><i class='zmdi zmdi-file-text'></i></a>" +
+                                    "<a href='VoucherCampaignEdit/" + data + "' class='btn btn-icon btn-sm waves-effect waves-circle waves-float' title='Chỉnh sửa' onclick=''><i class='zmdi zmdi-edit'  aria-hidden='true'></i></a>" +
+                                    "<a class='btn btn-icon btn-sm waves-effect waves-circle waves-float' title='Xóa' onclick='removeCampaign(" + data + ")'><i class='fa fa-trash fa-2x'></i></a>";
+                            }
+                            else if (row[5] == 1) {
+                                result = "<a class='btn btn-icon btn-sm btn-primary' onclick=''>Kết thúc</a>" +
+                                    "<a href='VoucherCampaignDetail/" + data + "' class='btn btn-icon btn-sm waves-effect waves-circle waves-float' title='Chi tiết' onclick='showDetail(" + data + ")'><i class='zmdi zmdi-file-text'></i></a>" +
+                                    "<a href='VoucherCampaignEdit/" + data + "' class='btn btn-icon btn-sm waves-effect waves-circle waves-float' title='Chỉnh sửa' onclick=''><i class='zmdi zmdi-edit'  aria-hidden='true'></i></a>" +
+                                "<a class='btn btn-icon btn-sm waves-effect waves-circle waves-float' title='Xóa' onclick='removeCampaign(" + data + ")'><i class='fa fa-trash fa-2x'></i></a>";
+                            }
+                            else {
+                                result = "<a class='btn btn-icon btn-primary' onclick=''>Kích hoạt</a>" +
+                                    "<a href='VoucherCampaignDetail/" + data + "' class='btn btn-icon btn-sm waves-effect waves-circle waves-float' title='Chi tiết' onclick='showDetail(" + data + ")'><i class='zmdi zmdi-file-text'></i></a>" +
+                                    "<a href='VoucherCampaignEdit/" + data + "' class='btn btn-icon btn-sm waves-effect waves-circle waves-float' title='Chỉnh sửa' onclick=''><i class='zmdi zmdi-edit'  aria-hidden='true'></i></a>" +
+                                    "<a class='btn btn-icon btn-sm waves-effect waves-circle waves-float' title='Xóa' onclick='removeCampaign(" + data + ")'><i class='fa fa-trash fa-2x'></i></a>";
+                            }
+                            return result;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+    </script>
+}
+
+

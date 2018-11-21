@@ -1,0 +1,360 @@
+﻿/* ==================== Modal Fullscreen ==================== */
+.modal.modal-fullscreen {
+    top: 0;
+    bottom: 0;
+}
+
+/* ==================== Dual Screen ==================== */
+.dual-screen {
+    width: 100%;
+    height: 100%;
+}
+
+    .dual-screen .dual-sub-screen {
+        height: 100%;
+        float: left;
+        padding: 0 15px;
+        position: relative;
+    }
+
+        .dual-screen .dual-sub-screen:first-child {
+            border-right: 1px solid #e0e0e0;
+            padding-left: 0;
+        }
+
+        .dual-screen .dual-sub-screen:last-child {
+            padding-right: 0;
+        }
+
+    .dual-screen .screen-40 {
+        width: 35%;
+    }
+
+    .dual-screen .screen-60 {
+        width: 65%;
+    }
+
+.panel-fullscreen {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+    .panel-fullscreen.have-header {
+        padding-top: 45px;
+    }
+
+    .panel-fullscreen.have-large-header {
+        padding-top: 145px;
+    }
+
+    .panel-fullscreen.have-footer {
+        padding-bottom: 45px;
+    }
+
+    .panel-fullscreen.have-large-footer {
+        padding-bottom: 145px;
+    }
+
+    .panel-fullscreen > [class*=panel-] {
+        position: absolute;
+        left: 0;
+        right: 0;
+    }
+
+    .panel-fullscreen .panel-header {
+        top: 0;
+    }
+
+    .panel-fullscreen .panel-footer {
+        bottom: 0;
+        padding: 0;
+        border: none;
+        background-color: transparent;
+        border-radius: 0;
+    }
+
+    .panel-fullscreen .panel-subfooter {
+        /*bottom: 30px;*/
+        bottom: 0;
+        width: 100%;
+        height: 100px;
+    }
+
+    .panel-fullscreen .tab-content,
+    .panel-fullscreen .tab-content .tab-pane {
+        height: 100%;
+    }
+
+    .panel-fullscreen .title-bordered {
+        font-weight: 700;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #ddd;
+        margin: 15px 0;
+    }
+
+/* ==================== Service Item ==================== */
+.service-item {
+    margin-bottom: 30px;
+    border: solid 2px rgba(0, 0, 0, 0.7);
+}
+
+    .service-item .selected {
+        border: solid 2px rgba(0, 110, 173, 0.7) !important;
+    }
+
+        .service-item .selected .title {
+            background: #006EAD;
+        }
+
+    /*.ace-thumbnails > li.service-item {
+    display: inline-block;
+    white-space: nowrap;
+    float: none;
+    width: 145px;
+    vertical-align: top;
+    margin: 0 10px 10px 0 !important;
+    border-radius: 3px;
+    border: 1px solid #767676;
+}*/
+
+    .service-item .img-container {
+        height: 100%;
+        overflow: hidden;
+    }
+
+        .service-item .img-container img {
+            width: 100%;
+            height: auto;
+            min-height: 100%;
+        }
+
+        .service-item .img-container .title,
+        .service-item .img-container .price {
+            color: #fff;
+            padding: 3px 5px;
+            position: absolute;
+            left: 0;
+            text-align: center;
+            overflow: hidden;
+            line-height: 1;
+        }
+
+            .service-item .img-container .title > label,
+            .service-item .img-container .price > label {
+                width: 100%;
+                overflow: hidden;
+                margin: 0;
+                line-height: 1.2;
+                -ms-text-overflow: ellipsis;
+                -o-text-overflow: ellipsis;
+                text-overflow: ellipsis;
+            }
+
+        .service-item .img-container .title {
+            background: rgba(0, 0, 0, 0.6);
+            right: 0;
+            bottom: 0;
+            white-space: nowrap;
+        }
+
+        .service-item .img-container .price {
+            top: 15px;
+            background-color: #b31e47;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+        }
+
+    /* Spinner */
+    .service-item .ace-spinner {
+        width: 100%;
+    }
+
+        .service-item .ace-spinner .input-group {
+            position: relative;
+            padding: 0 30px;
+            display: block;
+        }
+
+            .service-item .ace-spinner .input-group .spinner-buttons {
+                display: block;
+                float: none;
+                position: absolute;
+                top: 0;
+                width: auto;
+            }
+
+                .service-item .ace-spinner .input-group .spinner-buttons.spinner-left {
+                    left: 0;
+                }
+
+                .service-item .ace-spinner .input-group .spinner-buttons.spinner-right {
+                    right: 0;
+                }
+
+                .service-item .ace-spinner .input-group .spinner-buttons > .btn {
+                    width: 30px;
+                    height: 30px;
+                    margin: 0 !important;
+                }
+
+        .service-item .ace-spinner .input-quantity {
+            color: #005c8f;
+            font-weight: 700;
+            cursor: default;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
+            /*border-top: 2px solid #474747 !important;
+        border-bottom: 2px solid #474747 !important;
+        border-left: none;
+        border-right: none;*/
+        }
+
+    .service-item .service-item-footer {
+        width: 100%;
+        height: 30px;
+        color: #fff;
+        position: relative;
+        text-align: center;
+        padding: 5px 0;
+        font-weight: 600;
+    }
+
+    .service-item.item-extra .service-item-footer {
+        background-color: #d15b47;
+    }
+
+        .service-item.item-extra .service-item-footer:before {
+            content: 'Extra';
+        }
+
+    .service-item.item-general .service-item-footer {
+        background-color: #85b558;
+    }
+
+        .service-item.item-general .service-item-footer:before {
+            content: 'General';
+        }
+
+    .service-item.item-combo .service-item-footer {
+        background-color: #9889c1;
+    }
+
+        .service-item.item-combo .service-item-footer:before {
+            content: 'Combo';
+        }
+
+    .service-item.service-item-sm {
+        margin-bottom: 10px;
+    }
+
+        .service-item.service-item-sm label {
+            font-size: 12px;
+        }
+
+/* Other */
+.recently-order {
+    background-color: #fae888;
+}
+
+#table-item-service .table {
+    margin: 0;
+}
+
+.modal-header .dual-screen .dual-sub-screen:first-child {
+    border: none;
+}
+
+@media only screen and (min-width:768px) {
+    .modal.modal-fullscreen .modal-dialog {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+    }
+
+        .modal.modal-fullscreen .modal-dialog .modal-content {
+            height: 100%;
+        }
+
+            .modal.modal-fullscreen .modal-dialog .modal-content .modal-body {
+                height: calc(100% - 40px);
+                padding: 0;
+            }
+
+    .modal.modal-fullscreen .modal-header {
+        height: 48px;
+        padding: 6px 10px;
+        border: none;
+    }
+}
+
+/* ==================== Progress Points ==================== */
+.progress-points {
+    display: table;
+    margin: 0 auto;
+}
+
+    .progress-points > li {
+        position: relative;
+        float: left;
+        padding-right: 150px;
+    }
+
+    .progress-points .point {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: #2e8965;
+        z-index: 1;
+        /*border: 2px solid #ddd;*/
+    }
+
+        .progress-points .point:after {
+            content: '';
+            width: 151px;
+            height: 5px;
+            position: absolute;
+            top: 8px;
+            right: -1px;
+            background-color: #2e8965;
+        }
+
+    /*.progress-points .line:before {
+            content: '';
+            z-index: 1;
+            position: absolute;
+            top: 0px;
+            height: 5px;
+            left: -5px;
+            right: -5px;
+        }*/
+    .progress-points > li.active .point:after,
+    .progress-points > li.active ~ li .point:after, 
+    .progress-points > li.active ~ li .point {
+        background-color: #ddd;
+    }
+
+    .progress-points > li:last-child {
+        padding: 0;
+    }
+
+        .progress-points > li:last-child .point:after {
+            display: none;
+        }
+
+    .progress-points .caption {
+        position: absolute;
+        text-align: center;
+        white-space: nowrap;
+        -moz-transform: translateX(-40%);
+        -ms-transform: translateX(-40%);
+        -o-transform: translateX(-40%);
+        -webkit-transform: translateX(-40%);
+        transform: translateX(-40%);
+        color: #444;
+        /*display: none;*/
+    }

@@ -1,0 +1,63 @@
+﻿
+@{
+    ViewBag.Title = "Home Page";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card" id="page-wrapper">
+    <div class="card-header">
+        <div class="row small-margin">
+            <div class="col-md-5 col-xs-12">
+                <h3>Tổng quan tháng</h3>
+                <h5 class="smallDate" data-role="small-date" id="dateRange"></h5>
+            </div>
+            <div class="col-md-3 col-xs-12">
+                <div class="input-group" style="float: right">
+                    <div class="input-group date" id="datetimepicker1" style="float: right">
+                        <input id="startDate" type="text" class="form-control" style="width: 100px" />
+                        @*<input id="startDate" type='text' class="form-control" />*@
+                        <span class="input-group-addon">
+                            <span class="fa fa-calendar"></span>
+                        </span>
+                    </div>
+                    <span class="hidden-md" style="float: right;margin-right: 20px">Từ</span>
+                </div><!-- /input-group -->
+            </div>
+            <div class="col-md-4 col-xs-12">
+                <div class="input-group">
+                    <div class="input-group date" id="datetimepicker2" style="float: right">
+                        <input id="endDate" type='text' class="form-control"style="width: 100px" />
+                        @*<input id="endDate" type='text' class="form-control" />*@
+                        <span class="input-group-addon">
+                            <span class="fa fa-calendar"></span>
+                        </span>
+                    </div>
+                    <span class="hidden-md" style="float: right;margin-right: 20px">Đến</span>
+                    <div class="input-group-btn">
+                        <a class="btn btn-success btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>Xem báo cáo
+                        </a>
+                    </div>
+                    @*<input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />*@
+                </div><!-- /input-group -->
+            </div>
+        </div>
+        <input type="hidden" id="sTime" />
+        <input type="hidden" id="eTime" />
+    </div>
+    <div class="card-padding">
+        @{Html.RenderAction("GetDashboardPartial", "Dashboard", new { storeId = @ViewBag.storeId });}
+    </div>
+    </div>
+
+@section scripts {
+    <script>
+        $(function () {
+            HMS.Dashboard.init('Month');
+            HMS.Dashboard.setupMonthPicker();
+        });
+    </script>
+}
+
+

@@ -1,0 +1,118 @@
+﻿@model Wisky.SkyAdmin.Manage.Areas.Admin.Models.ViewModels.ProductEditViewModel
+
+@{
+    ViewBag.Title = "Create Product";
+}
+
+@this.Html.Partial("EditorProduct", this.Model)
+
+
+@section scripts {
+
+    <link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/elfinder/css/theme.css" rel="stylesheet" />
+
+    <script src="~/Content/plugins/dropzone/dropzone.js"></script>
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#displayPriority").val(1000);
+        })
+
+        $(function () {
+            SKYWEB.Admin.Product.init();
+
+            $('#btn-submit-product').click(function () {
+                var code = $('#Product_Code').val();
+                var seoName = $('#Product_SeoName').val();
+                if ($('#Product_ProductName').val() == '')
+                {
+                    ShowMessage("Vui lòng nhập tên sản phẩm", 3);
+                    return;
+                }
+                else if (code == '') {
+                    ShowMessage("Vui lòng nhập mã sản phẩm", 3);
+                    return;
+                }
+                else if (seoName == '') {
+                    ShowMessage("Vui lòng nhập Seo name", 3);
+                    return;
+                }
+                else if ($("input[name='Product.Price']").val() <= 0) {
+                    ShowMessage("Giá sản phẩm phải lớn hơn 0", 3);
+                    return;
+                }
+                //else if (parseInt($("input[name='Product.Price']").val()) <= parseInt(($("input[name='Product.DiscountPriceEdit']").val()))) {
+                //    ShowMessage("Giá khuyến mãi không được lớn hơn giá sản phẩm", 3);
+                //    return;
+                //}
+                //else if ($("textarea[name='Description']").val() == '')
+                //{
+                //    ShowMessage("Vui lòng nhập mô tả", 3);
+                //    return;
+                //}
+                else
+                {
+                    $.ajax({
+                        url: '@Url.Action("CheckProductCode")',
+                        type: 'POST',
+                        data: {
+                            code: code,
+                            seoName: seoName
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                $("#Product_DiscountPercent").val($("#Product_DiscountPercent").val().replace(/[%]/g, ''));
+
+                                var $form = $('form');
+
+                                var specNames = $form.find("[name='Specifications.Name']");
+                                var specValues = $form.find("[name='Specifications.Value']");
+
+                                for (var i = 0; i < specNames.length; i++) {
+                                    var $specName = $(specNames[i]);
+                                    var $specValue = $(specValues[i]);
+
+                                    $specName.removeAttr('required');
+                                    $specValue.removeAttr('required');
+
+                                    var specName = $specName.val();
+                                    var specValue = $specValue.val();
+
+                                    if (specName && !specValue) {
+                                        $specValue.attr('required', 'required');
+                                        $form.find(':submit').click();
+                                    } else if (!specName && specValue) {
+                                        $specName.attr('required', 'required');
+                                        $form.find(':submit').click();
+                                    }
+                                }
+
+                                $form.find("[name='Specifications.Name']").each(function (i, e) {
+                                    $(e).attr("name", "Specifications[" + i + "].Name");
+                                });
+
+                                $form.find("[name='Specifications.Value']").each(function (i, e) {
+                                    $(e).attr("name", "Specifications[" + i + "].Value");
+                                });
+
+                                $form.find("[name='Atts']").each(function (i, e) {
+                                    $(e).attr("name", "Atts[" + i + "]");
+                                });
+
+                                $form.find(':submit').click();
+                                ShowMessage("Thêm sản phẩm mới thành công", 2);
+                                //$('#Code').focus();
+                            }
+                        },
+                        error: function (error) {
+                                ShowMessage("Có lỗi xảy ra", 1);
+                        }
+                    })
+                }
+            });
+        });
+    </script>
+}

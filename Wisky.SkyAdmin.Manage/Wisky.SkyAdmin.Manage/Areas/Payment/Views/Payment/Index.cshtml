@@ -1,0 +1,286 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .tab-nav.tn-justified > li {
+        width: 33.3% !important;
+        padding: 0px;
+    }
+
+    .hr-line {
+        border-color: gainsboro;
+        margin-bottom: 0px !important;
+    }
+
+    .revenue-box {
+        border-radius: 5px;
+        padding: 15px 20px;
+        color: white;
+        display: block;
+    }
+
+    .revenue-box-icon {
+        margin-top: 10px;
+        font-size: 35px;
+    }
+
+    .revenue-box-title {
+        font-size: 15px;
+        text-align: right;
+        display: block;
+    }
+
+    .revenue-box-number {
+        /*margin-top: 6px;*/
+        font-size: 25px;
+        text-align: right;
+        display: block;
+    }
+
+    .p-l-r-15 {
+        padding: 0px 15px !important;
+    }
+
+    .payment-icon {
+        width: 30px;
+        display: inline-block;
+        margin: 0px 10px;
+    }
+
+    .payment-icon-size {
+        font-size: 25px;
+    }
+
+    .payment-number {
+        font-size: 17px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header p-b-0">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Doanh thu thoanh toán</h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body p-t-0 p-l-20 p-r-20">
+        <hr class="hr-line" />
+        <div class="row">
+            <div class="col-md-12">
+                <ul id="TabList" class="tab-nav tn-justified">
+                    <li class="active waves-effect col-md-4 m-0"><a data-toggle="tab" id="all" href="#all_tab"><i class="fa fa-globe"></i> Hệ thống</a></li>
+                    <li class="waves-effect col-md-4 m-0"><a data-toggle="tab" id="store" href="#store_tab"><i class="fa fa-home"></i> Cửa hàng</a></li>
+                    <li class="waves-effect col-md-4 m-0"><a data-toggle="tab" id="group" href="#group_tab"><i class="fa fa-users"></i> Nhóm cửa hàng</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="row m-t-10">
+            <div class="col-md-12">
+                <div class="dateTime width230 pull-right">
+                    <div class="fg-line m-t-5">
+                        <div id="reportrange" class="height-fix">
+                            <input id="date-string" size="23" readonly class="form-control text-center pull-right">
+                            <a class="myCelenderA" id=""> <i class="fa fa-calendar"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <form id="form-create-session" class="form-inline" style="display:none">
+                    <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" />
+                </form>
+            </div>
+        </div>
+
+        <h4>Thông tin bán hàng</h4>
+        <div class="row p-l-r-15 m-t-20">
+            <div class="col-md-4">
+                <div class="revenue-box" style="background-color: #009688">
+                    <div class="row p-0">
+                        <div class="col-md-3 text-center">
+                            <i class="revenue-box-icon fa fa-calculator"></i>
+                        </div>
+                        <div class="col-md-9">
+                            <span class="revenue-box-title">Doanh thu</span>
+                            <span class="revenue-box-number">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="revenue-box" style="background-color: #c67a3e;">
+                    <div class="row p-0">
+                        <div class="col-md-3 text-center">
+                            <i class="revenue-box-icon fa fa-money"></i>
+                        </div>
+                        <div class="col-md-9">
+                            <span class="revenue-box-title">Doanh thu sau giảm giá</span>
+                            <span class="revenue-box-number">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="revenue-box" style="background-color: seagreen;">
+                    <div class="row p-0">
+                        <div class="col-md-3 text-center">
+                            <i class="revenue-box-icon fa fa-tags"></i>
+                        </div>
+                        <div class="col-md-9">
+                            <span class="revenue-box-title">Tổng giảm giá</span>
+                            <span class="revenue-box-number">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <h4>Thông tin thoanh toán</h4>
+        <div class="row p-l-r-15 m-t-20">
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-cc-amex"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-cc-diners-club"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-cc-discover"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-cc-jcb"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-cc-mastercard"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-cc-paypal"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-cc-stripe"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-cc-visa"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-credit-card"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-cc-diners-club"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-cc-diners-club"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+            <div class="col-md-4">
+                <span class="payment-icon">
+                    <i class="payment-icon-size fa fa-paypal"></i>
+                </span>
+                <span class="payment-number">0</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        setupDaterangerpicker1();
+    });
+
+
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $('#date-string').val(dateString);
+        }
+
+        $('#sTime').val(startTime);
+        $('#eTime').val(endTime);
+        $('#date-string span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+
+
+    };
+    function setupDaterangerpicker1() {
+        cb(moment(), moment(), "Hôm nay");
+        $('#reportrange').daterangepicker({
+
+            startDate: moment(),
+            endDate: moment(),
+            //minDate: $('#promotionCombobox').find(':selected').data('stime'),
+            //maxDate: $('#promotionCombobox').find(':selected').data('etime'),
+            dateLimit: { days: 365 },
+            showDropdowns: true,
+            showWeekNumbers: true,
+            timePicker: false,
+            timePickerIncrement: 1,
+            timePicker12Hour: true,
+            //parentEl: '.modal-body',
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            opens: 'left',
+            drops: 'down',
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-primary',
+            cancelClass: 'btn-success',
+            separator: ' to ',
+            locale: {
+                format: 'DD/MM/YYYY',
+                applyLabel: 'Chọn',
+                cancelLabel: 'Hủy',
+                fromLabel: 'Từ',
+                toLabel: 'Đến',
+                customRangeLabel: 'Tùy chọn',
+                daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                firstDay: 1
+            }
+        }, cb);
+    }
+</script>

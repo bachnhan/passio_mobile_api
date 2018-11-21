@@ -1,0 +1,231 @@
+﻿@using System.Globalization;
+@using System.Linq;
+
+@model Wisky.SkyAdmin.Manage.Areas.CRM.Models.MembershipCardEditViewModels
+
+@{
+    ViewBag.Title = "Detail";
+    Layout = null;
+}
+
+
+<style>
+    .modal-dialog {
+        width: 80%;
+    }
+</style>
+
+<div>
+    <form id="form">
+        <div class="modal-header ">
+            <div class="col-md-12">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h3> Chi tiết thẻ</h3>
+            </div>
+        </div>
+
+        <div class="modal-body">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-md-4"><strong>Mã thẻ</strong></label>
+                        <div class="col-md-8">
+                           <div class="row">
+                               @Html.LabelFor(a => a.MembershipCardCode, Model.MembershipCardCode, new { id = "code", @class = "control-label" })
+                           </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-md-4"><strong>Mã CSV</strong></label>
+                        <div class="col-md-8">
+                            <div class="row">
+                                @Html.LabelFor(a => a.CSV, Model.CSV, new { id = "csv", @class = "control-label" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-md-4"><strong>Loại thẻ</strong></label>
+                        <div class="col-md-8" id="cardGroup">
+                            <div class="row">
+
+                                @Html.LabelFor(q => q.Type, Model.Type, new { @class = "control-label" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-md-4"><strong>Trạng Thái</strong></label>
+                        <div class="col-md-8">
+                            @{
+                                MembershipStatusEnum statusEnum = (MembershipStatusEnum)Enum.Parse(typeof(MembershipStatusEnum), Model.Status.ToString());
+                            }
+                            @Html.LabelFor(q => q.Status, statusEnum.DisplayName(), new { @class = "control-label" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-md-4"><strong>Cấp độ</strong></label>
+                        <div class="col-md-8">
+                            @{
+                                MembershipCardLevel levelEnum = ((MembershipCardLevel[])Enum.GetValues(typeof(MembershipCardLevel))).FirstOrDefault(a => (int)a == Model.C_Level);
+                            }
+                            @Html.LabelFor(q => q.C_Level, levelEnum.DisplayName(), new { @class = "control-label" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="row">
+                        <label class="col-md-4"><strong>Ngày tạo</strong></label>
+                        <div class="col-md-8">
+                            @Html.LabelFor(q => q.CreatedTime, Model.CreatedTime.ToString("MMM d, yyyy"), new { @class = "control-label" })
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered table-hover" id="account" style="width: 100%"></table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            @*<label class="btn btn-success pull-left" data-dismiss="modal">Thoát</label>
+            @if (Model.Status != (int)MembershipStatusEnum.Active)
+            {
+                <label class="btn btn-default" disabled>Tạm dừng</label>
+            }
+            else
+            {
+                <label class="btn btn-warning" onclick="Deactivate()">Tạm dừng</label>
+            }
+
+            @if (Model.Status == (int)MembershipStatusEnum.Inactive || Model.Status == (int)MembershipStatusEnum.Suspensed)
+            {
+                <label class="btn btn-primary" onclick="Deactivate()">Kích hoạt</label>
+            }
+            else
+            {
+                <label class="btn btn-primary" disabled>Đã Kích hoạt</label>
+            }*@
+        </div>
+    </form>
+</div>
+
+<script>
+    var table = null;
+
+    $(document).ready(function () {
+        InitTable();
+
+        $('input[name=type]').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+            increaseArea: '20%'
+        });
+
+        $("input[name=type][value=" + @Model.MembershipTypeId + "]").iCheck('check');
+        $("input[name=type][value=" + @Model.MembershipTypeId + "]").iCheck('enable');
+    });
+
+    function InitTable() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ValidateCard", "MembershipCard")',
+            data: { cardCode: '@Model.MembershipCardCode' },
+            success: function (result) {
+                if (result.success) {
+                    var array = result.data;
+                    InitAccountTables(array);
+                } else {
+                    ShowAlert(result.error, 1);
+                }
+            }
+        });
+    }
+
+    function InitAccountTables(array) {
+        if (table != null) table.destroy();
+        table = $("#account").DataTable({
+            "data": array,
+            "language": {
+                "sSearchPlaceholder": "Tài khoản",
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "columns": [
+                { title: "STT" },
+                { title: "Mã tài khoản" },
+                { title: "Tên tài khoản" },
+                 { title: "Loại tài khoản" },
+                { title: "Tài khoản" },
+                { title: "Ngày khởi tạo" },
+                { title: "Thời gian hoạt động" },               
+                { title: "Sản phẩm" },
+            ],
+            "columnDefs": [
+                    {
+                        "visible": false,
+                        "searchable": false,
+                        "targets": 8
+                    },
+                     {
+                         "visible": false,
+                         "searchable": false,
+                         "targets": 9
+                     },
+
+            ]
+        });
+    }
+
+    function Deactivate() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("DeactivateOrActivateAccount", "MembershipCard")',
+            data: { id : @Model.Id },
+            success: function (result) {
+                if (result.success) {
+                    swal({
+                        title: "Thành công",
+                        text: "Cập nhật thành công",
+                        type: "success",
+                    }, function () {
+                        InitCardsTable();
+                        $('#modal').modal('hide');
+                    });
+                } else {
+                    ShowAlert(result.error, 1);
+                }
+            }
+        });
+    }
+</script>
+
+

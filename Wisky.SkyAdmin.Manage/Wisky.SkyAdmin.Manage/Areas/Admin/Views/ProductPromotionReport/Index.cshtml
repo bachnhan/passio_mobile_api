@@ -1,0 +1,279 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+<style>
+    .tab-nav.tn-justified > li {
+        width: 33% !important;
+        padding: 0px;
+    }
+
+    .overview-container .col-md-3 {
+        padding-left: 9px;
+        padding-right: 9px;
+    }
+
+    .overview-container h4 {
+        margin-bottom: 7px;
+        padding-bottom: 5px;
+    }
+
+        .overview-container h4 span {
+            text-align: center;
+        }
+
+    .overview-container h3 {
+        margin-top: 7px !important;
+        padding-top: 5px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 id="reportTitle">Báo cáo doanh thu theo khuyến mãi từng sản phẩm</h3>
+                <h5 data-role="small-date" id="dateRange"></h5>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-body">
+
+        <div class="row m-t-20">
+            <div class="form-horizontal col-md-12">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="pull-left m-t-10">Cửa hàng:</label>
+                        <div class="col-md-8">
+                            <select class="selectpicker" id="listStoreId">
+                                <option value="0">Tất cả cửa hàng</option>
+
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+
+                </div>
+                <div class="dateTime width230 pull-right">
+                    <div class="fg-line m-t-5">
+                        <div id="reportrange" class="height-fix">
+                            <input id="date-string" size="23" readonly class="form-control text-center pull-right">
+                            <a class="myCelenderA" id=""> <i class="fa fa-calendar"></i></a>
+                        </div>
+
+                    </div>
+
+                </div>
+                <div class="fg-line m-t-5">
+                    <button type="submit" id="exportExcel" class="btn btn-primary btn-sm pull-right">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+                <form id="form-create-session" class="form-inline" style="display:none">
+                    <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" />
+                </form>
+            </div>
+        </div>
+            <div  style="padding-top: 5px; overflow-x: scroll; cursor: grab; cursor :-o-grab; cursor :-moz-grab; cursor:-webkit-grab;" class="dragscroll;" >
+                <table id="productPromotionReport"   class="table table-condensed table-striped table-bordered table-hover dataTable no-footer">
+                    <thead style="white-space: nowrap; text-overflow: ellipsis;">
+                        <tr>
+                            <th rowspan="2"><label class="">STT</label>
+                            </th>
+                            <th rowspan="2"><label class="">Tên Sản phẩm</label>
+                            </th>
+                            <th rowspan="2"><label class="">Tổng doanh số</label>
+                            </th>
+                            <th colspan="10"><label class="">Tiền mặt</label>
+                            </th>
+                            <th colspan="10"><label class="">Thẻ thành viên</label>
+                            </th>
+                            <th rowspan="2"><label class="">Tổng tiền giảm</label>
+                            </th>
+                            <th rowspan="2"><label class="">Tổng tiền thu được</label>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th><label class="">10%</label></th>
+                            <th><label class="">20%</label></th>
+                            <th><label class="">30%</label> </th>
+                            <th><label class="">40%</label></th>
+                            <th><label class="">50%</label></th>
+                            <th><label class="">60%</label></th>
+                            <th><label class="">70%</label></th>
+                            <th><label class="">80%</label></th>
+                            <th><label class="">90%</label></th>
+                            <th><label class="">100%</label></th>
+                            <th><label class="">10%</label></th>
+                            <th><label class="">20%</label></th>
+                            <th><label class="">30%</label> </th>
+                            <th><label class="">40%</label></th>
+                            <th><label class="">50%</label></th>
+                            <th><label class="">60%</label></th>
+                            <th><label class="">70%</label></th>
+                            <th><label class="">80%</label></th>
+                            <th><label class="">90%</label></th>
+                            <th><label class="">100%</label></th>
+                        </tr>
+                        <tbody></tbody>
+                    </thead>
+                </table>
+        </div>
+    </div>
+    
+</div>
+<script>
+    var once = 0;
+    $(document).ready(function () {
+        var startTimePromo;
+        var endTimePromo;
+        $('.selectpicker').selectpicker({
+            size: 8,
+        });
+        //LoadStoreComboBox();
+        GetStoreList();
+        setupDaterangerpicker1();
+    });
+    function GetStoreList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStoreList", "ProductPromotionReport")',
+            jsonp: "$callback",
+            success: function (result) {
+                for (var i = 0; i < result.store.length; i++) {
+                    $('#listStoreId').append('<option value="' + result.store[i].ID + '">' + result.store[i].Name + '</option>')
+                }
+                $('#listStoreId').selectpicker('refresh');
+            }
+        });
+    }
+
+    function LoadPromotionComboBox() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadPromotion", "PromotionReport")',
+            data: { selectedStoreId: $('#storeCombobox').val() },
+            success: function (result) {
+                $('#promotionCombobox').html("");
+                if (result.promoList.length > 0) {
+                    for (var i = 0; i < result.promoList.length; i++) {
+                        $('#promotionCombobox').append('<option value=' + result.promoList[i].Value + '>' + result.promoList[i].Text + '</option>');
+                    }
+                } else {
+                    $('#promotionCombobox').append('<option value="0">Không có khuyến mãi</option>');
+                }
+
+                $('#promotionCombobox').selectpicker('refresh');
+
+                //setupDaterangerpicker1();
+            }
+        });
+    };
+    function convertNETDateTime(sNetDate) {
+        if (sNetDate == null) return null;
+        if (sNetDate instanceof Date) return sNetDate;
+        var r = /\/Date\(([0-9]+)\)\//i
+        var matches = sNetDate.match(r);
+        if (matches.length == 2) {
+            return new Date(parseInt(matches[1]));
+        }
+        else {
+            return sNetDate;
+        }
+    }
+
+
+    $('#storeCombobox').on('change', function () {
+        LoadPromotionComboBox();
+        reDrawDatatable("#CustomerTable");
+    });
+    $('#promotionCombobox').on('change', function () {
+        reDrawDatatable("#CustomerTable");
+    });
+    function reDrawDatatable(id) {
+        $(id).dataTable()._fnPageChange(0);
+        $(id).dataTable()._fnAjaxUpdate();
+    }
+    function cb(start, end, label) {
+        //Prepare start time and end time format
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $('#date-string').val(dateString);
+        }
+
+        $('#sTime').val(startTime);
+        $('#eTime').val(endTime);
+        startTimePromo = startTime;
+        endTimePromo = endTime;
+        $('[data-role=small-date]').html(dateString);
+        if (once == 0) {
+            once = 1;
+        }
+        else {
+            reDrawDatatable("#CustomerTable");
+        }
+        $('#date-string span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+    };
+    function setupDaterangerpicker1() {
+        cb(moment(), moment(), "Hôm nay");
+        $('#reportrange').daterangepicker({
+
+            startDate: moment(),
+            endDate: moment(),
+            minDate: $('#promotionCombobox').find(':selected').data('stime'),
+            maxDate: $('#promotionCombobox').find(':selected').data('etime'),
+            dateLimit: { days: 365 },
+            showDropdowns: true,
+            showWeekNumbers: true,
+            timePicker: false,
+            timePickerIncrement: 1,
+            timePicker12Hour: true,
+            //parentEl: '.modal-body',
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            opens: 'left',
+            drops: 'down',
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-primary',
+            cancelClass: 'btn-success',
+            separator: ' to ',
+            locale: {
+                format: 'DD/MM/YYYY',
+                applyLabel: 'Chọn',
+                cancelLabel: 'Hủy',
+                fromLabel: 'Từ',
+                toLabel: 'Đến',
+                customRangeLabel: 'Tùy chọn',
+                daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                firstDay: 1
+            }
+        }, cb);
+
+        $(document).on('click', '#exportExcel', function () {
+            $('#startTimeOne').val($('#sTime').val());
+            $('#endTimeOne').val($('#eTime').val());
+            $('#promotionId').val($('#promotionCombobox').val());
+            $('#storeId').val($('#storeCombobox').val());
+            $('#brandId').val(@ViewBag.brandId);
+            $('#ExportPromotionExcel').submit();
+        });
+    }
+</script>

@@ -1,0 +1,106 @@
+﻿@model Wisky.SkyAdmin.Manage.Areas.CRM.Models.MembershipCardLevelViewModels
+
+@{
+    ViewBag.Title = "Detail";
+    Layout = null;
+}
+
+<style>
+    .modal-dialog {
+        width: 50%;
+    }
+</style>
+
+<div>
+    <form id="levelUpDetail">
+        <div class="modal-header">
+            <h4 class="modal-title">
+                Nâng cấp thẻ tích điểm
+            </h4>
+        </div>
+
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-md-12 form-group">
+                    <label class="control-label col-md-4">ID thẻ</label>
+                    <div class="col-md-4">
+                        @Html.LabelFor(a => a.CardModel.Id, Model.CardModel.Id.ToString(), new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-md-12 form-group">
+                    <label class="control-label col-md-4">Mã số thẻ</label>
+                    <div class="col-md-4">
+                        @Html.LabelFor(a => a.CardModel.MembershipCardCode, Model.CardModel.MembershipCardCode, new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-md-12 form-group">
+                    <label class="control-label col-md-4">CSV</label>
+                    <div class="col-md-4">
+                        @Html.LabelFor(a => a.CardModel.CSV, Model.CardModel.CSV, new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-md-12 form-group">
+                    <label class="control-label col-md-4">Tình trạng</label>
+                    <div class="col-md-4">
+                        @{
+                            MembershipStatusEnum statusEnum = (MembershipStatusEnum)Enum.Parse(typeof(MembershipStatusEnum), Model.CardModel.Status.ToString());
+                        }
+                        @Html.LabelFor(a => a.CardModel.Status, statusEnum.DisplayName(), new { @class = "control-label" })
+                    </div>
+                </div>
+                <div class="col-md-12 form-group">
+                    <label class="control-label col-md-4">Các thẻ có thể nâng cấp</label>
+                    <div class="col-md-4">
+                        @Html.DropDownListFor(a => a.ListLevelUpCards, Model.ListLevelUpCards, new { @class = "selectpicker", id = "newCard" })
+                    </div>
+                    <div class="col-md-1">
+                        @if (Model.ListLevelUpCards.Count() != 0)
+                        {
+                            <button type="button" class="btn btn-info" onclick="levelUp()">Nâng cấp</button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-info" disabled>Nâng cấp</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <label class="btn btn-warning pull-right" data-dismiss="modal">Thoát</label>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $(".selectpicker").selectpicker({
+            size: 10,
+            liveSearch: true
+        });
+    });
+
+    function levelUp() {
+        var id = $('#newCard').val();
+        var currentId = '@Model.CurrentCardId';
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("LevelUp", "LevelUp")',
+            data: { newCardId: id, currentCardId: currentId },
+            success: function (result) {
+                if (result.success) {
+                    swal({
+                        title: "Thành công",
+                        text: "Nâng cấp thẻ thành công!",
+                        type: "success",
+                    }, function () {
+                        window.location.href = '@Url.Action("CustomerDetail", "Customer", new { id = Model.CustomerId })';
+                    });
+                } else {
+                    ShowAlert(result.error, 1);
+                }
+            }
+        });
+    }
+</script>

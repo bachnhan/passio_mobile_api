@@ -1,0 +1,105 @@
+﻿@{
+    var dpi = (List<HmsService.Models.Entities.DateProductItem>)ViewBag.DateItemProduct;
+}
+
+<table id="tblProductItem" class="table table-striped table-bordered table-hover" style="width: 100% !important;">
+    <thead style="white-space: nowrap;">
+        <tr>
+            <th>
+                <label class="">STT</label>
+            </th>
+            <th>
+                <label class="">Tên nguyên liệu</label>
+            </th>
+            <th>
+                <label class="">Số lượng tiêu thụ</label>
+            </th>
+            <th>
+                <label class="">Đơn vị tính</label>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (dpi != null)
+        {
+            foreach (var item in dpi)
+            {
+                <tr>
+                    <td>@(dpi.IndexOf(item) + 1) </td>
+                    <td>@item.ProductItemName</td>
+                    <td>@item.Quantity</td>
+                    <td>@item.Unit</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+@if (dpi != null)
+{
+    <script>
+        $(document).ready(function() {
+            $("#tblProductItem").datatablevpn({
+                "iDisplayLength": 50,
+                "aLengthMenu": [50, 100],
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý..."
+                }
+            });
+        });
+    </script>
+}
+else
+{
+    <script>
+        $(document).ready(function () {
+            InitDatatable();
+            RefreshTable();
+        });
+        function RefreshTable() {
+            var oTable = $("#tblProductItem").dataTable();
+            oTable._fnPageChange(0);
+            oTable._fnAjaxUpdate();
+        }
+        function InitDatatable() {
+            $("#tblProductItem").dataTable({
+
+                "bSort": false,
+                "bRetrieve": true,
+                "bServerSide": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("LoadProductItemDatatables", "StoreReport")",
+                "bProcessing": true,
+                "iDisplayLength": 50,
+                "aLengthMenu": [50, 100],
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "reportDate", "value": '@ViewBag.ReportDate' });
+                    aoData.push({ "name": "storeId", "value": '@ViewBag.storeId' });
+                },
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý..."
+
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3],
+                        "bSortable": false
+                    }
+                ],
+                "bAutoWidth": false
+            }).fnSetFilteringDelay(delaySearch);
+        }
+    </script>
+}
+

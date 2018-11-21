@@ -1,0 +1,478 @@
+﻿@using HmsService.Models
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+</style>
+
+@* ------ Biến FLAG hidden dùng chứa val() check hành động Thêm hoăc Sửa *@
+@* ------ Biến TMP hidden dùng làm biến tạm đỡ WebElementId (data) khi bấm nút sửa*@
+<input type="hidden" id="FLAG" />
+<input type="hidden" id="TMP" />
+@*--------------------------------------*@
+
+<div class="card">
+    <div class="card-header">
+    <div class="box-header p-b-0">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Các thành phần của trang</h3>
+            </div>
+            <div class="col-md-6 text-right p-t-5">
+                    <button class="btn btn-success btn-sm pull-right" onclick="callShowCreateModal()">
+                    <i class="glyphicon glyphicon-plus"></i> THÊM THÀNH PHẦN
+                </button>
+            </div>
+        </div>
+    </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="allcust">
+                    <!-- Datatable -->
+                    <div class="col-md-12">
+
+                <table id="item-type-table" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th><label>STT</label></th>
+                                    <th><label>Hình ảnh</label></th>
+                            <th><label>Thành phần</label></th>
+                            <th><label>Loại thành phần</label></th>
+                            <th><label>Link</label></th>
+                            <th><label>Mô tả</label></th>
+                            <th><label>Tùy chọn</label></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+            </div>
+        </div>
+    </div>
+</div>
+    </div>
+</div>
+
+<!--Model container-->
+<div id="create-modal-container">
+    <div class="modal" id="create-edit-webElementType-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="Title_Create_Edit">Title (Thêm - Sửa)</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <input type="hidden" id="WebElementId" />
+                            <label class="col-sm-3 control-label">Tên thành phần</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="ElementName" name="ElementName" placeholder="Tên thành phần">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Chọn mẫu</label>
+                            <div class="col-sm-9">
+                                <select class="form-control" name="Template" id="Template">
+                                    @foreach (ElementTypeTemplate qType in Enum.GetValues(typeof(ElementTypeTemplate)))
+                                    {
+                                        <option value="@((int)qType)">
+                                            @Utils.GetEnumDescription(qType)
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @*<button type="button" class="btn-link btn-sm pull-right add-img" style="border:none; margin-right:11px" onclick="chooseImg()">+ Thêm hình ảnh</button>
+                            <input type="file" style="display: none" name="ContentImg" id="ContentImg" onchange="addImg()" />*@
+                            <label class="col-sm-3 control-label">Hình ảnh</label>
+                            <div class="col-sm-8">
+                                <div style="display: none">
+                                    <input type="file" hidden id="uploadImage" accept="image/gif, image/jpeg, image/png" class="btn btn-sm btn-success uploadImageToBlob" multiple />
+                                </div>
+                                <button type="button" id="btnUploadImage" class="btn btn-sm btn-success">
+                                    <i class="fa fa-cloud-upload"></i> (Thêm - Sửa) Hình ảnh 
+                                </button>
+                            </div>
+                            <div class="col-md-6" style="display:none; margin-left:148px" id="showImage">
+                                <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                                    <li class="col-md-4 photo-item removeable">
+                                        <div class="ratio-wrapper ratio-wrapper-1-1">
+                                            <div class="ratio-item">
+                                                <div class="img-container">
+                                                    <img id="ImgShow" />
+                                                    <span class="btn-remove"><i class="glyphicon glyphicon-remove" onclick="removeImage()"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>   
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Link</label>
+                            <div class="col-sm-9">
+                                <input class="form-control" id="Link" name="Link" placeholder="Mô tả"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label">Mô tả</label>
+                            <div class="col-sm-9">
+                                <textarea class="form-control" id="Description" name="Description" placeholder="Mô tả"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="col-sm-9 col-sm-offset-3">
+                                <input type="checkbox" id="showOnPage" />
+                                <label for="showOnPage">Hiện trong trang nội dung</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="submit" id="btnAction" onclick="actionWebElementType()" class="btn btn-success btn-sm pull-right">(Thêm mới - Hoàn Tất)</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts { 
+<script>
+    // --- Load datatable
+
+    $(document).ready(function () {
+        loadWebElementTypeTable();
+    });
+
+    function loadWebElementTypeTable() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetWebElementType", "WebElementType")',
+
+            success: function (result) {
+                initItemTypeDatatable(result.datatable);
+            }
+        });
+    }
+
+    function initItemTypeDatatable(data) {
+        $("#item-type-table").dataTable().fnDestroy();
+        $("#item-type-table").dataTable({
+            stateSave: true,
+            "bFilter": true,
+            "bSort": false,
+            "data": data,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "bProcessing": true,
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Thành phần",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5],
+                    "sClass": "text-center",
+                    "bSortable": false,
+                },
+                {
+                    "aTargets": [1],
+                    "mRender": function (data, type, row) {
+                        var imageUrl = "";
+                        if (data) {
+                            imageUrl = '<img height="52px" width="52px" src=' + data + '>';
+                        }
+
+                        return imageUrl;
+                    }
+                },
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, row) {
+                        var detailUrl = "@Url.Action("Index", "WebElement", new { area = "WebElement", webElementTypeId = "_TYPEID" })";
+                        detailUrl = detailUrl.replace("_TYPEID", data);
+                        var detail = "<a title='Chi tiết'class='btn btn-sm btn-success' href='" + detailUrl + "'><i class='glyphicon glyphicon-eye-open'></i></a>";
+                        //var detail = "<a title='Chi tiết'class='btn btn-sm btn-success' href=''><i class='glyphicon glyphicon-eye-open'></i></a>";
+                        var edit = "<a title='Chỉnh sửa' class='btn btn-sm btn-primary' onclick='callShowEditModal(" + data + ")'><i class='glyphicon glyphicon-pencil'></i></a>";
+                        var del = "<a title='Xóa' class='btn btn-sm btn-danger' onclick='deleteElementType(" + data + ")'><i class='glyphicon glyphicon-trash'></i></a>";
+                        return detail + " " + edit + " " + del;
+                    },
+                }
+
+            ],
+            "bAutoWidth": false,
+        });
+    }
+
+    //------------- Goi hàm show modal
+    function callShowCreateModal() {
+        $('#FLAG').val('ADD');
+        showModal();
+    }
+    function callShowEditModal(data) {
+        $('#FLAG').val('FIX');
+        $('#TMP').val(data);
+        showModal();
+
+    }
+
+    // --- Show Modal them thanh phan
+    function resetData() {        
+        $('#ElementName').val(""),
+        $('#Template').val(""),
+        $('#Description').val(""),
+        $("#showOnPage").attr('checked', false),
+        $('#Link').val(""),
+        $('#ImgShow').attr("src", null);
+        $('#showImage').hide();
+    }
+
+    function showModal() {        
+        var check = $('#FLAG').val();
+        if (check == "ADD") {
+            resetData();
+            $('#showImage').hide();
+            $('#Title_Create_Edit').text("Thêm thành phần con");
+            $('#btnAction').text("Thêm mới");
+            $('#btnUploadImage').text("Thêm Hình Ảnh");
+            showCreateModal();
+        } else if (check == "FIX") {
+            $('#showImage').show();
+            $('#btnAction').text("Hoàn tất");
+            $('#Title_Create_Edit').text("Sửa thành phần");
+            showEditModal($('#TMP').val());
+        }
+    }
+    function showCreateModal() {
+        $('#Template').val(1);
+        $('#create-edit-webElementType-modal').modal('show');
+    }
+
+    function showEditModal(data) {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("prepareEdit")',
+            data: {
+                WebElementTypeId: data
+            },
+            success: function (result) {
+                $('#create-edit-webElementType-modal').modal('show');
+                $('#WebElementId').val(result.Id);
+                $('#ElementName').val(result.Name);
+                $('#Template').val(result.Template);
+                $('#Link').val(result.Link);
+                $('#Description').val(result.Description);
+                $('#showOnPage').prop('checked', result.ShowOnContentPage);
+
+                if (result.ImageUrl == null || result.ImageUrl == "") {                    
+                    $('#showImage').hide();
+                    $('#btnUploadImage').text("Thêm Hình Ảnh");
+                } else {
+
+                    $('#showImage').show();
+                    $('#btnUploadImage').text("Sửa Hình Ảnh");
+                    $('#ImgShow').attr("src", result.ImageUrl);
+                }
+            },
+            error: function (error) {
+                ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+            }
+        })
+    }
+    //----- action: thêm và sửa webElement -------------
+
+    function actionWebElementType() {
+        var check = $('#FLAG').val();
+        if (check == "ADD") {
+            createWebElementType();
+        } else if (check == "FIX") {
+            editWebElementType();
+        }
+    }
+
+    function createWebElementType() {
+        if ($('#ElementName').val().trim() == "" || $('#ElementName').val() == null) {
+            ShowAlert("Tên không được bỏ trống. Vui lòng nhập lại", 1);
+        } else {
+        var showOnPageTmp = false;
+        if ($("#showOnPage").is(':checked')) showOnPageTmp = true
+        else showOnPageTmp = false;
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("CreateElementType")',
+            data: {
+                name: $('#ElementName').val(),
+                template: $('#Template').val(),
+                description: $('#Description').val(),
+                showOnPage: showOnPageTmp,
+                link: $('#Link').val(),
+                    imageUrl: $('#ImgShow').prop('src')
+            },
+            success: function (result) {
+                if (result == true) {
+                    ShowAlert("Thêm thành công", 2);
+                        $('#create-edit-webElementType-modal').modal('hide');
+                        resetData();
+                        loadWebElementTypeTable();
+                } else {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            },
+            error: function (error) {
+                ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+            }
+        })
+    }
+    }
+
+    function editWebElementType() {
+        if ($('#ElementName').val().trim() == "" || $('#ElementName').val() == null) {
+            ShowAlert("Tên không được bỏ trống. Vui lòng nhập lại", 1);
+        } else {
+            var tmp = $('#ImgShow').prop("src");
+            if ($('#ImgSrc').prop('src') != null) {
+                tmp = $('#ImgSrc').prop('src');
+        }
+
+        var showOnPageTmp = false;
+            $("#showOnPage").is(':checked') ? showOnPageTmp = true : showOnPageTmp = false;
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("EditWebElementType")',
+            data: {
+                Id: $('#WebElementId').val(),
+                    name: $('#ElementName').val(),
+                    template: $('#Template').val(),
+                    description: $('#Description').val(),
+                showOnPage: showOnPageTmp,
+                    link: $('#Link').val(),
+                imageUrl: tmp
+            },
+            success: function (result) {
+                if (result == true) {
+                    ShowAlert("Sửa thành công", 2);
+                        $('#create-edit-webElementType-modal').modal('hide');
+                        resetData();
+                        loadWebElementTypeTable();
+                } else {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            },
+            error: function (error) {
+                ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+            }
+                })
+    }
+    }
+    // ----- Thêm ảnh và xóa ảnh
+    $("#btnUploadImage").on('click', function () {
+        $('#uploadImage').click();
+    });
+
+    $("#uploadImage").on('click', function () {
+        this.value = null;
+    });
+
+    $("#uploadImage").on('change', function () {
+        var files = this.files;
+        // Kiểm tra file extension hợp lệ hay không
+        for (var i = 0; i < files.length; ++i) {
+            var exType = files[i].type;
+            if (exType != "image/gif" && exType != "image/png" && exType != "image/jpeg") {
+                ShowMessage("Sai định dạng hình, xin hãy chọn hình .png, .jpg hoặc .gif", 3);
+                return;
+            }
+        }
+
+        // Kiểm tra ảnh đại diện có hay không
+        if (!$.trim($("#avatar-preview").html())) {
+            firstImage = true;
+        }
+
+        if (files) {
+            sendFiles(files);
+            $('#showImage').show();
+        }
+    });
+
+    function sendFiles(files) {
+        var formData = new FormData();
+        if (files.length > 0) {
+            for (var i = 0; i < files.length; i++) {
+                formData.append('file-' + i, files[i]);
+            }
+        }
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("UploadImages", "File", new { area = "Admin"})',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    $('#ImgShow').attr("src", result.imagesUrl[0]);
+                }
+            },
+            processData: false,
+            contentType: false,
+            error: function () {
+                ShowMessage("Có lỗi xảy ra!", 1);
+            }
+        });
+    }
+    function removeImage() {
+        $('#ImgShow').attr("src", null);
+        $('#showImage').hide();
+    }
+
+    //------------- Xóa WebElementType
+    function deleteElementType(id) {
+        ShowConfirm("Bạn có muốn xóa thành phần này?", function () {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("DeleteElementType")',
+                data: { ElementTypeId: id },
+
+                success: function (data) {
+                    if (data) {
+                        ShowAlert("Xóa thành công", 2);
+                        loadWebElementTypeTable();
+                    } else {
+                        ShowAlert("Thất bại. Vui lòng thử lại", 1);
+                    }
+
+
+                },
+                error: function (error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        })
+    }
+
+</script>    
+
+}

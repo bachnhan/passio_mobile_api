@@ -1,0 +1,12 @@
+﻿<script>
+    window.urls = {
+        "Product_GetStoreList": "@(Url.Action("GetStoreList", "Product"))",
+        "Delivery_Create": "@(Url.Action("Create","Delivery",new { area = "Delivery" }))",
+        "Delivery_LoadAllCustomer": "@(Url.Action("LoadAllCustomer","Delivery", new { area="Delivery"}))",
+        "Delivery_GetCustomerDetail": "@(Url.Action("GetCustomerDetail","Delivery", new { area="Delivery"}))",
+        "Delivery_LoadItemByCategory": "@(Url.Action("LoadItemByCategory","Delivery",new { area="Delivery"}))",
+        "Product_UpdateAssignToStore": "@(Url.Action("UpdateAssignToStore", "Product", new { area="Admin"}))",
+        "Customer_Order_History":"@(Url.Action("GetCustomerProductData", "Customer", new {area="Customer"}))",
+
+    }
+</script>

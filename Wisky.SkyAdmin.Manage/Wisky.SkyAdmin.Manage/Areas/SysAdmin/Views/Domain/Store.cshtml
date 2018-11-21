@@ -1,0 +1,116 @@
+﻿@model int?
+
+@{
+    ViewBag.Title = "Store Domains";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Danh sách tên miền</h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <a class="btn btn-success" href="@Url.Action("Index","Store")">Quay lại</a>
+                <a class="btn btn-primary btn-icon-text waves-effect" onclick="onAddButtonClick();">
+                    <i class="zmdi zmdi-plus"></i>   Thêm tên miền
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <table id="lst-items" class="table table-striped table-vmiddle">
+            <thead>
+                <tr>
+                    <th data-column-id="Domain" data-formatter="Domain">Tên miền</th>
+                    <th data-column-id="commands" data-formatter="Commands" data-sortable="false">Tùy chọn</th>
+                </tr>
+        </table>
+    </div>
+
+</div>
+
+<template id="command-template" class="hidden">
+    <div>
+        <button onclick="onDeleteButtonClick(this);" class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete">
+            <i class="glyphicon glyphicon-trash"></i>
+        </button>
+    </div>
+</template>
+
+<form id="frm-add" class="hidden" method="post" action="@this.Url.Action("Create")">
+    @this.Html.AntiForgeryToken()
+
+    <input type="hidden" name="id" value="@(this.Model)" />
+    <input type="hidden" name="protocol" value="" />
+    <input type="hidden" name="hostName" value="" />
+    <input type="hidden" name="port" value="" />
+</form>
+
+@section scripts {
+    <script>
+        $(function () {
+            var commandTemplate = $("#command-template").html();
+
+            $("#lst-items").bootgrid({
+                rowCount: [10, 20, 50, ],
+
+                ajax: true,
+                url: "@this.Url.Action("StoreList")",
+                post: {
+                    id: "@(this.Model)",
+                },
+                labels: {
+                    noResults: "Không có kết quả",
+                    infos: "Hiển thị {{ctx.start}} tới {{ctx.end}} của {{ctx.total}} dòng",
+                    search: "Tìm kiếm"
+
+                },
+                formatters: {
+                    "Check": function (column, row) {
+                        var icon = row[column.id] ? "fa-check" : "fa-remove";
+
+                        return "<i class='fa " + icon + "'></i>";
+                    },
+
+                    "Domain": function (column, row) {
+                        return row.Protocol + "://" + row.HostName + ":" + row.Port;
+                    },
+
+                    "Commands": function (column, row) {
+                        var template = $(commandTemplate);
+
+                        template.find("[title=Delete]").attr("data-id", row.Id);
+
+                        return template[0].outerHTML;
+                    },
+                },
+            });
+        });
+
+        function onAddButtonClick() {
+            var domain = prompt("Enter the domain components seperated by a space (for e.g `http www.wisky.vn 80`)");
+
+            if (!domain) {
+                return;
+            }
+
+            var domainParts = domain.split(" ");
+            var frm = $("#frm-add");
+            frm.find("[name=protocol]").val(domainParts[0]);
+            frm.find("[name=hostName]").val(domainParts[1]);
+            frm.find("[name=port]").val(domainParts[2]);
+            frm.submit();
+        }
+
+        function onDeleteButtonClick(btn) {
+            ShowConfirm("Bạn có chắc là mình muốn xóa tên miền này?", function () {
+                var id = $(btn).attr("data-id");
+                window.location.href = "@this.Url.Action("Delete")/" + id;
+            });
+        }
+
+    </script>
+}

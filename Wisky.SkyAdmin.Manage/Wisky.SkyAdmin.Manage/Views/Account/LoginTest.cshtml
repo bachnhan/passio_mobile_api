@@ -1,0 +1,89 @@
+﻿@{
+    Layout = null;
+}
+@model Wisky.SkyAdmin.Manage.Models.Identity.LoginViewModel
+
+@{
+    this.Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Log In</title>
+
+    <link rel="stylesheet" href="~/Content/css/font-awesome.min.css" />
+
+    <link href="~/Content/template/template-material/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
+    <link href="~/Content/template/template-material/vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
+    <link href="~/Content/frontend/zmdi/css/material-design-iconic-font.min.css" rel="stylesheet" />
+    <link href="~/Content/template/template-material/css/app.min.1.css" rel="stylesheet">
+    <link href="~/Content/template/template-material/css/app.min.2.css" rel="stylesheet">
+    <link href="~/Content/css/login.css" rel="stylesheet">
+    <link href="~/Content/css/theme.css" rel="stylesheet" />
+    @*<link href="~/Content/css/admin.min.css" rel="stylesheet"/>*@
+    <style>
+        body {
+            font-family: OpenSans;
+        }
+    </style>
+</head>
+<body class="login-content">
+
+    <div class="login-frame">
+        <div class="login-logo">
+            <img src="~/Content/images/login/logo-wisky-slogan.png" />
+        </div>
+        <div class="login-form">
+            <form method="post" action="@Url.Action("LoginTest","Account")">
+                <div class="form-group custom">
+                    <div class="login-icon"><i class="fa fa-user" aria-hidden="true"></i></div>
+                    <input type="text" class="form-control" id="l-username" placeholder="Tên tài khoản" name="@this.Html.NameFor(q => q.Username)" value="@(this.Model.Username)" required />
+                    <span class="focus-bg"></span>
+                </div>
+                <div class="form-group custom">
+                    <div class="login-icon"><i class="fa fa-key" aria-hidden="true"></i></div>
+                    <input type="password" class="form-control" id="l-password" placeholder="Mật khẩu" name="@this.Html.NameFor(q => q.Password)" value="@(this.Model.Password)" required />
+                    <span class="focus-bg"></span>
+                </div>
+                <div class="form-group login-remember">
+                    <input type="checkbox" id="l-remember" value="true" name="RememberMe"/>
+                    <label for="l-remember"><span>Ghi nhớ đăng nhập</span></label>
+                </div>
+
+                @this.Html.AntiForgeryToken()
+
+                @if (!this.ViewData.ModelState.IsValid)
+                {
+                    <div class="login-error">
+                        @(this.Html.ValidationSummary(true, "", new { @style = "color:red;font-size: 125%;" }))
+                    </div>
+                }
+
+                <div class="form-group">
+                    <input type="submit" class="login-button" value="Đăng nhập" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="~/Content/js/jquery-1.9.1.js"></script>
+    <script src="~/Content/js/bootstrap.min.js"></script>
+
+    <script src="~/Content/template/template-material/vendors/bower_components/Waves/dist/waves.min.js"></script>
+
+    <!-- Placeholder for IE9 -->
+    <!--[if IE 9 ]>
+        <script src="vendors/bower_components/jquery-placeholder/jquery.placeholder.min.js"></script>
+    <![endif]-->
+
+    <script src="~/Content/template/template-material/js/functions.js"></script>
+
+</body>
+</html>
+

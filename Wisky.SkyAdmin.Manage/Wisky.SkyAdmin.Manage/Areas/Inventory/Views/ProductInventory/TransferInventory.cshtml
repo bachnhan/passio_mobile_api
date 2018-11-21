@@ -1,0 +1,567 @@
+﻿@model HmsService.ViewModels.InventoryReceiptEditViewModel
+@{
+    ViewBag.Title = "TransferInventory";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Chuyển kho đi
+                </h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <a href="@Url.Action("ListTransferInventory", "ProductInventory", new { area = "Inventory"})" class="btn btn-sm btn-success">Quay lại</a>
+                <button class="btn btn-primary" id="btnSubmitTransfer">
+                    Lưu lại
+                </button>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="clearfix"></div>
+                <div class="well well-success">
+                    <h4>
+                        <span>Thông tin</span>
+                    </h4>
+                    <br />
+                    <div>
+                        <input id="listItemReceipt" type="hidden" />
+                        <div class="form-group">
+                            <label class="control-label">Cửa hàng chuyển đến</label>
+                            <div>
+                                <select class="form-control" id="selectInStore">
+                                    @foreach (var item in Model.AvailableStore)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Ngày chuyển hàng</label>
+                            <div id="sTime" class="pull-right" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                                <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+                                <span></span> <b class="caret"></b>
+                            </div>
+                            @*<div class='' id="">
+                                    <input type='text' class="form-control" id='sTime' value="@DateTime.Now.ToString("MM/dd/yyyy")" />
+                                </div>*@
+                        </div>
+                        <div class="form-group" style="margin-top:45px">
+                            <label class="control-label">Người xuất hàng</label>
+                            <div class="fg-line">
+                                <input id="creator" class="form-control" name="Creator" placeholder="Người xuất hàng" value="quanly" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Ghi chú</label>
+                            <div class="fg-line">
+                                <textarea class="form-control" id="notes-import" name="Notes" placeholder="Thêm ghi chú" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-8">
+                <div class="well well-success">
+                    <div class="row small-margin">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Nhóm hàng
+                                </label>
+                                <select class="form-control" id="item-categories">
+                                    @foreach (var item in Model.AvailableItemCategory)
+                                    {
+                                        <option value="@item.Value">@item.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Tên hàng
+                                </label>
+                                <select class="form-control" id="item-product"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-3" style="margin-top: 23px">
+                            <div class="form-group">
+                                <div id="expDate" class="pull-right" style="background: #fff; cursor: pointer; padding: 8px 10px; border: 1px solid #ccc; width: 100%">
+                                    <i class="glyphicon glyphicon-calendar fa fa-calendar"></i>&nbsp;
+                                    <span></span> <b class="caret"></b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-2" style="margin-top: 23px">
+                            <div class="form-group">
+                                <label class="control-label"> </label>
+                                <button id="btn-save-item" class="btn btn-primary form-control pull-right">
+                                    Thêm hàng
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row small-margin">
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="control-label">
+                                    Đơn vị
+                                </label>
+                                <select class="form-control" id="item-unit"></select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label class="control-label" style="display: block">Số lượng</label>
+                                <input name="quantity" class="form-control text-center" type="number" min="1" max="99" value="1" id="quantity" oninput="this.value= this.value.replace(/[^0-9.]/g,'');" />
+                                <input name="price" type="hidden" id="price" />
+                                @*<label> (<span id="lblUnit"></span>)</label>*@
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label" style="display: block">Quy đổi</label>
+                                <input id="exchangeRate" disabled class="form-control text-center" />
+
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+                <table id="item-import" class="table table-bordered table-striped table-fixed-header">
+                    <thead>
+                        <tr>
+                            <th>Tên hàng</th>
+                            <th>Đơn vị</th>
+                            <th>Số lượng</th>
+                            <th>Đơn giá</th>
+                            <th>Thành tiền</th>
+                            <th>Ngày hết hạn</th>
+                            <th>Tùy chọn</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                    <tfoot>
+                        <tr>
+                            <th style="text-align:left" class="text-center" colspan="4">Tổng cộng:</th>
+                            <th id="totalPrice" colspan="1" style="text-align:right">0</th>
+                            <th id="totalPrice" colspan="2" style="text-align:right">VNĐ</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        function cb(date) {
+            $('#sTime span').html(date.format('DD/MM/YYYY'));
+            $('#expDate span').html(date.format('DD/MM/YYYY'));
+        }
+        cb(moment());
+        $("#sTime").daterangepicker({
+            singleDatePicker: true,
+            startDate: '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")',
+            minDate: '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")',
+            showDropdowns: true,
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        }, cb);
+        $('#expDate').daterangepicker({
+                singleDatePicker: true,
+                startDate: '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")',
+                minDate: '@Utils.GetCurrentDateTime().ToString("dd/MM/yyyy")',
+                showDropdowns: true,
+                locale: {
+                    format: 'DD/MM/YYYY'
+                }
+            }, cb);
+        initCategories();
+        function displayExchangeRate() {
+            var selectedUnit = $('#item-unit option:selected').text();
+            var defaultUnit = $("#item-unit option:first").text();
+            var quantity = parseFloat($('#quantity').val());
+            var exchangeRate = parseInt($('#item-unit option:selected').attr("unit-rate"));
+            if (selectedUnit != '') {
+                $('#exchangeRate').val("1 " + selectedUnit + " = " + exchangeRate + " " + defaultUnit);
+            } else {
+                $('#exchangeRate').val("1 " + defaultUnit + " = " + exchangeRate + " " + defaultUnit);
+            }
+        };
+        $(document).on("change", "#item-categories", function (e) {
+            //console.log('haha');
+            var providerId = $("#selectProviderList option:selected").val();
+            $("#item-product").empty();
+            $.ajax({
+                url: "@(Url.Action("SelectChangeItemByCategoryId", "ProductInventory"))",
+                type: "GET",
+                data: {
+                    itemCatId: parseInt($("#item-categories").val()),
+                    ProviderId: parseInt(providerId),
+                },
+                dataType: "json",
+                success: function (result) {
+                    //console.log("#item-categories");
+                    //console.log(result.data);
+                    renderProductByData(result.data);
+                    displayExchangeRate();
+                }
+            });
+        });
+        $(document).on("change", "#item-product", function (e) {
+            $("#quantity").val(1);
+            $("#item-unit").empty();
+            var unitList = JSON.parse($(this).find("option:selected").attr("data-unit"));
+            var unitRate = ($(this).find("option:selected").attr("unit-rate")) || 1;
+            $.each(unitList, function (i, e) {
+                $('#item-unit').append($('<option/>', {
+                    'html': e,
+                    'value': i,
+                    'unit-rate': (i != 0) ? unitRate : 1,
+                }));
+            });
+            displayExchangeRate();
+        });
+        $(document).on("change", "#item-unit", function () {
+            displayExchangeRate();
+        });
+        window.dt = $("#item-import").dataTable({
+            "bFilter": false,
+            "bLengthChange": false,
+            "lengthMenu": [[5], [5]],
+            "aaData": [],
+            "aoColumns": [
+                { 'mDataProp': "name" },
+                { 'mDataProp': "unit" },
+                {
+                    'mDataProp': function (data) {
+                        return "<input name='input-qty' data-id='" + data.id + "' type='number' step='1' value='" + data.quantity + "' class='form-control text-center' min='1'/>";
+                    }
+                },
+                {
+                    'mDataProp': function (data) {
+                        return "<input name='input-unitPrice' data-id='" + data.id + "' type='number' step='1000' value='" + data.price + "' class='form-control text-center' min='0'/>";
+                    }
+                },
+                {
+                    'mDataProp': function (data) {
+                        return formatVND(data.price * data.quantity);
+                    }
+                },
+                { 'mDataProp': "expDate" },
+                {
+                    'mDataProp': function (data) {
+                        return "<button title='Xóa' class=\"btn btn-danger btn-sm\" data-action=\"remove-inventory-item\" data-id=\"" + data.id + "\"><i class='glyphicon glyphicon-trash'></i></button";
+                    }
+                }
+            ],
+            "aoColumnDefs": [
+                {
+                    "aTargets": [1, 2, 3],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [4],
+                    "sClass": "text-right price"
+                },
+            ],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+        }).fnSetFilteringDelay(delaySearch);
+        $(document).on("click", "#btn-save-item", function (e) {
+            var product = $('#item-product option:selected').val();
+
+            if (product === undefined) {
+                ShowMessage("Chưa chọn sản phẩm!", 1);
+            }
+            else {
+                saveItemToInventory();
+                $("#quantity").val(1);
+            }
+        });
+        $(document).on("click", "[data-action=\"remove-inventory-item\"]", function (e) {
+            var list = $("#listItemReceipt").data("items") || [];
+            var id = $(this).data("id");
+            for (var i = 0; i < list.length; i++) {
+                if (id === list[i].id) list.splice(i, 1);
+            }
+            $("#listItemReceipt").data("items", list);
+            /* var me = $(e.currentTarget);
+            //console.log(me);
+            me.parents('tr').remove();*/
+            dt.fnClearTable();
+            if (list.length > 0) {
+                dt.fnAddData(list);
+            }
+            sumTotalPrice();
+        });
+        $('#item-unit,#quantity').on('change', function () {
+            displayExchangeRate();
+        });
+        $(document).on("click", "#btnSubmitTransfer", function (e) {
+            
+            if (validateInput()) {
+                var ReceiptItems = $("#listItemReceipt").data("items");
+                var totalAmount = 0;
+                for (var i = 0; i < ReceiptItems.length; i++) {
+                    totalAmount = totalAmount + (parseFloat(ReceiptItems[i].quantity) * parseFloat(ReceiptItems[i].price));
+                }
+                var data = {
+                    Creator: $("#creator").val(),
+                    InStoreId: $("#selectInStore").val(),
+                    Notes: $("#notes-import").val(),
+                    ReceiptItems: ReceiptItems,
+                    ExportDate: $('#sTime').data('daterangepicker').startDate.toISOString(),
+                    Amount: totalAmount
+                };
+                //console.log(data.ReceiptItems);
+                var dataStr = JSON.stringify(data);
+                $.ajax({
+                    url: "@(Url.Action("TransferInventory", "ProductInventory"))",
+                    type: "POST",
+                    data: { data: dataStr },
+                    dataType: "json",
+                    success: function (result) {
+                        if (result.success) {
+                            ShowAlert("Thêm hóa đơn thành công", 2);
+                            setTimeout(function () {
+                                window.location.replace("ListTransferInventory");
+                            }, 2000);
+
+                        } else {
+                            ShowAlert(result.message, 1);
+                        }
+                    }
+                });
+            }
+        });
+    });
+    var initCategories = function () {
+        $.ajax({
+            url: "@(Url.Action("SelectChangeItemByCategoryId", "ProductInventory"))",
+            type: "GET",
+            data: { itemCatId: parseInt($("#item-categories").val()) },
+            dataType: "json",
+            success: function (result) {
+                renderProductByData(result.data);
+            }
+        });
+    };
+    var renderProductByData = function (data) {
+        //console.log('renderProductByData');
+        $("#item-product").empty();
+        $.each(data, function (i, item) {
+            var unitList = [item.Unit];
+            if (item.Unit2 != undefined)
+                unitList.push(item.Unit2);
+            $("#item-product").append($("<option>", {
+                value: item.ItemId,
+                text: item.ItemName,
+                'data-unit': JSON.stringify(unitList),
+                'data-price': item.Price,
+                'unit-rate': item.UnitRate,
+            }));
+        });
+        $("#item-product").trigger("change");
+    };
+    var saveItemToInventory = function () {
+        // Support method: Get index of given item in the list. Return -1 if item doesn't exist
+        function indexOfItem(item, list) {
+            var index = -1;
+            $.each(list, function (i, e) {
+                if (item.id === e.id) index = i;
+            });
+            return index;
+        }
+
+        // Transfer to smallest unit
+        function getLowestUnitName() {
+            var $selected = $("#item-unit :selected");
+            var unitRate = parseInt($selected.attr('unit-rate'));
+            if (unitRate > 1) return $selected.siblings().eq(0).html();
+            return $selected.html();
+        }
+
+        // Init variables
+        var $table = $("#item-import tbody"),
+            $storeField = $("#listItemReceipt"),
+            newItem = {
+                id: parseInt($("#item-product").val()),
+                name: $("#item-product :selected").text(),
+                unit: getLowestUnitName(),
+                unitRate: parseInt($("#item-unit :selected").attr("data-price")),
+                price: $("#item-product :selected").attr("data-price"),
+                quantity: parseInt($("#quantity").val()) * parseInt($("#item-unit :selected").attr("unit-rate")),
+                expDate: $("#expDate").data('daterangepicker').startDate.format("DD/MM/YYYY").toString()
+            };
+        var data = $storeField.data("items") || [];
+        // Add item to data list
+        var newItemIndex = indexOfItem(newItem, data);
+        //if (newItem.unitRate >= 1) {
+        var minUnit = ($("#item-unit").find("option"));
+        //console.log(minUnit);
+        //}
+        if (newItemIndex >= 0) { // Case 1: if new item exist, update quantity
+            data[newItemIndex].quantity = data[newItemIndex].quantity + newItem.quantity;
+            data[newItemIndex].expDate = newItem.expDate;
+        } else { // Case 2: if new item does not exist, create new one
+            data.push(newItem);
+        }
+
+        // Save to hidden field
+        $storeField.data("items", data);
+        // and update table
+        dt.fnClearTable();
+        dt.fnAddData(data);
+        sumTotalPrice();
+    };
+    var saveItemToExportInventory = function () {
+        // Support method: Get index of given item in the list. Return -1 if item doesn't exist
+        function indexOfItem(item, list) {
+            var index = -1;
+            $.each(list, function (i, e) {
+                if (item.id === e.id) index = i;
+            });
+            return index;
+        }
+
+        // Init variables
+        var $table = $("#item-import tbody"),
+            $storeField = $("#listItemReceipt"),
+            newItem = {
+                id: parseInt($("#item-product").val()),
+                name: $("#item-product :selected").text(),
+                unit: $("#lblUnit").html(),
+                price: $("#item-product :selected").attr("data-price"),
+                quantity: parseInt($("#quantity").val())
+            };
+        var data = $storeField.data("items") || [];
+        //console.log(data);
+        // Add item to data list
+        var newItemIndex = indexOfItem(newItem, data);
+        if (newItemIndex >= 0) { // Case 1: if new item exist, update quantity
+            data[newItemIndex].quantity = data[newItemIndex].quantity + newItem.quantity;
+        } else { // Case 2: if new item does not exist, create new one
+            data.push(newItem);
+        }
+
+        // Save to hidden field
+        $storeField.data("items", data);
+        // and update table
+        dt.fnClearTable();
+        dt.fnAddData(data);
+        sumTotalPrice();
+        // $table.empty();
+        /* $.each(data, function (i, e) {
+            var record = $('<tr/>', {
+                'data-id': e.id,
+                html: [
+                    $('<td/>', { 'html': e.name }),
+                    $('<td/>', { 'html': e.unit }),
+                    $('<td/>', { 'html': e.quantity }),
+                    $('<td/>', {
+                        'class': 'align-center',
+                        'html': '<button class="btn btn-danger btn-sm" data-action="remove-inventory-item">Xóa</button'
+                    })
+                ]
+            });
+            $table.append(record);
+         });;*/
+    };
+
+    $(document).on("change", "input[name=input-qty]", function () {
+        function indexOfItemById(id, list) {
+            var index = -1;
+            $.each(list, function (i, e) {
+                if (id === e.id) index = i;
+            });
+            return index;
+        }
+        var id = $(this).data("id");
+        var list = $("#listItemReceipt").data("items");
+        //var quantity = parseInt($(this).val());
+        var indexOfItem = indexOfItemById(id, list);
+        if (indexOfItem >= 0) {
+            list[indexOfItem].quantity = parseInt($(this).val());
+            $(this).parent().next().next().text(formatVND(list[indexOfItem].quantity * list[indexOfItem].price));
+            sumTotalPrice();
+        }
+    });
+
+    //On change input price
+    $(document).on("change", "input[name=input-unitPrice]", function () {
+        function indexOfItemById(id, list) {
+            var index = -1;
+            $.each(list, function (i, e) {
+                if (id === e.id) index = i;
+            });
+            return index;
+        }
+        var id = $(this).data("id");
+        var list = $("#listItemReceipt").data("items");
+        //var quantity = parseInt($(this).val());
+        var indexOfItem = indexOfItemById(id, list);
+        if (indexOfItem >= 0) {
+            list[indexOfItem].price = parseInt($(this).val());
+            $(this).parent().next().text(formatVND(list[indexOfItem].quantity * list[indexOfItem].price));
+            sumTotalPrice();
+        }
+    });
+
+    function validateInput() {
+        if ($('#sTime').data('daterangepicker').startDate.toISOString() === "") {
+            ShowMessage("Bạn chưa chọn ngày nhập/xuất hàng", 1);
+            return false;
+        } else if ($('#creator').val() === "") {
+            ShowMessage("Bạn chưa chọn người nhập/xuất hàng", 1);
+            return false;
+        } else if ($('#invoice-number-import').val() === "") {
+            ShowMessage("Bạn chưa nhập mã hóa đơn", 1);
+            return false;
+        } else if ($("#listItemReceipt").data("items") === undefined) {
+            ShowMessage("Bạn chưa chọn sản phẩm", 1);
+            return false;
+        } else return true;
+    }
+    var formatVND = function (x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    };
+
+    function sumTotalPrice() {
+        var list = $("#listItemReceipt").data("items");
+        var sum = 0;
+        for (var i = 0; i < list.length; i++) {
+            sum = sum + (list[i].price * list[i].quantity);
+        }
+        $('#totalPrice').text(formatVND(sum));
+    }
+</script>
+<style>
+    .daterangepicker {
+        margin-top: 0px !important;
+    }
+</style>

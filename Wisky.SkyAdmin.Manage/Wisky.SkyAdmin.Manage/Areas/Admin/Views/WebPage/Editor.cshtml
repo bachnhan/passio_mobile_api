@@ -1,0 +1,102 @@
+﻿@model WebPageViewModel
+@{
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+}
+<form method="post">
+    @this.Html.AntiForgeryToken()
+    @this.Html.HiddenFor(model => model.Id)
+
+    <div class="block-header">
+        <h2>Chỉnh sửa trang</h2>
+
+        <ul class="actions">
+            <li class="m-r-10">
+                <a class="btn btn-default" href="@this.Url.Action(" Index", new { parameters=currentStoreDomain.Directory })">Quay lại</a>
+            </li>
+            <li>
+                <button type="submit" class="btn btn-primary">Hoàn tất</button>
+            </li>
+        </ul>
+    </div>
+
+    @if (!this.ViewData.ModelState.IsValid)
+    {
+    <div class="card">
+        <div class="card-body card-padding text-danger">
+            @(this.Html.ValidationSummary())
+        </div>
+    </div>
+    }
+
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Thông tin chính</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label for="inputTitle" class="control-label">Tên trang</label>
+                        <div class="fg-line">
+                            @this.Html.EditorFor(q => q.Title)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputTitle" class="control-label">Tiêu đề</label>
+                        <div class="fg-line">
+                            @this.Html.TextAreaFor(q => q.PageTitle, new { @id = "inputPage"})
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputPageContent" class="control-label">Nội dung</label>
+                        <div class="fg-line">
+                            @Html.TextAreaFor(model => model.PageContent,
+                            new
+                            {
+                            //@class = "ckeditor",
+                            @id = "inputPageContent"
+                            })
+                            @*  @Html.ValidationMessageFor(model => model.BlogPost.BlogContent, "", new { @class = "text-danger" })*@
+                        </div>
+                    </div>
+                    @*<div class="form-group">
+                        <label for="inputDescription" class="control-label">Nội dung</label>
+                        <div class="fg-line">
+                            @Html.TextAreaFor(model => model.PageContent, new { @class = "ckeditor", name = "PageContent" })
+                        </div>
+                    </div>*@
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-5">
+            <!-- Card: SEO -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>SEO</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label class="control-label">Từ khóa SEO</label>
+                        <div class="fg-line">
+                            @this.Html.EditorFor(q => q.MetaKeyword)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Mô tả SEO</label>
+                        <div class="fg-line">
+                            @this.Html.EditorFor(q => q.MetaDescription)
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Đường dẫn</label>
+                        <div class="fg-line">
+                            @this.Html.EditorFor(q => q.SeoName)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>

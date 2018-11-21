@@ -1,0 +1,1396 @@
+﻿@using HmsService.Models
+
+@model Wisky.SkyAdmin.Manage.Areas.MembershipCard.Controllers.MembershipCardController.MembershipCardEditViewModel2
+@*@model Wisky.SkyAdmin.Manage.Areas.MembershipCard.Controllers.MembershipCardController.membershipCardAndType*@
+@{
+    ViewBag.Title = "editcard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    //var count = 1;
+    var testScript = "";
+    var oldCodeList = Model.accountList.Select(q => q.AccountCode);
+    //var availableTypes = new List<dynamic>();
+
+    //foreach (var type in ViewBag.AllAccountTypes)
+    //{
+    //    if (!ViewBag.AccountTypes.Contains(type.Value))
+    //    {
+    //        availableTypes.Add(type);
+    //    }
+    //}
+
+    var availableTypes = ViewBag.AllAccountTypes;
+
+    //foreach (var account in Model.accountList)
+    //{
+    //    var productCode = string.IsNullOrEmpty(account.ProductCode) ? "N/A" : account.ProductCode;
+    //    testScript += Html.Raw("listAccounts.push([" + count++
+    //+ ",'" + account.AccountCode
+    //+ "','" + account.AccountName
+    //+ "','" + Utils.DisplayName((AccountTypeEnum)account.Type)
+    //+ "'," + account.Balance
+    //+ ",'" + productCode
+    //+ "','" + account.Active
+    //+ "','" + account.AccountID
+    //+ "'," + account.Type
+    //+ ",'" + account.StartDate
+    //+ "']);");
+    //}
+}
+
+<style>
+    .pair-group .btn,
+    .variant-group .btn {
+        font-weight: 500 !important;
+        padding-left: 13px !important;
+    }
+
+    .dropdown-menu.open {
+        max-height: 200px !important;
+        overflow: visible !important;
+    }
+
+    .dropdown-menu.inner {
+        max-height: 200px !important;
+    }
+
+    .col-md-4 {
+        padding-top: 10px;
+    }
+
+    .pair-group .btn,
+    .variant-group .btn {
+        font-weight: 500 !important;
+        padding-left: 13px !important;
+    }
+
+    .col-md-4 {
+        padding-top: 10px;
+    }
+
+    .setHeight {
+        height: 250px;
+    }
+</style>
+
+<div class="card">
+    <div class="row">
+        <div class="col-md-12 card-header">
+            <h3 style="color:#0d8e2d" class="col-md-9">Chỉnh sửa thẻ thành viên</h3>
+            <div class="col-md-3">
+                <div class="pull-right">
+                    <a href="@Url.Action("/")" class="btn btn-success waves-effect" id="btn-back">Quay lại</a>
+                    <button type="button" class="btn btn-primary waves-effect" id="btn-submit" onclick="submitform()">Hoàn tất</button>
+                </div>
+            </div>
+        </div>
+        @*<div class="col-md-12">
+                <div class="row col-md-12">
+                    <h2 class="col-md-2 m-t-10 p-l-25">Loại thẻ</h2>
+                    <div class="group-radio-buttons col-md-6">
+                        <div class="col-md-4" id="check_credit_div">
+                            <input type="checkbox" name="checktype" value="4" style="background-color:aqua" class="input-assumpte" id="check_credit">
+                            <label for="check_credit" id="label_creditcard"><span>Credit Card</span></label>
+                        </div>
+                        <div class="col-md-4" id="check_gift_div">
+                            <input type="checkbox" name="checktype" value="5" class="input-assumpte" id="check_gift">
+                            <label for="check_gift" id="label_gift"><span>Gift</span></label>
+                        </div>
+                        <div class="col-md-4" id="check_member_div">
+                            <input type="checkbox" name="checktype" value="6" class="input-assumpte" id="check_member">
+                            <label for="check_member" id="label_membercard"><span>Member Card</span></label>
+                        </div>
+
+                    </div>
+                    <input name="selectedtype" hidden />
+                    <input name="membershipCardId" hidden />
+                </div>
+            </div>*@
+    </div>
+
+
+
+
+    <div class="row">
+        <div class="card-body card-padding">
+            <div class="card">
+
+                <div class="card-body card-padding row setHeight">
+                    <div class="col-md-12">
+                        <h3 class="m-b-25">Thông tin chính</h3>
+                        <div hidden class="form-group row">
+                            <label for="Card_Id" class="control-label col-md-4">ID</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <input class="form-control seo-source" value="@Model.membershipCard.Id" readonly id="Card_Id" name="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row col-md-6">
+                            <label for="Card_Code" class="control-label col-md-4">Mã thẻ:</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <input class="form-control seo-source" value="@Model.membershipCard.MembershipCardCode" readonly id="Card_Code" name="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row col-md-6">
+                            <label for="Customer_Name" class="control-label col-md-4">Tên chủ thẻ:</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <input class="form-control" id="Customer_Name" name="" type="text" readonly value="@Model.membershipCard.CustomerName">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row col-md-6">
+                            <label for="Card_TypeName" class="control-label col-md-4">Loại thẻ:</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <select id="Card_TypeName" @*title=""*@ class="selectpicker" data-live-search="true"></select>
+                                    @*<input class="form-control" id="Card_Type" name="" type="text" readonly value="@Model.membershipCard.MembershipTypeName">*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row col-md-6">
+                            <label for="Info_CSV" class="control-label col-md-4">CSV:</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <input class="form-control" id="Info_CSV" name="" type="text" readonly value="@Model.membershipCard.CSV">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 dangkitaikhoan" id="form_dangki" hidden>
+                        <h2 id="text_register"><i class="fa fa-minus"></i>Đăng ký tài khoản</h2>
+
+                        <div class="form-group row" hidden>
+                            <label for="input_code" class="control-label col-md-3">MembershipCardID</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <input class="form-control" id="input_codeID" readonly name="input_codeID" type="text" value="@Model.membershipCard.Id">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row" hidden>
+                            <label for="input_TypeAccount" class="control-label col-md-3">MembershipCardID</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <input class="form-control" id="input_TypeAccount" readonly name="input_TypeAccount" type="text" value="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="input_name" class="control-label col-md-3">Tên tài khoản</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <input class="form-control" id="input_name" name="input_name" type="text" value="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for="AccountFinishDate" class="control-label col-md-3">Ngày hết hạn</label>
+                            <div class="col-md-8">
+                                <div class="fg-line" id="divInput" style="display:inline-block;">
+                                    <input class="form-control" required type="text" id="AccountFinishDate" name="AccountFinishDate" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row forCreditAndMember">
+                            <label for="input_blance" class="control-label col-md-3">Số dư</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <input class="form-control" id="input_blance" name="input_blance" type="number" value="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row forGift" hidden>
+                            <label for="input_productCode" class="control-label col-md-3">Sản phẩm</label>
+                            <div class="col-md-8">
+                                <div class="fg-line">
+                                    <select title="Chọn 1 sản phẩm" class="selectpicker" id="input_productCode" name="input_productCode"></select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label class="control-label col-md-9"></label>
+                            <div class="col-md-6">
+                                <div class="fg-line">
+                                    <button type="button" onclick="closeForm()" class="btn btn-success state-success" id="btn_Cancel">Hủy</button>
+                                    <button type="button" class="btn btn-primary waves-effect" id="btn_Save">Lưu</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+
+                <div class="card-body card-padding row">
+                    <div class="col-md-8 m-b-10">
+                        <h2>Danh sách tài khoản</h2>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-primary waves-effect pull-right" style="width: 200px;" id="btnCreateAccount">Tạo tài khoản</button>
+                    </div>
+                    <div class="col-md-12">
+                        <table id="MemberCardDatatable" class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label class="">STT</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Mã tài khoản</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tên tài khoản</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Loại tài khoản</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tài khoản</label>
+                                        <label class="">Số lượng</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Đơn vị</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Ngày tạo</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Trạng thái</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tùy chọn</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="createAccountModal" class="modal fade" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" style="width: 700px">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4>Tạo tài khoản</h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-2 col-sm-offset-1 control-label">
+                                        Mã tài khoản
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="text" required readonly id="accountCode_Create" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 col-sm-offset-1 control-label">
+                                        Tên tài khoản
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input id="create-accountName" class="form-control" type="text" required />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 col-sm-offset-1 control-label">
+                                        Loại tài khoản
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="selectpicker" id="create-accountType"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="AccountFinishDateCreate" class="control-label col-md-offset-1 col-md-2">Ngày hết hạn</label>
+                                    <div class="col-md-8">
+                                        <div class="fg-line" id="divInput" style="display:inline-block;">
+                                            <input class="form-control" required type="text" id="AccountFinishDateCreate" name="AccountFinishDateCreate" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="create-creditAccount">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 col-sm-offset-1 control-label">
+                                            Tiền
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <input id="create-credit-balance" class="form-control" type="text" required />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="create-giftAccount">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 col-sm-offset-1 control-label">
+                                            Sản phẩm
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <select title="Chọn 1 sản phẩm" class="selectpicker" id="create-ProductCode"></select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 col-sm-offset-1 control-label">
+                                            Số lượng
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <input id="create-gift-balance" class="form-control" type="text" required />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="create-memberAccount">
+                                    <div class="form-group">
+                                        <label class="col-sm-2 col-sm-offset-1 control-label">
+                                            Số điểm
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <input id="create-member-balance" class="form-control" type="text" required />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-sm-2 col-sm-offset-1 control-label">
+                                            Level
+                                        </label>
+                                        <div class="col-sm-8">
+                                            <input id="create-member-level" class="form-control" type="text" required />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" id="CreateAccountBTN">Tạo</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    var cardId = $('#Card_Id').val();
+    var customerId = $('#Customer_Id').val();
+    var listTypeCheck = [];
+    var listCheck = [];
+    var currentProcess = -1;
+    var onload = 0;
+    var comboboxTypes = @Html.Raw(Json.Encode(availableTypes));
+    function Account(Count, AccountCode, AccountName, AccountType, Balance, ProductCode, Active, AccountID, AccountTypeId, FinishDate) {
+        this.Count = Count;
+        this.AccountCode = AccountCode;
+        this.AccountName = AccountName;
+        this.AccountType = AccountType;
+        this.Balance = Balance;
+        this.ProductCode = ProductCode;
+        this.Active = Active;
+        this.AccountID = AccountID;
+        this.AccountTypeId = AccountTypeId;
+        this.FinishDate = FinishDate;
+    };
+
+    var listAccounts = [];
+    var listAccountTmps = [];
+    function GetAllMembershipCardTypes() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetAllMembershipCardTypes")',
+            success: function (result) {
+                if (result.success) {
+                    var content = "";
+                    for (var i = 0; i < result.list.length; ++i) {
+                        content += "<option value='" + result.list[i].Id + "'>" + result.list[i].TypeName + "</option>";
+                    }
+                    $("#Card_TypeName").html(content);
+                    $("#Card_TypeName").val('@Model.membershipCard.MembershipTypeId');
+                    $("#Card_TypeName").selectpicker('refresh');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    }
+    function GetProductList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadProductList", "MembershipCard")',
+            data: { 'brandId': 1 },
+            success: function (result) {
+                for (var i = 0; i < result.list.length; i++) {
+                    $('#input_productCode').append('<option value="' + result.list[i].ProductId + '" checked>' + result.list[i].ProductName + '</option>')
+                    $('#create-ProductCode').append('<option value="' + result.list[i].ProductId + '" checked>' + result.list[i].ProductName + '</option>')
+                }
+                //$("#input_productCode").val($("#input_productCode option:first").val());
+                $('#input_productCode').selectpicker('refresh');
+                //$("#create-ProductCode").val($("#input_productCode option:first").val());
+                $('#create-ProductCode').selectpicker('refresh');
+                var dataTable = $("#MemberCardDatatable").dataTable();
+
+                if (dataTable != null) {
+                    dataTable.fnDestroy();
+                    initDatatable(listAccounts);
+                    RefreshTable();
+                } else {
+                    initDatatable(listAccounts);
+                }
+
+                onload = 1;
+            }
+        });
+    }
+
+    @*function LoadMemberShipCardType() {
+        @{
+            if(allAccountTypes.Contains((int) AccountTypeEnum.CreditAccount))
+            {
+                Html.Raw("$('#check_credit').prop('checked', true);");
+            }
+
+            if (allAccountTypes.Contains((int)AccountTypeEnum.GiftAccount))
+            {
+                Html.Raw("$('#check_gift').prop('checked', true);");
+            }
+
+            if (allAccountTypes.Contains((int)AccountTypeEnum.PointAccount))
+            {
+                Html.Raw("$('#check_member').prop('checked', true);");
+            }
+        }
+    }*@
+
+    function getAccountMembershipCard() {
+        //@Html.Raw(testScript);
+        listAccounts = @Html.Raw(Json.Encode(Model.dataTable));
+
+        var dataTable = $("#MemberCardDatatable").dataTable();
+
+        if (dataTable != null) {
+            dataTable.fnDestroy();
+            initDatatable(listAccounts);
+            RefreshTable();
+        } else {
+            initDatatable(listAccounts);
+        }
+    }
+
+    function initDatatable(data) {
+        $("#MemberCardDatatable").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 150],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [3],
+                    "mRender": function (data, type, row) {
+                        var type = row[3];
+                        var str = "";
+
+                        switch (type) {
+                            case 1: str = "Tài khoản thanh thoán"; break;
+                            case 2: str = "Tài khoản sản phẩm"; break;
+                            case 3: str = "Tài khoản tích điểm"; break;
+                        }
+
+                        return str;
+                    }
+                },
+                {
+                    "aTargets": [7],
+                    "mRender": function (data, type, row) {
+                        var status = row[7];
+                        if (status) {
+                            return "Đã kích hoạt";
+                        } else {
+                            return "Chưa kích hoạt";
+                        }
+                    }
+                },
+                {
+                    "aTargets": [8],
+                    "mRender": function (data, type, row) {
+                        var active = row[7];
+                        var alreadyCreate = row[11];
+                        var btnActiveClass = "";
+                        var btnActiveHtml = "";
+                        if (active) {
+                            btnActiveClass = "btn btn-sm btn-warning btnComparison";
+                            btnActiveHtml = "Khóa";
+                        } else {
+                            btnActiveClass = "btn btn-sm btn-success btnComparison";
+                            btnActiveHtml = "Kích hoạt";
+                        }
+
+                        var btnActive = "<div style='display: inline-flex;'><a data-row=" + row[0]
+                                    + " onclick='changeAccountActivation(this)' class='" + btnActiveClass
+                                    + "'><span class=''>" + btnActiveHtml + "</span></a>";
+                        var btnDelete = "";
+                        if (!alreadyCreate) {
+                            btnDelete =  "<a class='btn btn-danger btn-lg m-l-5' onclick='deleteMembershipCard(" + row[0] + ")'><i class='glyphicon glyphicon-trash'></i></a>";
+                        }
+
+                        return btnActive + " " + btnDelete + "</div>";
+                    },
+                },
+            ],
+            "bAutoWidth": true,
+            "order": [[1, 'asc']],
+        });
+    };
+
+    function deleteMembershipCard(row) {
+        if (listAccounts.length == 1) {
+            listAccounts = [];
+        } else {
+            for (var i = row - 1; i < listAccounts.length - 1; ++i) {
+                listAccounts[i + 1][0] = i + 1;
+                listAccounts[i] = listAccounts[i + 1];
+            }
+            listAccounts.pop();
+        }
+
+        var dataTable = $("#MemberCardDatatable").dataTable();
+        dataTable.fnDestroy();
+        initDatatable(listAccounts);
+    };
+
+    function changeAccountActivation(btn) {
+        var row = $(btn).data('row');
+
+        listAccounts[row - 1][7] = !listAccounts[row - 1][7];
+        if (listAccounts[row - 1][7]) {
+            $(btn).attr("class", "btn btn-sm btn-warning btnComparison");
+            $(btn).html("Khóa");
+        } else {
+            $(btn).attr("class", "btn btn-sm btn-success btnComparison");
+            $(btn).html("Kích hoạt");
+        }
+    }
+
+    //function activeAccount(account1, account2, checkActive) {
+
+    //    var accountCode = account1 + "" + account2;
+
+    //    $.each(listAccounts, function (index, item) {
+    //        //check code
+    //        if (item[1] == accountCode) {
+    //            if (checkActive == true) {
+    //                item[6] = 1;
+    //            } else {
+    //                item[6] = 0;
+    //            }
+    //            return;
+    //        }
+    //    });
+    //    var flagcredit = false;
+    //    var flaggift = false;
+    //    var flagmember = false;
+
+    //    $.each(listAccounts, function (index, item) {
+    //        if (item[8] == 1 && item[6] == true) {
+    //            flagcredit = true;
+    //        }
+    //        if (item[8] == 2 && item[6] == true) {
+    //            flaggift = true;
+    //        }
+    //        if (item[8] == 3 && item[6] == true) {
+    //            flagmember = true;
+    //        }
+    //    });
+    //    if (flagcredit == false) {
+    //        listCheck[0] = 0;
+    //        $("#check_credit").prop("checked", false);
+    //    } else {
+    //        $("#check_credit").prop("checked", true);
+    //        listCheck[0] = 1;
+    //    }
+
+    //    if (flaggift == false) {
+    //        listCheck[1] = 0;
+    //        $("#check_gift").prop("checked", false);
+    //    } else {
+    //        listCheck[1] = 1;
+    //        $("#check_gift").prop("checked", true);
+    //    }
+
+    //    if (flagmember == false) {
+    //        listCheck[2] = 0;
+    //        $("#check_member").prop("checked", false);
+    //    } else {
+    //        listCheck[2] = 1;
+    //        $("#check_member").prop("checked", true);
+    //    }
+    //    var dataTable = $("#MemberCardDatatable").dataTable();
+    //    if (dataTable != null) {
+    //        dataTable.fnDestroy();
+    //        initDatatable(listAccounts);
+    //        RefreshTable();
+    //    }
+    //    ShowMessage("Cập nhật tài khoản thành công", 2);
+    //};
+
+    $(document).ready(function () {
+        HMS.General.init();
+
+        $('#AccountFinishDate').datetimepicker({
+            format: 'DD/MM/YYYY',
+            minDate: new Date(),
+        }).on('dp.hide', function (e) {
+            e.preventDefault();
+            this.blur();
+        });
+        $('#AccountFinishDateCreate').datetimepicker({
+            format: 'DD/MM/YYYY',
+            minDate: new Date(),
+        }).on('dp.hide', function (e) {
+            e.preventDefault();
+            this.blur();
+        });
+
+        GetAllMembershipCardTypes();
+
+        //getCustomerMembershipCard(customerId);
+        getAccountMembershipCard();
+        //LoadMemberShipCardType();
+        GetProductList();
+        $("#input_productCode option:first").attr('selected', 'selected');
+
+        $('#btn-back').fixedScroll(70);
+        $('#btn-submit').fixedScroll(70);
+    });
+
+    //$('#check_credit').on('change', function () {
+    //    // initform
+    //    if (currentProcess != -1) {
+    //        if (currentProcess == 1) {
+    //            $('#check_credit').prop('checked', false);
+    //            currentProcess = -1;
+    //        }
+    //        if (currentProcess == 2) {
+    //            $('#check_gift').prop('checked', false);
+    //            currentProcess = -1;
+    //        }
+    //        if (currentProcess == 3) {
+    //            $('#check_member').prop('checked', false);
+    //            currentProcess = -1;
+    //        }
+    //    }
+    //    clearInput();
+    //    $('#form_dangki').slideUp(function() {
+    //        $('.forGift').hide();
+    //    });
+
+    //    if (listCheck[0] == 0) {
+    //        var flagHaveAccount = false;
+
+    //        $.each(listAccounts, function (index, item) {
+    //            if (!item[6] && item[8] == 1) {
+    //                flagHaveAccount = true;
+    //                return;
+    //            }
+    //        });
+
+    //        if (flagHaveAccount) {
+    //            ActiveFullAccount(1);
+    //            ShowAlert("Đã tái kích hoạt các tài khoản", 2);
+    //        } else {
+    //            if (listTypeCheck[0] == 0) {
+    //                if ($('#check_credit').prop('checked') == true) {
+    //                    //Open form đăng ký
+    //                    $('#form_dangki').slideDown(false);
+    //                    $('#text_register').html('Ðăng kí tài khoản: CreditCard');
+    //                    $('#input_TypeAccount').val(1);
+    //                    currentProcess = 1;
+    //                    // xóa những form hiện hành chưa được add vào
+    //                    if (listTypeCheck[1] == 0 && listCheck[1] == 0) {
+    //                        $('#check_gift').prop('checked', false);
+    //                    }
+    //                    if (listTypeCheck[2] == 0 && listCheck[2] == 0) {
+    //                        $('#check_member').prop('checked', false);
+    //                    }
+
+    //                } else {
+    //                    $('#form_dangki').slideUp();
+    //                }
+    //            } else {
+    //                ShowAlert("Đã tái kích hoạt các tài khoản", 2);
+    //            }
+    //        }
+    //    } else {
+    //        var checkValue = 0;
+    //        ShowConfirm("Bạn có muốn khóa các tài khoản không?", function () {
+    //            checkValue = 1;
+    //            $('#check_credit').prop('checked', false);
+    //            DeActiveFullAccount(1);
+    //            ShowAlert("Thành công", 2);
+    //            listCheck[0] = 0;
+    //        });
+    //        if (checkValue == 0) {
+    //            $('#check_credit').prop('checked', true);
+    //        }
+    //        $('#form_dangki').slideUp();
+    //    }
+    //});
+
+    //$('#check_gift').on('change', function () {
+    //    if (currentProcess != -1) {
+    //        if (currentProcess == 1) {
+    //            $('#check_credit').prop('checked', false);
+    //            currentProcess = -1;
+    //        }
+    //        if (currentProcess == 2) {
+    //            $('#check_gift').prop('checked', false);
+    //            currentProcess = -1;
+    //        }
+    //        if (currentProcess == 3) {
+    //            $('#check_member').prop('checked', false);
+    //            currentProcess = -1;
+    //        }
+    //    }
+    //    clearInput();
+    //    $('#form_dangki').slideUp(500, function() {
+    //        $('.forGift').show();
+    //    });
+
+    //    if (listCheck[1] == 0) {
+    //        var flagHaveAccount = false;
+
+    //        $.each(listAccounts, function (index, item) {
+    //            if (!item[6] && item[8] == 2) {
+    //                flagHaveAccount = true;
+    //                return;
+    //            }
+    //        });
+
+    //        if (flagHaveAccount) {
+    //            ActiveFullAccount(2);
+    //            ShowAlert("Đã tái kích hoạt các tài khoản", 2);
+    //        } else {
+    //            if (listTypeCheck[1] == 0) {
+    //                if ($('#check_gift').prop('checked') == true) {
+    //                    $('#form_dangki').slideDown(false);
+    //                    $('#text_register').html('Ðăng kí tài khoản: Gift Card');
+    //                    $('#input_TypeAccount').val(2);
+    //                    currentProcess = 2;
+    //                    if (listTypeCheck[0] == 0 && listCheck[0] == 0) {
+    //                        $('#check_credit').prop('checked', false);
+    //                    }
+    //                    if (listTypeCheck[2] == 0 && listCheck[2] == 0) {
+    //                        $('#check_member').prop('checked', false);
+    //                    }
+    //                } else {
+    //                    $('#form_dangki').slideUp(500);
+    //                }
+    //            } else {
+    //                ShowAlert("Đã tái kích hoạt các tài khoản", 2);
+    //            }
+    //        }
+    //    } else {
+    //        if ($('#check_gift').prop('checked') == false) {
+    //            $('#form_dangki').slideUp(500);
+    //            var test = listTypeCheck;
+    //            var checkValue = 0;
+    //            ShowConfirm("Bạn có muốn khóa các tài khoản không?", function () {
+    //                checkValue = 1;
+    //                $('#check_gift').prop('checked', false);
+    //                DeActiveFullAccount(2);
+    //                ShowAlert("Thành công", 2);
+    //                listCheck[1] = 0;
+    //                console.log(listTypeCheck);
+    //            });
+    //            if (checkValue == 0) {
+    //                $('#check_gift').prop('checked', true);
+    //            }
+    //        }
+    //    }
+    //});
+
+
+    //$('#check_member').on('change', function () {
+    //    if (currentProcess != -1) {
+    //        if (currentProcess == 1) {
+    //            $('#check_credit').prop('checked', false);
+    //            currentProcess = -1;
+    //        }
+    //        if (currentProcess == 2) {
+    //            $('#check_gift').prop('checked', false);
+    //            currentProcess = -1;
+    //        }
+    //        if (currentProcess == 3) {
+    //            $('#check_member').prop('checked', false);
+    //            currentProcess = -1;
+    //        }
+    //    }
+    //    clearInput();
+    //    $('#form_dangki').slideUp(function() {
+    //        $('.forGift').hide();
+    //    });
+
+    //    if (listCheck[2] == 0) {
+    //        var flagHaveAccount = false;
+
+    //        $.each(listAccounts, function (index, item) {
+    //            if (!item[6] && item[8] == 3) {
+    //                flagHaveAccount = true;
+    //                return;
+    //            }
+    //        });
+
+    //        if (flagHaveAccount) {
+    //            ActiveFullAccount(3);
+    //            ShowAlert("Đã tái kích hoạt các tài khoản", 2);
+    //        } else {
+    //            if (listTypeCheck[2] == 0) {
+    //                if ($('#check_member').prop('checked') == true) {
+    //                    $('#form_dangki').slideDown(false);
+    //                    $('#text_register').html('Ðăng kí tài khoản: Member Card');
+    //                    $('#input_TypeAccount').val(3);
+    //                    currentProcess = 3;
+    //                    if (listTypeCheck[1] == 0 && listCheck[1] == 0) {
+    //                        $('#check_gift').prop('checked', false);
+    //                    }
+    //                    if (listTypeCheck[0] == 0 && listCheck[0] == 0) {
+    //                        $('#check_credit').prop('checked', false);
+    //                    }
+    //                } else {
+    //                    $('#form_dangki').slideUp();
+    //                }
+    //            } else {
+    //                ShowAlert("Đã tái kích hoạt các tài khoản", 2);
+    //            }
+    //        }
+    //    } else {
+    //        $('#form_dangki').slideUp();
+    //        var checkValue = 0;
+    //        ShowConfirm("Bạn có muốn khóa các tài khoản không?", function () {
+    //            checkValue = 1;
+    //            $('#check_member').prop('checked', false);
+    //            DeActiveFullAccount(3);
+    //            ShowAlert("Thành công", 2);
+    //            listCheck[2] = 0;
+    //        });
+    //        if (checkValue == 0) {
+    //            $('#check_member').prop('checked', true);
+    //        }
+    //    }
+    //});
+
+    function reDrawDatatable(id, data) {
+        $(id).dataTable()._fnPageChange(0);
+        $(id).dataTable().fnDraw();
+    }
+
+    function ActiveFullAccount(typeAccount) {
+        $.each(listAccounts, function (index, item) {
+            if (item[8] == typeAccount) {
+                item[6] = true;
+            }
+            var dataTable = $("#MemberCardDatatable").dataTable();
+
+            if (dataTable != null) {
+                dataTable.fnDestroy();
+                initDatatable(listAccounts);
+                RefreshTable();
+            }
+        });
+        listCheck[typeAccount - 1] = 1;
+        currentProcess = -1;
+    };
+
+    function DeActiveFullAccount(typeAccount) {
+        $.each(listAccounts, function (index, item) {
+            if (item[8] == typeAccount) {
+                item[6] = false;
+            }
+            var dataTable = $("#MemberCardDatatable").dataTable();
+
+            if (dataTable != null) {
+                dataTable.fnDestroy();
+                initDatatable(listAccounts);
+                RefreshTable();
+            }
+        });
+        listCheck[typeAccount - 1] = 0;
+        currentProcess = -1;
+    }
+
+    function submitform() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("EditMembershipCardType", "MembershipCard")',
+            data: {
+                "listAccount": JSON.stringify(listAccounts),
+                "membershipCardCode": $("#Card_Id").val(),
+                "membershipCardTypeId": $("#Card_TypeName").val()
+            },
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage("Chỉnh sửa thẻ thành viên thành công", 2);
+                    var url = "@Url.Action("Index", "MembershipCard")";
+                    window.location.href = url;
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            }
+        });
+    }
+
+    function RefreshTable() {
+        reDrawDatatable("#MemberCardDatatable");
+    }
+
+    $('#btn_Save').on('click', function () {
+
+        //validate
+
+        if ($('#input_name').val().trim() == '') {
+            ShowMessage("Vui lòng nhập tên sản phẩm", 1);
+            return;
+        }
+        else if ($('#AccountFinishDate').val().trim() == '') {
+            ShowMessage("Ngày hết hạn không hợp lệ", 1);
+            return;
+        }
+        else if ($('#input_blance').val().trim() == '') {
+            ShowMessage("Vui lòng nhập tài khoản", 1);
+            return;
+        } else if (parseInt($("#input_blance").val()) <= 0) {
+            ShowMessage("Giá trị tài khoản phải lớn hơn 0", 1);
+            return;
+        }
+        else if ($('#input_TypeAccount').val() == 2) {
+            if ($("#input_productCode").val() == '-1' || $("#input_productCode").val() == null) {
+                ShowMessage("Vui lòng chọn sản phẩm", 1);
+                return;
+            }
+        }
+
+
+
+        var accountName = $('#input_name').val();
+        var finishDate = $('#AccountFinishDate').val();
+        var balance = $('#input_blance').val();
+        var productCode = $('#input_productCode').val();
+        if (productCode == null) {
+            productCode = "";
+        }
+        var accountType = parseInt($('#input_TypeAccount').val(), 10);
+        var accountId = 0;
+        var active = 1;
+        var accountTypeName = "";
+
+        // get datetime now
+        //var datetimeNow = $.now();
+        //generatecode
+        //var accountCode = datetimeNow + "";
+
+        var datetimeNow = moment();
+        var accountCode = datetimeNow.format("YYYYMMDDHHmmSSMS");
+
+        var accountTypeId = -1;
+        switch (accountType) {
+            case 1:
+                accountTypeName = "Tài khoản thanh thoán"
+                listCheck[0] = 1
+                accountTypeId = 1;
+                break;
+            case 2:
+                accountTypeName = "Tài khoản sản phẩm"
+                listCheck[1] = 1;
+                accountTypeId = 2;
+                break;
+            case 3:
+                accountTypeName = "Tài khoản tích điểm"
+                listCheck[2] = 1;
+                accountTypeId = 3;
+                break;
+        }
+
+        var dataArrarytmp = [];
+        //var counttmp = listAccounts.length;
+        //dataArrarytmp.push(counttmp);
+        //dataArrarytmp.push(accountCode);
+        //dataArrarytmp.push(accountName);
+        //dataArrarytmp.push(accountTypeName);
+        //dataArrarytmp.push(balance);
+        //dataArrarytmp.push(productCode);
+        //dataArrarytmp.push(1);
+        //dataArrarytmp.push(-1);
+        //dataArrarytmp.push(accountTypeId);
+        //dataArrarytmp.push(finishDate);
+        //dataArrarytmp.push(0);//client side
+        //listAccounts.push(dataArrarytmp);
+
+        var counttmp = listAccounts.length;
+        dataArrarytmp.push(counttmp+1);
+        dataArrarytmp.push(accountCode);
+        dataArrarytmp.push(accountName);
+        dataArrarytmp.push(accountType);
+        dataArrarytmp.push(balance);
+        dataArrarytmp.push(productName);
+        dataArrarytmp.push(moment().format("DD/MM/YYYY"));
+        dataArrarytmp.push(true);
+        dataArrarytmp.push(finishDate);
+        dataArrarytmp.push(productCode);
+        dataArrarytmp.push(level);
+        listAccounts.push(dataArrarytmp);
+        function clearInput() {
+            $('#input_name').val("");
+            $('#AccountFinishDate').val("");
+            $('#input_blance').val("");
+            $('#input_productCode').val("");
+        }
+
+        $('#form_dangki').slideUp();
+        var dataTable = $("#MemberCardDatatable").dataTable();
+
+        if (dataTable != null) {
+            dataTable.fnDestroy();
+            initDatatable(listAccounts);
+            RefreshTable();
+        }
+        currentProcess = -1
+    });
+
+    //$('#btn_Cancel').on('click', function () {
+    //    if (document.getElementById("btn_Cancel").value == "2") {
+    //        $('#GiftCard').prop('checked', false);
+    //        $(".dangkitaikhoan").hide(500);
+    //    }
+    //    if (document.getElementById("btn_Cancel").value == "3") {
+    //        $('#MemberCard').prop('checked', false);
+    //        $(".dangkitaikhoan").hide(500);
+    //    }
+    //});
+    function clearInput() {
+        $('#input_name').val("");
+        $('#AccountFinishDate').val("");
+        $('#input_blance').val("");
+        $('#input_productCode').val("");
+
+    }
+
+    function removeType(type) {
+        for(var i = 0; i < comboboxTypes.length; i++) {
+            if(comboboxTypes[i].Value == type) {
+                comboboxTypes.splice(i, 1);
+            }
+        }
+
+        if(comboboxTypes.length == 0) {
+            $('#btnCreateAccount').attr('disabled', 'disabled');
+        }
+    }
+
+    $(document).on('click', '#btn-submit', function () {
+        var selecteditem = null;
+        if ($("#CreditCard").is(':checked')) {
+            selecteditem = $("#CreditCard").val();
+        } else {
+            selecteditem = '0';
+        }
+        if ($("#GiftCard").is(':checked')) {
+            selecteditem[1] = $("#GiftCard").val();
+        } else {
+            selecteditem[1] = '0';
+        }
+        if ($("#MemberCard").is(':checked')) {
+            selecteditem[2] = $("#MemberCard").val();
+        } else {
+            selecteditem[2] = '0';
+        }
+        $('input[name=membershipCardId]').val(cardId);
+        $('input[name=selectedtype]').val(selecteditem);
+        $('#editMembershipCardStype').submit();
+    });
+
+    // <----------- Create Account Modal ----------->
+
+    $('#btnCreateAccount').on('click', function () {
+        loadComboboxAccountType();
+        //var datetimeNow = $.now();
+        //var accountCode = datetimeNow + "";
+        var datetimeNow = moment();
+        var accountCode = datetimeNow.format("YYYYMMDDHHmmSSMS");
+        $("#accountCode_Create").val(accountCode);
+        $('#createAccountModal').modal('show');
+    });
+
+    $('#create-accountType').on('change', function () {
+        onChangeAccountTypeByValue($(this).val());
+    });
+
+    function loadComboboxAccountType() {
+        @*$.ajax({
+            type: 'POST',
+            url: '@Url.Action("GetAvailableMembershipType", "MembershipCard")',
+            data: { 'membershipCardId': @Model.membershipCard.Id },
+            success: function (result) {
+                $('#create-accountType').html("");
+                var content = "";
+                var value;
+                if (result.types.length > 0) {
+                    for (var i = 0; i < result.types.length; ++i) {
+                        content += "<option value='" + result.types[i].Value + "'>" + result.types[i].Text + "</option>";
+                    }
+                    value = "" + result.types[0].Value;
+                } else {
+                    content += "<option value='-1'>Không có dữ liệu</option>";
+                    value = -1;
+                }
+                $('#create-accountType').html(content);
+                $('#create-accountType').selectpicker('refresh');
+                onChangeAccountTypeByValue(value);
+            }
+        });*@
+
+        // MembershipCardTypeEnum
+        // 1: CreditCard
+        // 2: GiftCard
+        // 3: PointCard
+        //var creditExist = false;
+        //var pointExist = false;
+        //for (var i = 0; i < listAccounts.length; ++i) {
+        //    var type = listAccounts[i][8];
+        //    if (type == 1) {
+        //        creditExist = true;
+        //    } else if (type == 3) {
+        //        pointExist = true;
+        //    }
+        //}
+
+        $('#create-accountType').html("");
+        var content = "";
+        var value;
+        if (comboboxTypes.length > 0) {
+            for (var i = 0; i < comboboxTypes.length; ++i) {
+                content += "<option value='" + comboboxTypes[i].Value + "'>" + comboboxTypes[i].Name + "</option>";
+            }
+            value = "" + comboboxTypes[0].Value;
+        } else {
+            content += "<option value='-1'>Không có dữ liệu</option>";
+            value = -1;
+        }
+        $('#create-accountType').html(content);
+        $('#create-accountType').selectpicker('refresh');
+        onChangeAccountTypeByValue(value);
+    }
+
+    function onChangeAccountTypeByValue(value) {
+        $('#create-creditAccount').css("display", "none");
+        $('#create-giftAccount').css("display", "none");
+        $('#create-memberAccount').css("display", "none");
+
+        switch (value) {
+            case '1':
+                $('#create-creditAccount').css("display", "block");
+                break;
+            case '2':
+                $('#create-giftAccount').css("display", "block");
+                $('#create-ProductCode').val('');
+                $('#create-ProductCode').selectpicker('refresh');
+                break;
+            case '3':
+                $('#create-memberAccount').css("display", "block");
+                break;
+            default:
+        }
+    }
+
+
+    // create Account with modal
+
+    $('#CreateAccountBTN').on('click', function () {
+
+        //validate
+        var typeAccount = parseInt($('#create-accountType').val(), 10);
+
+        if ($('#create-accountName').val().trim() == '') {
+            ShowMessage("Vui lòng nhập tên sản phẩm", 1);
+            return;
+        }
+        //check credit
+        if (typeAccount == 1){
+            if ($('#create-credit-balance').val().trim() == '') {
+                ShowMessage("Vui lòng nhập tài khoản", 1);
+                return;
+            }
+            if (parseInt($("#create-credit-balance").val()) < 0) {
+                ShowMessage("Giá trị tài khoản phải lớn hơn hoặc bằng 0", 1);
+                return;
+            }
+        }
+        if (typeAccount == 2){
+            if ($('#create-gift-balance').val().trim() == '') {
+                ShowMessage("Vui lòng nhập giá trị tài khoản", 1);
+                return;
+            }
+            if (parseInt($("#create-gift-balance").val()) < 0) {
+                ShowMessage("Giá trị tài khoản không được âm", 1);
+                return;
+            }
+        }
+        if (typeAccount == 3){
+            if ($('#create-member-balance').val().trim() == '') {
+                ShowMessage("Vui lòng nhập tài khoản", 1);
+                return;
+            }
+            if (parseInt($("#create-member-balance").val()) < 0) {
+                ShowMessage("Giá trị điểm không được âm", 1);
+                return;
+            }
+        }
+        if ($('#AccountFinishDateCreate').val().trim() == '') {
+            ShowMessage("Xin chọn ngày kết thúc", 1);
+            return;
+        }
+        if (typeAccount == 2) {
+            if ($("#create-ProductCode").val() == '-1' || $("#create-ProductCode").val() == null) {
+                ShowMessage("Vui lòng chọn sản phẩm", 1);
+                return;
+            }
+        }
+        var productCode = "";
+        var productName = "";
+        var level = "";
+        var accountName = $('#create-accountName').val();
+        var finishDate = $('#AccountFinishDateCreate').val();
+        if (typeAccount == 1){
+            var balance = $('#create-credit-balance').val();
+            productName = "VNĐ";
+        } else if (typeAccount ==2){
+            var balance = $('#create-gift-balance').val();
+            productName = $('#create-ProductCode :selected').text();
+            var code = $('#create-ProductCode').val();
+            if (code != null || code == '-1') {
+                productCode = code;
+            }
+        } else if (typeAccount ==3){
+            var balance = $('#create-member-balance').val();
+            productName = "điểm";
+            level = $('#create-member-level').val();
+        }
+
+        var accountType = typeAccount;
+        var accountId = 0;
+        var active = 1;
+        var accountTypeName = "";
+        // get datetime now
+        //var datetimeNow = $.now();
+        //generatecode
+        //var accountCode = datetimeNow + "";
+        var datetimeNow = moment();
+        var accountCode = $("#accountCode_Create").val();
+        var dataArrarytmp = [];
+        var counttmp = listAccounts.length + 1;
+        //dataArrarytmp.push(counttmp);
+        //dataArrarytmp.push(accountCode);
+        //dataArrarytmp.push(accountName);
+        //dataArrarytmp.push(accountTypeName);
+        //dataArrarytmp.push(balance);
+        //dataArrarytmp.push(productCode);
+        //dataArrarytmp.push(active);
+        //dataArrarytmp.push(-1);
+        //dataArrarytmp.push(accountTypeId);
+        //dataArrarytmp.push(finishDate);
+        //dataArrarytmp.push(0);//client side
+
+        dataArrarytmp.push(counttmp);
+        dataArrarytmp.push(accountCode);
+        dataArrarytmp.push(accountName);
+        dataArrarytmp.push(accountType);
+        dataArrarytmp.push(balance);
+        dataArrarytmp.push(productName);
+        dataArrarytmp.push(moment().format("DD/MM/YYYY"));
+        dataArrarytmp.push(true);
+        dataArrarytmp.push(finishDate);
+        dataArrarytmp.push(productCode);
+        dataArrarytmp.push(level);
+        listAccounts.push(dataArrarytmp);
+        //$('#form_dangki').slideUp();
+        var dataTable = $("#MemberCardDatatable").dataTable();
+
+        if (dataTable != null) {
+            dataTable.fnDestroy();
+            initDatatable(listAccounts);
+            RefreshTable();
+        }
+
+        $('#createAccountModal').modal('hide');
+        clearInputModal();
+    });
+
+    function clearInputModal() {
+        $('#create-accountName').val("");
+        $('#create-credit-balance').val("");
+        $('#create-gift-balance').val("");
+        $('#create-member-balance').val("");
+        $('#AccountFinishDateCreate').val("");
+        $('#create-member-level').val("");
+        $('#create-ProductCode').val("-1");
+        $('#create-ProductCode').selectpicker('refresh');
+    }
+
+    $('#create-gift-balance').keydown(function (e) {
+        // Allow: backspace, delete, tab, escape and enter
+        if ($.inArray(e.keyCode, [8, 9, 27, 13, 127]) !== -1 ||
+            // Allow: Ctrl+A, Command+A
+            (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+            // Allow: home, end, left, right, down, up
+            (e.keyCode >= 35 && e.keyCode <= 40)) {
+            // let it happen, don't do anything
+            return;
+        }
+        // Ensure that it is a number and stop the keypress
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+            e.preventDefault();
+        }
+    });
+
+    function clearInputModal() {
+        $('#create-accountName').val("");
+        $('#create-credit-balance').val("");
+        $('#create-gift-balance').val("");
+        $('#create-member-balance').val("");
+        $('#AccountFinishDateCreate').val("");
+        $('#create-member-level').val("");
+        $('#create-ProductCode').val("-1");
+        $('#create-ProductCode').selectpicker('refresh');
+    }
+
+
+    // <--------- End Create Account Modal ---------->
+
+</script>

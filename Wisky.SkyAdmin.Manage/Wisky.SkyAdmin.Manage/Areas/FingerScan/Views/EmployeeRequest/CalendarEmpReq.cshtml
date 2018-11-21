@@ -1,0 +1,661 @@
+﻿@using HmsService.Models;
+@{
+    var current = CurrentStatusEnum.Current.DisplayName();
+    var past = CurrentStatusEnum.Past.DisplayName();
+    var future = CurrentStatusEnum.Future.DisplayName();
+
+    var comelate = StatusAttendance.ComeLate.DisplayName();
+    var Bothviolate = StatusAttendance.Bothviolate.DisplayName();
+    var Miss = StatusAttendance.Miss.DisplayName();
+    var OnTime = StatusAttendance.OnTime.DisplayName();
+    var ReturnEarly = StatusAttendance.ReturnEarly.DisplayName();
+    var empId = ViewBag.empId;
+    var empName = ViewBag.empName;
+}
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+
+    .mtab_content {
+        display: none;
+    }
+</style>
+<link href="~/Content/calendarResource/calendar.css" rel="stylesheet" />
+<div class="card">
+<div>
+<div class="card-header">
+    <div class="box-header p-b-0">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 id="title-shift-model">@empName - Chi tiết công việc trong tuần</h3>
+            </div>
+        </div>
+    </div>
+    <hr />
+</div>
+
+
+
+<div>
+    <div class="card-header">
+        <div class="row" style="margin-bottom: 10px">
+            <label style="margin-left:20px;"><i class="fa fa-tag" aria-hidden="true"></i> &nbsp;Chú thích:</label> <br> <br>
+            <div class="col-md-2"><label class="label label-default" style="font-size: small; margin-left: 20px; background-color: #5BC0DE;">A</label> : Ca tương lai</div>
+            <div class="col-md-2"><label class="label label-default" style="font-size: small; margin-left: 20px; background-color: #D9534F;">A</label> : Ca vắng</div>
+            <div class="col-md-2"><label class="label label-default" style="font-size: small; margin-left: 20px; background-color: #F0AD4E;">A</label> : Ca vi phạm</div>
+            <div class="col-md-2"><label class="label label-default" style="font-size: small; margin-left: 20px; background-color: #5CB85C;">A</label> : Ca chuẩn</div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+            </div>
+            <div class="col-md-6 pull-right p-0" style="margin-top:10px">
+                <div class="pull-right text-right myDatetimePicker">
+                    <div class="input-group">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="time-range-picker-calendar">
+                                    <input id="weeklyDatePicker" class="form-control text-center">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group-btn FindButtonDateTime">
+                            <a class="btn btn-primary btn-sm FindDateTime" id="btnSearchCalendar" style="margin-top: -5px;">
+                                <i class="left-icon fa fa-search"></i>  Tìm
+                            </a>
+                        </div>
+                    </div>
+                    <input type="text" id="sTimeCa" name="startTimeCalendar" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                    <input type="text" id="eTimeCa" name="endTimeCalendar" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-padding">
+        <header class="headings clearfix">
+            <div class="weekdays clearfix" style="padding-left: 10%;">
+                <div class="weekday heading">Monday</div>
+                <div class="weekday heading non-visible">Tuesday</div>
+                <div class="weekday heading non-visible">Wednesday</div>
+                <div class="weekday heading non-visible">Thursday</div>
+                <div class="weekday heading non-visible">Friday</div>
+                <div class="weekend heading non-visible">Saturday</div>
+                <div class="weekend heading">Sunday</div>
+            </div>
+        </header>
+        <div class="navigator clearfix">
+            <div class="col-xs-6 go-left"><a rel="nofollow" rel="noreferrer" href="" id="goLeft"><span class="glyphicon glyphicon-arrow-left"></span></a></div>
+            <div class="col-xs-6 go-right"><a rel="nofollow" rel="noreferrer" href="" id="goRight"><span class="glyphicon glyphicon-arrow-right"></span></a></div>
+        </div>
+        <div class="container-fluid cearfix" id="weekly_calendar">
+
+            <div class="columns clearfix dragscroll" style="overflow-y: scroll;height: 650px; cursor: grab; cursor : -o-grab; cursor : -moz-grab; cursor : -webkit-grab;">
+
+                <div class="hour-column clearfix">
+                    <div class="hour">
+                        <div class="hours">
+                            <div class="hr">12 Am</div>
+                            <div class="hr">1 Am</div>
+                            <div class="hr">2 Am</div>
+                            <div class="hr">3 Am</div>
+                            <div class="hr">4 Am</div>
+                            <div class="hr">5 Am</div>
+                            <div class="hr">6 Am</div>
+                            <div class="hr">7 Am</div>
+                            <div class="hr">8 Am</div>
+                            <div class="hr">9 Am</div>
+                            <div class="hr">10 Am</div>
+                            <div class="hr">11 Am</div>
+                            <div class="hr">12 Pm</div>
+                            <div class="hr">1 Pm</div>
+                            <div class="hr">2 Pm</div>
+                            <div class="hr">3 Pm</div>
+                            <div class="hr">4 Pm</div>
+                            <div class="hr">5 Pm</div>
+                            <div class="hr">6 Pm</div>
+                            <div class="hr">7 Pm</div>
+                            <div class="hr">8 Pm</div>
+                            <div class="hr">9 Pm</div>
+                            <div class="hr">10 Pm</div>
+                            <div class="hr">11 Pm</div>
+                            <div class="hr">All day</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="event-column clearfix">
+                    <div class="week-grid clearfix" style="top: 0px">
+                        <div class="hours-grid">
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                            <div class="grid"></div>
+                        </div>
+                    </div>
+                    <div class="events clearfix">
+                        <div class="event-outer clearfix" id="event-outer clearfix">
+                            <div class="event-cont" id="Monday"></div>
+                            <div class="event-cont" id="Tuesday"></div>
+                            <div class="event-cont non-visible" id="Wednesday"></div>
+                            <div class="event-cont non-visible" id="Thursday"></div>
+                            <div class="event-cont today non-visible" id="Friday"></div>
+                            <div class="event-cont non-visible" id="Saturday"></div>
+                            <div class="event-cont non-visible" id="Sunday"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+</div>
+</div>
+
+
+<!--Model container-->
+<input type="hidden" id="EmployeeId" />
+<!--Model container-->
+<div id="create-modal-container">
+    <div class="modal" id="create-edit-timeFrame-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="Title_Create_Edit">Thông tin ca</h4>
+                    </div>
+                    <div class="modal-body col-md-12">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Tên nhân viên : </label>
+                                    <label class="col-sm-8 control-label" id="NameEmp"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ bắt đầu : </label>
+                                    <label class="col-sm-8 control-label" id="HourOfStart"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ Kết thúc : </label>
+                                    <label class="col-sm-8 control-label" id="HourOfEnd"></label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Tình trạng ca : </label>
+                                    <label class="col-sm-8 control-label" id="Status"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ vào : </label>
+                                    <label class="col-sm-8 control-label" id="DateOfStart"></label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ ra : </label>
+                                    <label class="col-sm-8 control-label" id="DateOfEnd"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model xac nhan lai diem danh - Gio Vao -->
+<div id="request-modal-edit-container">
+    <div class="modal" id="request-modal-edit" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document" style="width:800px;">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Gửi yêu cầu xác nhận lại điểm danh</h4>
+                        <input type="hidden" id="attId" />
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Khung giờ vào</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="ShiftMin" name="CheckInRequest" placeholder="Khung giờ vào" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Khung giờ ra</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="ShiftMax" name="CheckInRequestNew" placeholder="Khung giờ ra" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ vào (Sys)</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckInSystem" name="CheckInRequest" placeholder="Giờ vào trên hệ thống" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ ra (Sys)</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckOutSystem" name="CheckInRequestNew" placeholder="Giờ ra trên hệ thống" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ vào đã gửi</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckInRequest" name="CheckInRequest" placeholder="Giờ vào đã gửi" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ vào mới</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckInRequestNew" name="CheckInRequestNew" placeholder="Giờ vào mới">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ vào ra gửi</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckOutRequest" name="CheckOutRequest" placeholder="Giờ ra đã gửi" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-md-4 control-label">Giờ ra mới</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="CheckOutRequestNew" name="CheckOutRequestNew" placeholder="Giờ ra mới">
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="submit" onclick="EditRequest()" class="btn btn-success btn-sm pull-right">Gửi yêu cầu</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model them lich-->
+<div id="create-modal-container2">
+    <div class="modal" id="create-attendance-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Thêm Lịch</h4>
+                    </div>
+                    <div class="modal-body col-md-12">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Thuộc nhóm</label>
+                                    <div class="col-sm-8">
+                                        <select id="listGroupIdInModalAddEmp" class="selectpicker" data-live-search="true" data-size="5" disabled="true"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Khung giờ</label>
+                                    <div class="col-sm-8">
+                                        <select id="listTimeFrameIdInModalAddEmp" class="selectpicker" data-live-search="true" data-size="5" onchange="reloadStart_End()"></select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Ngày phân công</label>
+                                    <div class="col-sm-8">
+                                        <div class="input-group date col-sm-12" id="datetimepicker_Start">
+                                            <input id="TimeFrameDateOfStart" type="text" class="input-group-addon form-control" style="text-align:left" />
+                                            <span class="input-group-addon myCerlenderSpan p-r-45" style="z-index: 0;">
+                                                <span class="fa fa-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @*luu duration de tinh endtime khi gui xuong controller*@
+                                    <input type="hidden" id="TimeFrameDurationCreateAtt" />
+
+                                    <label class="col-sm-4 control-label">Giờ bắt đầu</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="TimeFrameStartCreateAtt" name="TimeFrameStart" placeholder="Giờ bắt đầu ca" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Giờ Kết thúc</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="TimeFrameEndCreateAtt" name="TimeFrameEnd" placeholder="Giờ kết thúc ca" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Tổng thời gian</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control" id="totalTimeWork" name="TimeFrameDuration" placeholder="Tổng thời gian" readonly>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-4 control-label">Thời gian nghỉ</label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control " id="totalFreeTimeWork" name="TimeFrameDuration" placeholder="Thời gian giải lao" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="button" id="btnActionCreateAtt" onclick="createAttendance()" class="btn btn-success btn-sm pull-right">Hoàn Tất</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section scripts {
+    <script type="text/javascript" src="https://cdn.rawgit.com/asvd/dragscroll/master/dragscroll.js"></script>
+    <script>
+        
+        // chon loc ngày
+        function setupChooseDate() {
+            $('#chooseDayDiv').datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+
+            //initEmployeeDatatable();
+        }
+        // --- Load datatable
+        var flag = true;
+        $(document).ready(function () {
+            setupChooseDate();
+            loadCalendar();
+            $('#CheckInRequestNew').datetimepicker({
+                sideBySide: true,
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+
+            $('#CheckOutRequestNew').datetimepicker({
+                sideBySide: true,
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+
+            $('#datetimepicker').datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+            $('#datetimepicker_Start').datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+            setupDaterangepicker();
+            setupDaterangepicker2();
+           
+            
+            //calendar
+            moment.locale('en', {
+                week: { dow: 1 } // Monday is the first day of the week
+            });
+
+            //Initialize the datePicker(I have taken format as mm-dd-yyyy, you can     //have your owh)
+            $("#weeklyDatePicker").datetimepicker({
+                format: 'DD/MM/YYYY'
+            });
+            $("#weeklyDatePicker").val("Tuần này");
+            //Get the value of Start and End of Week
+            $('#weeklyDatePicker').on('dp.change', function (e) {
+                var value = $("#weeklyDatePicker").val();
+                var firstDate = moment(value, "DD/MM/YYYY").day(1).format("DD/MM/YYYY");
+                var lastDate = moment(value, "DD/MM/YYYY").day(7).format("DD/MM/YYYY");
+                $("#weeklyDatePicker").val(firstDate + " - " + lastDate);
+                $("#sTimeCa").val(firstDate);
+                $("#eTimeCa").val(lastDate);
+            });
+            loadCalendar();
+        });
+        //calendar
+
+        function setupDaterangepicker() {
+            cb(moment().startOf('day'), moment(), "Hôm nay");
+            $('#time-range-picker').daterangepicker({
+                "opens": "left",
+                "maxDate": moment(),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    'Hôm nay': [moment().startOf('day'), moment().endOf('day')],
+                    'Hôm qua': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
+                    'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                    'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+        }
+        function setupDaterangepicker2() {
+            cbcheck(moment().startOf('day'), moment(), "Hôm nay");
+            $('#time-range-picker-check').daterangepicker({
+                "opens": "left",
+                "maxDate": moment(),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    'Hôm nay': [moment().startOf('day'), moment().endOf('day')],
+                    'Hôm qua': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
+                    'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                    'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cbcheck);
+        }
+       
+
+       
+        $('#btnSearchCalendar').on('click', function () {
+            loadCalendar();
+
+        });
+
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+
+            $("#sTime").val(startTime);
+            $("#eTime").val(endTime);
+            $("#date-string").html(dateString);
+        }
+        function cbcheck(start, end, label) {
+            var startTimeCk = start.format("DD/MM/YYYY"),
+                endTimeCk = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTimeCk + (startTimeCk == endTimeCk ? "" : " - " + endTimeCk) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string-check').val(label);
+            } else {
+                $("#date-string-check").val(dateString);
+            }
+
+            $("#sTimeCheck").val(startTimeCk);
+            $("#eTimeCheck").val(endTimeCk);
+            $("#date-string-check").html(dateString);
+        }
+
+        //-------------------Datatable------------------
+        // Calendar view/////////////////////////////////////////////////////////
+
+        function loadCalendar() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("LoadCalendarAttendance", "EmployeeRequest")',
+                data: {
+                    'empId': @empId,
+                    'startTime': $('#sTimeCa').val(),
+                    'endTime': $('#eTimeCa').val(),
+                },
+
+                success: function (result) {
+                    $(".remove").remove();
+                    addCalendar(result.rs);
+                }
+            });
+        }
+
+        function addCalendar(data) {
+            if (data.length > 0) {
+                for (i = 0; i < data.length; ++i) {
+                    var div = document.createElement('div');
+                    div.className = 'event-cont remove';
+                    for (j = 0; j < data[i].timeslot.length; ++j) {
+                        var a ="";
+                        var b ="";
+
+                        if (data[i].timeslot[j].Late != null) {
+                            a = '<label style="margin-left: 5px;" class="label label-danger">Đi trễ</label>'
+                        }
+                        if (data[i].timeslot[j].LeaveEarly != null) {
+                            b = '<label style="margin-left: 5px;" class="label label-primary">Về sớm</label>'
+                        }
+                        div.innerHTML += '<div onclick="ShowSlotModal(' + data[i].timeslot[j].idAttendance + ')" class="event" data-duration="' + data[i].timeslot[j].duration + '" data-start="' + data[i].timeslot[j].startHour + '" style="background: ' + data[i].timeslot[j].color + '">' + a + b +'</br><p style="padding-top: 10px;">' + data[i].timeslot[j].status + '</p></div>';
+                    }
+                    document.getElementById(data[i].date).appendChild(div);
+                }
+
+            }
+            $('.event').each(function () {
+                var $this = $(this);
+                var h = $this.attr('data-duration');
+                var pos = $this.attr('data-start');
+                $this.css({
+                    'height': h * 60,
+                    'top': pos * 60,
+                    'width' : "700%",
+                });
+            });
+
+            $(window).resize(function () {
+                if ($(window).width() < '650') {
+                    $('.event-column').css('margin-left', "60px");
+                } else {
+                    $('.event-column').css('margin-left', "0");
+                    $('.event-column').css('left', '0')
+                }
+            });
+
+
+            if ($(window).width() < '650') {
+                $('.event-column').css('margin-left', "60px");
+            }
+
+            $("#goRight").click(function (event) {
+                event.preventDefault();
+                var left = $('.event-column').css('left');
+                var leftVal = parseInt(left.replace("px", ""));
+                if (leftVal === 0) {
+                    $('.event-column').css('left', "-114px");
+                } else if (leftVal > '-570') {
+                    var newPos = (leftVal - 114);
+                    $('.event-column').css({
+                        left: newPos + 'px'
+                    });
+                }
+                $("#goLeft").css("opacity", "1");
+            });
+
+            $("#goLeft").click(function (event) {
+                event.preventDefault();
+
+                var left = $('.event-column').css('left');
+                var leftVal = parseInt(left.replace("px", ""));
+                if (leftVal === 0) {
+                    event.preventDefault();
+                } else if (leftVal >= '-684') {
+                    var newPos = (leftVal + 114);
+                    $('.event-column').css({
+                        left: newPos + 'px'
+                    });
+                }
+                $("#goLeft").css("opacity", "1");
+            });
+        }
+
+        //thong tin của ca
+        function ShowSlotModal(data) {
+            //$('#create-edit-timeFrame-modal').modal('show');
+            if (data != 0) {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("DetailsAttendance", "EmployeeRequest")',
+                    data: {
+                        id: data
+                    },
+                    success: function (result) {
+                        $('#create-edit-timeFrame-modal').modal('show');
+                        document.getElementById('NameEmp').innerHTML = result.Name;
+                        document.getElementById('DateOfStart').innerHTML = result.StartTime;
+                        document.getElementById('DateOfEnd').innerHTML = result.EndTime;
+                        document.getElementById('Status').innerHTML = result.Status;
+                        document.getElementById('HourOfStart').innerHTML = result.StartHour;
+                        document.getElementById('HourOfEnd').innerHTML = result.EndHour;
+
+                    },
+                    error: function (error) {
+                        ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                    }
+                });
+            }
+
+        }
+        
+    </script>
+}

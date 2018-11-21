@@ -1,0 +1,734 @@
+﻿
+@{
+    ViewBag.Title = "Báo cáo so sánh";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Báo cáo so sánh theo cửa hàng
+                </h3>
+                <h5 data-role="small-date"></h5>
+            </div>
+            <div class="col-md-6">
+                <div style="text-align: right">
+                    <button type="submit" id="exportAllStoreGroup" class="btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-padding">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="col-md-6" style="padding-left: 0px;">
+                    <label class="control-label col-md-3 row">Chọn loại :</label>
+                    <input type="hidden" value="loadStores" id="filterStoreType" />
+                    <div id="checkproduct" class="group-radio-buttons col-md-9 row">
+                        <div class="toggle-switch col-md-6 m-y-10">
+                            <input name="mapping1" id="activeMapping" type="radio" class="nice-check" checked value="loadStores" />
+                            <label for="activeMapping" class="ts-label"><span>Cửa hàng</span></label>
+                        </div>
+                        <div class="toggle-switch col-md-6 m-y-10">
+                            <input name="mapping1" id="deActiveMapping" type="radio" class="nice-check" value="loadStoreGroups" />
+                            <label for="deActiveMapping" class="ts-label"><span>Nhóm cửa hàng</span></label>
+                        </div>
+                    </div>
+
+                    @*<div class="form-group">
+                            <select class="selectpicker" id="filterStoreType">
+                                <option value="loadStores" selected>Cửa hàng</option>
+                                <option value="loadStoreGroups">Nhóm cửa hàng</option>
+                            </select>
+                        </div>*@
+                </div>
+                @*<div class="col-md-3">
+                    <div class="form-group">
+                        <div id="filterStoreTypeItem-container">
+                            <select class="selectpicker" id="filterStoreTypeItem" title="Chọn cửa hàng" data-max-options="3" data-max-options-text='["Bạn chỉ được chọn tối đa 3 mục", "Bạn chỉ được chọn tối đa 3 mục"]' multiple></select>
+                        </div>
+                    </div>
+                </div>*@
+                <div class="col-md-5 col-md-offset-1" style="padding-right: 0px;">
+                    <form id="form-create-session" class="form-inline">
+                        <label class="control-label p-t-10">Chọn thời gian:</label>
+                        <div class="input-group pull-right">
+                            <div class="dateTime width230 pull-right">
+                                <div class="fg-line m-t-5">
+                                    <div id="reportrange">
+                                        <input id="date-string" readonly class="form-control text-center">
+                                        <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="input-group-btn FindButtonDateTime">
+                                    <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                                        <i class="left-icon fa fa-search"></i> Tìm
+                                    </a>
+                                </div>*@
+                        </div>
+                        <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                        <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row m-y-25">
+            <div class="col-md-4">
+                <div class="form-group row">
+                    <label class="control-label col-md-12">Cửa hàng 1:</label>
+                    <div class="col-md-9 filterStoreTypeItem-container">
+                        <select id="store1" title="Chọn cửa hàng 1" class="selectpicker" data-live-search="true"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group row">
+                    <label class="control-label col-md-12">Cửa hàng 2:</label>
+                    <div class="col-md-9 filterStoreTypeItem-container">
+                        <select id="store2" title="Chọn cửa hàng 2" class="selectpicker" data-live-search="true"></select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group row">
+                    <label class="control-label col-md-12">Cửa hàng 3:</label>
+                    <div class="col-md-9 filterStoreTypeItem-container">
+                        <select id="store3" title="Chọn cửa hàng 3" class="selectpicker" data-live-search="true"></select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row" style="margin-bottom: 10px; margin-top:10px">
+            <div class="col-md-2">
+                <button type="button" data-status="hide" id="btnChart" class="btn btn-primary btn-sm" style="width: 150px;">
+                    <i class="fa fa-plus"></i>
+                    Hiển thị biểu đồ
+                </button>
+            </div>
+            <div class="col-md-10 form-horizontal hidden">
+                <div class="form-group" style="float:right; width:35%">
+                    <label class="control-label col-md-3">So sánh: </label>
+                    <div class="col-md-9">
+                        <select id="filterSaleType" class="selectpicker">
+                            <option value="after">Sau khi giảm giá</option>
+                            <option value="before">Trước khi giảm giá</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12" id="containerWrapper" style="display:none">
+                <div id="container" style="width:100%; height:300px"></div>
+            </div>
+        </div>
+
+        <div id="datatable">
+            <table id="groups-table" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label>STT</label>
+                        </th>
+                        <th>
+                            <label>Ngày</label>
+                        </th>
+                        <th>
+                            <label>Cửa hàng</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+
+    </div>
+    <form class="hidden" id="formReportExcel" action="@Url.Action("ExportExcelGroupReport","ComparisonReport")">
+        <input type="hidden" name="startTime" />
+        <input type="hidden" name="endTime" />
+        <input type="hidden" name="selectedItems" />
+        <input type="hidden" name="printStore" />
+    </form>
+</div>
+<script>
+    var storesData;
+    var storeGroupsData;
+    var storesCbxContent = "";
+    var groupsCbxContent = "";
+
+    var selectedItems;
+    var isLoadStore = true;
+
+    $('#exportAllStoreGroup').on('click', null, function () {
+        if (selectedItems != null && selectedItems.length > 0) {
+            $('[name=startTime]').val($('#sTime').val());
+            $('[name=endTime]').val($('#eTime').val());
+
+            var items = JSON.stringify(selectedItems);
+            $('[name=selectedItems]').val(items);
+            $('[name=printStore]').val(isLoadStore);
+            $('#formReportExcel').submit();
+        } else {
+            ShowMessage("Xin chọn cửa hàng trước khi xuất file excel", 2);
+        }
+    });
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker({
+            size: 10,
+        });
+
+        setupDaterangepicker();
+        loadComboboxStores();
+        loadComboboxStoreGroups();
+        initEmptyDatatable();
+    });
+
+    //Radio groups change
+    $('#activeMapping').on('change', function () {
+        //$("#filterStoreTypeItem").html(storesCbxContent);
+        //$('#filterStoreTypeItem').selectpicker({ title: 'Chọn cửa hàng' }).selectpicker('render');
+        //$("#filterStoreTypeItem").selectpicker('refresh');
+        $('#store1').html(storesCbxContent);
+        $('#store2').html(storesCbxContent);
+        $('#store3').html(storesCbxContent);
+        $('#store1').selectpicker({ title: 'Chọn cửa hàng 1' }).selectpicker('render');
+        $('#store2').selectpicker({ title: 'Chọn cửa hàng 2' }).selectpicker('render');
+        $('#store3').selectpicker({ title: 'Chọn cửa hàng 3' }).selectpicker('render');
+        $('#store1').selectpicker('refresh');
+        $('#store2').selectpicker('refresh');
+        $('#store3').selectpicker('refresh');
+        $('#filterStoreType').val($('#activeMapping').val());
+    });
+
+    $('#deActiveMapping').on('change', function () {
+        //$('#filterStoreTypeItem').html(groupsCbxContent);
+        //$('#filterStoreTypeItem').selectpicker({ title: 'Chọn nhóm cửa hàng' }).selectpicker('render');
+        //$('#filterStoreTypeItem').selectpicker('refresh');
+        $('#store1').html(groupsCbxContent);
+        $('#store2').html(groupsCbxContent);
+        $('#store3').html(groupsCbxContent);
+        $('#store1').selectpicker({ title: 'Chọn nhóm cửa hàng 1' }).selectpicker('render');
+        $('#store2').selectpicker({ title: 'Chọn nhóm cửa hàng 2' }).selectpicker('render');
+        $('#store3').selectpicker({ title: 'Chọn nhóm cửa hàng 3' }).selectpicker('render');
+        $('#store1').selectpicker('refresh');
+        $('#store2').selectpicker('refresh');
+        $('#store3').selectpicker('refresh');
+        $('#filterStoreType').val($('#deActiveMapping').val());
+    });
+
+    $('#filterSaleType').on('change', function () {
+        if (storesData != null && isLoadStore) {
+            changeDisplayColumns($(this).val(), 'store', storesData.datatable.itemList.length);
+            loadChart(storesData.datachart, $(this).val(), 'BIỂU ĐỒ DOANH THU THEO CỬA HÀNG');
+        }
+        else if (storeGroupsData != null) {
+            changeDisplayColumns($(this).val(), 'storeGroup', storeGroupsData.datatable.itemList.length);
+            loadChart(storeGroupsData.datachart, $(this).val(), 'BIỂU ĐỒ DOANH THU THEO NHÓM CỬA HÀNG');
+        }
+    });
+
+    //$('#filterStoreType').on('change', function () {
+    //    if ($(this).val() == 'loadStores') {
+    //        $("#filterStoreTypeItem").html(storesCbxContent);
+    //        $('#filterStoreTypeItem').selectpicker({ title: 'Chọn cửa hàng' }).selectpicker('render');
+    //        $("#filterStoreTypeItem").selectpicker('refresh');
+    //    } else if ($(this).val() == 'loadStoreGroups') {
+    //        $("#filterStoreTypeItem").html(groupsCbxContent);
+    //        $('#filterStoreTypeItem').selectpicker({ title: 'Chọn nhóm cửa hàng' }).selectpicker('render');
+    //        $("#filterStoreTypeItem").selectpicker('refresh');
+    //    }
+    //});
+
+    $('#btnChart').click(function () {
+        var status = $(this).data('status');
+        if ($.trim($('#container').html()).length > 0) {
+            if (status == 'show') {
+                $(this).html('<i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                $(this).data('status', 'hide');
+            } else {
+                $(this).html('<i class="fa fa-minus"></i> Ẩn biểu đồ');
+                $(this).data('status', 'show');
+            }
+            $('#containerWrapper').stop().slideToggle();
+        } else {
+            ShowMessage("Xin chọn cửa hàng trước khi xem biểu đồ", 3);
+        }
+    });
+
+    //function LoadDataOnChange() {
+    //    var items = $("#filterStoreTypeItem").val();
+    //    if (items != null) {
+    //        if (items.length >= 2) {
+    //            selectedItems = items;
+    //            if ($("#filterStoreType").val() == "loadStores") {
+    //                loadStoreReport();
+    //                isLoadStore = true;
+    //            } else {
+    //                loadStoreGroupReport();
+    //                isLoadStore = false;
+    //            }
+
+    //            $("#filterSaleType").val($("#filterSaleType option:first").val());
+    //            $("#filterSaleType").selectpicker('refresh');
+    //        }
+    //    }
+    //}
+
+    function LoadDataOnChange() {
+        var items = [];
+        if ($('#store1').val() != null && $('#store1').val() != "") {
+            items.push($('#store1').val());
+        }
+        if ($('#store2').val() != null && $('#store2').val() != "") {
+            items.push($('#store2').val());
+        }
+        if ($('#store3').val() != null && $('#store3').val() != "") {
+            items.push($('#store3').val());
+        }
+        if (items.length >= 1) {
+            selectedItems = items;
+            if ($("#filterStoreType").val() == "loadStores") {
+                loadStoreReport();
+                isLoadStore = true;
+            } else {
+                loadStoreGroupReport();
+                isLoadStore = false;
+            }
+
+            $("#filterSaleType").val($("#filterSaleType option:first").val());
+            $("#filterSaleType").selectpicker('refresh');
+        }
+    }
+
+    $(".filterStoreTypeItem-container").on("hide.bs.dropdown", function () {
+        LoadDataOnChange();
+    });
+
+    function loadComboboxStores() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GetAllStores", "ComparisonReport")',
+            success: function (result) {
+                if (result.success) {
+                    for (var i = 0; i < result.list.length; ++i) {
+                        storesCbxContent += "<option value='" + result.list[i].Value + "'>" + result.list[i].Text + "</option>";
+                    }
+                    //$("#filterStoreTypeItem").html(storesCbxContent);
+                    $("#store1").html(storesCbxContent);
+                    $("#store2").html(storesCbxContent);
+                    $("#store3").html(storesCbxContent);
+                    //$("#filterStoreTypeItem").selectpicker('refresh');
+                    $("#store1").selectpicker('refresh');
+                    $("#store2").selectpicker('refresh');
+                    $("#store3").selectpicker('refresh');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    };
+
+    function loadComboboxStoreGroups() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GetAllStoreGroups", "ComparisonReport")',
+            success: function (result) {
+                if (result.success) {
+                    //var content = "";
+                    for (var i = 0; i < result.list.length; ++i) {
+                        groupsCbxContent += "<option value='" + result.list[i].Value + "'>" + result.list[i].Text + "</option>";
+                    }
+                    //$("#filterStoreTypeItem").html(groupsCbxContent);
+                    //$("#filterStoreTypeItem").selectpicker('refresh');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    };
+
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+
+        $("#sTime").val(startTime);
+        $("#eTime").val(endTime);
+        $("#dateRange").html(dateString);
+        LoadDataOnChange();
+    };
+
+    function setupDaterangepicker() {
+        cb(moment().startOf('month'), moment().add(0, 'days'), "Tháng này");
+        $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'), "Tháng này");
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+    };
+
+    function RefreshTable() {
+        var oTable = $("#groups-table").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+
+    function changeDisplayColumns(type, storeType, itemLength) {
+        var skippingCol = 2;
+        var isTotalDisplay = false;
+
+        var groupHeader = "<label>";
+        groupHeader += storeType == 'store' ? "Cửa hàng " : "Nhóm cửa hàng ";
+        if (type == 'before') {
+            isTotalDisplay = true;
+            groupHeader += "(Trước khi giảm giá)";
+        } else {
+            isTotalDisplay = false;
+            groupHeader += "(Sau khi giảm giá)";
+        }
+        $('#groupHeader').html(groupHeader + "</label>");
+
+
+        for (var i = 0; i < itemLength ; ++i) {
+            var totalCol = $("#groups-table").dataTable().api().column(i + skippingCol);
+            totalCol.visible(isTotalDisplay);
+
+            var finalCol = $("#groups-table").dataTable().api().column(i + skippingCol + itemLength);
+            finalCol.visible(!isTotalDisplay);
+        }
+    }
+
+    $('#btnSearch').on('click', function () {
+        if ($("#eTime").val().length > 16 || $("#sTime").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+
+        if ($("#filterStoreType").val() == "loadStores") {
+            loadStoreReport();
+        } else {
+            loadStoreGroupReport();
+        }
+    });
+
+    function loadStoreGroupReport() {
+        var selectedGroups = JSON.stringify(selectedItems);
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("StoreGroupsComparisonReport", "ComparisonReport")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'selectedGroups': selectedGroups },
+            success: function (result) {
+                if (result.success) {
+                    storeGroupsData = result;
+
+                    createTableHeader(result.datatable.itemList, 'storeGroup');
+                    initDatatable(result.datatable);
+
+                    loadChart(result.datachart, 'after', 'BIỂU ĐỒ DOANH THU THEO NHÓM CỬA HÀNG');
+
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra, xin vui lòng thử lại.", 1);
+            }
+        });
+    }
+
+    function loadStoreReport() {
+        var selectedStores = JSON.stringify(selectedItems);
+        $.ajax({
+            type: 'GET',
+            url: '@this.Url.Action("StoresComparisonReport")',
+            //contentType: "application/json; charset=utf-8",
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'selectedStores': selectedStores },
+            success: function (result) {
+                if (result.success == true) {
+                    storesData = result;
+
+                    createTableHeader(result.datatable.itemList, 'store');
+                    initDatatable(result.datatable);
+
+                    loadChart(result.datachart, 'after', 'BIỂU ĐỒ DOANH THU THEO CỬA HÀNG');
+                }
+                else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra, xin vui lòng thử lại.", 1);
+            }
+        });
+    }
+
+    function createTableHeader(data, storeType) {
+        $("#groups-table").dataTable().fnDestroy();
+        var str = "";
+        //TODO: chuyển label cho 3 selectpicker
+        if (storeType == 'store') {
+            str = "Cửa hàng";
+        } else {
+            str = "Nhóm cửa hàng";
+        }
+
+        var datatableHtml = "<thead><tr>";
+        datatableHtml += "<th rowspan='2'><label>STT</label></th>";
+        datatableHtml += "<th rowspan='2'><label>Ngày</label></th>";
+        //datatableHtml += "<th id='groupHeader' colspan='" + (data.length * 2) + "'><label>"
+        //    + str + " (Trước khi giảm giá)</label></th></tr><tr>";
+        datatableHtml += "<th id='groupHeader' colspan='" + (data.length) + "'><label>"
+            + str + " (Trước khi giảm giá)</label></th>";
+        datatableHtml += "<th id='groupHeader' colspan='" + (data.length) + "'><label>"
+            + str + " (Sau khi giảm giá)</label></th>";
+        datatableHtml += "<th id='orderHeader' colspan='" + (data.length) + "'><label>Tổng hóa đơn</label></th></tr><tr>";;
+
+        var groupHeaders = "";
+        for (var i = 0; i < data.length; ++i) {
+            groupHeaders += "<th><label>" + data[i] + "</label></th>";
+        }
+        datatableHtml += groupHeaders + groupHeaders + groupHeaders;
+        datatableHtml += "</tr></thead><tbody></tbody>";
+
+        $("#groups-table").html(datatableHtml);
+    }
+
+    function initEmptyDatatable() {
+        dataSet = [];
+        $("#groups-table").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": dataSet,
+            "ordering": true,
+            "iDisplayLength": 10,
+            "aLengthMenu": [10, 50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm ",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "bAutoWidth": true
+        });
+    }
+
+    function initDatatable(datatable) {
+        var columnDefs = [];
+        var numOfItems = datatable.itemList.length;
+
+        columnDefs.push({
+            "aTargets": [0, 1],
+            "bSortable": false,
+            "sClass": "text-center",
+        });
+
+        var startColumn = 2;
+        var endColumn = (numOfItems * 3) + 2;
+        var leftMiddle = startColumn + numOfItems;
+        var rightMiddle = leftMiddle + numOfItems;
+
+        for (var i = startColumn; i < endColumn; ++i) {
+            // < leftMiddle là cột totalAmount, < rightMiddle là cột finalAmount, còn lại là cột orderTotal
+            if (i < leftMiddle) {
+                columnDefs.push({
+                    "aTargets": [i],
+                    "mRender": function (data, type, row) {
+                        var amount = toMoney(data, ',', ' VNĐ');
+                        var maxAmount = row[endColumn];
+                        var content = amount;
+
+                        if (data == maxAmount && maxAmount > 0) {
+                            content = "<b style='color: green'>" + amount + "</b>";
+                        }
+
+                        return content;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center",
+                    "visible": false
+                });
+            } else if (i < rightMiddle) {
+                columnDefs.push({
+                    "aTargets": [i],
+                    "mRender": function (data, type, row) {
+                        var amount = toMoney(data, ',', ' VNĐ');
+                        var maxAmount = row[endColumn + 1];
+                        var content = amount;
+
+                        if (data == maxAmount && maxAmount > 0) {
+                            content = "<b style='color: green'>" + amount + "</b>";
+                        }
+
+                        return content;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                });
+            } else {
+                columnDefs.push({
+                    "aTargets": [i],
+                    "mRender": function (data, type, row) {
+                        var amount = data;
+                        var maxAmount = row[endColumn + 2];
+                        var content = amount;
+
+                        if (data == maxAmount && maxAmount > 0) {
+                            content = "<b style='color: green'>" + amount + "</b>";
+                        }
+
+                        return content;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                });
+            }
+        }
+
+        $("#groups-table").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": datatable.data,
+            "ordering": true,
+            "iDisplayLength": 10,
+            "aLengthMenu": [10, 50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm ",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": columnDefs,
+            "bAutoWidth": true
+        });
+    };
+
+
+    //-------------
+    //- LINE CHART -
+    //--------------
+
+    function loadChart(dataChart, type, title) {
+        var seriesOptions = [];
+        var subTitle;
+
+        if (type == 'before') {
+            $.each(dataChart.itemList, function (i, name) {
+                seriesOptions[i] = {
+                    name: dataChart.itemList[i],
+                    data: dataChart.revenueList[i].totalList,
+                };
+            });
+            subTitle = "(Trước khi giảm giá)";
+        } else {
+            $.each(dataChart.itemList, function (i, name) {
+                seriesOptions[i] = {
+                    name: dataChart.itemList[i],
+                    data: dataChart.revenueList[i].finalList,
+                };
+            });
+            subTitle = "(Sau khi giảm giá)";
+        }
+
+        $('#container').highcharts({
+            chart: {
+                style: {
+                    fontFamily: 'Arial'
+                }
+            },
+            title: {
+                text: title,
+                x: -20
+            },
+            subtitle: {
+                text: subTitle,
+                x: -20
+            },
+            xAxis: {
+                categories: dataChart.dateList
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh Thu'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ' VNĐ'
+            },
+            legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'bottom',
+                borderWidth: 0
+            },
+            series: seriesOptions
+        });
+    };
+</script>
+<style>
+    .highcharts-container {
+        width: 100% !important;
+    }
+
+    .table {
+        width: 100% !important;
+    }
+
+    .control-label {
+        font-weight: 600;
+        font-size: 14px;
+        padding-top: 15px;
+    }
+</style>

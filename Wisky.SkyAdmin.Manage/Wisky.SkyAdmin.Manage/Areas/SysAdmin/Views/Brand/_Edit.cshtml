@@ -1,0 +1,134 @@
+﻿@model HmsService.ViewModels.BrandViewModel
+
+@{
+    Layout = null;
+}
+
+<div class="modal-dialog">
+    <form id="editBrandForm" method="post">
+        <div class="modal-content">
+            @Html.ValidationSummary()
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3>Chỉnh sửa nhãn hiệu</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px; margin-top:12px; padding-top:20px; padding-bottom:22px;">
+                        @Html.HiddenFor(q => q.Id)
+                        @Html.HiddenFor(q => q.CreateDate)
+                        @Html.HiddenFor(q => q.Active)
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-1" for="BrandName">Tên nhãn hiệu<span style="color:red"></span></label>
+                            <div class="col-md-7">
+                                @Html.TextBoxFor(q => q.BrandName, new { id = "BrandName", @class = "form-control fg-line", placeholder = "Nhập nhãn hiệu", required = "required" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-1" for="Description">Mô tả<span style="color:red"></span></label>
+                            <div class="col-md-7">
+                                @Html.TextAreaFor(q => q.Description, new { id = "Description", @class = "form-control fg-line", placeholder = "Mô tả nhãn hiệu" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-1" for="Website">Trang chủ<span style="color:red"></span></label>
+                            <div class="col-md-7">
+                                @Html.TextAreaFor(q => q.Website, new { id = "Website", @class = "form-control fg-line", placeholder = "Trang chủ" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-1" for="CompanyName">Tên công ty<span style="color:red"></span></label>
+                            <div class="col-md-7">
+                                @Html.TextBoxFor(q => q.CompanyName, new { id = "CompanyName", @class = "form-control fg-line", placeholder = "Tên công ty" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-1" for="CompanyName">Fax<span style="color:red"></span></label>
+                            <div class="col-md-7">
+                                @Html.TextBoxFor(q => q.Fax, new { id = "Fax", @class = "form-control fg-line", maxlength = "12", placeholder = "Fax", oninput = "correctPhoneAndFax(this)" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-1" for="ContactPerson">Người liên hệ<span style="color:red"></span></label>
+                            <div class="col-md-7">
+                                @Html.TextBoxFor(q => q.ContactPerson, new { id = "ContactPerson", @class = "form-control fg-line", placeholder = "Người liên hệ" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-1" for="PhoneNumber">Số điện thoại<span style="color:red"></span></label>
+                            <div class="col-md-7">
+                                @Html.TextBoxFor(q => q.PhoneNumber, new { id = "PhoneNumber", @class = "form-control fg-line", placeholder = "Số điện thoại", maxlength = "12", oninput = "correctPhoneAndFax(this)" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                <button type="button" onclick="validate()" class="btn btn-primary">Cập nhật</button>
+            </div>
+
+        </div>
+    </form>
+</div>
+<script>
+
+    //autocorrect phone, fax number field
+    function correctPhoneAndFax(input) {
+        var num = $(input).val().replace(/[^\d]/g, '');
+        num = num.replace(/^00/, '0');
+
+        $(input).val(num);
+    }
+
+    function validate() {
+
+        if ($('#BrandName').val() == "") {
+            ShowMessage("Tên nhãn hiệu không được để trống", 3);
+            //swal({ title: "Tên nhãn hiệu không được để trống", text: "Vui lòng bổ sung", timer: 2500, type: "error" });
+            return;
+        }
+
+        if ($('#ContactPerson').val() == "") {
+            ShowMessage("Người liên hệ không được để trống", 3);
+            //swal({ title: "Người liên hệ không được để trống", text: "Vui lòng bổ sung", timer: 2500, type: "error" });
+            return;
+        }
+
+        var phoneNumber = $("#PhoneNumber").val();
+        if (phoneNumber == "") {
+            ShowMessage("Số điện thoại không được bỏ trống", 3);
+            return;
+        } else if (!phoneNumber.match(/^([0-9]{10,12})$/)) {
+            ShowMessage("Số điện thoại không không hợp lệ", 3);
+            return;
+        }
+
+        editBrand();
+    }
+
+    function editBrand() {
+        var formData = $('#editBrandForm').serialize();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Edit", "Brand")',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    $('#editBrandModal').modal('hide');
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').remove();
+
+                    ShowMessage(result.message, 2);
+                    RefreshTable();
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (error) {
+                ShowAlert("Error happened", 1);
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,1503 @@
+﻿@using HmsService.Models
+@{
+    ViewBag.Title = "List Cash Payment";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var stores = ViewBag.Stores;
+    //Dictionary<string, double> paymentChart = ViewBag.PaymentChart;
+    var storeId = 0;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+    var brandId = 0;
+    if (ViewContext.RouteData.Values["brandId"] != null)
+    {
+        brandId = int.Parse(ViewContext.RouteData.Values["brandId"]?.ToString());
+    }
+    var tmp = Enum.GetValues(typeof(PaymentTypeEnum)).Cast<PaymentTypeEnum>();
+}
+
+<style>
+    .smallDate {
+        color: black;
+    }
+
+    .chartOption {
+        cursor: pointer;
+    }
+
+    .widget-header {
+        cursor: pointer;
+    }
+
+    .infobox {
+        height: 100px !important;
+    }
+
+    .chartOptionActive {
+        font-weight: bold;
+    }
+
+    #storePieChart {
+        margin-top: 80px;
+    }
+
+    /*  bhoechie tab */
+    div.bhoechie-tab-container {
+        z-index: 10;
+        background-color: #ffffff;
+        padding: 0;
+        border-radius: 4px;
+        -moz-border-radius: 4px;
+        /*border: 1px solid #ddd;*/
+        -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        -moz-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        background-clip: padding-box;
+        opacity: 0.97;
+        filter: alpha(opacity=97);
+    }
+
+    div.bhoechie-tab-menu {
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
+        background-color: rgba(44, 73, 73, 1);
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+    }
+
+    a.list-group-item {
+        color: #ffffff !important;
+        background-color: rgba(44, 73, 73, 1) !important;
+        border: 0 !important;
+    }
+
+        a.list-group-item:hover,
+        button.list-group-item:hover,
+        a.list-group-item:focus,
+        button.list-group-item:focus {
+            text-decoration: none !important;
+            color: #ffffff !important;
+            background-color: rgba(44, 73, 73, 1) !important;
+        }
+
+    .no-padding {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .bhoechie-tab-menu .list-group {
+        margin-bottom: 0;
+        /*border: 0;*/
+    }
+
+        .bhoechie-tab-menu .list-group li {
+            width: 25%;
+        }
+
+        .bhoechie-tab-menu .list-group a {
+            margin-bottom: 0;
+        }
+
+            .bhoechie-tab-menu .list-group a .glyphicon,
+            .bhoechie-tab-menu .list-group a .fa {
+                color: #fff;
+            }
+
+            .bhoechie-tab-menu .list-group a:first-child {
+                border-radius: 0;
+                -moz-border-radius: 0;
+            }
+
+            /*.bhoechie-tab-menu .list-group  a:last-child {
+            border-bottom-right-radius: 0;
+            -moz-border-bottom-right-radius: 0;
+        }*/
+
+            .bhoechie-tab-menu .list-group a.active,
+            .bhoechie-tab-menu .list-group a.active .glyphicon,
+            .bhoechie-tab-menu .list-group a.active .fa {
+                background-color: #fff !important;
+                color: rgba(44, 73, 73, 1) !important;
+            }
+
+                .bhoechie-tab-menu .list-group a.active:after {
+                    content: '';
+                    position: absolute;
+                    top: 100%;
+                    margin-left: -44px;
+                    /* border-left: 0; */
+                    border-right: 13px solid transparent;
+                    border-left: 13px solid transparent;
+                    border-top: 10px solid rgba(44, 73, 73, 1);
+                }
+
+    div.bhoechie-tab-content {
+        background-color: #ffffff;
+        /* border: 1px solid #eeeeee; */
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+
+    a.list-group-item,
+    button.list-group-item {
+        color: #fff;
+    }
+
+    /*div.bhoechie-tab-content > .col-lg-6, .col-md-6 {
+        padding-top: 50px;
+    }
+
+    div.bhoechie-tab-content > .col-sm-12, .col-xs-12 {
+        padding-top: 20px;
+    }
+
+    div.bhoechie-tab div.bhoechie-tab-content:not(.active) {
+        display: none;
+    }*/
+
+    .row {
+        margin-top: 10px;
+    }
+
+    .clearfix > * {
+        color: #fff;
+    }
+
+    .nav-tabs {
+        border-bottom: 1px solid rgba(44, 73, 73, 1);
+    }
+
+    .infobox-data > h1, h2, h3, h4 {
+        color: #fff;
+        margin-top: 0;
+    }
+
+    .padding15 {
+        padding-bottom: 15px;
+        padding-top: 15px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .bgm-wheat {
+        background-color: wheat !important;
+    }
+
+    .bgm-cadet {
+        background-color: cadetblue;
+    }
+
+    .bgm-seagreen {
+        background-color: seagreen;
+    }
+
+    .bgm-sandbrown {
+        background-color: sandybrown;
+    }
+
+    .margin-in-col {
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+
+    .my-widget {
+        border-radius: 10px;
+        margin-right: 15px;
+    }
+
+    .widget-rev {
+        background-color: darkslategrey;
+    }
+
+    .widget-rev-odd {
+        background-color: rgba(44, 73, 73, 1);
+    }
+
+    .wdidget-as {
+        background-color: rgba(200, 81, 81, 1);
+    }
+
+    .wdidget-as-odd {
+        background-color: rgba(191, 79, 79, 1);
+    }
+
+    .widget-del {
+        background-color: rgba(204, 155, 30, 1);
+    }
+
+    .widget-del-odd {
+        background-color: rgba(195, 148, 29, 1);
+    }
+
+    .wdidget-ta {
+        background-color: darkolivegreen;
+    }
+
+    .wdidget-ta-odd {
+        background-color: rgba(83, 103, 50, 1);
+    }
+
+    .infobox-content {
+    }
+
+    .dataTables_wrapper.no-footer .dataTables_scrollBody {
+        border-bottom: 1px solid lightgray;
+    }
+
+    #storeReportDatatable > thead {
+        visibility: hidden;
+        border: 0;
+    }
+
+    #storeReportDatatable tr[role=row] {
+        cursor: pointer;
+    }
+
+    .tableDiv-responsive {
+        width: 100%;
+    }
+    .detail-header-show{
+        color: black;
+    }
+    .detail-show > *{
+        color: black;
+    }
+    .infobox.infobox-block {
+        min-height: 170px;
+    }
+    .bmoney {
+        font-size: 1.5em;
+    }
+    .modified-money {
+        position: absolute;
+        top: 3em;
+        right: 1em;
+        float: right;
+        display: inline-block;
+    }
+
+    .h2Money {
+        font-size: 1.85em;
+        float: right;
+        margin-bottom: 0;
+        margin-top: 0;
+    }
+
+    .small-padding {
+        padding-top: 1em;
+        padding-right: 1em;
+    }
+
+    .infobox-data-modified {
+        min-height: 5em;
+    }
+    .infobox-data-modified2 {
+        min-height: 1em;
+    }
+    .repadding {
+        padding: 0 1em !important;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3 id="title-id">Báo cáo thanh toán</h3>
+                <h4 id="today" class="smallDate" data-role="small-date"></h4>
+            </div>
+            <div class="col-md-6 p-l-0">
+                <button type="submit" id="exportExcel" class="m-l-15 create-button  btn btn-primary btn-sm pull-right waves-effect">
+                    <i class="fa fa-download"></i>
+                    Xuất file Excel
+                </button>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-padding">
+        @* Detail data
+        <div class="card-body">
+        <div class="row">
+            <div class="col-md-3 col-xs-6">
+                <div class="padding15 margin-in-col widget-rev-odd">
+                    <div class="clearfix">
+                        <center>
+                            <i class="fa fa-4x fa-money"></i>
+                            <br />
+                            Tiền mặt
+                        </center>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-rev">
+                    <div class="clearfix">
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <div>Thu</div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="cash_income"></h2>
+                        <div class="infobox-data" id="avgCash_income" style="display: none;">
+                            <div class="pull-right">
+                                <small>VNĐ/ngày</small>
+                            </div>
+                            <small>Avg</small> <strong></strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-rev-odd">
+                    <div class="clearfix">
+                        <div>Chi</div>
+                        <div class="inline">
+                            <div class="pull-right">
+                                <small>VNĐ</small>
+                            </div>
+                            <div class="infobox-data">
+                                <h2 style="margin-bottom:0; margin-top:0;" id="cash_expense"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-rev">
+                    <div class="clearfix">
+                        <div>Số lượng GD</div>
+                        <div class="inline">
+                            <div class="pull-right">
+                                <small>lần</small>
+                            </div>
+                            <div class="infobox-data">
+                                <h2 style="" id="cash_time"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-xs-6">
+                <div class="padding15 margin-in-col wdidget-as-odd">
+                    <div class="clearfix">
+                        <center>
+                            <i class="fa fa-4x fa-credit-card"></i>
+                            <br />
+                            Thẻ thành viên
+                        </center>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col wdidget-as">
+                    <div class="clearfix">
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <div class="infobox-content">Thu</div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="ms_income"></h2>
+                        <div class="infobox-data" id="avgRevenueAtStore" style="display: none;">
+                            <div class="pull-right">
+                                <small>VNĐ</small>
+                            </div>
+                            <small>Avg</small> <strong></strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col wdidget-as-odd">
+                    <div class="clearfix">
+                        <div class="infobox-content">Chi</div>
+                        <div class="inline">
+                            <div class="pull-right">
+                                <small>VNĐ/Hóa đơn</small>
+                            </div>
+                            <div class="infobox-data">
+                                <h2 style="margin-bottom:0; margin-top:0;" id="ms_expense"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col wdidget-as">
+                    <div class="clearfix">
+                        <div class="infobox-content">Số lượng GD</div>
+                        <div class="inline">
+                            <div class="pull-right">
+                                <small>lần</small>
+                            </div>
+                            <div class="infobox-data">
+                                <h2 style="" id="ms_time"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-xs-6">
+                <div class="padding15 margin-in-col widget-del-odd">
+                    <div class="clearfix">
+                        <center>
+                            <i class="fa fa-4x fa-bank"></i>
+                            <br />
+                            Ngân hàng
+                        </center>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-del">
+                    <div class="clearfix">
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <div class="infobox-content">Thu</div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="bank_income"></h2>
+                        <div class="infobox-data" id="avgBank" style="display: none;">
+                            <div class="pull-right">
+                                <small>VNĐ</small>
+                            </div>
+                            <small>Avg</small> <strong></strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-del-odd">
+                    <div class="clearfix">
+                        <div class="infobox-content">Chi</div>
+                        <div class="inline">
+                            <div class="pull-right">
+                                <small>VNĐ</small>
+                            </div>
+                            <div class="infobox-data">
+                                <h2 style="margin-bottom:0; margin-top:0;" id="bank_expense"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col widget-del">
+                    <div class="clearfix">
+                        <div class="infobox-content">Số lượng GD</div>
+                        <div class="inline">
+                            <div class="pull-right">
+                                <small>lần</small>
+                            </div>
+                            <div class="infobox-data">
+                                <h2 style="" id="bank_time"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-xs-6">
+                <div class="padding15 margin-in-col wdidget-ta-odd">
+                    <div class="clearfix">
+                        <center>
+                            <i class="fa fa-4x fa-tablet"></i>
+                            <br />
+                            E-Wallet
+                        </center>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col wdidget-ta">
+                    <div class="clearfix">
+                        <div class="pull-right">
+                            <small>VNĐ</small>
+                        </div>
+                        <div class="infobox-content">Thu</div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="ew_income"></h2>
+                        <div class="infobox-data" id="avgRevenueTakeAway" style="display: none;">
+                            <div class="pull-right">
+                                <small>VNĐ/ngày</small>
+                            </div>
+                            <small>Avg</small> <strong></strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col wdidget-ta-odd">
+                    <div class="clearfix">
+                        <div class="infobox-content">Chi</div>
+                        <div class="inline">
+                            <div class="pull-right">
+                                <small>VNĐ</small>
+                            </div>
+                            <div class="infobox-data">
+                                <h2 style="margin-bottom:0; margin-top:0;" id="ew_expense"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="padding15 margin-in-col wdidget-ta">
+                    <div class="clearfix">
+                        <div class="infobox-content">Số lượng GD</div>
+                        <div class="inline">
+                            <div class="pull-right">
+                                <small>lần</small>
+                            </div>
+                            <div class="infobox-data">
+                                <h2 style="" id="ew_time"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <hr />*@
+        <div class="row m-t-20">
+            <div class="col-md-12 m-t-25">
+                <label class="right-icon pull-left" style="line-height: 25px;">Cửa hàng: &nbsp;</label>
+                <div class="col-md-3">
+                    <div class="fg-line">
+                        <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7"></select>
+                    </div>
+                </div>
+                <label class="right-icon pull-left" style="line-height: 25px;">Phương thức: &nbsp;</label>
+                @*<div class="col-md-3">
+                    <div class="fg-line">
+                            @Html.DropDownList("listPaymentTypeId", EnumHelper.GetSelectList(typeof(PaymentTypeEnum)), "Phương thức thanh toán", new { @class = "selectpicker" })
+                        </div>
+                </div>*@
+                <div class="col-md-3">
+                    <div class="fg-line">
+                            <select class="selectpicker" id="listPaymentTypeId" name="listPaymentTypeId" tabindex="-98">
+                                <option value="">Phương thức thanh toán</option>
+                                <option value="1">Tiền mặt</option>
+                                <option value="3">Thẻ thành viên</option>
+                                <option value="13">Momo</option>
+                                <option value="4">Voucher</option>
+                                <option value="7">MasterCard</option>
+                                <option value="8">VisaCard</option>
+                                <option value="9">Tiền thối</option>
+                                <option value="10">Tiền nạp vào tài khoản</option>
+                                <option value="11">Khách nợ</option>
+                                <option value="12">Trả nợ</option>
+                            </select>
+                        </div>
+
+
+                </div>
+                <div class="col-md-4 pull-right">
+                    <div class="input-group pull-right">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                                <input type="hidden" id="startTime" />
+                                <input type="hidden" id="endTime" />
+                            </div>
+                        </div>
+                        <div class="fg-line m-t-5">
+                            <button style="width:230px;" type="submit" id="exportExcel" class="btn btn-primary btn-sm pull-right">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-3 col-xs-12 p-10">
+                <div class="infobox infobox-block infobox-dark bgm-blue">
+                    <div class="infobox-icon">
+                        <i class="ace-icon fa fa-reply"></i>
+                    </div>
+                    <div class="infobox-data infobox-data-modified">
+                        <div>Tổng thu</div>
+                        <div class="inline">
+                            <div class="pull-right small-padding">
+                                <small>Tiền mặt</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 repadding">
+                        <h2 class="h2Money" id="incomeCash"></h2>
+                    </div>
+                    <div class="infobox-data infobox-data-modified2">
+                        <div class="pull-right small-padding">
+                            <small>Khác</small>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 repadding">
+                        <h2 class="h2Money" id="incomeOther"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-xs-12 p-10">
+                <div class="infobox infobox-block infobox-dark infobox-brown">
+                    <div class="infobox-icon">
+                        <i class="ace-icon fa fa-share"></i>
+                    </div>
+                    <div class="infobox-data infobox-data-modified">
+                        <div>Tổng chi</div>
+                        <div class="inline">
+                            <div class="pull-right small-padding">
+                                <small>Tiền mặt</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 repadding">
+                        <h2 class="h2Money" id="outcomeCash"></h2>
+                    </div>
+                    <div class="infobox-data infobox-data-modified2">
+                        <div class="pull-right small-padding">
+                            <small>Khác</small>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 repadding">
+                        <h2 class="h2Money" id="outcomeOther"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-xs-12 p-10">
+                <div class="infobox infobox-block infobox-dark bgm-green">
+                    <div class="infobox-icon">
+                        <i class="ace-icon fa fa-arrow-up"></i>
+                    </div>
+                    <div class="infobox-data infobox-data-modified">
+                        <div>Số lượt giao dịch tăng</div>
+                        <div class="inline">
+                            <div class="pull-right small-padding">
+                                <small>Tiền mặt</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 repadding">
+                        <h2 class="h2Money" id="insTransactionCash"></h2>
+                    </div>
+                    <div class="infobox-data infobox-data-modified2">
+                        <div class="pull-right small-padding">
+                            <small>Khác</small>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 repadding">
+                        <h2 class="h2Money" id="insTransactionOther"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 col-xs-12 p-10">
+                <div class="infobox infobox-block infobox-dark bgm-red">
+                    <div class="infobox-icon">
+                        <i class="ace-icon fa fa-arrow-down"></i>
+                    </div>
+                    <div class="infobox-data infobox-data-modified">
+                        <div>Số giao dịch giảm</div>
+                        <div class="inline">
+                            <div class="pull-right small-padding">
+                                <small>Tiền mặt</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 repadding">
+                        <h2 class="h2Money" id="descTransactionCash"></h2>
+                    </div>
+                    <div class="infobox-data infobox-data-modified2">
+                        <div class="pull-right small-padding">
+                            <small>Khác</small>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 repadding">
+                        <h2 class="h2Money" id="descTransactionOther"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 m-t-25">
+                <table id="payment-dt" class="table table-condensed table-hover table-responsive table-striped">
+                    <thead>
+                        <tr>
+                            <th><label>STT</label></th>
+                            <th><label>Mã thanh toán</label></th>
+                            <th><label>Mã phiếu thu/chi</label></th>
+                            <th><label>Giá trị tăng (VNĐ)</label></th>
+                            <th><label>Giá trị giảm (VNĐ)</label></th>
+                            <th><label>Thời gian</label></th>
+                            <th><label>Loại</label></th>
+                            <th><label>Chi tiết</label></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade " tabindex="-1" id="order-detail-report-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title detail-header-show">Chi tiết thu/chi</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="clearfix detail-show" style="margin-bottom: 20px;">
+                        <div class="col-md-6 float-left">
+                            <label class="col-md-5 no-padding text-bold float-left" style="font-weight:bold">Tên khách hàng:</label>
+                            <label class="control-label float-left" data-role="customer-name"></label>
+                            <br />
+                            <div class="col-md-12 no-padding" id="delivery">
+                                <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Địa chỉ giao:</label>
+                                <label class="control-label float-left" data-role="delivery-address"></label>
+                                <br />
+                            </div>
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Điện thoại:</label>
+                            <label class="control-label float-left" data-role="customer-phone"></label>
+                            <br />
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Cashier:</label>
+                            <label class="control-label float-left" data-role="cashier">
+                            </label>
+                            <br />
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Cửa hàng:</label>
+                            <label class="control-label float-left" data-role="store">
+                            </label>
+                            <br />
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Thời gian đặt:</label>
+                            <label class="control-label float-left " data-role="order-time"></label>
+                            <br />
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Phân loại:</label>
+                            <label class="control-label float-left" data-role="status">
+                            </label>
+                        </div>
+                        <div class="col-md-6 float-right">
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Mã hóa đơn:</label>
+                            <label class="control-label float-left" data-role="invoiceid">
+                            </label>
+                            <br />
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Tổng cộng:</label>
+                            <label class="control-label float-left" data-role="total-amount">
+                            </label>
+                            <br />
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Giảm giá:</label>
+                            <label class="control-label float-left" data-role="discount">
+                            </label>
+                            <br />
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Thanh toán:</label>
+                            <label class="control-label float-left" data-role="final-amount">
+                            </label>
+                            <br />
+                            @*<label class="control-label text-bold float-left" style="font-weight:bold">Hình thức thanh toán:</label>
+                                <label class="control-label float-left" data-role="payment-type">
+                                </label>
+                                <br />*@
+                            <label class="control-label text-bold float-left" style="font-weight:bold">Ghi chú:</label>
+                            <label class="control-label float-left" data-role="notes">
+                            </label>
+
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-md-offset-7">
+                        <button type="submit" id="exportEx" class="btn btn-primary btn-sm pull-right">
+                            <i class="fa fa-download"></i>
+                            Xuất ra file Excel
+                        </button>
+                    </div>
+                    <table class="table table-bordered table-condensed table-striped table-hover" id="order-report-detail-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên sản phẩm</th>
+                                <th>Giá sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Tình trạng</th>
+                                <th>Giảm giá</th>
+                                <th>Thanh toán</th>
+                                @*<th>RentID</th>*@
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        <tfoot>
+                            <tr>
+                                <th style="text-align:left" colspan="5"></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                    <form class="hidden" id="formDetailReportExcel" action="@Url.Action("ExportOrderDetailTableToExcel","Order")">
+                        <input type="hidden" name="_id" id="RentID" value="" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade " tabindex="-1" id="cost-detail-report-modal" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title detail-header-show">Chi tiết thu/chi</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="clearfix detail-show" style="margin-bottom: 20px;">
+
+                        <center class="col-md-6 col-md-offset-3">
+                            <label class="col-md-5 no-padding text-bold float-left" style="font-weight:bold">Người thực hiện:</label>
+                            <label class="control-label float-left" data-role="paid-person"></label>
+                            <br />
+
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Cửa hàng:</label>
+                            <label class="control-label float-left" data-role="store-name">
+                            </label>
+                            <br />
+
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Thời gian thực hiện:</label>
+                            <label class="control-label float-left " data-role="cost-time"></label>
+                            <br />
+
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Phân loại:</label>
+                            <label class="control-label float-left" data-role="type">
+                            </label>
+                            <br />
+
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Mã phiếu:</label>
+                            <label class="control-label float-left" data-role="cost-id">
+                            </label>
+                            <br />
+
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Khoảng tiền:</label>
+                            <label class="control-label float-left" data-role="amount">
+                            </label>
+                            <br />
+
+                            <label class="col-md-5 no-padding control-label text-bold float-left" style="font-weight:bold">Nội dung:</label>
+                            <label class="control-label float-left" data-role="description"></label>
+                            <br />
+                        </center>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="add-cost-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+</div>
+
+<form class="hidden" id="ExportPaymentExcel" action="@Url.Action("ExportPaymentExcel", "PaymentReport")">
+    <input id="startTimeOne" name="sTime" />
+    <input id="endTimeOne" name="eTime" />
+    <input id="storeId" name="selectedStoreId" />
+    <input id="brandId" name="brandId" />
+    <input id="enumPaymentType" name="enumPaymentType" />
+</form>
+
+<script>
+    $(document).on('click', '#exportExcel', function () {
+        $('#startTimeOne').val($('#startTime').val());
+        $('#endTimeOne').val($('#endTime').val());
+        $('#storeId').val($('#listStoreId').val());
+        $('#brandId').val(@ViewBag.brandId);
+        $('#ExportPaymentExcel').submit();
+        //alert(123);
+    });
+    $(document).ready(function () {
+        setupListStoreFilter()
+        setupDaterangepicker();
+        //GetStoreList();
+        //renderPaymentDt();
+        getTotalPaymentReport();
+        $('#listStoreId').on('change', function () {
+            renderPaymentDt();
+        });
+        $('#listPaymentTypeId').on('change', function () {
+            renderPaymentDt();
+        });
+        setReportDay();
+        console.log($('#date-string').val());
+    });
+
+    function setReportDay() {
+        var theDay = $('#endTime').val();
+        $('#today').html(theDay);
+    }
+
+    $('#chart-btn').on('click', function () {
+        $('#payment-chart-container').toggle();
+        var chart = $('#payment-chart-container').highcharts();
+        if (chart == undefined) {
+            getDataChart();
+        }
+    });
+
+    function getDataChart() {
+        $.ajax({
+            type: 'get',
+            contentType: "application/json; charset=utf-8",
+            data: { 'sTime': $("#startTime").val(), 'eTime': $("#endTime").val() },
+            url: '@Url.Action("GetPaymentReportData", "PaymentReport")',
+            success: function (result) {
+                if (result.success) {
+                    renderChart(result.datachart);
+                } else {
+                    ShowAlert(result.message, 1)
+                }
+            },
+            error: function () {
+                ShowAlert("Có lỗi nha", 1);
+            }
+        });
+    }
+
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+        $("#startTime").val(startTime);
+        $("#endTime").val(endTime);
+        renderPaymentDt();
+
+        setReportDay();
+        getTotalPaymentReport();
+
+        //getDataChart();
+    }
+
+    function setupDaterangepicker() {
+        cb(moment(), moment(), 'Hôm nay');
+        $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'), "Tháng này");
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+    }
+
+    function RefreshOrderTable(id) {
+        var oTable = $(id).dataTable();
+        oTable._fnAjaxUpdate();
+    }
+
+    function renderPaymentDt() {
+        $('#payment-dt').dataTable({
+            "bAutoWidth": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sServerMethod": "POST",
+            "sAjaxSource": "@Url.Action("GetCashPaymentData", "PaymentReport")",
+            "bProcessing": true,
+            "bSort": false,
+            "bFilter": false,
+            "bDestroy": true,
+            "bScrollCollapse": true,
+            "bInfo": true,
+            "bPaginate": true,
+            "lengthMenu": [
+                [10, 25, 50, 100],
+                [10, 25, 50, 100]],
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "sTime", "value": $("#startTime").val() });
+                aoData.push({ "name": "eTime", "value": $("#endTime").val() });
+                aoData.push({ "name": "selectedStoreId", "value": $("#listStoreId").val() });
+                aoData.push({ "name": "enumPaymentType", "value": $("#listPaymentTypeId").val() });
+            },
+            "oLanguage": {
+                "sSearchPlaceholder": "Tên nguyên liệu",
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " ",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                //{
+                //    "aTargets": [1],
+                //    "bVisible": false,
+                //    "mRender": function (data, type, row) {
+                //        return row[1];
+                //    }
+                //},
+                {
+                    "aTargets": [3],
+                    "sClass": "text-right",
+                    "mRender": function (data, type, row) {
+                        var icon = "fa fa-level-up";
+                        var color = "green";
+                        if (data == null || data == "") {
+                            return "<strong style='color:" + color + "'><i class='" + icon + "'></i> " + toMoney(0, ',', 'VNĐ') + "</strong>";
+                        } else {
+                            return "<strong style='color:" + color + "'><i class='" + icon + "'></i> " + toMoney(data, ',', 'VNĐ') + "</strong>";
+                        }
+                    }
+                },
+                {
+                    "aTargets": [4],
+                    "sClass": "text-right",
+                    "mRender": function (data, type, row) {
+                        var icon = "fa fa-level-down";
+                        var color = "orange";
+                        if (data == null || data == "") {
+                            return "<strong style='color:" + color + "'><i class='" + icon + "'></i> " + toMoney(0, ',', 'VNĐ') + "</strong>";
+                        } else {
+                            return "<strong style='color:" + color + "'><i class='" + icon + "'></i> " + toMoney(data, ',', 'VNĐ') + "</strong>";
+                        }
+                    }
+                },
+                {
+                    "aTargets": [7],
+                    "mRender": function (data, type, row) {
+                        var detailType = "";
+                        if (row[2] == "N/A") {
+                            detailType = 'Order';
+                        } else {
+                            detailType = 'Cost';
+                        }
+
+                        var button = $('<a/>', {
+                            "class": "btn btn-sm btn-primary",
+                            "html": $('<i/>', {
+                                "class": 'glyphicon glyphicon-eye-open'
+                            }),
+                            "data-id": row[7],
+                            "data-costId": row[7],
+                            "data-type": detailType,
+                            "data-role": 'detail',
+                        });
+
+                        return button[0].outerHTML;
+                    }
+                },
+            ],
+        }).fnSetFilteringDelay(800);
+    }
+
+    function renderChart(data) {
+        var seriesOptions = [];
+        var categories = [];
+        $.each(data, function (i, item) {
+            seriesOptions.push({
+                name: item['PaymentType'],
+                y: item['Amount']
+            });
+            categories.push(item['PaymentType']);
+        });
+        $('#payment-chart-container').highcharts({
+            //chart: {
+            //    type: 'column'
+            //},
+
+            //xAxis: {
+            //},
+
+            //series: [{
+            //    data: seriesOptions
+            //}]
+            chart: {
+                type: 'column',
+                style: {
+                    fontFamily: 'Arial'
+                }
+            },
+            title: {
+                text: 'DOANH THU THEO HÌNH THỨC THANH TOÁN',
+                x: -20 //center
+            },
+            //subtitle: {
+            //    x: -20
+            //},
+            xAxis: {
+                categories: categories
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh Thu'
+                }
+            },
+            tooltip: {
+                valueSuffix: ' VNĐ'
+            },
+            legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'bottom',
+                borderWidth: 0
+            },
+            series: [{
+                data: seriesOptions
+            }]
+        });
+    }
+
+    function setupListStoreFilter() {
+        $.ajax({
+            type: "GET",
+            url: "@(Url.Action("GetListStore", "PaymentReport"))",
+            success: function (data) {
+                var content = "";
+                content += "<option value='0'>" + "Hệ Thống" + "</option>";
+                for (var i = 0; i < data.listresult.length; ++i) {
+                    content += "<option value='" + data.listresult[i].storeId + "'>" + data.listresult[i].storeName + "</option>";
+                }
+                $("#listStoreId").html(content);
+                $("#listStoreId").selectpicker('refresh');
+            },
+            error: function (error) {
+                alert("Error Occured")
+            }
+        });
+    }
+
+    @*function GetStoreList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStoreList")',
+            jsonp: "$callback",
+            success: function (result) {
+                for (var i = 0; i < result.store.length; i++) {
+                    $('#listStoreId').append('<option value="' + result.store[i].ID + '">' + result.store[i].Name + '</option>')
+                }
+                $('#listStoreId').selectpicker('refresh');
+            }
+        });
+    }*@
+
+    var currentRentId = -1;
+    var totalamount = 0;
+    var finalamount = 0;
+    var totaldiscount = 0;
+
+    $(document).on('click', '[data-role=detail]', function () {
+        currentRentId = $(this).data('costid');
+        $("#RentID").val(currentRentId);
+
+
+        //$('#order-detail-report-modal [data-role=store-name]').html($(this).data('store-name'));
+        //if ($(this).data('status') == 6 || $(this).data('status') == 1) {
+        //    $('#delivery').show();
+        //}
+        //else {
+        //    $('#delivery').hide();
+        //}
+
+        switch ($(this).data('type')) {
+            case 'Order':
+                $.ajax({
+                    type: "GET",
+                    data: {"id": currentRentId},
+                    url: "@Url.Action("LoadOrderDetail","../../Orders/"+ViewBag.storeId+"/Order")",
+                    dataType: "json",
+                    success: function(result){
+                        getOrderDetailsGeneralData(result.lblData)
+                        orderDetailTable(result.dataTable);
+                        $('#order-detail-report-modal').modal('show');
+                    },
+                    error: function(){
+                        ShowMessage("Có lỗi xảy ra", 1);
+                    }
+                });
+                break;
+            case 'Cost':
+                $.ajax({
+                    type: "GET",
+                    "data": { "id": currentRentId },
+                    url: "@Url.Action("LoadCost")",
+                    datatype: "json",
+                    success: function (result) {
+                        getCostGeneralData(result);
+                        $('#cost-detail-report-modal').modal('show');
+                    },
+                    error: function () {
+                        ShowMessage("Có lỗi xảy ra", 1);
+                    }
+                });
+                break;
+        }
+    });
+
+    var getCostGeneralData = function (data) {
+        $('#cost-detail-report-modal [data-role=paid-person]').html(data.paidPerson);
+        $('#cost-detail-report-modal [data-role=store-name]').html(data.store);
+        $('#cost-detail-report-modal [data-role=description]').html(data.description);
+        $('#cost-detail-report-modal [data-role=cost-time]').html(data.time);
+
+        $('#cost-detail-report-modal [data-role=cost-id]').html(data.id);
+        $('#cost-detail-report-modal [data-role=amount]').html(data.amount);
+
+        switch (data.type) {
+            case @((int)CostTypeEnum.ReceiveCost) :
+                $('#cost-detail-report-modal [data-role=type]').html("<div class='label label-primary myCategory'>@CostTypeEnum.ReceiveCost.DisplayName()</div>");
+                break;
+            case @((int)CostTypeEnum.ReceiveCostTranferOut) :
+                $('#cost-detail-report-modal [data-role=type]').html("<div class='label label-success myCategory'>@CostTypeEnum.ReceiveCostTranferOut.DisplayName()</div>");
+                break;
+            case @((int)CostTypeEnum.SpendingCost) :
+                $('#cost-detail-report-modal [data-role=type]').html("<div class='label label-info myCategory'>@CostTypeEnum.SpendingCost.DisplayName()</div>");
+                break;
+            case @((int)CostTypeEnum.SpendingCostTranferIn) :
+                $('#cost-detail-report-modal [data-role=type]').html("<div class='label label-warning myCategory'>@CostTypeEnum.SpendingCostTranferIn.DisplayName()</div>");
+                break;
+        }
+    }
+
+    var getOrderDetailsGeneralData = function (data) {
+        finalamount = data.finalAmount;
+        totalamount = data.totalAmount;
+        totaldiscount = data.totalDiscount * (-1);
+
+        $('#order-detail-report-modal [data-role=order-time]').html(data.checkInTime);
+        $('#order-detail-report-modal [data-role=invoiceid]').html(data.invoiceId);
+        $('#order-detail-report-modal [data-role=cashier]').html(data.checkInPerson);
+
+        switch (data.orderStatus) {
+            case @((int) OrderTypeEnum.AtStore):
+                $('#order-detail-report-modal [data-role=status]').html("<div class='label label-primary myCategory'>@Resources.EnumLanguage.View_AtStore</div>")
+                break;
+            case @((int) OrderTypeEnum.TakeAway):
+                $('#order-detail-report-modal [data-role=status]').html("<div class='label label-success myCategory'>@Resources.EnumLanguage.View_TakeAway</div>")
+                break;
+            case @((int) OrderTypeEnum.Delivery):
+                $('#order-detail-report-modal [data-role=status]').html("<div class='label label-warning myCategory'>@Resources.EnumLanguage.View_Delivery</div>")
+                break;
+            case @((int) OrderTypeEnum.OrderCard):
+                $('#order-detail-report-modal [data-role=status]').html("<div class='label label-warning myCategory'>@Resources.EnumLanguage.View_OrderCard</div>")
+                break;
+        }
+
+        if (data.orderStatus == 6 || data.orderStatus == 1) {
+            $('#delivery').show();
+        }
+        else {
+            $('#delivery').hide();
+        }
+
+        $('#order-detail-report-modal [data-role=customer-name]').html(data.cusName);
+        $('#order-detail-report-modal [data-role=delivery-address]').html(data.cusAddr);
+        $('#order-detail-report-modal [data-role=customer-phone]').html(data.cusPhone);
+
+        $('#order-detail-report-modal [data-role=store]').html(data.store);
+        $('#order-detail-report-modal [data-role=notes]').html(data.notes);
+        $('#order-detail-report-modal [data-role=total-amount]').html(toMoney(totalamount, ',', ''));
+        $('#order-detail-report-modal [data-role=discount]').html(toMoney(totaldiscount, ',', ''));
+
+        var html = "";
+        for(var i = 0; i < data.payment.length; i++){
+            html += toMoney(data.payment[i].amount, ',', '') + " (" + data.payment[i].type + ")<br/>";
+            $('#order-detail-report-modal [data-role=final-amount]').html(html);
+        }
+
+    }
+
+    var orderDetailTable = function (data) {
+        $('#order-report-detail-table').dataTable({
+            "footerCallback": function (row, data, start, end, display) {
+                var cells = row.getElementsByTagName('th');
+                cells[0].innerHTML = "Tổng cộng: " + toMoney(totalamount, ',', '');
+                cells[1].innerHTML = toMoney(totaldiscount, ',', '');
+                cells[2].innerHTML = toMoney(finalamount, ',', '');
+            },
+
+            "bFilter": false,
+            "bRetrieve": false,
+            "bDestroy": true,
+            "bServerSide": false,
+            "bScrollCollapse": true,
+            "bProcessing": true,
+            "data": data,
+            "oLanguage": {
+                "sSearch": "Tên Phòng:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+
+            },
+            "aoColumnDefs": [
+                { "aTargets": [0, 1, 2, 3, 4, 5, 6], "bSortable": false },
+                { "aTargets": [2, 3, 4, 5], "sClass": "text-center" },
+                {
+                    "aTargets": [2],
+                    "mRender": function (data, type, row) {
+                        //var money = o.aData[5];
+                        var data = row[2];
+                        return toMoney(data, ',', '');
+                    }
+                },
+                {
+                    "aTargets": [5],
+                    "mRender": function (data, type, row) {
+                        //var money = o.aData[5];
+                        var data = row[5];
+                        return toMoney(data, ',', '');
+                    }
+                },
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, row) {
+                        //var money = o.aData[5];
+                        var data = row[6];
+                        return toMoney(data, ',', '');
+                    }
+                },
+                {
+                    "aTargets": [7],
+                    "sClass": "hidden",
+                },
+                {
+                    "aTargets": [4],
+                    "mRender": function (data, type, row) {
+                        var type = "";
+                        var color = "";
+                        data = row[4];
+                        switch (data) {
+                            case 11:
+                                type = "@Resources.EnumLanguage.View_PosFinished";
+                                color = "<div class='label label-success myCategory'>";
+                                break;
+                            case 12:
+                                type = "@Resources.EnumLanguage.View_PosPreCancel";
+                                color = "<div class='label label-warning myCategory'>";
+                                break;
+                            case 13:
+                                type = "@Resources.EnumLanguage.View_PosCancel";
+                                color = "<div class='label label-warning myCategory'>";
+                                break;
+                            default:
+                                type = "---";
+                                color = "<div>";
+
+                        }
+                        return color + type + '</div>';
+                    }
+
+                },
+            ],
+            "bAutoWidth": false
+        });
+    };
+
+    function GetCreatingForm(type) {
+        if (type == '@((int)CostTypeEnum.SpendingCost)') {
+            $('#add-cost-modal').html("");
+            $.ajax({
+                url: "@Url.Action("CreatingSpendForm")",
+                dataType: "HTML",
+                data: { 'costCategoryType': type },
+                beforeSend: function () {
+
+                    },
+                success: function (result) {
+                    $('#add-cost-modal').html(result);
+                    $('#add-cost-modal').modal('show');
+                    }
+                });
+        }
+        else {
+            $('#add-cost-modal').html("");
+
+            $.ajax({
+                url: "@Url.Action("CreatingReceiptForm")",
+                dataType: "HTML",
+                data: {
+                    costCategoryType: type,
+                    brandId: @brandId,
+                    storeId: @storeId
+                },
+                beforeSend: function () {
+
+                },
+                success: function (result) {
+                    $('#add-cost-modal').html(result);
+                    $('#add-cost-modal').modal('show');
+                }
+            });
+        }
+
+    }
+
+    function getTotalPaymentReport() {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("LoadTotalPaymentReport", "PaymentReport")',
+            data: {
+                'storeIdCode': @ViewBag.storeId,
+                'startDate': $('#startTime').val(),
+                'endDate': $('#endTime').val()
+            },
+            success: function (result) {
+                //Total
+                //$('#incomeCash').text(toMoney(result.incomeSum.cashValue, ',', ''));
+                //$('#incomeOther').text(toMoney(result.incomeSum.otherValue, ',', ''));
+                //$('#outcomeCash').text(toMoney(result.outcomeSum.cashValue, ',', ''));
+                //$('#outcomeOther').text(toMoney(result.outcomeSum.otherValue, ',', ''));
+                //$('#insTransactionCash').text(toMoney(result.insTransaction.cashValue, ',', ''));
+                //$('#insTransactionOther').text(toMoney(result.insTransaction.otherValue, ',', ''));
+                //$('#descTransactionCash').text(toMoney(result.descTransaction.cashValue, ',', ''));
+                //$('#descTransactionOther').text(toMoney(result.descTransaction.otherValue, ',', ''));
+                //Total with money Css
+                setMoneyCss('incomeCash', result.incomeSum.cashValue);
+                setMoneyCss('incomeOther', result.incomeSum.otherValue);
+                setMoneyCss('outcomeCash', result.outcomeSum.cashValue);
+                setMoneyCss('outcomeOther', result.outcomeSum.otherValue);
+                setMoneyCss('insTransactionCash', result.insTransaction.cashValue);
+                setMoneyCss('insTransactionOther', result.insTransaction.otherValue);
+                setMoneyCss('descTransactionCash', result.descTransaction.cashValue);
+                setMoneyCss('descTransactionOther', result.descTransaction.otherValue);
+
+                //Detail
+                //$('#cash_income').text(toMoney(result.cashData.income, ',', ''));
+                //$('#cash_expense').text(toMoney(result.cashData.expense, ',', ''));
+                //$('#cash_time').text(toMoney(result.cashData.transaction, ',', ''));
+                //$('#ms_income').text(toMoney(result.memshipData.income, ',', ''));
+                //$('#ms_expense').text(toMoney(result.memshipData.expense, ',', ''));
+                //$('#ms_time').text(toMoney(result.memshipData.transaction, ',', ''));
+                //$('#bank_income').text(toMoney(result.bankData.income, ',', ''));
+                //$('#bank_expense').text(toMoney(result.bankData.expense, ',', ''));
+                //$('#bank_time').text(toMoney(result.bankData.transaction, ',', ''));
+                //$('#ew_income').text(toMoney(result.ewalletData.income, ',', ''));
+                //$('#ew_expense').text(toMoney(result.ewalletData.expense, ',', ''));
+                //$('#ew_time').text(toMoney(result.ewalletData.transaction, ',', ''));
+            }
+        });
+    }
+
+    function setMoneyCss(target, value) {
+        if (value > 10000000) {
+            $('#' + target).css('font-size', "1.5em");
+        }
+        if (value > 100000000000) {
+            $('#' + target).css('font-size', "1.2em");
+        }
+        else {
+            $('#' + target).css('font-size', "");
+        }
+        $('#' + target).text(toMoney(value, ',', ''));
+    }
+
+</script>
+<style>
+    .m-t-25 {
+        margin-top: 0px !important;
+    }
+
+    .m-t-20 {
+        margin-top: 1px !important;
+    }
+</style>

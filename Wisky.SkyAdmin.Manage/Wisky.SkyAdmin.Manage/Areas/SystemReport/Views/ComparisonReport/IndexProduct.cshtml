@@ -1,0 +1,940 @@
+﻿@{
+    ViewBag.Title = "Báo cáo so sánh";
+    var BrandCreatedDate = ViewBag.BrandCreatedDate;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Báo cáo so sánh theo sản phẩm
+                </h3>
+                <h5 data-role="small-date"></h5>
+            </div>
+            <div class="col-md-6">
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-padding">
+        <div class="row">
+            <div class="col-md-12">
+                @*<div class="col-md-3" style="padding-left: 0px;">
+                        <div class="form-group">
+                            <select class="selectpicker" id="filterProductType">
+                                <option value="loadProducts" selected>Sản phẩm</option>
+                                <option value="loadProductCates">Loại sản phẩm</option>
+                            </select>
+                        </div>
+                    </div>*@
+                <div class="col-md-6" style="padding-left: 0px;">
+                    <label class="control-label col-md-3 row">Chọn loại :</label>
+                    <input type="text" class="hidden" value="loadProducts" id="filterProductType" />
+                    <div id="checkproduct" class="group-radio-buttons col-md-9 row">
+                        <div class="toggle-switch col-md-6 m-y-10">
+                            <input name="mapping1" id="activeMapping" type="radio" class="nice-check" checked value="loadProducts" />
+                            <label for="activeMapping" class="ts-label"><span>Sản phẩm</span></label>
+                        </div>
+                        <div class="toggle-switch col-md-6 m-y-10">
+                            <input name="mapping1" id="deActiveMapping" type="radio" class="nice-check" value="loadProductCates" />
+                            <label for="deActiveMapping" class="ts-label"><span>Loại sản phẩm</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="col-md-3">
+                        <input type="text" class="row" id="filterProductTypeItem" style="display:block;" />
+                    </div>*@
+                <div class="col-md-5 col-md-offset-1" style="padding-right: 0px;">
+                    <label class="control-label p-t-10">Chọn thời gian:</label>
+                    <div class="input-group pull-right">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="text-align: right">
+                            <button type="submit" id="exportDataToExcel" class="btn btn-primary btn-sm" style="display:block">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="col-md-3 col-md-offset-9 p-r-0 m-t-10">
+                    <input type="text" class="row" id="filterProductCategory" style="display:block;" />
+                </div>
+            </div>
+        </div>
+        <div class="row m-y-15 filterProductTypeItem-context hidden">
+            <div class="col-md-4">
+                <div class="form-group row">
+                    <label class="control-label col-md-12">Sản phẩm 1:</label>
+                    <div class="col-md-9 filterProductTypeItem-container">
+                        <input type="text" id="product1" style="display:block;" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group row">
+                    <label class="control-label col-md-12">Sản phẩm 2:</label>
+                    <div class="col-md-9 filterProductTypeItem-container">
+                        <input type="text" id="product2" style="display:block;" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group row">
+                    <label class="control-label col-md-12">Sản phẩm 3:</label>
+                    <div class="col-md-9 filterProductTypeItem-container">
+                        <input type="text" id="product3" style="display:block;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row m-t-20 m-b-10">
+            <div class="col-md-2">
+                <button type="button" data-status="hide" id="btnChart" class="btn btn-primary btn-sm" style="width: 150px;">
+                    <i class="fa fa-plus"></i>
+                    Hiển thị biểu đồ
+                </button>
+            </div>
+            <div class="col-md-10 form-horizontal m-b-10">
+                <div class="form-group hidden">
+                    <label class="control-label col-md-2 col-md-offset-6"><span class="pull-right">So sánh: </span></label>
+                    <div class="col-md-4">
+                        <select id="filterSaleType" class="selectpicker">
+                            <option value="after">Sau khi giảm giá</option>
+                            <option value="before">Trước khi giảm giá</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12" id="containerWrapper" style="display:none">
+                <div id="container" style="width:100%; height:300px"></div>
+            </div>
+        </div>
+
+        <div id="datatable">
+            <table id="products-table" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label>STT</label>
+                        </th>
+                        <th>
+                            <label>Ngày</label>
+                        </th>
+                        <th>
+                            <label>Sản phẩm</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+    <form class="hidden" id="formExportDataToExcel" action='@Url.Action("ExportCateProductDataToExcel")'>
+        <input id="startTime" name="startTime" />
+        <input id="endTime" name="endTime" />
+        <input name="selectedItems" />
+        <input name="isFilterProduct" />
+    </form>
+</div>
+
+
+<script>
+    var productData;
+    var productCategoryData;
+    var selectedItems;
+    var responseData;
+    var firstPageLoad = true;
+    var typeChange = true;
+
+    $(document).ready(function () {
+        //$('.selectpicker').selectpicker({
+        //    size: 10,
+        //});
+
+        loadComboboxProductCates();
+    });
+
+
+    $('#exportDataToExcel').on('click', function () {
+        if (responseData != null) {
+            exportDataToExcel();
+        }
+    });
+
+    function exportDataToExcel() {
+        //var selectedItems = getSelectedItems();
+        var isFilterProduct = ($("#filterProductType").val() == "loadProducts");
+        //$("input[name=startTime]").val($('#startTime').val());
+        //$("input[name=endTime]").val($('#startTime').val());
+        $("input[name=selectedItems]").val(JSON.stringify(selectedItems));
+        $("input[name=isFilterProduct]").val(isFilterProduct);
+        $("#formExportDataToExcel").submit();
+    }
+
+    //$('#filterSaleType').on('change', function () {
+    //    if (responseData != null) {
+    //        $("#products-table").dataTable().fnDestroy();
+    //        changeDataTableHeader();
+    //        InitDatatable();
+    //        InitDatachart();
+    //    }
+    //});
+
+    function clearData() {
+        responseData = null;
+        $('#product1').select2("val", "");
+        $('#product2').select2("val", "");
+        $('#product3').select2("val", "");
+        $('#filterProductCategory').select2("val", "");
+        clearDatatable();
+        clearChart();
+    }
+
+    function clearChart() {
+        var status = $("#btnChart").data('status');
+        if (status == 'show') {
+            $("#btnChart").html('<i class="fa fa-plus"></i> Hiển thị biểu đồ');
+            $("#btnChart").data('status', 'hide');
+            $('#containerWrapper').slideUp();
+        }
+        var chart = $("#container").highcharts();
+        if (chart != null) {
+            while (chart.series.length > 0) {
+                chart.series[0].remove(true);
+            }
+        }
+    }
+
+    function clearDatatable() {
+        if (responseData == null) {
+            var tblTitle = $("#filterProductType").val() == 'loadProducts' ? 'Sản phẩm' : 'Loại sản phẩm';
+            $("#products-table").dataTable().fnDestroy();
+            $("#products-table").html("<thead><tr><th><label>STT</label></th><th><label>Ngày</label></th><th><label>" + tblTitle + "</label></th></tr></thead><tbody></tbody>");
+            InitDatatable();
+        }
+    }
+
+    //Radio groups change
+    $('#activeMapping').on('change', function () {
+        typeChange = true;
+        $('#filterProductType').val($('#activeMapping').val());
+        clearData();
+        loadComboboxProducts();
+
+        //$("#exportDataToExcel").css("display", "none");
+
+        var count = 1;
+        $.each($('.filterProductTypeItem-context').find('label.control-label'), function (i, el) {
+            el.innerHTML = "Chọn sản phẩm " + (i + 1);
+        });
+
+
+        if (!$('.filterProductTypeItem-context').hasClass('hidden')) {
+            $('.filterProductTypeItem-context').addClass('hidden');
+        }
+
+        if ($('#filterProductCategory').parent().hasClass('hidden')) {
+            $('#filterProductCategory').parent().removeClass('hidden');
+        }
+    });
+
+    $('#deActiveMapping').on('change', function () {
+        typeChange = true;
+        $('#filterProductType').val($('#deActiveMapping').val());
+        clearData();
+        loadComboboxProductCates();
+
+        //$("#exportDataToExcel").css("display", "none");
+
+        var count = 1;
+        $.each($('.filterProductTypeItem-context').find('label.control-label'), function (i, el) {
+            el.innerHTML = "Chọn loại sản phẩm " + (i + 1);
+        });
+
+        if ($('.filterProductTypeItem-context').hasClass('hidden')) {
+            $('.filterProductTypeItem-context').removeClass('hidden');
+        }
+
+        if (!$('#filterProductCategory').parent().hasClass('hidden')) {
+            $('#filterProductCategory').parent().addClass('hidden');
+        }
+    });
+
+    $('#filterProductType').on('change', function () {
+        if ($(this).val() == "loadProducts") {
+            loadComboboxProducts();
+        } else if ($(this).val() == "loadProductCates") {
+            loadComboboxProductCates();
+        }
+        clearData();
+        //$("#exportDataToExcel").css("display", "none");
+    });
+
+    $('#btnChart').click(function () {
+        var status = $(this).data('status');
+        if (selectedItems != null && selectedItems.length >= 1) {
+            if (status == 'show') {
+                $(this).html('<i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                $(this).data('status', 'hide');
+                $('#containerWrapper').stop().slideUp();
+            } else {
+                $(this).html('<i class="fa fa-minus"></i> Ẩn biểu đồ');
+                $(this).data('status', 'show');
+                $('#containerWrapper').stop().slideDown();
+                InitDatachart();
+            }
+
+        } else {
+            ShowMessage("Xin chọn ít nhất 1 mục để hiển thị biểu đồ", 1);
+            return;
+        }
+
+    });
+
+    //function initSelect2(type, dataUrl) {
+    //    $("#filterProductTypeItem").select2({
+    //        placeholder: "Hãy chọn ít nhất 2 " + type,
+    //        multiple: true,
+    //        maximumSelectionSize: 4,
+    //        allowClear: true,
+    //        closeOnSelect: false,
+    //        ajax: {
+    //            url: dataUrl,
+    //            dataType: 'json',
+    //            quietMillis: 500,
+    //            cache: true,
+    //            data: function (term, page) {
+    //                return {
+    //                    searchTokens: term,
+    //                    page: page - 1
+    //                }
+    //            },
+    //            results: function (data, page) {
+    //                var more = (page * 20 < data.total);
+    //                return {
+    //                    results: data.list,
+    //                    more: more
+    //                };
+    //            }
+    //        },
+    //        formatSelectionTooBig: function (maxSize) {
+    //            return "Chỉ lựa chọn tối đa " + maxSize + " " + type;
+    //        },
+    //        formatLoadMore: function (page) {
+    //            return "Hiển thị kết quả từ " + (page - 1) * 20 + " đến " + (page * 20) + "";
+    //        },
+    //        formatSearching: function () {
+    //            return "Tìm kiếm...";
+    //        },
+    //        formatNoMatches: function (term) {
+    //            return "Không tìm thấy " + type + " '" + term + "'";
+    //        },
+    //        //escapeMarkup: function (m) {
+    //        //    return m;
+    //        //}
+    //    });
+    //}
+
+    function initSelect2Static(type, tagId, pos) {
+        var tag = $('#' + tagId);
+        var data = $("#filterProductType").val() == "loadProducts" ? productData : productCategoryData;
+
+        tag.select2({
+            placeholder: "Chọn " + type + " " + pos,
+            closeOnSelect: true,
+            data: data,
+            formatSearching: function () {
+                return "Tìm kiếm...";
+            },
+            formatNoMatches: function (term) {
+                return "Không tìm thấy " + type + " '" + term + "'";
+            },
+        });        
+
+        if ($('.filterProductTypeItem-context').hasClass('hidden')) {
+            $('.filterProductTypeItem-context').removeClass('hidden');
+        }
+    }
+
+    function loadComboboxProducts() {
+        //Product Category for product selection
+        if ($("#filterProductType").val() == "loadProducts") {
+            $('#filterProductCategory').select2({
+                placeholder: "Chọn loại sản phẩm",
+                closeOnSelect: true,
+                data: productCategoryData,
+                formatSearching: function () {
+                    return "Tìm kiếm...";
+                },
+                formatNoMatches: function (term) {
+                    return "Không tìm thấy " + type + " '" + term + "'";
+                },
+            }).on('change', function () {
+                var type = "sản phẩm";
+                //var dataUrl = '@Url.Action("GetAllProducts", "ComparisonReport")';
+                var cateId = $('#filterProductCategory').select2('data').id;
+
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("GetProductByCateId", "ComparisonReport")?cateId=' + cateId,
+                    success: function (result) {
+                        if (result.success) {
+                            productData = result.list;
+
+                            $('#product1').select2("val", "");
+                            $('#product2').select2("val", "");
+                            $('#product3').select2("val", "");
+
+                            $('#product2').select2('destroy');
+                            $('#product3').select2('destroy');
+                            $('#product1').select2('destroy');
+
+                            initSelect2Static(type, "product1", "1");
+                            initSelect2Static(type, "product2", "2");
+                            initSelect2Static(type, "product3", "3");
+                        }
+                        else {
+                            ShowMessage("Có lỗi xảy ra!", 1);
+                        }
+                    },
+                    error: function (result) {
+                        ShowMessage(result.message, 1);
+                    }
+                });
+            });
+        } else {
+            var type = "loại sản phẩm";
+
+            initSelect2Static(type, "product1", "1");
+            initSelect2Static(type, "product2", "2");
+            initSelect2Static(type, "product3", "3");
+        }
+
+        if (firstPageLoad) {
+            InitDatatable();
+            setupDaterangepicker();
+            firstPageLoad = false;
+        }
+    }
+
+    //init data on page load
+    function loadComboboxProductCates() {
+        var type = "loại sản phẩm";
+        var dataUrl = '@Url.Action("GetAllProductCates", "ComparisonReport")';
+        //initSelect2(type, dataUrl);
+
+        $.ajax({
+            type: 'GET',
+            url: dataUrl,
+            success: function (result) {
+                if (result.success) {
+                    productCategoryData = result.list;
+                    loadComboboxProducts();
+                }
+                else {
+                    ShowMessage("Có lỗi xảy ra!", 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage(result, 1);
+            }
+        });
+    }
+
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+        $("#startTime").val(startTime);
+        $("#endTime").val(endTime);
+        LoadDataOnChange();
+    }
+
+    function setupDaterangepicker() {
+        cb(moment().startOf('month'), moment().add(0, 'days'), "Tháng này");
+        $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'), "Tháng này");
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            "minDate": '@BrandCreatedDate',
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+    }
+
+    function LoadDataOnChange() {
+        //var selectedItem = $("#filterProductTypeItem").select2('data');
+        var items = [];
+        if (!firstPageLoad) {
+            if ($("#product1").select2('data') != null) {
+                items.push($("#product1").select2('data'));
+            }
+            if ($("#product2").select2('data') != null) {
+                items.push($("#product2").select2('data'));
+            }
+            if ($("#product3").select2('data') != null) {
+                items.push($("#product3").select2('data'));
+            }
+        }
+
+        if (items.length > 0) {
+            selectedItems = items;
+            //$("#exportDataToExcel").css("display", "inline");
+            loadReport();
+        } else {
+            clearData();
+            //$("#exportDataToExcel").css("display", "none");
+        }
+    }
+
+    //$("#filterProductTypeItem").on("change", function () {
+    //    LoadDataOnChange();
+    //});
+
+    $("#product1").on("change", function () {
+        LoadDataOnChange();
+    });
+
+    $("#product2").on("change", function () {
+        LoadDataOnChange();
+    });
+
+    $("#product3").on("change", function () {
+        LoadDataOnChange();
+    });
+
+    function getSelectedItems() {
+        var items = [];
+        if ($("#product1").select2('data') != null) {
+            items.push($("#product1").select2('data'));
+        }
+        if ($("#product2").select2('data') != null) {
+            items.push($("#product2").select2('data'));
+        }
+        if ($("#product3").select2('data') != null) {
+            items.push($("#product3").select2('data'));
+        }
+        return JSON.stringify(items);
+    }
+
+    //-------------
+    //- DATATABLE -
+    //--------------
+
+    function loadReport() {
+        var isFilterProduct = ($("#filterProductType").val() == "loadProducts");
+        var selectedItems = getSelectedItems();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CateProductComparisonReport")',
+            contentType: "application/json; charset=utf-8",
+            data: { 'startTime': $('#startTime').val(), 'endTime': $('#endTime').val(), 'selectedItems': selectedItems, 'isFilterProduct': isFilterProduct },
+            success: function (result) {
+                if (result.isEmpty == false) {
+                    responseData = result;
+                    $("#products-table").dataTable().fnDestroy();
+                    changeDataTableHeader();
+                    InitDatatable();
+                    InitDatachart();
+                }
+                else {
+                    $("#products-table").dataTable().fnDestroy();
+                    responseData = null;
+                    InitDatatable();
+                }
+            },
+            error: function (result) {
+                alert(result);
+            }
+        });
+    }
+
+    function changeDataTableHeader() {
+        if (responseData != null) {
+            var tblTitle = $("#filterProductType").val() == 'loadProducts' ? "Sản phẩm" : "Loại sản phẩm";
+            var subTitle = $("#filterSaleType option:selected").text();
+            var maxSize = selectedItems.length;
+            var items = "";
+            $.each(responseData.datatable.header, function (index, el) {
+                items += "<th><label>" + el + "</label></th>";
+            });
+            $("#products-table").html("<thead><tr><th rowspan='2'><label>STT</label></th><th rowspan='2'><label>Ngày</label></th><th colspan='" + maxSize + "'><label>" + tblTitle + " (" + subTitle + ")</label></th><th colspan='" + maxSize + "'><label>Tổng sản phẩm</label></th></tr>"
+                                        + "<tr>" + items + items + "</tr></thead><tbody></tbody>");
+        } else {
+            clearDatatable();
+        }
+    }
+
+    function InitDatatable() {
+        var columnDefs = [];
+
+        var tableData = [];
+        if (responseData != null) {
+            tableData = responseData.datatable.data;
+        }
+        columnDefs.push({
+            "aTargets": [0, 1],
+            "bSortable": false,
+            "sClass": "text-center",
+        });
+        if (selectedItems != null && selectedItems.length >= 1 && !typeChange) {
+            if ($('#filterSaleType').val() == 'before') {
+                $.each(selectedItems, function (index, el) {
+                    columnDefs.push({
+                        "aTargets": [(index + 2) * 1],
+                        "mRender": function (data, type, row) {
+                            var total = row[2][index];
+                            var max = row[3];
+                            var color = "";
+                            var totalMoney = toMoney(total, ',', ' VNĐ');
+                            if (total == max && max > 0) {
+                                totalMoney = "<b style='color: green'>" + totalMoney + "</b>";
+                            }
+                            return totalMoney;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    });
+                });
+            } else {
+                $.each(selectedItems, function (index, el) {
+                    columnDefs.push({
+                        "aTargets": [(index + 2) * 1],
+                        "mRender": function (data, type, row) {
+                            var total = row[4][index];
+                            var max = row[5];
+                            var color = "";
+                            var totalMoney = toMoney(total, ',', ' VNĐ');
+                            if (total == max && max > 0) {
+                                totalMoney = "<b style='color: green'>" + totalMoney + "</b>";
+                            }
+                            return totalMoney;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    });
+                    columnDefs.push({
+                        "aTargets": [(index + 2 + selectedItems.length) * 1],
+                        "mRender": function (data, type, row) {
+                            var total = row[6][index];
+                            var max = row[7];
+                            var color = "";
+                            var quantity = total;
+                            if (total == max && max > 0) {
+                                quantity = "<b style='color: green'>" + total + "</b>";
+                            }
+                            return quantity;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    });
+                });
+            }
+        } else {
+            typeChange = false;
+        }
+        $("#products-table").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": tableData,
+            "ordering": true,
+            "iDisplayLength": 10,
+            "aLengthMenu": [10, 50, 100],
+            "oLanguage": {
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": columnDefs,
+            "bAutoWidth": true,
+        });
+    }
+
+    @*function loadProductReport() {
+        var selectedProducts = JSON.stringify($('#filterProductTypeItem').val());
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ProductsComparisonReport", "ComparisonReport")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'selectedProducts': selectedProducts },
+            success: function (result) {
+                if (result.success) {
+                    $("#products-table").dataTable().fnDestroy();
+                    var numOfProducts = result.datatable.products.length;
+
+                    var datatableHtml = "<thead><tr>";
+                    datatableHtml += "<th rowspan='2'><label>STT</label></th>";
+                    datatableHtml += "<th rowspan='2'><label>Ngày</label></th>";
+                    datatableHtml += "<th id='groupHeader' colspan='" + (numOfProducts * 2) + "'><label>Sản phẩm (Trước khi giảm giá)</label></th></tr><tr>";
+
+                    var productHeaders = "";
+                    for (var i = 0; i < numOfProducts; ++i) {
+                        productHeaders += "<th><label>" + result.datatable.products[i] + "</label></th>";
+                    }
+                    datatableHtml += productHeaders + productHeaders;
+                    datatableHtml += "</thead></tr><tbody></tbody>";
+
+                    $("#products-table").html(datatableHtml);
+                    initProductDatatable(result.datatable.data, numOfProducts);
+                    $("#filterSaleType").val($("#filterSaleType option:first").val());
+
+                    productChart(result.datachart);
+                    productsData = result;
+                } else {
+                    ShowMessage(result.message, 3);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra, vui lòng thử lại.", 3);
+            }
+        });
+    }*@
+
+    function initProductDatatable(dataSet, numOfProducts) {
+        var columnDefs = [];
+        columnDefs.push({
+            "aTargets": [0, 1],
+            "bSortable": false,
+            "sClass": "text-center",
+        });
+
+        var endGroupColumn = (numOfProducts * 2) + 2;
+
+        for (var i = 2; i < endGroupColumn; ++i) {
+            // Trường hợp true là cột TotalAmount, false là FinalAmount
+            if (i < numOfProducts + 2) {
+                columnDefs.push({
+                    "aTargets": [i],
+                    "mRender": function (data, type, row) {
+                        var amount = data;
+                        var color;
+
+                        if (amount == 0 || row[endGroupColumn] == 0) {
+                            color = "";
+                        } else {
+                            var isMax = (amount == row[endGroupColumn]);
+                            color = isMax ? "style='color: green'" : "";
+                        }
+                        amount = toMoney(amount, ',', ' VNĐ');
+
+                        return "<span " + color + ">" + amount + "</span>"
+                    },
+                    "width": "24%",
+                    "bSortable": false,
+                    "sClass": "text-center",
+                });
+            } else {
+                columnDefs.push({
+                    "aTargets": [i],
+                    "mRender": function (data, type, row) {
+                        var amount = data;
+                        var color;
+
+                        if (amount == 0 || row[endGroupColumn + 1] == 0) {
+                            color = "";
+                        } else {
+                            var isMax = (amount == row[endGroupColumn + 1]);
+                            color = isMax ? "style='color: green'" : "";
+                        }
+                        amount = toMoney(amount, ',', ' VNĐ');
+
+                        return "<span " + color + ">" + amount + "</span>"
+                    },
+                    "width": "24%",
+                    "bSortable": false,
+                    "sClass": "text-center",
+                    "visible": false
+                });
+            }
+
+        }
+
+        $("#products-table").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": dataSet,
+            "ordering": true,
+            "iDisplayLength": 10,
+            "aLengthMenu": [10, 50, 100],
+            "oLanguage": {
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": columnDefs,
+            "bAutoWidth": true
+        });
+    }
+
+    //-------------
+    //- LINE CHART -
+    //--------------
+
+    function InitDatachart() {
+        if (responseData != null) {
+            var seriesOptions = [];
+            var subTitle;
+            var dataChart = responseData.datachart;
+            if ($('#filterSaleType').val() == 'before') {
+                $.each(dataChart.data, function (i, cate) {
+                    seriesOptions[i] = {
+                        name: dataChart.data[i]['Name'],
+                        data: dataChart.data[i]['totalList']
+                    };
+                });
+                subTitle = "(Trước khi giảm giá)";
+            } else {
+                $.each(dataChart.data, function (i, cate) {
+                    seriesOptions[i] = {
+                        name: dataChart.data[i]['Name'],
+                        data: dataChart.data[i]['finalList']
+                    };
+                });
+                subTitle = "(Sau khi giảm giá)";
+            }
+            $('#container').highcharts({
+                chart: {
+                    style: {
+                        fontFamily: 'Arial'
+                    }
+                },
+                title: {
+                    text: 'BIỂU ĐỒ DOANH THU THEO LOẠI SẢN PHẨM',
+                    x: -20 //center
+                },
+                subtitle: {
+                    text: subTitle,
+                    x: -20
+                },
+                xAxis: {
+                    categories: dataChart.dateList
+                },
+                yAxis: {
+                    title: {
+                        text: 'Doanh Thu'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    valueSuffix: ' VNĐ'
+                },
+                legend: {
+                    layout: 'horizontal',
+                    align: 'center',
+                    verticalAlign: 'bottom',
+                    borderWidth: 0
+                },
+                series: seriesOptions
+            });
+        }
+    }
+</script>
+<style>
+    .highcharts-container {
+        width: 100% !important;
+    }
+
+    .select2-chosen {
+        color: #FFF !important;
+    }
+
+    .select2-container {
+        background: url(http://i62.tinypic.com/15xvbd5.png) no-repeat 94% 0;
+        height: 29px;
+        overflow: hidden;
+        padding: 0px;
+        background-color: #244363;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        border-radius: 3px;
+    }
+
+        .select2-container .select2-choice {
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            height: 29px;
+            width: 100%;
+            color: white;
+            font-weight: 300;
+        }
+
+        .select2-container select {
+            background: transparent;
+            border: none;
+            font-size: 14px;
+            height: 29px;
+            width: 100%;
+            color: white;
+            font-weight: 300;
+            padding-left: 10px;
+            -webkit-appearance: none;
+        }
+
+            .select2-container select option {
+                color: black;
+            }
+
+    .select2-container-multi {
+        height: auto;
+    }
+
+    .table {
+        width: 100% !important;
+    }
+
+    .control-label {
+        font-weight: 600;
+        font-size: 14px;
+        padding-top: 15px;
+    }
+</style>

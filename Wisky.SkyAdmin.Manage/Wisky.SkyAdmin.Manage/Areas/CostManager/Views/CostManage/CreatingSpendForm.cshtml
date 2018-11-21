@@ -1,0 +1,141 @@
+﻿
+@model HmsService.ViewModels.CostViewModel
+@{
+    var user = HttpContext.Current.User;
+    var storeId = 0;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+}
+
+<form method="POST" role="form" id="createSpend">
+    @Html.HiddenFor(a => a.CostCategoryType);
+    @Html.Hidden("LoggedPerson", user.Identity.Name)
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Phiếu chi</h4>
+            </div>
+            <div class="modal-body">
+               
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Loại chi</label>
+                    <select class="form-control" name="CatId">
+                        @foreach (var item in Model.Categories)
+                        {
+                            <option value="@item.CatID">@item.CatName</option>
+                        }
+                    </select>
+                </div>
+                
+                @if (storeId == 0)
+                {
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Cửa hàng: &nbsp;</label>
+                        <select id="StoreId" class="form-control selectpicker" data-live-search="true"></select>
+                    </div>
+                }
+                else
+                {
+                    <div class="form-group" hidden>
+                        @Html.Hidden("StoreId", storeId)
+                    </div>
+                }
+
+                <div class="form-group" hidden>
+                    <label class="col-md-4 control-label">Thời gian</label>
+                    @Html.HiddenFor(a => a.CostDate, new { @class = "form-control" })
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Người chi</label>
+                    <div class="fg-line">
+                        @Html.TextBoxFor(a => a.PaidPerson, new { @class = "form-control" })
+                    </div>
+                    </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Giá trị</label>
+                    <div class="fg-line">
+                        @Html.TextBoxFor(a => a.Amount, new { @class = "form-control" })
+                        </div>
+                    </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Nội dung</label>
+                    <div class="fg-line">
+                        @Html.TextAreaFor(a => a.CostDescription, new { @class = "form-control", @rows = "5" })
+                    </div>
+                    </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                <button type="submit" class="btn btn-primary" id="add-cost-modal-btn">Thêm</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+
+</form>
+
+
+
+<script>
+    $('#createSpend').submit(function (e) {
+        e.preventDefault();
+        var form = $(this);
+        if ($("#PaidPerson").val() == "") {
+            ShowMessage("Người chi không được để trống", 1);
+            return;
+        }
+        else if ($("#Amount").val() == "") {
+            ShowMessage("Giá trị không được để trống", 1);
+            return;
+        }
+        else if ($("#Amount").val() <= 0) {
+            ShowMessage("Giá trị phải lớn hơn 0", 1);
+            return;
+        }
+
+
+        $.ajax({
+            url: "@Url.Action("CreatingSpendForm")",
+            dataType:'JSON',
+            type: 'POST',
+            data: form.serialize(),
+            success: function (result) {
+                if (result.success) {
+                    RefreshTable();
+                    //HMS.Cost.loadOverViewCost();
+                    $('#add-cost-modal').modal('hide');
+                    ShowMessage("Tác vụ thành công", 3);
+                } else {
+                    ShowMessage("Tác vụ không thành công", 1);
+                }
+            }
+        })
+    });
+
+    $.ajax({
+        type: "GET",
+        url: "@(Url.Action("GetListStore"))",
+        success: function (data) {
+            var content = "";
+            for (var i = 0; i < data.listresult.length; ++i) {
+                content += "<option value='" + data.listresult[i].storeId + "'>" + data.listresult[i].storeName + "</option>";
+            }
+            $("#StoreId").append(content);
+            $("#StoreId").selectpicker('refresh');
+        },
+        error: function (error) {
+            ShowMessage("Không tải dc dữ liệu!", 1);
+        }
+    });
+
+    function RefreshTable() {
+        var oTable = $("#cost-main-table").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    }
+</script>
+

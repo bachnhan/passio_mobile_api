@@ -1,0 +1,126 @@
+﻿<div class="block-header">
+    <h2>Thông tin chung</h2>
+    <ul class="actions">
+        <li>
+            <button type="submit" id="okButton" class="btn btn-primary">Hoàn tất</button>
+        </li>
+    </ul>
+</div>
+<form role="form">
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Card: SEO -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>Thông tin doanh nghiệp / cửa hàng</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label class="control-label">Tên doanh nghiệp / cửa hàng</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" id="storeName">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputTitle" class="control-label">Địa chỉ</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" id="address" value="">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="inputDescription" class="control-label">Số điện thoại</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" value="" id="phone">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDescription" class="control-label">Fax</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" value="" id="fax">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Email</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" id="storeEmail">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Bản đồ</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="row">
+                        <div class="col-sm-5 col-md-5">
+                            <div class="form-group">
+                                <label class="control-label">Vĩ độ</label>
+                                <input type="text" class="form-control" name="lat" id="lat" />
+                            </div>
+                        </div>
+                        <div class="col-sm-5 col-md-5">
+                            <div class="form-group">
+                                <label class="control-label">Kinh độ</label>
+                                <div class="fg-line">
+                                    <input type="text" class="form-control" name="lng" id="lng" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 col-md-2">
+                            <button type="button" data-action="change-coordinates" class="btn btn-success btn-search">Tìm</button>
+                        </div>
+                    </div>
+
+                    <div id="map">
+                    </div>
+                </div>
+            </div>
+            @*<div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin giới thiệu</h2>
+                    </div>
+                    <div class="card-body card-padding">
+                        <div class="form-group" id="titleBlock">
+                            <label for="inputTitle" class="control-label">Tiêu đề</label>
+                            <div class="fg-line">
+                                <input type="text" class="form-control" id="title">
+                            </div>
+                        </div>
+                        <div class="form-group" id="sloganBlock">
+                            <label for="inputTitle" class="control-label">Slogan</label>
+                            <div class="fg-line">
+                                <textarea class="form-control" rows="3" id="slogan"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group" id="desBlock">
+                            <label for="inputTitle" class="control-label">Mô tả về cửa hàng</label>
+                            <div class="fg-line">
+                                <textarea class="form-control" rows="6" id="storeDescription"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>*@
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+         $(document).ready(function () {
+            SKYWEB.Admin.GeneralInformatinoPage.init();
+        });
+    </script>
+}
+
+
+
+
+
+

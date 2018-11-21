@@ -1,0 +1,188 @@
+﻿
+@{
+    ViewBag.Title = "EditMembershipCardCode";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Thay đổi mã thẻ</h3>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-body">
+        <div class="modal-body">
+            <div class="form-horizontal">
+                <div class="col-sm-7">
+                    <div>
+                        <label class="col-sm-2 control-label">
+                            Mã thẻ:
+                        </label>
+                        <div class="col-sm-5" style="width:61%">
+                            <input class="form-control" type="text" style="width:70%;margin-left:30px;" required id="membership-card-code" placeholder="Vui lòng nhập mã thẻ." />
+                        </div>
+                        <div class="col-sm-1">
+                            <button type="button" class="btn btn-primary pull-right" id="membership-card-check">Kiểm tra</button>
+                        </div>
+                    </div>
+                    <div id="membershipCard-info" class="hidden col-md-8" style="padding-top: 15px;padding-left: 15px;">
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">
+                                Tên tài khoản:
+                            </label>
+                            <div class="col-sm-8">
+                                <input id="account-name" class="form-control" type="text" readonly />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">
+                                Tên khách hàng:
+                            </label>
+                            <div class="col-sm-8">
+                                <input id="customer-name" class="form-control" type="text" readonly />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">
+                                Số điện thoại:
+                            </label>
+                            <div class="col-sm-8">
+                                <input id="customer-phone" class="form-control" type="text" readonly />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-4 control-label">
+                                Địa chỉ:
+                            </label>
+                            <div class="col-sm-8">
+                                <input id="customer-address" class="form-control" type="text" readonly />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+               <div class="form-group">
+                   <div id="update-memberCode" class="hidden">
+                       <div class="col-sm-1">
+                           <label>Mã mới: </label>
+                       </div>
+                       <div class="col-sm-3">
+                           <input class="form-control" type="text" required id="membership-card-codeNew" placeholder="Vui lòng nhập mã thẻ mới" />
+                       </div>
+                       <div class="col-sm-1" style="padding-top:0px">
+                           <button type="button" class="btn btn-primary pull-right" id="membership-card-update">Cập nhật</button>
+                       </div>
+                   </div>
+               </div>
+            </div>
+        </div>
+    </div>
+    <div id="update-membershipCode-modal" class="modal fade" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" style="padding-top: 50px; width: 700px">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h3>Cập nhật mã thẻ</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 col-sm-offset-1 control-label">
+                                Tài khoản:
+                            </label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="text" required id="membership-card-account" placeholder="Vui lòng nhập tài khoản." />
+                            </div>
+                            <label class="col-sm-2 col-sm-offset-1 control-label">
+                                Password:
+                            </label>
+                            <div class="col-sm-8">
+                                <input class="form-control" type="password" required id="membership-card-password" placeholder="Vui lòng nhập mật khẩu." />
+                            </div>
+                            <div class="col-sm-12" style="margin-top:10px;padding-right: 73px;">
+                                <button type="button" style="margin-left: 20px;" class="btn btn-primary pull-right" id="membership-card-checkUpdate">Cập nhật</button>
+                                <button type="button" class="btn btn-primary pull-right" id="closeModel">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>  
+
+<script>
+    $('#closeModel').on('click', function() {
+        $('#update-membershipCode-modal').modal('hide');
+    });
+    $('#membership-card-check').on('click', function () {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CheckMembershipCardCode", "MembershipCard")',
+            data: { 'membershipCardCode': $('#membership-card-code').val() },
+            success: function (result) {
+                if (result.success) {
+                    $('#membershipCard-info').removeClass('hidden');
+                    $('#update-memberCode').removeClass('hidden');
+                    $('#account-name').val(result.AccountName);
+                    $('#customer-name').val(result.Customer.Name);
+                    $('#customer-phone').val(result.Customer.Phone);
+                    $('#customer-address').val(result.Customer.Address);
+                } else {
+                    $('#membershipCard-info').addClass('hidden');
+                    $('#update-memberCode').addClass('hidden');
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra!", 1);
+            }
+        });
+    });
+    $('#membership-card-update').on('click', function () {
+        if ($('#membership-card-codeNew').val() == null || $('#membership-card-codeNew').val() == "") {
+            ShowMessage("Vui lòng điền mã thẻ mới", 1);
+            return false;
+        } else {
+            $('#membership-card-account').val("");
+            $('#membership-card-password').val("");
+            $('#update-membershipCode-modal').modal('show');
+        }
+    });
+    $('#membership-card-checkUpdate').on('click', function () {
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("UpdateMembershipCardCode", "MembershipCard")',
+            data: {
+                'membershipCardCode': $('#membership-card-code').val(),
+                'membershipCardNew': $('#membership-card-codeNew').val(),
+                'membershipCardAccount': $('#membership-card-account').val(),
+                'membershipCardPassword': $('#membership-card-password').val(),
+            },
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage(result.message, 2);
+                    $('#update-membershipCode-modal').modal('hide');
+                    $('#membership-card-account').val("");
+                    $('#membership-card-password').val("");
+                    $('#membership-card-codeNew').val("");
+                    $('#membership-card-code').val("");
+                    $('#account-name').val("");
+                    $('#customer-name').val("");
+                    $('#customer-phone').val("");
+                    $('#customer-address').val("");
+                    $('#membershipCard-info').addClass('hidden');
+                    $('#update-memberCode').addClass('hidden');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra!", 1);
+            }
+        });
+    });
+
+</script>

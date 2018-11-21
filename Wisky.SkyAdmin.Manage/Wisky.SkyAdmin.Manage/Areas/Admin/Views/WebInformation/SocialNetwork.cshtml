@@ -1,0 +1,55 @@
+﻿<div class="block-header">
+    <h2>Thông tin chung</h2>
+    <ul class="actions">
+
+        <li>
+            <button type="submit" id="okButton" class="btn btn-primary">Hoàn tất</button>
+        </li>
+    </ul>
+</div>
+<div class="row">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header">
+                <h2>Thông tin về mạng xã hội</h2>
+            </div>
+            <div class="card-body card-padding">
+                <form role="form">
+                    <div class="form-group" id="facebookBlock">
+                        <label for="facebook" class="control-label">Đường dẫn Facebook</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" id="facebookLink" value="">
+                        </div>
+                    </div>
+                    <div class="form-group" id="twitterBlock">
+                        <label for="twitter" class="control-label">Đường dẫn Twitter</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" value="" id="twitterLink">
+                        </div>
+                    </div>
+                    <div class="form-group" id="youtubeBlock">
+                        <label for="youtube" class="control-label">Đường dẫn youtube</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" value="" id="youtubeLink">
+                        </div>
+                    </div>
+                    <div class="form-group" id="zaloBlock">
+                        <label for="zalo" class="control-label">Đường dẫn zalo</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" value="" id="zaloLink">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            SKYWEB.Admin.SocialNetwork.init();
+        });
+    </script>
+}

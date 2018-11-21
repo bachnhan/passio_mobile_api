@@ -1,0 +1,302 @@
+﻿@model HmsService.ViewModels.CouponCampaignViewModel
+@{
+    ViewBag.Title = "Coupon";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+
+
+<div class="card" id="profile-main">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6"><h3><strong>@this.Model.Name</strong></h3></div>
+            
+        </div>
+        <hr />
+    </div>
+    <div class="card-body">
+        <div class="col-md-12">
+            <div class="col-md-4">
+                <div class="pmo-block pmo-contact hidden-xs">
+                    <ul>
+                        <li title="Nhà cung cấp"><i class="zmdi zmdi-accounts-alt"></i> @this.Model.CouponProvider.ProviderName</li>
+                        <li title="Thành tiền"><i class="zmdi zmdi-money-box"></i> @this.Model.Price</li>
+                        <li title="Giá trị"><i class="zmdi zmdi-money"></i> @this.Model.Value</li>
+                        <li title="Ngày bắt đầu"><i class="zmdi zmdi-calendar-check"></i> @this.Model.StartDate.Value.ToString("dd/MM/yyyy")</li>
+                        <li title="Ngày kết thúc"><i class="zmdi zmdi-calendar-close"></i>@this.Model.EndDate.Value.ToString("dd/MM/yyyy")</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-6"><strong>Danh sách coupon</strong></div>
+                            <div class="col-md-6 text-right">
+                                <a href="@(Url.Action("CouponCampaign","Coupon"))" class="btn btn-danger comeback ">Quay lại</a>
+                                <a id="createCoupon" class="btn btn-success btn-sm waves-effect "><i class="glyphicon glyphicon-plus"></i> Thêm Coupon</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-padding">
+                            <div class="row">
+
+                                <div class="col-md-12">
+                                    <table id="Coupon-table" class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <label class="">STT</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Serial number</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Trạng thái</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Tên cửa hàng</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Ngày sử dụng</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Thao tác</label>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       
+
+        @*<div class="pm-overview c-overflow mCustomScrollbar _mCS_3 mCS-autoHide" style="overflow: visible;">
+                <div id="mCSB_3" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" tabindex="0">
+                    <div id="mCSB_3_container" class="mCSB_container mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr">
+
+                        <div class="pmo-block pmo-contact hidden-xs">
+                            <ul>
+                                <li title="Nhà cung cấp"><i class="zmdi zmdi-accounts-alt"></i> @this.Model.CouponProvider.ProviderName</li>
+                                <li title="Thành tiền"><i class="zmdi zmdi-money-box"></i> @this.Model.Price</li>
+                                <li title="Giá trị"><i class="zmdi zmdi-money"></i> @this.Model.Value</li>
+                                <li title="Ngày bắt đầu"><i class="zmdi zmdi-calendar-check"></i> @this.Model.StartDate.Value.ToString("dd/MM/yyyy")</li>
+                                <li title="Ngày kết thúc"><i class="zmdi zmdi-calendar-close"></i>@this.Model.EndDate.Value.ToString("dd/MM/yyyy")</li>
+                            </ul>
+                        </div>
+
+                    </div>
+                </div><div id="mCSB_3_scrollbar_vertical" class="mCSB_scrollTools mCSB_3_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: block;"><div class="mCSB_draggerContainer"><div id="mCSB_3_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 587px; top: 0px; display: block; max-height: 695px;" oncontextmenu="return false;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div><div id="mCSB_3_scrollbar_horizontal" class="mCSB_scrollTools mCSB_3_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_3_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;" oncontextmenu="return false;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div>
+            </div>*@
+
+        @*<div class="pm-body clearfix">
+                <ul class="tab-nav tn-justified">
+                    <li class="active waves-effect"><a data-toggle="tab" href="#denCuaHang">Danh sách Coupon</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div id="denCuaHang" class="tab-pane fade in active">
+
+                        <div class="col-md-12 text-right">
+
+                            <a href="@(Url.Action("CouponCampaign","Coupon"))" class="btn btn-danger comeback ">Quay lại</a>
+                            <a id="createCoupon" class="btn btn-success btn-sm waves-effect "><i class="glyphicon glyphicon-plus"></i> Thêm Coupon</a>
+                        </div>
+
+                        <div class="col-md-12">
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="card-padding">
+                                        <div class="row">
+
+                                            <table id="Coupon-table" class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>
+                                                            <label class="">STT</label>
+                                                        </th>
+                                                        <th>
+                                                            <label class="">Serial number</label>
+                                                        </th>
+                                                        <th>
+                                                            <label class="">Trạng thái</label>
+                                                        </th>
+                                                        <th>
+                                                            <label class="">Tên cửa hàng</label>
+                                                        </th>
+                                                        <th>
+                                                            <label class="">Ngày sử dụng</label>
+                                                        </th>
+                                                        <th>
+                                                            <label class="">Thao tác</label>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody></tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>*@
+    </div>
+    <div id="createCouponForm" class="modal fade in" data-dissmiss="modal" data-keyboard="true"></div>
+    <div id="editCouponPanel" class="modal fade in" data-dissmiss="modal" data-keyboard="true"></div>
+</div>
+
+
+
+
+<script>
+    $('#createCoupon').click(function () {
+        $.ajax({
+            dataType: 'HTML',
+            url: '@Url.Action("CreateCoupon","Coupon")',
+            type: 'GET',
+            data: {
+                "Id": @Model.Id,
+            },
+            success: function (result) {
+                $('#createCouponForm').html(result),
+                $('#createCouponForm').modal('show')
+            },
+            error: function (error) {
+                ShowMessage("Error Occured", 1)
+            }
+        });
+    });
+
+    function showEditCouponForm (id) {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("EditCoupon", "Coupon")',
+            data: {
+                "Id": id,
+            },
+            success: function (result) {
+                $('#editCouponPanel').html(result),
+                $('#editCouponPanel').modal('show')
+            },
+            error: function (error) {
+                ShowMessage("Error Occured")
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        InitCouponDatatable();
+        RefresCouponTable
+
+
+    });
+
+    function RefresCouponTable() {
+        var oTable = $("#Coupon-table").dataTable();
+    }
+    function InitCouponDatatable() {
+        $("#Coupon-table").dataTable({
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "bSort": false,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "Id", "value": '@Model.Id' });
+            },
+            "sAjaxSource": "@Url.Action("LoadCoupon")",
+            "bProcessing": true,
+            "aLengthMenu": [10, 20, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Serial Number",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 3, 4],
+                    "bSortable": true,
+                    "sClass": "text-center"
+                },
+
+                {
+                    "aTargets": [2],
+                    "mRender": function (data, type, row) {
+                        var result = "";
+                        if (parseInt(row[2]) == 0) {
+                            result = "Chưa bán";
+                        }
+                        else if (parseInt(row[2]) == 1) {
+                            result = "Đã bán";
+                        }
+                        else {
+                            result = "Đã được sử dụng";
+                        }
+                        return "<span style=\'font-weight:bold;\'>" + result + "</span>";
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [5],
+                    "mRender": function (data, type, row) {
+                        var data = row[5];
+                        var edit = "<a class='btn btn-sm btn-primary' onclick='showEditCouponForm("+ data +")'><i class='glyphicon glyphicon-pencil'></i></a>";
+                        var deleteCoupon = " <a class='btn btn-sm btn-danger' onclick='deleteCoupon(" + data + ")'><i class='fa fa-trash-o'></i></a>";
+                        return edit + deleteCoupon;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(800);
+    }
+
+    function deleteCoupon(CouponId) {
+        if (confirm("Bạn có muốn xóa tài khoản này?")) {
+            $.ajax({
+                type: 'URL',
+                url: '@Url.Action("DeleteCoupon")',
+                method: 'POST',
+                data: { Id: CouponId },
+                success: function (result) {
+                    if (result.success) {
+                        alert("Xóa thành công!");
+                        location.href = '@Url.Action("Coupon",new {ID = Model.Id })',
+                        RefresCouponTable();
+                    } else {
+                        alert("Xóa không thành công, xin thử lại sau");
+                    }
+                },
+                error: function (error) {
+                    alert("Xóa không thành công, xin thử lại sau");
+                }
+            });
+        }
+    }
+
+</script>

@@ -1,0 +1,198 @@
+﻿@model HmsService.ViewModels.PromotionDetailViewModel
+@{
+    Layout = null;
+}
+@this.Html.Partial("Editor", this.Model)
+<input id="isMember" hidden value="@Model.isMember" />
+<script src="~/Content/plugins/select2/js/select2.full.js"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+
+
+        //var result = ($('#RegExCode').val()).replace(/[^a-zA-Z0-9]/g, '');
+        //$('#textinput').val(result);
+
+        //load GroupCode của PromotionDetail
+        if('@Model.RegExCode' != ""){
+            var str ='@Model.RegExCode';
+            //var n1 = str.search(/\d+/g);
+            var n2 = str.search(/_/g);
+            var substring = str.substring(3, n2); //  hiện tại của Passio regex có chứa Group code từ index = 3, index trong js bắt đầu từ 0
+            $('#group-membership-code').val(substring);
+        }
+
+        if(/\^/.test($('#RegExCode').val())){
+            $('#regexinput').val("start");
+        }
+        else if(/\$/.test($('#RegExCode').val())){
+            $('#regexinput').val("end");
+        }
+        else{
+            $('#regexinput').val("contain");
+        }
+
+
+        //console.log(result);
+    })
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    }
+    //var regexcode = /[a-zA-Z0-9]/.exec($('#RegExCode').val());
+
+    function confirmSubmit(btn) {
+        var min = $('#MinBuyQuantity').val();
+        var max = $('#MaxBuyQuantity').val();
+        var minOr = $('#MinOrderAmount').val();
+        var maxOr = $('#MaxOrderAmount').val();
+
+        $('#GiftProductCode').val($('#giftApplyList').val());
+        $('#BuyProductCode').val($('#productApplyList').val());
+        var isValidPromo = promoValidator();
+        if (isValidPromo) {
+            editDetail();
+        }
+    }
+    function editDetail() {
+        //var formData = $('#promotionDetailForm').serialize();
+        var formData = new FormData($('#promotionDetailForm')[0]);
+        if('@ViewBag.Promo.IsForMember' == "True")
+            formData.append('GroupCode', $('#group-membership-code').val());
+        formData.append('isAppliedOnce', '@ViewBag.Promo.IsApplyOnce' === 'True')
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("EditDetail")',
+            dataType: 'JSON',
+            processData: false,
+            contentType: false,
+            data: formData,
+            //data: {
+            //    model: formData,
+            //    code: $('#promoCode').val()
+            //},
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage(result.message,2);
+                    $('#editDetailModal').modal('hide');
+                    RefreshTable();
+                    //location.reload();
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+        });
+    }
+
+    //Test
+    function loadAllProductEdit() {
+        $.ajax({
+            url: '@Url.Action("LoadAllProductEdit","PromotionDetail")',
+            type: 'POST',
+            success: function (data) {
+                if (data.success) {
+                    //$('#productApplyList').select2({
+                    //    data: data.data,
+                    //    allowClear: true,
+                    //});
+                    myOwnSelect2.call($('#productApplyList'),{
+                        data: data.data,
+                        allowClear: true,
+                    });
+                    //$('#giftApplyList').select2({
+                    //    data: data.data,
+                    //    allowClear: true,
+                    //});
+                    myOwnSelect2.call($('#giftApplyList'),{
+                        data: data.data,
+                        allowClear: true,
+                    });
+                    //window['productApplyList'] = data.data;
+                    //$('#productApplyList').select2({
+                    //    formatResult: formatSelect2,
+                    //    data: getListProduct,
+                    //    matcher: filterFunction,
+                    //    allowClear: true,
+                    //});
+                    //window['giftApplyList'] = data.data;
+                    //$('#giftApplyList').select2({
+                    //    formatResult: formatSelect2,
+                    //    data: getGiftProduct,
+                    //    matcher: filterFunction,
+                    //    allowClear: true,
+                    //});
+                }
+            }
+        });
+        $('#giftApplyList').val($('#GiftProductCode').val());
+        $('#productApplyList').val($('#BuyProductCode').val());
+    }
+    function getListProduct() {
+        var term = '';
+        if (event.target.tagName === 'INPUT') {
+            term = $(event.target).val().toLowerCase();
+        }
+        //if (term.length < 2) return false;
+        //delay(function () {
+        //    alert("Really?");
+        //}, 5000);
+        var count = 0;
+        var tmp = window['productApplyList'].filter(function (ele) {
+            if (ele.text != null) {
+                var text = ele.text.toLowerCase();
+                if (text == undefined)
+                    return false;
+                else {
+                    return term === '' || text.indexOf(term) > -1;
+                }
+            }
+        });
+        return {
+            text: 'text',
+            results: tmp.slice(0,100)
+        };
+    }
+    function getGiftProduct() {
+        var term = '';
+        if (event.target.tagName === 'INPUT') {
+            term = $(event.target).val().toLowerCase();
+        }
+        //if (term.length < 2) return false;
+        //delay(function () {
+        //    alert("Really?");
+        //}, 5000);
+        var count = 0;
+        var tmp = window['giftApplyList'].filter(function (ele) {
+            if (ele.text != null) {
+                var text = ele.text.toLowerCase();
+                if (text == undefined)
+                    return false;
+                else {
+                    return term === '' || text.indexOf(term) > -1;
+                }
+            }
+        });
+        return {
+            text: 'text',
+            results: tmp.slice(0,100)
+        };
+    }
+    function filterFunction(term, text, ele) {
+        return term === '' || ele.text.toLowerCase().indexOf(term.toLowerCase()) > -1;
+    }
+    function formatSelect2(state) {
+        var markup =
+            '<div class="row">' +
+            '<div class="col-xs-7" style="white-space: nowrap">' + state.text + '</div>' +
+            '</div>';
+        markup += '</div>';
+        return markup;
+    }
+</script>
+@*<script>
+        var p = $( "#select2-drop" );
+        var position = p.position();
+        $("#select2-drop").css('top', position.top - 6 + "px");
+    </script>*@

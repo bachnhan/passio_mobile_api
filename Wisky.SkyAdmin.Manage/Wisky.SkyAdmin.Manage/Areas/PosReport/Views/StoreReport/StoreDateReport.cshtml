@@ -1,0 +1,555 @@
+﻿@using System.Web.UI.WebControls
+@model HmsService.Models.Entities.DateReport
+@{
+    ViewBag.Title = "DateDetail";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+
+    IEnumerable<HmsService.Models.Entities.DateProduct> dateProduct = ViewBag.DateProducts;
+    var user = HttpContext.Current.User;
+    ViewBag.ReportDate = Model.Date;
+    int total = (int)@Model.TotalAmount;
+    int final = (int)@Model.FinalAmount;
+    int dis = (int)@ViewBag.DiscountFee;
+
+
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Chi tiết ngày <b>@Model.Date.ToString("dd/MM/yyyy")</b></h3>
+            </div>
+            <div class="col-md-6">
+                <div class="pull-right">
+                    @if (user.IsInRole("Manager"))
+                    {
+                        if (DateTime.Now.ToString("dd/MM/yyyy") != @Model.Date.ToString("dd/MM/yyyy"))
+                        {
+                            <a class="btn btn-primary btn-sm" id="runReport" href="#">
+                                Chạy lại báo cáo
+                            </a>
+                        }
+                    }
+                    <a class="btn btn-primary btn-sm" href='@Url.Action("StoreReportOrtherDay","StoreReport")'>
+                        Xem báo cáo ngày khác
+                    </a>
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="clearfix" style="margin-top: 30px;">
+            <ul class="nav nav-tabs" id="myTab">
+                <li class="active">
+                    <a data-toggle="tab" href="#tab0" class="tab-styling"><i class="left-icon icon-info-sign"></i>Thông tin chung</a>
+                </li>
+                <li class="">
+                    <a data-toggle="tab" href="#tab1" class="tab-styling"><i class="left-icon icon-money"></i>Hóa đơn</a>
+                </li>
+                <li class="">
+                    <a data-toggle="tab" href="#tab2" class="tab-styling"><i class="left-icon icon-gift"></i>Sản phẩm</a>
+                </li>
+                <li class="" style="display: none">
+                    <a data-toggle="tab" href="#tab3" class="tab-styling"><i class="left-icon icon-gift"></i>Nguyên liệu</a>
+                </li>
+                <li class="">
+                    <a data-toggle="tab" href="#tab4" class="tab-styling"><i class="left-icon icon-user"></i>Cashier</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div id="tab0" class="tab-pane fade in active">
+                    <br />
+                    <div class="form-horizontal thin-form">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-sign-in"></i>Ngày lập báo cáo:
+                                    </label>
+                                    <label class="control-label text-left col-md-4">
+                                        @Model.Date.ToString("dd/MM/yyyy")
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-sign-in"></i>Trạng thái:
+                                    </label>
+                                    <label class="control-label text-left col-md-4">
+                                        @if (Model.Status == 1)
+                                        {
+                                            <span>Đã kết báo cáo</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Chưa kết báo cáo</span>
+                                        }
+
+
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-globe"></i>Doanh thu tổng cộng:
+                                    </label>
+                                    <label class="control-label text-left text-bold col-md-4">
+                                        @Model.TotalAmount.Value.ToString("N0")
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-sign-out"></i>Giảm giá trên sản phẩm:
+                                    </label>
+                                    <label class="control-label text-left col-md-4">
+                                        -@Model.DiscountOrderDetail.Value.ToString("N0")
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-sign-out"></i>Giảm giá trên hóa đơn:
+                                    </label>
+                                    <label class="control-label text-left col-md-4">
+                                        -@Model.Discount.Value.ToString("N0")
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-sign-out"></i>Doanh thu sau giảm giá:
+                                    </label>
+                                    <label class="control-label text-left col-md-4">
+                                        @Model.FinalAmount.Value.ToString("N0")
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                @*<div class="form-group">
+                                        <label class="control-label text-left text-bold col-md-5">
+                                            <i class="left-icon fa fa-sign-out"></i>Tổng số sản phẩm:
+                                        </label>
+                                        <label class="control-label text-left col-md-4">
+                                            @ViewBag.TotalProduct
+                                        </label>
+                                    </div>*@
+                                <div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-sign-in"></i>Tổng số hóa đơn:
+                                    </label>
+                                    <label class="control-label text-left col-md-4">
+                                        @ViewBag.TotalBill
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-sign-out"></i>Tổng số hóa đơn (Tại quán):
+                                    </label>
+                                    <label class="control-label text-left col-md-4">
+                                        @ViewBag.TotalBillAtStore
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-money"></i>Tổng số hóa đơn (Mang đi):
+                                    </label>
+                                    <label class="control-label text-left col-md-4" id="balance-lbl">
+                                        @ViewBag.TotalBillTakeAway
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-money"></i>Tổng số hóa đơn (Giao hàng):
+                                    </label>
+                                    <label class="control-label text-left col-md-4" id="balance">
+                                        @ViewBag.TotalBillDelivery
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row" style="margin-bottom: 25px;">
+
+                        <div class="col-lg-6">
+                            <div id="container-product" style="min-width: 310px; height: 300px; max-width: 600px; margin: 0 auto"></div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div id="container-bill" style="min-width: 310px; height: 300px; max-width: 600px; margin: 0 auto"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab1" class="tab-pane fade">
+                    <br />
+                    <div id="order-detail">
+                        @Html.Partial("_TabOrder")
+                    </div>
+                </div>
+
+                <div id="tab2" class="tab-pane fade">
+                    <br />
+
+                    <div id="product-session">
+                        @{
+                            Html.RenderPartial("_TabProduct");
+                        }
+                    </div>
+                </div>
+                @*<div id="tab3" class="tab-pane fade">
+                    <br />
+
+                    <div id="product-item">
+                        @{ Html.RenderPartial("_TabProductItem"); }
+                    </div>
+                </div>*@
+
+                <div id="tab4" class="tab-pane fade">
+                    <br />
+
+                    <div id="product-cashier">
+                        @{ Html.RenderPartial("_TabCashier");}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*<div class="page-content">
+    <div class="page-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Chi tiết ngày @Model.Date.ToString("dd/MM/yyyy")</h1>
+            </div>
+            <div class="col-md-6">
+                <div class="pull-right">
+                    @if (user.IsInRole("Manager"))
+                    {
+                        if (Utils.GetCurrentDateTime().ToString("dd/MM/yyyy") != @Model.Date.ToString("dd/MM/yyyy"))
+                        {
+                            <a class="btn btn-success btn-sm" id="runReport" href="#">
+                                <i class="left-icon fa fa-eye"></i>Chạy lại báo cáo
+                            </a>
+                        }
+                    }
+                    <a class="btn btn-success btn-sm" href='@Url.Action("StoreReportOrtherDay","StoreReport")'>
+                        <i class="left-icon fa fa-eye"></i>Xem báo cáo ngày khác
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix">
+        <ul class="nav nav-tabs" id="myTab">
+            <li class="active">
+                <a data-toggle="tab" href="#tab0"><i class="left-icon icon-info-sign"></i>Thông tin chung</a>
+            </li>
+            <li class="">
+                <a data-toggle="tab" href="#tab1"><i class="left-icon icon-money"></i>Hóa đơn</a>
+            </li>
+            <li class="">
+                <a data-toggle="tab" href="#tab2"><i class="left-icon icon-gift"></i>Sản phẩm</a>
+            </li>
+            <li class="" style="display: none">
+                <a data-toggle="tab" href="#tab3"><i class="left-icon icon-gift"></i>Nguyên liệu</a>
+            </li>
+            <li class="">
+                <a data-toggle="tab" href="#tab4"><i class="left-icon icon-user"></i>Cashier</a>
+            </li>
+        </ul>
+        <div class="tab-content">
+            <div id="tab0" class="tab-pane fade in active">
+                <br />
+                <div class="form-horizontal thin-form">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label text-left text-bold col-md-5">
+                                    <i class="left-icon fa fa-sign-in"></i>Ngày lập báo cáo:
+                                </label>
+                                <label class="control-label text-left col-md-4">
+                                    @Model.Date.ToString("dd/MM/yyyy")
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label text-left text-bold col-md-5">
+                                    <i class="left-icon fa fa-sign-in"></i>Trạng thái:
+                                </label>
+                                <label class="control-label text-left col-md-4">
+                                    @if (Model.Status == 1)
+                                    {
+                                        <span>Đã kết báo cáo</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Chưa kết báo cáo</span>
+                                    }
+
+
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label text-left text-bold col-md-5">
+                                    <i class="left-icon fa fa-globe"></i>Doanh thu tổng cộng:
+                                </label>
+                                <label class="control-label text-left text-bold col-md-4">
+                                    @Model.TotalAmount.Value.ToString("N0")
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label text-left text-bold col-md-5">
+                                    <i class="left-icon fa fa-sign-out"></i>Giảm giá trên sản phẩm:
+                                </label>
+                                <label class="control-label text-left col-md-4">
+                                    -@Model.DiscountOrderDetail.Value.ToString("N0")
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label text-left text-bold col-md-5">
+                                    <i class="left-icon fa fa-sign-out"></i>Giảm giá trên hóa đơn:
+                                </label>
+                                <label class="control-label text-left col-md-4">
+                                    -@Model.Discount.Value.ToString("N0")
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label text-left text-bold col-md-5">
+                                    <i class="left-icon fa fa-sign-out"></i>Doanh thu sau giảm giá:
+                                </label>
+                                <label class="control-label text-left col-md-4">
+                                    @Model.FinalAmount.Value.ToString("N0")
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            @*<div class="form-group">
+                                    <label class="control-label text-left text-bold col-md-5">
+                                        <i class="left-icon fa fa-sign-out"></i>Tổng số sản phẩm:
+                                    </label>
+                                    <label class="control-label text-left col-md-4">
+                                        @ViewBag.TotalProduct
+                                    </label>
+                                </div>
+                            <div class="form-group">
+                                <label class="control-label text-left text-bold col-md-5">
+                                    <i class="left-icon fa fa-sign-in"></i>Tổng số hóa đơn:
+                                </label>
+                                <label class="control-label text-left col-md-4">
+                                    @ViewBag.TotalBill
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label text-left text-bold col-md-5">
+                                    <i class="left-icon fa fa-sign-out"></i>Tổng số hóa đơn (Tại quán):
+                                </label>
+                                <label class="control-label text-left col-md-4">
+                                    @ViewBag.TotalBillAtStore
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label text-left text-bold col-md-5">
+                                    <i class="left-icon fa fa-money"></i>Tổng số hóa đơn (Mang đi):
+                                </label>
+                                <label class="control-label text-left col-md-4" id="balance-lbl">
+                                    @ViewBag.TotalBillTakeAway
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label text-left text-bold col-md-5">
+                                    <i class="left-icon fa fa-money"></i>Tổng số hóa đơn (Giao hàng):
+                                </label>
+                                <label class="control-label text-left col-md-4" id="balance">
+                                    @ViewBag.TotalBillDelivery
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="row">
+
+                    <div class="col-lg-6">
+                        <div id="container-product" style="min-width: 310px; height: 300px; max-width: 600px; margin: 0 auto"></div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div id="container-bill" style="min-width: 310px; height: 300px; max-width: 600px; margin: 0 auto"></div>
+                    </div>
+                </div>
+            </div>
+            <div id="tab1" class="tab-pane fade">
+                <br />
+                <div id="order-detail">
+                    @Html.Partial("_TabOrder")
+                </div>
+            </div>
+
+            <div id="tab2" class="tab-pane fade">
+                <br />
+
+                <div id="product-session">
+                    @{
+                        Html.RenderPartial("_TabProduct");
+                    }
+                </div>
+            </div>
+            <div id="tab3" class="tab-pane fade">
+                <br />
+
+                <div id="product-item">
+                    @{ Html.RenderPartial("_TabProductItem"); }
+                </div>
+            </div>
+
+            <div id="tab4" class="tab-pane fade">
+                <br />
+
+                <div id="product-cashier">
+                    @{ Html.RenderPartial("_TabCashier");}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>*@
+
+<script>
+    $('#runReport').click(function () {
+        $.ajax({
+            url: '@Url.Action("ReCalculatorStoreReport", "StoreReport")',
+            type: 'POST',
+            data: { startTime: '@Model.Date' },
+            //data: { startTime: '22-07-2015' },
+            success: function (rs) {
+                if (rs.success) {
+                    ShowMessage(rs.message,2);
+                } else {
+                    ShowMessage(rs.message, 1);
+                }
+            },
+            error: function (rs) {
+                ShowMessage("Có lỗi xảy ra, vui lòng liên hệ admin!",1)
+            }
+        });
+    });
+
+    //HuyNQ - View Pie Chart of Bill
+    $(function () {
+        var totalBill = parseInt(@ViewBag.TotalBill);
+        var totalBillAtStore = parseInt(@ViewBag.TotalBillAtStore);
+        var totalBillTakeAway = parseInt(@ViewBag.TotalBillTakeAway);
+        var totalBillDelivery = parseInt(@ViewBag.TotalBillDelivery);
+
+        $('#container-bill').highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Tỉ lệ Hóa Đơn'
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: "Brands",
+                colorByPoint: true,
+                data: [{
+                    name: "At Store",
+                    y: totalBillAtStore / totalBill
+                }, {
+                    name: "Take Away",
+                    y: totalBillTakeAway / totalBill,
+                    sliced: true,
+                    selected: true
+                }, {
+                    name: "Delivery",
+                    y: totalBillDelivery / totalBill,
+                }]
+            }]
+        });
+    });
+
+    // HuyNQ - View line Chart of product
+    $(function () {
+        var listData = [],
+            temp;
+        var index = 0;
+        @foreach (var item in dateProduct)
+        {
+            if (@item.Quantity > 5){
+            @:temp = [];
+                    @:temp.push("@item.ProductName_");
+                    @:temp.push(parseInt("@item.Quantity"));
+                    @:listData.push(temp);
+                    }
+        }
+
+        $('#container-product').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Top Sản Phẩm'
+            },
+            subtitle: {
+                text: '(Số lượng trên 5)'
+            },
+            xAxis: {
+                type: 'category',
+                labels: {
+                    rotation: -45,
+                    style: {
+                        fontSize: '8px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Số lượng'
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            tooltip: {
+                pointFormat: '<b>{point.y} Sản Phẩm</b>'
+            },
+            series: [{
+                name: 'Số lượng',
+                data: listData,
+                dataLabels: {
+                    enabled: true,
+                    rotation: -90,
+                    color: '#FFFFFF',
+                    align: 'right',
+                    format: '{point.y}', // one decimal
+                    y: 10, // 10 pixels down from the top
+                    style: {
+                        fontSize: '8px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
+            }]
+        });
+    });
+
+    function getDataTableData(data) {
+        var rs = {};
+        for (var i in data) {
+            rs[data[i].name] = data[i].value;
+        }
+        return rs;
+    }
+</script>

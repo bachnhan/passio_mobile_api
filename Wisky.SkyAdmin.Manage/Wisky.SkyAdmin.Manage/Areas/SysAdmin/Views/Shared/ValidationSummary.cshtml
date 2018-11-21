@@ -1,0 +1,8 @@
+﻿@if (!this.ViewData.ModelState.IsValid)
+{
+    <div class="card">
+        <div class="card-body card-padding text-danger">
+            @this.Html.ValidationSummary()
+        </div>
+    </div>
+}

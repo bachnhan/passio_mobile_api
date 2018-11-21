@@ -1,0 +1,86 @@
+﻿@model HmsService.ViewModels.OrderViewModel
+
+@{
+    Layout = null;
+}
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <h4 class="modal-title">Chi tiết hóa đơn</h4>
+        </div>
+        <div class="modal-body">
+            <div class="clearfix">
+                @if (this.Model.OrderType == (int)OrderTypeEnum.Delivery || this.Model.OrderType == (int)OrderTypeEnum.OnlineProduct)
+                {
+                    <div id="delivery">
+                        <div class="col-md-12">
+                            <label class="control-label text-left text-bold col-md-6">Tên khách hàng:</label>
+                            <label class="control-label text-left col-md-6">@this.Model.CustomerName</label>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="control-label text-left text-bold col-md-6">Địa chỉ giao hàng:</label>
+                            <label class="control-label text-left col-md-6">@this.Model.DeliveryAddress</label>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="control-label text-left text-bold col-md-6">Điện thoại:</label>
+                            <label class="control-label text-left col-md-6">@this.Model.DeliveryPhone</label>
+                        </div>
+                    </div>
+                }
+                <div class="col-md-12">
+                    <label class="control-label text-left text-bold col-md-6">Mã hóa đơn:</label>
+                    <div class="col-md-6">
+                        <label class="control-label text-left ">@this.Model.InvoiceID</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <label class="control-label text-left text-bold col-md-6">Cashier:</label>
+                    <div class="col-md-6">
+                        <label class="control-label text-left " data-role="cashier">@this.Model.CheckInPerson</label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <label class="control-label text-left text-bold col-md-6">Thời gian đặt:</label>
+                    <div class="col-md-6">
+                        <label class="control-label text-left " data-role="order-time">
+                            @(this.Model.CheckInDate.Value.ToString("dd/MM/yyyy") + " " + this.Model.CheckInDate.Value.ToShortTimeString())
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <label class="control-label text-left text-bold col-md-6">Loại hóa đơn:</label>
+                    <div class="col-md-6">
+                        <label class="control-label text-left" data-role="status">
+                            @switch (this.Model.OrderType)
+                            {
+                                case 4:
+                                    <span class='badge badge-primary'>@Resources.EnumLanguage.View_AtStore</span>
+                                    break;
+                                case 5:
+                                    <span class='badge badge-primary'>@Resources.EnumLanguage.View_TakeAway</span>
+                                    break;
+                                case 6:
+                                    <span class='badge badge-primary'>@Resources.EnumLanguage.View_Delivery</span>
+                                    break;
+                            }
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <table class="table table-bordered table-hover" id="order-report-detail-table">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Giá sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Giảm giá</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>

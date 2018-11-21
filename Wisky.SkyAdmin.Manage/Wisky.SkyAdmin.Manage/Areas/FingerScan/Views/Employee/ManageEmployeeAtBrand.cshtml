@@ -1,0 +1,1494 @@
+﻿@using HmsService.Models
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<style>
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+    .mtab_content {
+        display: none;
+    }
+    .funkyradio div {
+        /*margin: 0 50px;*/
+        overflow: hidden;
+    }
+
+    .funkyradio label {
+        /*min-width: 400px;*/
+        width: 100%;
+        border-radius: 3px;
+        border: 1px solid #D1D3D4;
+        font-weight: normal;
+    }
+
+    .funkyradio input[type="radio"]:empty, .funkyradio input[type="checkbox"]:empty {
+        display: none;
+    }
+
+        .funkyradio input[type="radio"]:empty ~ label, .funkyradio input[type="checkbox"]:empty ~ label {
+            position: relative;
+            line-height: 2.5em;
+            text-indent: 3.25em;
+            margin-top: 0em;
+            cursor: pointer;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+            .funkyradio input[type="radio"]:empty ~ label:before, .funkyradio input[type="checkbox"]:empty ~ label:before {
+                position: absolute;
+                display: block;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                content: '';
+                width: 2.5em;
+                background: #D1D3D4;
+                border-radius: 3px 0 0 3px;
+            }
+
+    .funkyradio input[type="radio"]:hover:not(:checked) ~ label:before, .funkyradio input[type="checkbox"]:hover:not(:checked) ~ label:before {
+        content: '\2714';
+        text-indent: .9em;
+        color: #C2C2C2;
+    }
+
+    .funkyradio input[type="radio"]:hover:not(:checked) ~ label, .funkyradio input[type="checkbox"]:hover:not(:checked) ~ label {
+        color: #888;
+    }
+
+    .funkyradio input[type="radio"]:checked ~ label:before, .funkyradio input[type="checkbox"]:checked ~ label:before {
+        content: '\2714';
+        text-indent: .9em;
+        color: #333;
+        background-color: #ccc;
+    }
+
+    .funkyradio input[type="radio"]:checked ~ label, .funkyradio input[type="checkbox"]:checked ~ label {
+        color: #777;
+    }
+
+    .funkyradio input[type="radio"]:focus ~ label:before, .funkyradio input[type="checkbox"]:focus ~ label:before {
+        box-shadow: 0 0 0 3px #999;
+    }
+
+    .funkyradio-default input[type="radio"]:checked ~ label:before, .funkyradio-default input[type="checkbox"]:checked ~ label:before {
+        color: #333;
+        background-color: #ccc;
+    }
+
+    .funkyradio-primary input[type="radio"]:checked ~ label:before, .funkyradio-primary input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #337ab7;
+    }
+
+    .funkyradio-success input[type="radio"]:checked ~ label:before, .funkyradio-success input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5cb85c;
+    }
+
+    .funkyradio-danger input[type="radio"]:checked ~ label:before, .funkyradio-danger input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #d9534f;
+    }
+
+    .funkyradio-warning input[type="radio"]:checked ~ label:before, .funkyradio-warning input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #f0ad4e;
+    }
+
+    .funkyradio-info input[type="radio"]:checked ~ label:before, .funkyradio-info input[type="checkbox"]:checked ~ label:before {
+        color: #fff;
+        background-color: #5bc0de;
+    }
+</style>
+
+@* ------ Biến FLAG hidden dùng chứa val() check hành động Thêm hoăc Sửa *@
+@* ------ Biến TMP hidden dùng làm biến tạm đỡ EmployeeId (data) khi bấm nút sửa*@
+<input type="hidden" id="FLAG" />
+<input type="hidden" id="TMP" />
+@*--------------------------------------*@
+
+<div class="card">
+    <div class="card-header">
+        <div class="box-header p-b-0">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Quản lý nhân viên</h3>
+                </div>
+                <div class="col-md-6 text-right p-t-5">
+                    <button class="btn btn-success btn-sm pull-right" onclick="callShowCreateModal()">
+                        <i class="glyphicon glyphicon-plus"></i> THÊM NHÂN VIÊN
+                    </button>
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div id="mtabs">
+            <ul id="tabList" class="nav nav-tabs ui-sortable-handle">
+                <li style="background-color:#f9f9f9" class="waves-effect active"><a data-toggle="tab" href="#EmployeeWorking">Nhân viên đang làm việc </a></li>
+                <li style="background-color:#f9f9f9" class="waves-effect"><a data-toggle="tab" href="#EmployeeNon_Working"> Nhân viên đã nghỉ việc</a></li>
+            </ul>
+        </div>
+        <div class="card mtab_content" id="EmployeeWorking" style="display:block;">
+            <div class="card-header card-padding">
+                <div class="row">
+                    <div class="col-md-6 p-t-10">
+                        <label class="right-icon pull-left" style="line-height: 25px;">Cửa hàng: &nbsp;</label>
+                        <div class="col-md-6">
+                            <div class="fg-line">
+                                <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7" onchange="reloadStoreData()"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-t-10">
+                        <div class="pull-right text-right">
+                            <button id="exportOneShift" class="width230 btn btn-primary btn-sm" onclick="exportExcellOneShift()">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Customer Table -->
+            <div class="card-body card-padding row">
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="allcust">
+                        <!-- Datatable -->
+                        <div class="col-md-12">
+                            <input type="hidden" id="enrollnumber" />
+                            <table id="item-type-table" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th><label>STT</label></th>
+                                    <th><label>Tên nhân viên</label></th>
+                                    <th><label>Mã Chấm Công</label></th>
+                                    <th><label>Số điện thoại</label></th>
+                                    <th><label>Ngày Bắt Đầu</label></th>
+                                    <th><label>Tiền Lương</label></th>
+                                    <th><label>Tùy chọn</label></th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mtab_content" id="EmployeeNon_Working">
+            <div class="card-header card-padding">
+                <div class="row">
+                    <div class="col-md-6 p-t-10">
+                        <label class="right-icon pull-left" style="line-height: 25px;">Cửa hàng: &nbsp;</label>
+                        <div class="col-md-6">
+                            <div class="fg-line">
+                                <select id="listStoreId_PageEmpNonWorking" class="selectpicker" data-live-search="true" data-size="7" onchange="reloadStoreDataEmpNonWorking()"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-t-10">
+                        <div class="pull-right text-right">
+                            <button id="exportOneShift_PageEmpNonWorking" class="width230 btn btn-primary btn-sm" onclick="exportExcellOneShiftEmpNonWorking()">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Customer Table -->
+            <div class="card-body card-padding row">
+                <div class="tab-content">
+                    <div role="tabpanel" class="tab-pane active" id="allcust2">
+                        <!-- Datatable -->
+                        <div class="col-md-12">
+                            
+                            <table id="item-type-table-emp-nonWorking" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                                <thead>
+                                <tr>
+                                    <th><label>STT</label></th>
+                                    <th><label>Tên nhân viên</label></th>
+                                    <th><label>Mã Chấm Công</label></th>
+                                    <th><label>Số điện thoại</label></th>
+                                    <th><label>Ngày Bắt Đầu</label></th>
+                                    <th><label>Tiền Lương</label></th>
+                                    <th><label>Tùy chọn</label></th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model container-->
+<div id="create-modal-container">
+    <div class="modal" id="create-edit-employee-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="Title_Create_Edit">Title (Thêm - Sửa)</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+
+
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 style="font-weight: bold">Thông tin chung</h5>
+
+                                    </div>
+                                    <div class="card-body card-padding">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Mã nhân viên</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="EmployeeCode" name="EmployeeCode" placeholder="Mã nhân viên" onblur="isChangeEmployeeCodeEdit()">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Mã chấm công</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="EmployeeFingerPrint" name="EmployeeFingerPrint" placeholder="Mã chấm công">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <input type="hidden" id="EmployeeId" />
+                                            <label class="col-sm-3 control-label">Họ và tên</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="EmployeeName" name="EmployeeName" placeholder="Họ và tên">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Ngày sinh</label>
+                                            <div class="col-sm-9">
+                                                <div class="input-group date col-sm-12" id="datetimepickerDOB">
+                                                    <input id="DateOfBirth" type="text" class="input-group-addon form-control" style="text-align: left" />
+                                                    <span class="input-group-addon myCerlenderSpan p-r-45">
+                                                        <span class="fa fa-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Chức vụ</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="EmployeeRegency" name="EmployeeRegency" placeholder="Chức vụ">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Ngày Bắt Đầu</label>
+                                            <div class="col-sm-9">
+                                                <div class="input-group date col-sm-12" id="datetimepickerDateStarWork">
+                                                    <input id="DateStartOfWork" type="text" class="input-group-addon form-control" style="text-align: left" />
+                                                    <span class="input-group-addon myCerlenderSpan p-r-45">
+                                                        <span class="fa fa-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group  row">
+                                            <label for="Product_ProductType" class="col-sm-3 control-label">Giới tính</label>
+                                            <div class="col-md-9">
+                                                <div class="group-radio-buttons myGroup-radio-buttons">
+                                                    <div class="col-md-4">
+                                                        <input type="radio" name="filter-type" value="1" class="nice-check" id="rbMale" />
+                                                        <label for="rbMale"><span>Nam</span></label>
+                                                    </div>
+
+                                                    <div class="col-md-4">
+                                                        <input type="radio" name="filter-type" value="2" class="nice-check" id="rbFemale" />
+                                                        <label for="rbFemale"><span>Nữ</span></label>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <input type="radio" name="filter-type" value="2" class="nice-check" id="rbOther" />
+                                                        <label for="rbOther"><span>Khác</span></label>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="card-header p-t-5 p-b-0 p-l-0">
+                                            <h5 style="font-weight: bold">Chứng minh nhân dân</h5>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Số CMND</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="PersonalCardId" name="PersonalCardId" placeholder="Số CMND">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Ngày cấp</label>
+                                            <div class="col-sm-9">
+                                                <div class="input-group date col-sm-12" id="datetimepickerDatePersonalCard">
+                                                    <input id="DatePersonalCard" type="text" class="input-group-addon form-control" style="text-align: left" />
+                                                    <span class="input-group-addon myCerlenderSpan p-r-45">
+                                                        <span class="fa fa-calendar"></span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Nơi cấp</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="PlaceOfPersonalCard" name="PlaceOfPersonalCard" placeholder="Nơi cấp">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                              
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 style="font-weight: bold">Thông tin khác</h5>
+                                    </div>
+                                    <div class="card-body card-padding">
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Số điện thoại</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="EmployeePhone" name="EmployeePhone" placeholder="Số điện thoại">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Email</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="EmployeeEmail" name="EmployeeEmail" placeholder="Email">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Địa chỉ thường trú</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="EmployeeMainAddr" name="EmployeeMainAddr" placeholder="Địa chỉ thường trú">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Địa chỉ tạm trú</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="EmployeeAddr" name="EmployeeAddr" placeholder="Địa chỉ tạm trú">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Nguyên quán</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="EmployeeHometown" name="EmployeeHometown" placeholder="Nguyên quán">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Nơi sinh</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" id="EmployeePlaceBorn" name="EmployeePlaceBorn" placeholder="Nơi sinh">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Tiền Lương(VND)</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control number" id="EmployeeSalary" name="EmployeeSalary" placeholder="Tiền Lương">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Cửa hàng</label>
+                                            <div class="col-sm-9">
+                                                <select id="listStoreIdInModalAddEmp" class="selectpicker" data-live-search="true" data-size="5" onchange="reloadStoreData()"></select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label">Nhóm nhân viên</label>
+                                            <div class="col-sm-9">
+                                                <select id="listGroupIdInModalAddEmp" class="selectpicker" data-live-search="true" data-size="5"></select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="button" id="btnAction" onclick="actionEmployee()" class="btn btn-success btn-sm pull-right">(Thêm mới - Hoàn Tất)</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="move-emp-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document" style="width: 815px">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="title-shift-model">Cửa hàng hiện tại của nhân viên: <label id="emplNameOfMoveModal"></label></h4>
+                    <input type="hidden" id="emplIdOfMoveModal" />
+                </div>
+                <div class="modal-body col-md-12" id="modal-detail-move-emp">
+                </div>
+                <div class="modal-footer">
+                    <div class="pull-left p-l-20" style="color: #d9534f"><i class="fa fa-home" aria-hidden="true"></i> : Cửa hàng chính nhân viên đang làm</div>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-success" data-dismiss="modal" onclick="updateEmpStoreId()">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!--Model them phan cong-->
+<div id="create-modal-container2">
+    <div class="modal" id="create-attendance-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">Thêm tài khoản cho nhân viên</h4>
+                    </div>
+                    <div class="modal-body col-md-12">
+                        
+                        <div class="tab-content p-0">
+                            <div class="card tab-pane fade in active" id="tableApprove">
+                                <div class="col-md-12 p-0" id="table_employee">
+                                    @*<div class="checkbox p-b-10"><label>Chọn tất cả nhân viên<input type="checkbox" id="CheckAll" /><i class="input-helper"></i></label></div>*@
+                                    <div id="datatable" ; overflow-x scroll;">
+                                        <input type="hidden" id="empIdToMappAcount" />
+                                        <table id="acountDatatable" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                                            <thead>
+                                            <tr>
+                                                <th><label>STT</label></th>
+                                                <th><label>Tên đăng nhập</label></th>
+                                                <th><label>Email</label></th>
+                                                <th><label>Chọn</label></th>
+                                            </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="button" id="btnActionCreateAtt" onclick="mapAcount()" class="btn btn-success btn-sm pull-right">Hoàn Tất</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        var listStoreIdInModalAddEmp = 0;
+        var listGroupIdInModalAddEmp = 0;
+
+        function setupListStoreFilter() {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("GetListStore", "AccountBrandManager", new {area = "Admin"}))",
+                success: function(data) {
+                    listStoreIdInModalAddEmp = data.listresult[0].storeId;
+                    var content = "";
+                    var contentEmpNonWorking = "";
+                    var contentSelectStore = "";
+
+                    content += "<option value='0'>" + "Hệ Thống" + "</option>";
+                    contentEmpNonWorking += "<option value='0'>" + "Hệ Thống" + "</option>";
+                    for (var i = 0; i < data.listresult.length; ++i) {
+                        content += "<option value='" +
+                            data.listresult[i].storeId +
+                            "'>" +
+                            data.listresult[i].storeName +
+                            "</option>";
+
+                        contentEmpNonWorking += "<option value='" +
+                            data.listresult[i].storeId +
+                            "'>" +
+                            data.listresult[i].storeName +
+                            "</option>";
+
+                        contentSelectStore += "<option value='" +
+                            data.listresult[i].storeId +
+                            "'>" +
+                            data.listresult[i].storeName +
+                            "</option>";
+                    }
+
+                    $("#listStoreId").html(content);
+                    $("#listStoreId").selectpicker('refresh');
+                    $("#listStoreId_PageEmpNonWorking").html(contentEmpNonWorking);
+                    $("#listStoreId_PageEmpNonWorking").selectpicker('refresh');
+                    $("#listStoreIdInModalAddEmp").html(contentSelectStore);
+                    $("#listStoreIdInModalAddEmp").selectpicker('refresh');
+
+                    loadEmployeeTable();
+                    loadEmployeeNonWorkingTable();
+                },
+                error: function(error) {
+                    alert("Error Occured")
+                }
+            });
+        }
+
+        function setupListGroup() {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("GetAllEmpGroup", "EmployeeGroup"))",
+                success: function(data) {
+                    var content = "";
+                    var contentSelectGroup = "";
+                    var choose = 0;
+                    listGroupIdInModalAddEmp = data.datatable[0][3];
+                    //content += "<option value='0'>" + "Chọn nhóm nhân viên" + "</option>";
+                    for (var i = 0; i < data.datatable.length; ++i) {
+                        content += "<option value='" +
+                            data.datatable[i][3] +
+                            "'>" +
+                            data.datatable[i][2] +
+                            "</option>";
+
+
+                    }
+                    $("#listGroupIdInModalAddEmp").html(content);
+                    $("#listGroupIdInModalAddEmp").selectpicker('refresh');
+
+                    loadEmployeeTable();
+                },
+                error: function(error) {
+                    alert("Error Occured")
+                }
+            });
+        }
+
+        function reloadStoreData() {
+            loadEmployeeTable();
+        }
+
+        function reloadStoreDataEmpNonWorking() {
+            loadEmployeeNonWorkingTable();
+        }
+
+        // --- Load datatable
+        $(document).ready(function() {
+            $('#datetimepickerDOB').datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+
+            $('#datetimepickerDateStarWork').datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+
+            $('#datetimepickerDatePersonalCard').datetimepicker({
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+
+            $('#EmployeeSalary').blur(function() {
+                var str = $(this).val() + "";
+                var data = str.replace(/[,.đ]/g, '');
+                $("#EmployeeSalary").val(toMoney(data, ',', 'đ'));
+            });
+            $(".number").keydown(function(e) {
+                // Allow: backspace, delete, tab, escape, enter and .
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                    // Allow: Ctrl+A, Command+A
+                    (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                    // Allow: home, end, left, right, down, up
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+            setupListStoreFilter();
+            setupListGroup();
+            $("#mtabs li").click(function() {
+                $("#mtabs li").removeClass('active');
+                $(this).addClass("active");
+                $(".mtab_content").hide();
+                var selected_tab = $(this).find("a").attr("href");
+                $(selected_tab).fadeIn();
+                return false;
+            });
+        });
+
+        function loadEmployeeTable() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetEmployeeByStore", "Employee")',
+                data: {
+                    storeSelected: $("#listStoreId").val()
+                },
+                success: function(result) {
+                    initEmployeeDatatable(result.data);
+                }
+            });
+        }
+
+        function initEmployeeDatatable(data) {
+            $("#item-type-table").dataTable().fnDestroy();
+            $("#item-type-table").dataTable({
+                "stateSave": true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Nhân viên",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3, 4, 5, 6],
+                        "sClass": "text-center",
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [3],
+                        "mRender": function(data, type, row) {
+                            if (data == null) {
+                                return "N/A"
+                            } else {
+                                return data;
+                            }
+                        },
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [5],
+                        "mRender": function(data, type, row) {
+                            if (data != null) {
+                                return toMoney(data, ',', 'đ');
+                            } else {
+                                return "N/A";
+                            }
+                        },
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function(data, type, row) {
+                            //var detail = "<a title='Ca làm việc hiện tại'class='btn btn-sm btn-success' onclick='ShowShiftModal(" + data + ")'><i class='glyphicon glyphicon-eye-open'></i></a>";<i class="fa fa-arrows-h" aria-hidden="true"></i>
+                            var mapAcount =
+                                "<a title='Gán tài khoản' class='btn btn-sm btn-info' onclick='ShowMapAcountModal(" +
+                                    data +
+                                    ")'><i class='fa fa-user'></i></a>";
+                            var move =
+                                "<a title='Chuyển nhân viên'class='btn btn-sm btn-info' onclick='ShowMoveEmpModal(" +
+                                    data +
+                                    ")'><i class='fa fa-arrows-h'></i></a>";
+                            var edit =
+                                "<a title='Chỉnh sửa' class='btn btn-sm btn-primary' onclick='callShowEditModal(" +
+                                    data +
+                                    ")'><i class='glyphicon glyphicon-pencil'></i></a>";
+                            var del = "<a title='Nghỉ việc' class='btn btn-sm btn-danger' onclick='deleteEmployee(" +
+                                data +
+                                ")'><i class='fa fa-times'></i></a>";
+
+                            return mapAcount + " " + move + " " + edit + " " + del;
+                        },
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+
+        function loadEmployeeNonWorkingTable() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetEmployeeNonWorkingByStore", "Employee")',
+                data: {
+                    storeSelected: $("#listStoreId_PageEmpNonWorking").val()
+                },
+                success: function(result) {
+                    initEmployeeNonWorkingDatatable(result.data);
+                }
+            });
+        }
+
+        function initEmployeeNonWorkingDatatable(data) {
+            $("#item-type-table-emp-nonWorking").dataTable().fnDestroy();
+            $("#item-type-table-emp-nonWorking").dataTable({
+                "stateSave": true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Nhân viên",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3, 4, 5, 6],
+                        "sClass": "text-center",
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [3],
+                        "mRender": function(data, type, row) {
+                            if (data == null) {
+                                return "N/A"
+                            } else {
+                                return data;
+                            }
+                        },
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [5],
+                        "mRender": function(data, type, row) {
+                            if (data != null) {
+                                return toMoney(data, ',', 'đ');
+                            } else {
+                                return "N/A";
+                            }
+                        },
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function(data, type, row) {
+                            //var detail = "<a title='Ca làm việc hiện tại'class='btn btn-sm btn-success' onclick='ShowShiftModal(" + data + ")'><i class='glyphicon glyphicon-eye-open'></i></a>";<i class="fa fa-arrows-h" aria-hidden="true"></i>
+                            var move =
+                                "<a title='Chuyển nhân viên'class='btn btn-sm btn-info' onclick='ShowMoveEmpModal(" +
+                                    data +
+                                    ")'><i class='fa fa-arrows-h'></i></a>";
+                            var edit =
+                                "<a title='Chỉnh sửa' class='btn btn-sm btn-primary' onclick='callShowEditModal(" +
+                                    data +
+                                    ")'><i class='glyphicon glyphicon-pencil'></i></a>";
+                            var active =
+                                "<a title='Làm lại' class='btn btn-sm btn-success' onclick='unDeleteEmployee(" +
+                                    data +
+                                    ")'><i class='fa fa-check'></i></a>";
+                            return move + " " + edit + " " + active;
+                        },
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+        function initShiftDatatable(data) {
+            $("#shiftDatatable").dataTable().fnDestroy();
+            $("#shiftDatatable").dataTable({
+                stateSave: true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Tất cả",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3, 4],
+                        "sClass": "text-center",
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [4],
+                        "mRender": function(data, type, row) {
+                            var q = new Date();
+                            var date = new Date(data);
+                            var now = new Date(q.toDateString());
+                            var html = "";
+
+                            if (date < now) {
+                                html = "<div class='label label-danger'>Quá khứ</div>";
+                            } else if (date > now) {
+                                html = "<div class='label label-success'>Tương lai</div>";
+                            } else {
+                                html = "<div class='label label-warning'>Hiện tại</div>";
+                            }
+                            return html;
+                        }
+                    }
+                ],
+                "bAutoWidth": false
+            });
+        }
+
+        //------------- Goi hàm show modal
+        function callShowCreateModal() {
+            $('#FLAG').val('ADD');
+            showModal();
+        }
+
+        function callShowEditModal(data) {
+            $('#FLAG').val('FIX');
+            $('#TMP').val(data);
+            showModal();
+
+        }
+
+        // --- Show Modal them thanh phan
+        function resetData() {
+            $('#EmployeeId').val("");
+            $('#EmployeeName').val("");
+            $('#EmployeeAddr').val("");
+            $('#EmployeePhone').val("");
+            $('#EmployeeSalary').val("");
+            $('#DateStartOfWork').val("");
+            $('#EmployeeFingerPrint').val("");
+            $('#EmployeeCode').val("");
+            $('#EmployeeRegency').val("");
+            $('#DateOfBirth').val("");
+            $('#PersonalCardId').val("");
+            $('#DatePersonalCard').val("");
+            $('#PlaceOfPersonalCard').val("");
+            $('#EmployeeEmail').val("");
+            $('#EmployeeMainAddr').val("");
+            $('#EmployeeHometown').val("");
+            $('#EmployeePlaceBorn').val("");
+            $('#listStoreIdInModalAddEmp').val(listStoreIdInModalAddEmp).change();
+            $('#listGroupIdInModalAddEmp').val(listGroupIdInModalAddEmp).change();
+            $("#rbMale").prop("checked", false);
+            $("#rbFemale").prop("checked", false);
+            $("#rbOther").prop("checked", false);
+        }
+
+        function showModal() {
+            var check = $('#FLAG').val();
+            if (check == "ADD") {
+                resetData();
+                $('#Title_Create_Edit').text("Thêm nhân viên mới");
+                $('#btnAction').text("Thêm mới");
+                showCreateModal();
+            } else if (check == "FIX") {
+                $('#btnAction').text("Hoàn tất");
+                $('#Title_Create_Edit').text("Sửa thông tin nhân viên");
+                showEditModal($('#TMP').val());
+            }
+        }
+
+        function showCreateModal() {
+            resetData();
+            $('#create-edit-employee-modal').modal('show');
+        }
+
+        var tmpEmpCode = "";
+
+        function showEditModal(data) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("prepareEdit", "Employee")',
+                data: {
+                    EmployeeId: data
+                },
+                success: function(result) {
+                    $('#create-edit-employee-modal').modal('show');
+                    $('#EmployeeId').val(result.Id);
+                    $('#EmployeeName').val(result.Name);
+                    $('#EmployeeAddr').val(result.Address);
+                    $('#EmployeePhone').val(result.Phone);
+                    $('#EmployeeSalary').val(toMoney(result.Salary, ',', 'đ'));
+                    $('#DateStartOfWork').val(result.DateStartWork);
+                    $('#EmployeeFingerPrint').val(result.EmpEnrollNumber);
+                    $('#listStoreIdInModalAddEmp').val(result.StoreId).change();
+                    $('#listGroupIdInModalAddEmp').val(result.EmpGroupId).change();
+                    $('#EmployeeCode').val(result.EmployeeCode);
+                    $('#EmployeeRegency').val(result.EmployeeRegency);
+                    $('#DateOfBirth').val(result.DateOfBirth);
+                    $('#PersonalCardId').val(result.PersonalCardId);
+                    $('#DatePersonalCard').val(result.DatePersonalCard);
+                    $('#PlaceOfPersonalCard').val(result.PersonalCardId);
+                    $('#EmployeeEmail').val(result.Email);
+                    $('#EmployeeMainAddr').val(result.MainAddress);
+                    $('#EmployeeHometown').val(result.EmployeeHometown);
+                    $('#EmployeePlaceBorn').val(result.EmployeePlaceBorn);
+
+                    if (result.EmployeeSex == '@((int) Sex.Male)') {
+                        $("#rbMale").prop("checked", true);
+                    }
+                    if (result.EmployeeSex == '@((int) Sex.Female)') {
+                        $("#rbFemale").prop("checked", true);
+                    }
+                    if (result.EmployeeSex == '@((int) Sex.Other)') {
+                        $("#rbOther").prop("checked", true);
+                    }
+                    isChange = false;
+                    tmpEmpCode = $('#EmployeeCode').val();
+                },
+                error: function(error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+
+        @*function ShowShiftModal(data) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("LoadNextShiftOfEmployee")',
+                data: {
+                    employeeId: data
+                },
+                success: function(result) {
+                    $('#shift-modal').modal('show');
+                    $('#title-shift-model').text('Ca làm việc hiện tại - ' + result.name);
+                    initShiftDatatable(result.data);
+                },
+                error: function(error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }*@
+        //----- action: thêm và sửa employee -------------
+
+        function actionEmployee() {
+            var check = $('#FLAG').val();
+            if (check == "ADD") {
+                createEmployee();
+            } else if (check == "FIX") {
+                editEmployee();
+            }
+        }
+
+        function createEmployee() {
+            if ($('#EmployeeName').val().trim() == "" || $('#EmployeeName').val() == null) {
+                ShowAlert("Tên không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+
+            if ($('#EmployeeFingerPrint').val().trim() == "" || $('#EmployeeFingerPrint').val() == null) {
+                ShowAlert("Mã chấm công không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+
+            //if (!$('#EmployeePhone').val().trim().match(/^[0-9]{10,12}$/)) {
+            //    ShowAlert("Số điện thoại phải từ 10 đến 12 số. Vui lòng nhập lại", 1);
+            //    return;
+            //}
+            var sex = 0;
+            if ($("#rbMale").is(':checked')) {
+                sex = 0;
+            }
+
+            if ($("#rbFemale").is(':checked')) {
+                sex = 1;
+            }
+
+            if ($("#rbOther").is(':checked')) {
+                sex = 2;
+            }
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CreateEmployee", "Employee")',
+                data: {
+                    name: $('#EmployeeName').val(),
+                    fingerPrint: $('#EmployeeFingerPrint').val(),
+                    addr: $('#EmployeeAddr').val(),
+                    phone: $('#EmployeePhone').val(),
+                    salary: $('#EmployeeSalary').val().replace(/[,.đ]/g, ''),
+                    datestart: $('#DateStartOfWork').val(),
+                    mainStoreId: $('#listStoreIdInModalAddEmp').val(),
+                    empGroupId: $('#listGroupIdInModalAddEmp option:selected').val(),
+                    empCode: $('#EmployeeCode').val(),
+                    empRecgency: $('#EmployeeRegency').val(),
+                    dob: $('#DateOfBirth').val(),
+                    sex: sex,
+                    personalCardId: $('#PersonalCardId').val(),
+                    datePersonalCard: $('#DatePersonalCard').val(),
+                    placeOfPersonalCard: $('#PlaceOfPersonalCard').val(),
+                    email: $('#EmployeeEmail').val(),
+                    mainAddr: $('#EmployeeMainAddr').val(),
+                    hometown: $('#EmployeeHometown').val(),
+                    placeBorn: $('#EmployeePlaceBorn').val()
+                },
+                success: function(result) {
+                    if (result.success) {
+                        ChangeEmployee();
+                        loadEmployeeTable();
+                        $('#create-edit-employee-modal').modal('hide');
+                        ShowAlert(result.message, 2);
+                    } else {
+                        ShowAlert(result.message, 1);
+                    }
+                },
+                error: function (error) {
+                    console.log(error)
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+
+        var isChange = false;
+
+        function isChangeEmployeeCodeEdit() {
+            if (tmpEmpCode.trim != $('#EmployeeCode').val()) {
+                isChange = true;
+            }
+        }
+
+        function editEmployee() {
+
+            if ($('#EmployeeName').val().trim() == "" || $('#EmployeeName').val() == null) {
+                ShowAlert("Tên không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+
+            if ($('#EmployeeFingerPrint').val().trim() == "" || $('#EmployeeFingerPrint').val() == null) {
+                ShowAlert("Mã chấm công không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+            //if (!$('#EmployeePhone').val().trim().match(/^[0-9]{10,12}$/)) {
+            //    ShowAlert("Số điện thoại phải từ 10 đến 12 số. Vui lòng nhập lại", 1);
+            //    return;
+            //}
+
+            if ($('#listGroupIdInModalAddEmp').val() == 0 || $('#listGroupIdInModalAddEmp').val() == null) {
+                ShowAlert("Vui lòng chọn nhóm", 1);
+                return;
+            }
+            var sex = 0;
+            if ($("#rbMale").is(':checked')) {
+                sex = 0;
+            }
+
+            if ($("#rbFemale").is(':checked')) {
+                sex = 1;
+            }
+
+            if ($("#rbOther").is(':checked')) {
+                sex = 2;
+            }
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("EditEmployee", "Employee")',
+                data: {
+                    id: $('#EmployeeId').val(),
+                    name: $('#EmployeeName').val(),
+                    addr: $('#EmployeeAddr').val(),
+                    phone: $('#EmployeePhone').val(),
+                    salary: $('#EmployeeSalary').val().replace(/[,.đ]/g, ''),
+                    datestart: $('#DateStartOfWork').val(),
+                    fingerPrint: $('#EmployeeFingerPrint').val(),
+                    mainStoreId: $('#listStoreIdInModalAddEmp').val(),
+                    empGroupId: $('#listGroupIdInModalAddEmp').val(),
+                    empCode: $('#EmployeeCode').val(),
+                    empRecgency: $('#EmployeeRegency').val(),
+                    dob: $('#DateOfBirth').val(),
+                    sex: sex,
+                    personalCardId: $('#PersonalCardId').val(),
+                    datePersonalCard: $('#DatePersonalCard').val(),
+                    placeOfPersonalCard: $('#PlaceOfPersonalCard').val(),
+                    email: $('#EmployeeEmail').val(),
+                    mainAddr: $('#EmployeeMainAddr').val(),
+                    hometown: $('#EmployeeHometown').val(),
+                    placeBorn: $('#EmployeePlaceBorn').val(),
+                    isChangEmpCode: isChange
+                },
+                success: function(result) {
+                    if (result.success) {
+                        ChangeEmployee();
+                        $('#create-edit-employee-modal').modal('hide');
+                        resetData();
+                        loadEmployeeTable();
+                        ShowAlert(result.message, 2);
+                    } else {
+                        ShowAlert(result.message, 1);
+                    }
+                },
+                error: function(error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+
+        function ChangeEmployee() {
+
+            $.ajax({
+                type: 'POST',
+                data: {
+                    EmpEnrollNumber: $("#EmployeeFingerPrint").val()
+                },
+                url: '@Url.Action("ChangeEmployee")',
+
+                success: function(result) {
+                    //if (result == true) {
+                    //    ShowAlert("Employee chưa được sửa đổi", 1);
+                    //} else if (result == false) {
+                    //    ShowAlert("Employee đã được Cập Nhật", 2);
+                    //}
+                },
+                error: function(error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            });
+        }
+
+
+        //------------- Xóa Employee
+        function deleteEmployee(id) {
+            ShowConfirm("Bạn có muốn xóa nhân viên này?",
+                function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("DeleteEmployee", "Employee")',
+                        data: { employeeId: id },
+
+                        success: function(data) {
+                            if (data.rs) {
+                                ShowAlert("Xóa thành công", 2);
+                                loadEmployeeNonWorkingTable();
+                                loadEmployeeTable();
+                            } else {
+                                ShowAlert("Thất bại. Vui lòng thử lại", 1);
+                            }
+
+
+                        },
+                        error: function(error) {
+                            showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                        }
+                    });
+                });
+        }
+
+        // kich hoat lai nhan vien
+        function unDeleteEmployee(id) {
+            ShowConfirm("Bạn có muốn thêm lại nhân viên này?",
+                function() {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("UnDeleteEmployee", "Employee")',
+                        data: { employeeId: id },
+
+                        success: function(data) {
+                            if (data.rs) {
+                                ShowAlert("Thành công", 2);
+                                loadEmployeeTable();
+                                loadEmployeeNonWorkingTable();
+                            } else {
+                                ShowAlert("Thất bại. Vui lòng thử lại", 1);
+                            }
+                        },
+                        error: function(error) {
+                            showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                        }
+                    });
+                });
+        }
+
+
+        function checkEmpStore(empId, mainStoreId) {
+            $.ajax({
+                type: "GET",
+                url: "@(Url.Action("GetListAssignToStore", "AccountBrandManager", new {area = "Admin"}))",
+                data: {
+                    empId: empId
+                },
+                success: function(data) {
+                    var storeData = "";
+                    for (var i = 0; i < data.listresult.length; ++i) {
+                        if (data.listresult[i].Checked == true) {
+                            if (data.listresult[i].StoreId == mainStoreId) {
+                                storeData += "<div class='col-md-4'>" +
+                                    "<div class='funkyradio funkyradio-danger'>" +
+                                    "<input type='checkbox' name='checkStore' value='" +
+                                    data.listresult[i].StoreId +
+                                    "' class='nice-check' id='" +
+                                    data.listresult[i].StoreId +
+                                    "' checked='checked' disabled/>" +
+                                    "<label for='" +
+                                    data.listresult[i].StoreId +
+                                    "'><span>" +
+                                    data.listresult[i].StoreName +
+                                    "<i class='fa fa-home' aria-hidden='true' style='color: #d9534f'></i></span></label>" +
+                                    "</div>" +
+                                    "</div>";
+                            } else {
+                                storeData += "<div class='col-md-4'>" +
+                                    "<div class='funkyradio funkyradio-primary'>" +
+                                    "<input type='checkbox' name='checkStore' value='" +
+                                    data.listresult[i].StoreId +
+                                    "' class='nice-check' id='" +
+                                    data.listresult[i].StoreId +
+                                    "' checked='checked'/>" +
+                                    "<label for='" +
+                                    data.listresult[i].StoreId +
+                                    "'><span>" +
+                                    data.listresult[i].StoreName +
+                                    "</span></label>" +
+                                    "</div>" +
+                                    "</div>";
+                            }
+
+                        } else {
+                            storeData += "<div class='col-md-4'>" +
+                                "<div class='funkyradio funkyradio-primary'>" +
+                                "<input type='checkbox' name='checkStore' value='" +
+                                data.listresult[i].StoreId +
+                                "' class='nice-check' id='" +
+                                data.listresult[i].StoreId +
+                                "'/>" +
+                                "<label for='" +
+                                data.listresult[i].StoreId +
+                                "'><span>" +
+                                data.listresult[i].StoreName +
+                                "</span></label>" +
+                                "</div>" +
+                                "</div>";
+                        }
+                    }
+                    $("#modal-detail-move-emp").empty();
+                    $("#modal-detail-move-emp").append(storeData);
+                },
+                error: function(error) {
+                    alert("Error Occured");
+                }
+            });
+        }
+
+        function ShowMapAcountModal(empId) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("ShowMapToAcount", "Employee")',
+                data: {
+                    'employeeId': empId
+                },
+                success: function(data) {
+                    InsertShowMapAcountModal(data.rs, data.rsCheckList);
+                    $("#create-attendance-modal").modal('show');
+                    $("#empIdToMappAcount").val(empId);
+                },
+                error: function(error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+
+        function InsertShowMapAcountModal(data, checkList) {
+            $("#acountDatatable").dataTable().fnDestroy();
+            $("#acountDatatable").dataTable({
+                stateSave: true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Tất cả",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 3],
+                        "sClass": "text-center",
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [3],
+                        "mRender": function (data, type, row) {
+                            var checkEmployee = "";
+                            if (checkList.length > 0) {
+                                for (var i = 0; i < checkList.length; ++i) {
+                                    if (data == checkList[i]) {
+                                        checkEmployee = " <div class='radio'>" +
+                                            "<label>" +
+                                            "<input type='radio' name='checkAcount' value='" +
+                                            data +
+                                            "' checked/>" +
+                                            "<i class='input-helper'></i>" +
+                                            "</label>" +
+                                            "</div>";
+                                    } else {
+                                        checkEmployee = " <div class='radio'>" +
+                                            "<label>" +
+                                            "<input type='radio' name='checkAcount' value='" +
+                                            data +
+                                            "'/>" +
+                                            "<i class='input-helper'></i>" +
+                                            "</label>" +
+                                            "</div>";
+                                    }
+                                }
+                            } else {
+                                checkEmployee = " <div class='radio'>" +
+                                    "<label>" +
+                                    "<input type='radio' name='checkAcount' value='" +
+                                    data +
+                                    "'/>" +
+                                    "<i class='input-helper'></i>" +
+                                    "</label>" +
+                                    "</div>";
+                            }
+
+                            return " " + checkEmployee;
+                        }
+                    }
+                ],
+                "bAutoWidth": false
+            });
+        }
+
+        function mapAcount(userId) {
+            //var allPages = $("#acountDatatable").dataTable().fnGetNodes();
+            //var yourArray = new Array();
+            //$('input[type="checkbox"]:checked', allPages).each(function() {
+            //    var tr = $(this).closest('tr');
+            //    var rowData = $("#acountDatatable").dataTable().fnGetData(tr);
+            //    yourArray.push(rowData[3]);
+            //});
+
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("MapAcount", "Employee")',
+                data: {
+                    'userId': $('input[name=checkAcount]:checked').val(),
+                    'empId': $("#empIdToMappAcount").val()
+                },
+                success: function(data) {
+                    if (data.rs == true) {
+                        $("#create-attendance-modal").modal('hide');
+                        ShowAlert("Cập nhật thành công", 2);
+                    } else {
+                        ShowAlert("Có lỗi xảy ra", 1);
+                    }
+                },
+                error: function(error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+
+        function ShowMoveEmpModal(empId) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("prepareUpdateStoreOfEmp")',
+                data: { EmployeeId: empId },
+                success: function(data) {
+                    checkEmpStore(data.rs.Id, data.rs.MainStoreId);
+                    $("#emplNameOfMoveModal").text(data.rs.Name);
+                    $("#emplIdOfMoveModal").val(data.rs.Id);
+
+                    $("#move-emp-modal").modal('show');
+                },
+                error: function(error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+
+        function updateEmpStoreId() {
+            var yourArray = new Array();
+            $('input[name=checkStore]:checked').each(function() {
+                yourArray.push($(this).val());
+            });
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("UpdateStoreOfEmp")',
+                data: {
+                    employeeId: $("#emplIdOfMoveModal").val(),
+                    listStoreId: yourArray
+                },
+                success: function(data) {
+                    if (data.success == true) {
+                        $("#move-emp-modal").modal('hide');
+                        ShowAlert("Cập nhật thành công", 2);
+                        loadEmployeeTable();
+                    }
+                },
+                error: function(error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+
+        function exportExcellOneShift() {
+            window.location.replace("@Url.Action("ExportToExcelReportEmpInStore", "Employee")" +
+                "?storeSelected=" +
+                $("#listStoreId").val());
+        }
+
+        function exportExcellOneShiftEmpNonWorking() {
+            window.location.replace("@Url.Action("ExportToExcelReportEmpNonWorkingInStore", "Employee")" +
+                "?storeSelected=" +
+                $("#listStoreId_PageEmpNonWorking").val());
+        }
+    </script>
+}

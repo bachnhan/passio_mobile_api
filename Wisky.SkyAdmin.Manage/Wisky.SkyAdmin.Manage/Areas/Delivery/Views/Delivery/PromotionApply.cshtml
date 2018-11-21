@@ -1,0 +1,305 @@
+﻿@model HmsService.ViewModels.PromotionEditViewModel
+
+@{
+    ViewBag.Title = "PromotionApply";
+}
+@{
+    Layout = null;
+}
+
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="card">
+
+
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>
+                            Promotion Apply
+                        </h3>
+
+                    </div>
+                </div>
+                <hr />
+            </div>
+
+            <div class="row">
+                <div class="col-md-offset-3">
+                    <lable class="control-label col-md-4"> Add Promotion </lable>
+
+                </div>
+                <select id="promotionSelect" multiple="multiple" style="width:150px;">
+                    @foreach (var item in Model.AvailablePromotion)
+                    {
+                        <option name="promoOption" value="@item.Value">@item.Text</option>
+                    }
+                </select>
+            </div>
+            <div role="tabpanel" class="tab-pane fade in active" id="order">
+                <div class="row">
+
+                    <div class="col-md-6 col-md-offset-3">
+                        <table id="showTable" class="table table-striped table-bordered table-hover">
+                            <thead style="white-space: nowrap;">
+                                <tr>
+                                    <th>
+                                        <label class="">Tên</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Đơn giá</label>
+                                    </th>
+                                    <th>
+                                        <label class="">SL</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Giảm giá (%)</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tổng cộng</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Xóa</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="showTableContent">
+                             
+                            </tbody>
+                            <template id="tmpItemRow">
+                                <tr>
+                                    <td data-role="name"></td>
+                                    <td data-role="price"></td>
+                                    <td data-role="quantity"></td>
+                                    <td data-role="discount"></td>
+                                    <td data-role="total"></td>
+                                    <td>
+                                        <button class="btn btn-xs btn-danger" data-action="delete-ordered-item"><i class="glyphicon glyphicon-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </template>
+                        </table>
+                        <label id="total-Item-money" class="pull-right text-bold"></label>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    var arrayTemp = new Array();
+   
+
+    $(document).ready(function () {
+        //$('#total-Item-money').html('Tổng cộng : ' + toMoney(window.OnlineOrder.getTotal(), ',', ''))
+        $('#promotionSelect').select2();
+
+        loadTable();
+
+    });
+
+    //Load data to Table
+    function loadTable() {
+      var OrderDetails =  window.OnlineOrder.Order.OrderDetails
+        for (var i = 0; i < OrderDetails.length; i++) {
+            var $tmpItemRow = $($('#tmpItemRow').html().trim());
+            $tmpItemRow.attr('data-id', OrderDetails[i]['Id']);
+            $tmpItemRow.attr('data-role', 'order-detail');
+
+            $tmpItemRow.find('[data-role="name"]').html(OrderDetails[i]['Name']);
+            $tmpItemRow.find('[data-role="price"]').html(OrderDetails[i]['UnitPrice']);
+            $tmpItemRow.find('[data-role="quantity"]').html(OrderDetails[i]['Quantity']);
+            $tmpItemRow.find('[data-role="discount"]').html(OrderDetails[i]['DiscountPercent']);
+            $tmpItemRow.find('[data-role="total"]').html(Math.round(OrderDetails[i]['FinalAmount']));
+
+
+            $('#showTable > tbody').append($tmpItemRow);
+            $('#total-Item-money').html('Tổng cộng : ' + toMoney(window.OnlineOrder.getTotal(), ',', ''));
+        }
+
+    }
+
+
+    function checkRedudant() {
+
+        for (var i = 0; i < $("option[name=promoOption]:selected").length; i++) {
+            if (arrayTemp[i] != $("option[name=promoOption]:selected")[i].value) {
+
+
+                checkValid($("option[name=promoOption]:selected")[i].value);
+            }
+
+        }
+    }
+    //check if items existed, item: OrderDetails, Idarray: itemIDs Array, QuantityArray: Items Quantity array
+    function checkExist(item, IdArray, QuantityArray) {
+        for (var i = 0; i < IdArray.length; i++) {
+            if (item.ProductID == IdArray[i]) {
+                QuantityArray[i] += item.Quantity;
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    var data = {
+        billDiscountRate: 0,
+        productDiscountRate: new Array(),
+        giftQuantity: new Array(),
+        giftItemId: new Array(),
+        promotionId: new Array(),
+        promotionGroup: new Array(),
+        discountBill: 0.0,
+        giftBillQuantity: new Array(),
+        giftItemBillId: new Array()
+
+    };
+
+
+    function checkValid(e) {
+        // push promotion Id to array here. Cause ajax is asynchronous, so it wont wait the array to sort
+        arrayTemp.push(e);
+        arrayTemp.sort(function (a, b) {
+            return a - b;
+        });;
+        var orderDetails = window.OnlineOrder.Order.OrderDetails;
+        var quantityDetails = new Array();
+        var itemsIDs = new Array();
+        var discount = new Array();
+
+        for (var i = 0; i < orderDetails.length; i++) {
+
+            if (checkExist(orderDetails[i], itemsIDs, quantityDetails) == false) {
+                itemsIDs.push(orderDetails[i].ProductID);
+                quantityDetails.push(orderDetails[i].Quantity);
+                discount.push(orderDetails[i].DiscountPercent + 0.0);
+            }
+        }
+
+        var sendValues = {
+            orderDetailsIDs: itemsIDs,
+            quantityDetails: quantityDetails,
+            promotionId: e,
+            strTotal: window.OnlineOrder.getTotal(),
+            discount: discount,
+            discountBillBefore: data.discountBill
+        };
+
+        var result2;
+        $.ajax({
+            dataType: "json",
+            type: "POST",
+            url: "@Url.Action("CheckPromotionDetail")",
+            data: sendValues,
+            success: function (result) {
+                if (!result.success) {
+                    //if promotion is Valid with this Bills. If not rescind select option.
+                    ShowMessage("Promotion ko hợp lệ", 3);
+                    new_data = $.grep($('#promotionSelect').select2('data'), function (value) {
+                        return value['id'] != e;
+                    });
+                    $('#promotionSelect').select2('data', new_data);
+
+                    new_data2 = $.grep(arrayTemp, function (value) {
+                        return value != e;
+                    });
+                    arrayTemp = new_data2;
+
+
+                } else {
+                    
+
+                    //Kiểm tra có thể áp dụng hoàn toàn quy định khuyến mãi hay ko
+                    if (result.isDiscountByBill > 0) {
+                        var money = window.OnlineOrder.getTotal();
+                        money *= ((100 - result.discountRate) / 100);
+                        $("#total-Item-money").html("Tổng cộng: " + money);
+                    }
+                    data.productDiscountRate = result.discountRate;
+                    data.giftQuantity = result.giftQuantity;
+                    data.giftItemId = result.giftItemId;
+                    data.promotionGroup = result.promotionGroup;
+                    data.discountBill = result.discountBill;
+                    data.giftBillQuantity.push(result.giftBillQuantity);
+                    data.giftItemBillId.push(result.giftItemBillId);
+
+                    var allOrderDetails = window.OnlineOrder.Order.OrderDetails;
+                    for (var i = 0; i < allOrderDetails.length; i++) {
+                        allOrderDetails[i].DiscountPercent = data.productDiscountRate[i];
+                        if (allOrderDetails[i].DiscountPercent != null) {
+                            allOrderDetails[i].TotalAmount = allOrderDetails[i].Quantity * allOrderDetails[i].UnitPrice;
+                        allOrderDetails[i].FinalAmount =
+                            allOrderDetails[i].TotalAmount * (1 - allOrderDetails[i].DiscountPercent * 0.01);
+                        } else {
+                            allOrderDetails[i].DiscountPercent = 0;
+                        }
+
+                    }
+                    $('#showTable > tbody').html('');
+                    loadTable();
+
+
+
+                    ShowMessage("OK<br/> PrmotionID: " + result.promotionId + "<br/>Discount items rate: " + result.discountRate +
+                        "<br/>Gift item: " + result.giftItemId + "<br/>" +
+                        "Gift quantity: " + result.giftQuantity + "<br/>" +
+                        "GiftBill Id : " + result.giftItemBillId + "<br/>" + 
+                        "Gift Bill Quantity: " + result.giftBillQuantity + "<br/>" +
+                        "Discount bill: " + result.discountBill, 2);
+
+                }
+
+            }
+        });
+    }
+
+
+
+    function deleteItems() {
+        for (var i = 0; i < arrayTemp.length; i++) {
+            if (($("option[name=promoOption]:selected")[i] == null)
+                || arrayTemp[i] != $("option[name=promoOption]:selected")[i].value) {
+
+
+                arrayTemp.splice(i, 1);
+
+                return;
+            }
+        }
+    }
+
+    $('#promotionSelect').on("change", function () {
+        if ($('#promotionSelect :selected').length < arrayTemp.length) {
+            deleteItems();
+            ShowMessage("Notcheck", 2);
+            --GlobalLength;
+            return;
+        }
+        checkRedudant();
+        GlobalLength = $('#promotionSelect :selected').length;
+    });
+
+
+
+
+
+
+
+</script>
+<style>
+    #showTable td:nth-child(6) {
+        display: none;
+    }
+
+    #showTable th:nth-child(6) {
+        display: none;
+    }
+
+    /*test*/
+</style>

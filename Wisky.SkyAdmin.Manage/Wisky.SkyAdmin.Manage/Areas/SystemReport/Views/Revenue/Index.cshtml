@@ -1,0 +1,884 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Overall statistics -->
+<style>
+    .chartOption {
+        cursor: pointer;
+    }
+
+    .widget-header {
+        cursor: pointer;
+    }
+
+    .infobox {
+        height: 100px !important;
+    }
+
+    .chartOptionActive {
+        font-weight: bold;
+    }
+
+    #storePieChart {
+        margin-top: 80px;
+    }
+
+    /*  bhoechie tab */
+    div.bhoechie-tab-container {
+        z-index: 10;
+        background-color: #ffffff;
+        padding: 0;
+        border-radius: 4px;
+        -moz-border-radius: 4px;
+        /*border: 1px solid #ddd;*/
+        -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        -moz-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        background-clip: padding-box;
+        opacity: 0.97;
+        filter: alpha(opacity=97);
+    }
+
+    div.bhoechie-tab-menu {
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
+        background-color: rgba(44, 73, 73, 1);
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+    }
+
+    a.list-group-item {
+        color: #ffffff !important;
+        background-color: rgba(44, 73, 73, 1) !important;
+        border: 0 !important;
+    }
+
+        a.list-group-item:hover,
+        button.list-group-item:hover,
+        a.list-group-item:focus,
+        button.list-group-item:focus {
+            text-decoration: none !important;
+            color: #ffffff !important;
+            background-color: rgba(44, 73, 73, 1) !important;
+        }
+
+    .no-padding {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .bhoechie-tab-menu .list-group {
+        margin-bottom: 0;
+        /*border: 0;*/
+    }
+
+        .bhoechie-tab-menu .list-group a {
+            margin-bottom: 0;
+        }
+
+            .bhoechie-tab-menu .list-group a .glyphicon,
+            .bhoechie-tab-menu .list-group a .fa {
+                color: #fff;
+            }
+
+            .bhoechie-tab-menu .list-group a:first-child {
+                border-radius: 0;
+                -moz-border-radius: 0;
+            }
+
+            /*.bhoechie-tab-menu .list-group  a:last-child {
+            border-bottom-right-radius: 0;
+            -moz-border-bottom-right-radius: 0;
+        }*/
+
+            .bhoechie-tab-menu .list-group a.active,
+            .bhoechie-tab-menu .list-group a.active .glyphicon,
+            .bhoechie-tab-menu .list-group a.active .fa {
+                background-color: #fff !important;
+                color: rgba(44, 73, 73, 1) !important;
+            }
+
+                .bhoechie-tab-menu .list-group a.active:after {
+                    content: '';
+                    position: absolute;
+                    top: 100%;
+                    margin-left: -13px;
+                    /* border-left: 0; */
+                    border-right: 13px solid transparent;
+                    border-left: 13px solid transparent;
+                    border-top: 10px solid rgba(44, 73, 73, 1);
+                }
+
+    div.bhoechie-tab-content {
+        background-color: #ffffff;
+        /* border: 1px solid #eeeeee; */
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+
+    a.list-group-item,
+    button.list-group-item {
+        color: #fff;
+    }
+
+    div.bhoechie-tab-content > .col-lg-6, .col-md-6 {
+        padding-top: 50px;
+    }
+
+    div.bhoechie-tab-content > .col-sm-12, .col-xs-12 {
+        padding-top: 20px;
+    }
+
+    div.bhoechie-tab div.bhoechie-tab-content:not(.active) {
+        display: none;
+    }
+
+    .row {
+        margin-top: 40px;
+    }
+
+    .clearfix > * {
+        color: #fff;
+    }
+
+    .nav-tabs {
+        border-bottom: 1px solid rgba(44, 73, 73, 1);
+    }
+
+    .infobox-data > h1, h2, h3, h4 {
+        color: #fff;
+        margin-top: 0;
+    }
+
+    .padding15 {
+        padding-bottom: 15px;
+        padding-top: 15px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .bgm-wheat {
+        background-color: wheat !important;
+    }
+
+    .bgm-cadet {
+        background-color: cadetblue;
+    }
+
+    .bgm-seagreen {
+        background-color: seagreen;
+    }
+
+    .bgm-sandbrown {
+        background-color: sandybrown;
+    }
+
+    .margin-in-col {
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+
+    .my-widget {
+        border-radius: 10px;
+        margin-right: 15px;
+    }
+
+    .widget-rev {
+        background-color: darkslategrey;
+    }
+
+    .widget-rev-odd {
+        background-color: rgba(44, 73, 73, 1);
+    }
+
+    .wdidget-as {
+        background-color: rgba(200, 81, 81, 1);
+    }
+
+    .wdidget-as-odd {
+        background-color: rgba(191, 79, 79, 1);
+    }
+
+    .widget-del {
+        background-color: rgba(204, 155, 30, 1);
+    }
+
+    .widget-del-odd {
+        background-color: rgba(195, 148, 29, 1);
+    }
+
+    .wdidget-ta {
+        background-color: darkolivegreen;
+    }
+
+    .wdidget-ta-odd {
+        background-color: rgba(83, 103, 50, 1);
+    }
+
+    .infobox-content {
+        visibility: hidden;
+    }
+
+    .dataTables_wrapper.no-footer .dataTables_scrollBody {
+        border-bottom: 1px solid lightgray;
+    }
+
+    #storeReportDatatable > thead {
+        visibility: hidden;
+        border: 0;
+    }
+
+    #storeReportDatatable tr[role=row] {
+        cursor: pointer;
+    }
+
+    .tableDiv-responsive {
+        width: 100%;
+    }
+    .modified-money {
+        position: absolute;
+        top: 3em;
+        right: 1em;
+        float: right;
+        display: inline-block;
+    }
+    .h2Money {
+        font-size: 1.85em;
+        float: right;
+        margin-bottom: 0;
+        margin-top: 0;
+    }
+    .small-padding {
+        padding-right: 1em;
+    }
+    .infobox-data-modified {
+        min-height: 5em;
+    }
+    .repadding {
+        padding: 0 1em !important;
+    }
+</style>
+
+<!--Card-->
+
+<div class="card">
+    <!--Card Header-->
+    <div class="card-header">
+        <!--Title-->
+        <div class="col-sm-12">
+            <h3>Báo cáo doanh thu theo ngày</h3>
+            <h5 data-role="small-date" id="dateRange"></h5>
+        </div>
+    </div>
+    <!--End Card Header-->
+    <!--Card body-->
+    <div class="card-body">
+        <hr />
+        <div class="row">
+            <!--Store-->
+            <div class="col-sm-6">
+                <label class="right-icon pull-left" style="line-height: 25px;">Cửa hàng: &nbsp;</label>
+                <div class="col-sm-6">
+                    <div class="fg-line">
+                        <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7">
+                            <option value='0'>Hệ Thống</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!--Date range-->
+            <div class="col-sm-6">
+                <form id="" class="form-inline">
+                    <div class="input-group pull-right">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group-btn FindButtonDateTime">
+                            <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top:unset !important">
+                                <i class="left-icon fa fa-search"></i> Tìm
+                            </a>
+                        </div>
+                    </div>
+                    <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                </form>
+            </div>
+        </div>
+
+        <!--Doanh thu-->
+        <div class="card m-t-10">
+            <div class="card-body">
+                <!--Title-->
+                <div class="col-sm-12" style="margin-top:20px">
+                    <h3 class="col-sm-6" style="color:black">Báo cáo doanh thu</h3>
+                    <a target="_blank" href="@Url.Action("Index","TimeReport")" class="btn btn-info waves-effect pull-right col-sm-1">Chi tiết</a>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 col-xs-4 col-md-offset-1">
+                        <div class="padding15 margin-in-col widget-rev-odd">
+                            <div class="clearfix">
+                                <center>
+                                    <i class="fa fa-4x fa-usd"></i>
+                                    <br />
+                                    Doanh thu
+                                    <br/>
+                                    VNĐ
+                                </center>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-rev">
+                            <div class="clearfix">
+                                <div>Doanh thu trước giảm giá</div>
+                                <div class="d-block">
+                                    <i class="ace-icon fa fa-plus p-t-10"></i>
+                                    <div class="pull-right">
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="tongDoanhThu"></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-rev-odd">
+                            <div class="clearfix">
+                                <div>Giảm giá hóa đơn</div>
+                                <div class="d-block">
+                                    <i class="ace-icon fa fa-minus p-t-10"></i>
+                                    <div class="pull-right">
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="giamGiaHoaDon"></h2>
+                                    </div>
+                                </div>                                
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-rev">
+                            <div class="clearfix">
+                                <div>Giảm giá sản phẩm</div>
+                                <div class="d-block">
+                                    <i class="ace-icon fa fa-minus p-t-10"></i>
+                                    <div class="pull-right">
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="giamGiaSanPham"></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-rev-odd">
+                            <div class="clearfix">
+                                <center style="font-weight: bolder">
+                                    <div>Doanh thu sau giảm giá</div>
+                                    <h2 style="margin-bottom:0; margin-top:0;" id="sauGiamGia"></h2>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 col-xs-4 col-md-offset-2">
+                        <div class="padding15 margin-in-col widget-del-odd">
+                            <div class="clearfix">
+                                <center>
+                                    <i class="fa fa-4x fa-calculator"></i>
+                                    <br />
+                                    Chi tiết doanh thu (VNĐ)
+                                    <br/>
+                                    (Doanh thu sau giảm giá)
+                                    <br/>
+                                </center>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-del-odd">
+                            <div class="clearfix">
+                                <div>Doanh thu tại quán</div>
+                                <div class="d-block">
+                                    <i class="ace-icon fa fa-plus p-t-10"></i>
+                                    <div class="pull-right">
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="finalAmountAtStore"></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-del">
+                            <div class="clearfix">
+                                <div>Doanh thu mang đi</div>
+                                <div class="d-block">
+                                    <i class="ace-icon fa fa-plus p-t-10"></i>
+                                    <div class="pull-right">
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="finalAmountTakeAway"></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-del-odd">
+                            <div class="clearfix">
+                                <div>Doanh thu giao hàng</div>
+                                <div class="d-block">
+                                    <i class="ace-icon fa fa-plus p-t-10"></i>
+                                    <div class="pull-right">
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="finalAmountDelivery"></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-del">
+                            <div class="clearfix" style="font-weight: bolder">
+                                <center style="font-weight: bolder">
+                                    <div>Tổng cộng</div>
+                                    <h2 style="margin-bottom:0; margin-top:0;" id="sauGiamGia2"></h2>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--Thanh toán-->
+        <div class="card m-t-10">
+            <div class="card-body">
+                <div class="col-sm-12" style="margin-top:20px">
+                    <h3 style="color:black">Báo cáo tiền mặt</h3>
+                </div>
+
+                @*<div class="col-sm-6" style="margin-top:20px">
+                    <h3 style="color:black">Báo cáo tài khoản</h3>
+                </div>*@
+
+                <div class="row">
+                    <div class="col-md-3 col-xs-12">
+                        <div class="infobox infobox-block infobox-dark bgm-cadet">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-usd"></i>
+                            </div>
+                            <div class="infobox-data infobox-data-modified">
+                                <div>Tiền mặt</div>
+                                <div class="inline">
+                                    <div class="pull-right small-padding">
+                                        <small>VNĐ</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 repadding">
+                                <h2 class="h2Money" id="totalCash"></h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <div class="infobox infobox-block infobox-dark bgm-blue">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-ticket"></i>
+                            </div>
+                            <div class="infobox-data infobox-data-modified">
+                                <div>Phiếu thu</div>
+                                <div class="inline">
+                                    <div class="pull-right small-padding">
+                                        <small>VNĐ</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 repadding">
+                                <h2 class="h2Money" id="cashCostReceive"></h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <div class="infobox infobox-block infobox-dark bgm-deeppurple">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-ticket"></i>
+                            </div>
+                            <div class="infobox-data infobox-data-modified">
+                                <div>Phiếu chi</div>
+                                <div class="inline">
+                                    <div class="pull-right small-padding">
+                                        <small>VNĐ</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 repadding">
+                                <h2 class="h2Money" id="cashCostSpend"></h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <div class="infobox infobox-block infobox-dark bgm-deeporange">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-check"></i>
+                            </div>
+                            <div class="infobox-data infobox-data-modified">
+                                <div>Tổng cộng</div>
+                                <div class="inline">
+                                    <div class="pull-right small-padding">
+                                        <small>VNĐ</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 repadding">
+                                <h2 class="h2Money" id="totalCashAll"></h2>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="col-md-4 col-md-offset-1">
+                        <div class="padding15 margin-in-col widget-del-odd">
+                            <div class="clearfix" style="font-weight: bolder">
+                                <center>
+                                    <i class="fa fa-4x fa-money"></i>
+                                </center>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-del">
+                            <div class="clearfix">
+                                <div>Tiền mặt</div>
+                                <div class="d-block">
+                                    <i class="ace-icon fa fa-plus p-t-10"></i>
+                                    <div class="pull-right">
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="totalCash"></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-del-odd">
+                            <div class="clearfix">
+                                <div>Phiếu thu</div>
+                                <div class="d-block">
+                                    <i class="ace-icon fa fa-plus p-t-10"></i>
+                                    <div class="pull-right">
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="cashCostReceive"></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-del">
+                            <div class="clearfix">
+                                <div>Phiếu chi</div>
+                                <div class="d-block">
+                                    <i class="ace-icon fa fa-minus p-t-10"></i>
+                                    <div class="pull-right">
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="cashCostSpend"></h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="padding15 margin-in-col widget-del-odd">
+                            <div class="clearfix" style="font-weight: bolder">
+                                <center>
+                                    <div>Tổng cộng</div>
+                                    <h2 style="margin-bottom:0; margin-top:0;" id="totalCashAll"></h2>
+                                </center>
+                            </div>
+                        </div>
+                    </div>*@
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card m-t-10">
+            <div class="card-body">
+                <!--Title-->
+                <div class="col-sm-12" style="margin-top:20px">
+                    <h3 style="color:black">Thẻ thành viên</h3>
+                </div>
+                <div class="row">
+                    <!--Box-->
+                    <div class="col-md-3 col-xs-12">
+                        <div class="infobox infobox-block infobox-dark bgm-cyan">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-rotate-left"></i>
+                            </div>
+                            <div class="infobox-data infobox-data-modified">
+                                <div>Tiền trong thẻ hôm trước</div>
+                                <div class="inline">
+                                    <div class="pull-right small-padding">
+                                        <small>VNĐ</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 repadding">
+                                <h2 class="h2Money" id="balanceBefore"></h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <div class="infobox infobox-block infobox-dark bgm-green">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-arrow-up"></i>
+                            </div>
+                            <div class="infobox-data infobox-data-modified">
+                                <div>Tổng tiền nạp vào thẻ</div>
+                                <div class="inline">
+                                    <div class="pull-right small-padding">
+                                        <small>VNĐ</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 repadding">
+                                <h2 class="h2Money" id="totalOrderCard"></h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <div class="infobox infobox-block infobox-dark bgm-purple">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-arrow-down"></i>
+                            </div>
+                            <div class="infobox-data infobox-data-modified">
+                                <div>Tổng tiền trong thẻ đã sử dụng</div>
+                                <div class="inline">
+                                    <div class="pull-right small-padding">
+                                        <small>VNĐ</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 repadding">
+                                <h2 class="h2Money" id="totalUseCard"></h2>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 col-xs-12">
+                        <div class="infobox infobox-block infobox-dark bgm-orange">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-credit-card"></i>
+                            </div>
+                            <div class="infobox-data infobox-data-modified">
+                                <div>Tổng tiền còn lại trong thẻ</div>
+                                <div class="inline">
+                                    <div class="pull-right small-padding">
+                                        <small>VNĐ</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-xs-12 repadding">
+                                <h2 class="h2Money" id="balanceAfter"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+
+            </div>
+
+        </div>
+
+
+        @*<div class="card m-t-10">
+            <div class="card-body">
+                <!--Title-->
+                <div class="col-sm-12" style="margin-top:20px">
+                    <h3 style="color:black">Tiền mặt</h3>
+                </div>
+                <div class="row">
+                    <!--Box-->
+                    <div class="col-md-6 col-xs-12">
+                        <div class="infobox infobox-block infobox-dark bgm-amber">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-2x fa-money"></i>
+                            </div>
+                            <div class="infobox-data padding15">
+                                <div>Tổng thanh toán</div>
+                                <div class="inline">
+                                    <div class="pull-right">
+                                        <small>VNĐ</small>
+                                    </div>
+                                    <div>
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="totalPayment">0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--End box-->
+                    <!--Box-->
+                    <div class="col-md-6 col-xs-12">
+                        <div class="infobox infobox-block infobox-dark bgm-cadet">
+                            <div class="infobox-icon">
+                                <i class="ace-icon fa fa-calculator"></i>
+                            </div>
+                            <div class="infobox-data padding15">
+                                <div>Tổng tiền mặt phải nộp</div>
+                                <div class="inline">
+                                    <div class="pull-right">
+                                        <small>VNĐ</small>
+                                    </div>
+                                    <div>
+                                        <h2 style="margin-bottom:0; margin-top:0;" id="totalCash">0</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--End box-->
+                </div>
+            </div>
+        </div>*@
+
+
+
+    </div>
+    <!--End Card body-->
+
+</div>
+<!--End Card-->
+
+
+
+
+@section scripts{
+    <script>
+
+        $(document).ready(function () {
+            setupDaterangepicker();
+            GetStoreList();
+            loadData();
+            $('#listStoreId').on('change', function () {
+                loadData();
+            });
+            $('#btnSearch').on('click', function () {
+                loadData();
+            });
+        });
+
+        //Load data
+        function loadData() {
+            $.ajax({
+                type: "POST",
+                url: '@(Url.Action("GetData"))',
+                data: {
+                    storeId: $('#listStoreId').val(),
+                    brandId: @ViewBag.brandId,
+                    sDate: $('#sTime').val(),
+                    eDate: $('#eTime').val()
+                },
+                success: function (data) {
+                    $('#cashFinalAmount').text(0);
+                    $('#cashFinalAmount').text(numberWithSeparator(data.revenueModel.cashFinalAmount));
+                    $('#bankFinalAmount').text(0);
+                    $('#bankFinalAmount').text(numberWithSeparator(data.revenueModel.bankPaymentFinalAmount));
+                    $('#memberPaymentFinalAmount').text(0);
+                    $('#memberPaymentFinalAmount').text(numberWithSeparator(data.revenueModel.memberPaymentFinalAmount));
+                    $('#voucherPaymentFinalAmount').text(0);
+                    $('#voucherPaymentFinalAmount').text(numberWithSeparator(data.revenueModel.voucherPaymentFinalAmount));
+                    $('#debtPaymentFinalAmount').text(0);
+                    $('#debtPaymentFinalAmount').text(numberWithSeparator(data.revenueModel.debtPaymentFinalAmount));
+                    $('#totalOrderCard2').text(0);
+                    $('#totalOrderCard2').text(numberWithSeparator(data.revenueModel.totalOrderCard));
+                    $('#canceledFinalAmount').text(0);
+                    $('#canceledFinalAmount').text(numberWithSeparator(data.revenueModel.canceledFinalAmount));
+                    $('#totalPayment2').text(0);
+                    $('#totalPayment2').text(numberWithSeparator(data.revenueModel.totalPayment));
+                    $('#totalCash').text(0);
+                    $('#totalCash').text(numberWithSeparator(data.revenueModel.totalCash));
+                    $('#totalPayment').text(0);
+                    $('#totalPayment').text(numberWithSeparator(data.revenueModel.totalPayment));
+                    $('#balanceBefore').text(0);
+                    $('#balanceBefore').text(numberWithSeparator(data.revenueMemberCard.balanceBefore));
+                    $('#balanceAfter').text(0);
+                    $('#balanceAfter').text(numberWithSeparator(data.revenueMemberCard.balanceAfter));
+                    $('#totalOrderCard').text(0);
+                    $('#totalOrderCard').text(numberWithSeparator(data.revenueMemberCard.totalOrderCard));
+                    $('#totalUseCard').text(0);
+                    $('#totalUseCard').text(numberWithSeparator(data.revenueMemberCard.totalUseCard));
+                    //setMoneyCss('balanceBefore', data.revenueMemberCard.balanceBefore);
+                    //setMoneyCss('balanceAfter', data.revenueMemberCard.balanceAfter);
+                    //setMoneyCss('totalOrderCard', data.revenueMemberCard.totalOrderCard);
+                    //setMoneyCss('totalUseCard', data.revenueMemberCard.totalUseCard);
+
+                    $('#cashCostReceive').text(numberWithSeparator(data.revenueModel.cashCostReceive));
+                    $('#cashCostSpend').text(numberWithSeparator(data.revenueModel.cashCostSpend));
+                    $('#totalCashAll').text(numberWithSeparator(data.revenueModel.totalCashAll));
+
+                    $('#tongDoanhThu').html(numberWithSeparator(data.discountRevenue.totalAmount));
+                    //$('#tongGiamGia').html(numberWithSeparator(data.discountRevenue.totalDiscount));
+                    $('#giamGiaHoaDon').html(numberWithSeparator(data.discountRevenue.totalDiscountOrder));
+                    $('#giamGiaSanPham').html(numberWithSeparator(data.discountRevenue.totalDiscountOrderDetail));
+                    $('#sauGiamGia').html(numberWithSeparator((parseInt(data.discountRevenue.finalAmountCash))));
+                    $('#sauGiamGia2').html(numberWithSeparator((parseInt(data.discountRevenue.finalAmountCash))));
+                    $('#finalAmountCash').html(numberWithSeparator(data.discountRevenue.finalAmountCash));                    
+                    $('#finalAmountAtStore').html(numberWithSeparator(data.discountRevenue.finalAmountAtStore));
+                    $('#finalAmountTakeAway').html(numberWithSeparator(data.discountRevenue.finalAmountTakeAway));
+                    $('#finalAmountDelivery').html(numberWithSeparator(data.discountRevenue.finalAmountDelivery));
+                    $('#finalAmountCard').html(numberWithSeparator(data.discountRevenue.finalAmountCard));
+                    $('#finalAmountCanceled').html(numberWithSeparator(data.discountRevenue.finalAmountCanceled));
+                },
+                error: function (error) {
+                    ShowMessage("Không lấy được dữ liệu",1);
+                }
+            });
+        }
+
+
+        //Set up Daterange picker
+        function setupDaterangepicker() {
+            cb(moment(), moment(), "Hôm nay");
+            //$('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+            $('#reportrange').daterangepicker({
+                "opens": "left",
+                "maxDate": moment(),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    'Hôm nay': [moment(), moment()],
+                    'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                    'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                    'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                    'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+        }
+
+        //Set up display daytime
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+
+            $("#sTime").val(startTime);
+            $("#eTime").val(endTime);
+            $("#date-string").html(dateString);
+        }
+
+        function GetStoreList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStoreList")',
+            jsonp: "$callback",
+            success: function (result) {
+                for (var i = 0; i < result.store.length; i++) {
+                    $('#listStoreId').append('<option value="' + result.store[i].ID + '">' + result.store[i].Name + '</option>')
+                }
+                $('#listStoreId').selectpicker('refresh');
+            }
+            });
+        }
+
+        var numberWithSeparator = function (x) {
+            console.log(x);
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        };
+
+        function setMoneyCss(target, value) {
+            if (value > 10000000) {
+                $('#' + target).css('font-size', "1.5em");
+            }
+            if (value > 100000000000) {
+                $('#' + target).css('font-size', "1.2em");
+            }
+            else {
+                $('#' + target).css('font-size', "");
+            }
+            $('#' + target).text(numberWithSeparator(value));
+        }
+
+    </script>
+}

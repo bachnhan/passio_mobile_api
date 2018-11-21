@@ -1,0 +1,238 @@
+﻿@model  HmsService.ViewModels.CustomerTypeEditViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách nhóm khách hàng</h3>
+            </div>
+
+            <div class="col-md-4 text-right">
+                <a data-toggle="modal" data-target="#createCustomerType" class="btn btn-primary btn-icon-text waves-effect addNewEmp">
+                    <i class="zmdi zmdi-plus"></i> Thêm nhóm khách hàng
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-body">
+        <div class="card-padding">
+            <div class="row">
+                <table id="customerTypeTable" class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr class="gray">
+                            <th class="">Mã</th>
+                            <th class="">Nhóm khách hàng</th>
+                            <th class="">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<form role="form" method="post" id="createCustomerTypeForm" action="@Url.Action("CreateCustomerType","CustomerType")" enctype="multipart/form-data">
+    @this.Html.AntiForgeryToken()
+    <div class="modal fade" id="createCustomerType" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">Thêm nhóm khách hàng</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label class="control-label col-sm-3">Nhóm khách hàng:</label>
+                            <div class="col-sm-8">
+                                @Html.TextBoxFor(q => q.CustomerType1, new { @id = "customerType1", @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <a onclick="duplicateCustomerType()" class="btn btn-primary">Xác nhận</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<div id="editCustomerTypePanel" class="modal fade"></div>
+@section Scripts{
+    <script>
+
+    @*// ko có Active nên ko xóa
+    function deleteCustomerType(id) {
+        var rs = confirm("Xác nhận xóa loại khách hàng?");
+        if (rs) {
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("Delete", "CustomerType"))",
+                "data": {
+                id: parseInt(id)
+                },
+            success: function (result) {
+                location.href = '/CRM/CustomerType/Index';
+            }
+        });
+    }
+    }*@
+        function duplicateCustomerType() {
+            if ($("input[name='CustomerType1']").val() == "") {
+                ShowMessage("Nhóm khách hàng không được bỏ trống", 2);
+                return;
+            }
+
+            var rs = document.getElementById("customerType1").value;
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("ValidateCustomerType", "CustomerType"))",
+                "data": {
+                    name: rs
+                },
+                success: function (result) {
+                    if (result == "duplicated") {
+                        ShowMessage("Nhóm khách hàng này đã tồn tại!", 2);
+                    }
+                    else {
+                        document.getElementById('createCustomerTypeForm').submit();
+                    }
+                }
+            });
+        }
+
+        function editDuplicateCustomerType() {
+            var rs = document.getElementById("customerType1").value;
+
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("ValidateCustomerType", "CustomerType"))",
+                "data": {
+                    name: rs
+                },
+                success: function (result) {
+                    if (result == "duplicated") {
+                        ShowMessage("Nhóm khách hàng này đã tồn tại!", 2);
+                    }
+                    else {
+                        document.getElementById('editCustomerType').submit();
+                    }
+                }
+            });
+        }
+
+
+
+        function showEditCustomerType(ID) {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("EditCustomerType", "CustomerType")",
+                data: { id: ID },
+                success: function (result) {
+                    $('#editCustomerTypePanel').html(result);
+                    $('#editCustomerTypePanel').modal('show');
+                    setModalHeaderWidth();
+                },
+                error: function (error) {
+                    ShowMessage("Error Occured", 1)
+                }
+            });
+        }
+        function editCustomerType() {
+            var formData = $('#editCustomerType').serialize();
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("EditCustomerType", "CustomerType")",
+                dataType: 'JSON',
+                data: formData,
+                success: function (result) {
+                    ShowMessage(result.message, 3);
+                    if (result.success) {
+                        $('#editCustomerTypePanel').modal('hide');
+                        //RefreshTable();
+                    }
+                },
+
+                error: function (error) {
+                    ShowMessage("Error Occured", 1);
+                }
+            });
+        }
+        function setModalHeaderWidth() {
+            //set width
+            $('#fixedHeader').css('width', $('#modal-dialog').width() + "px");
+            $(window).resize(function () {
+                $('#fixedHeader').css('width', $('#modal-dialog').width() + "px");
+            });
+        }
+
+
+
+        $(document).ready(function () {
+            InitCustomerTypeDatatable();
+        });
+
+
+        function InitCustomerTypeDatatable(data) {
+            $("#customerTypeTable").dataTable({
+                "bFilter": true,
+                "bRetrieve": true,
+                //"bServerSide": true,
+                "bScrollCollapse": true,
+                //"data": data,
+                "sAjaxSource": "@Url.Action("LoadCustomerType","CustomerType")",
+                "bProcessing": true,
+                "bFilter": true,
+                "oLanguage": {
+                    "sSearchPlaceholder": "Nhóm khách hàng",
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "sInfoEmpty": "Không có dữ liệu",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                },
+
+                "aoColumnDefs": [
+
+                    {
+                        "aTargets": [0, 1],
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [2],
+                        "mRender": function (data, type, row) {
+                            var data = row[0];
+                            var editCustomerType = "<a title='Chỉnh sửa' data-toggle='modal' onclick='showEditCustomerType(" + data + ")' class='btn btn-sm btn-primary' ><i class='glyphicon glyphicon-pencil'></i></a>";
+
+                            // ko có Active nên ko xóa
+                            //var deleteCustomer = "<a class='btn btn-sm btn-primary' onclick='deleteCustomerType(" + data + ")'><i class='glyphicon glyphicon-remove'></i></a>";
+
+                            return editCustomerType;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    }
+                ],
+                "bAutoWidth": false,
+            }).fnSetFilteringDelay(800);
+        }
+
+
+
+    </script>
+}

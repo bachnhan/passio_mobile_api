@@ -1,0 +1,97 @@
+﻿@model HmsService.ViewModels.BrandViewModel
+
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    @Html.ValidationSummary()
+    <form id="createBrand" method="post" onsubmit="return validate()">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3 class="modal-title" id="createAccountLabel">Thêm nhãn hiệu</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="@Url.Action("Index")" class="btn btn-success">Quay lại</a>
+                    <button class="btn btn-sm btn-primary">Hoàn tất</button>
+                </div>
+            </div>
+            <hr />
+        </div>
+        <div class="card-padding">
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px; margin-top:12px; padding-top:20px; padding-bottom:22px;">
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-2" for="BrandName">Tên nhãn hiệu<span style="color:red">*</span></label>
+                            <div class="col-md-5">
+                                @Html.TextBoxFor(q => q.BrandName, new { id = "BrandName", @class = "form-control fg-line", placeholder = "Nhập nhãn hiệu" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-2" for="Description">Mô tả<span style="color:red"></span></label>
+                            <div class="col-md-5">
+                                @Html.TextAreaFor(q => q.Description, new { id = "Description", @class = "form-control fg-line", placeholder = "Mô tả nhãn hiệu" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-2" for="Website">Trang chủ<span style="color:red"></span></label>
+                            <div class="col-md-5">
+                                @Html.TextAreaFor(q => q.Website, new { id = "Website", @class = "form-control fg-line", placeholder = "Trang chủ" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-2" for="CompanyName">Tên công ty<span style="color:red"></span></label>
+                            <div class="col-md-5">
+                                @Html.TextBoxFor(q => q.CompanyName, new { id = "CompanyName", @class = "form-control fg-line", placeholder = "Tên công ty" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-2" for="CompanyName">Fax<span style="color:red"></span></label>
+                            <div class="col-md-5">
+                                @Html.TextBoxFor(q => q.Fax, new { id = "Fax", @class = "form-control fg-line", placeholder = "Fax" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-2" for="ContactPerson">Người liên hệ<span style="color:red">*</span></label>
+                            <div class="col-md-5">
+                                @Html.TextBoxFor(q => q.ContactPerson, new { id = "ContactPerson", @class = "form-control fg-line", placeholder = "Người liên hệ" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label col-md-3 col-md-offset-2" for="PhoneNumber">Số điện thoại<span style="color:red">*</span></label>
+                            <div class="col-md-5">
+                                @Html.TextBoxFor(q => q.PhoneNumber, new { id = "PhoneNumber", @class = "form-control fg-line", placeholder = "Số điện thoại" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+</div>
+<script>
+    function validate() {
+        var errorFree = true;
+
+        if ($('#BrandName').val() == "") {
+            errorFree = false;
+            swal({ title: "Tên nhãn hiệu không được để trống", text: "Vui lòng bổ sung", timer: 2500, type: "error" });
+        }
+        if ($('#ContactPerson').val() == "") {
+            errorFree = false;
+            swal({ title: "Người liên hệ không được để trống", text: "Vui lòng bổ sung", timer: 2500, type: "error" });
+        }
+        if ($('#PhoneNumber').val() == "") {
+            errorFree = false;
+            swal({ title: "Số điện thoại không được để trống", text: "Vui lòng bổ sung", timer: 2500, type: "error" });
+        }
+        if (!errorFree) {
+            return false;
+        }
+    }
+</script>

@@ -1,0 +1,89 @@
+﻿
+<div class="block-header">
+    <h2>Thêm mới nhóm sản phẩm</h2>
+
+    <ul class="actions">
+        <li class="m-r-10">
+            <button type="submit" class="btn btn-default">Quay lại</button>
+        </li>
+        <li>
+            <button type="submit" class="btn btn-primary">Hoàn tất</button>
+        </li>
+    </ul>
+</div>
+<form role="form">
+    <div class="row">
+        <div class="col-md-7">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Thông tin chính</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label for="inputTitle" class="control-label">Tên nhóm</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control" id="inputTitle">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputDescription" class="control-label">Mô tả</label>
+                        <div class="fg-line">
+                            <textarea class="form-control" id="inputDescription" rows="6"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="">
+                                <i class="input-helper"></i>
+                                <b>Kích hoạt</b>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Card: SEO -->
+            <div class="card">
+                <div class="card-header">
+                    <h2>SEO</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <div class="form-group">
+                        <label class="control-label">Từ khóa SEO</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Mô tả SEO</label>
+                        <div class="fg-line">
+                            <textarea class="form-control" rows="6"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Đường dẫn</label>
+                        <div class="fg-line">
+                            <input type="text" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</form>
+
+@section scripts {
+    <script>
+        $(function () {
+            
+        });
+    </script>
+}

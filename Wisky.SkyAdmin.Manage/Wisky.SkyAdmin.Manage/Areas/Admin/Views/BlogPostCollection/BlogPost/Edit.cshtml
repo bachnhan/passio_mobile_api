@@ -1,0 +1,25 @@
+﻿@model BlogPostEditViewModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+@this.Html.Partial("Editor", model: this.Model)
+
+@section scripts {
+
+
+<link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+<link href="~/Content/plugins/elfinder/css/theme.css" rel="stylesheet" />
+
+<script src="~/Content/plugins/dropzone/dropzone.js"></script>
+<script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+<script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+
+
+    <script>
+        SKYWEB.Admin.Product.init();
+        SKYWEB.Admin.General.init();
+        SKYWEB.Admin.General.setupElfinderToCkeditor('inputDescription');
+    </script>
+}

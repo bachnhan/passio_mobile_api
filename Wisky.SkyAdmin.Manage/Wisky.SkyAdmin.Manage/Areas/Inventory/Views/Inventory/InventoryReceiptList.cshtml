@@ -1,0 +1,474 @@
+﻿
+@{
+    ViewBag.Title = "InventoryReceiptList";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<input type="hidden" id="sTime" />
+<input type="hidden" id="eTime" />
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Danh sách phiếu kho</h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div>
+
+        </div>
+        <hr />
+    </div>
+    <div class="group-radio-buttons Right30">
+        <div class="row " style="padding-left:20px">
+            <div class="col-md-2"></div>
+            <div class="col-md-2" style="margin-bottom:10px">
+                <input type="radio" name="report-filter" value="1" class="nice-check" id="filter4" checked />
+                <label for="filter4"><span>Tất cả</span></label>
+            </div>
+            <div class="col-md-2" style="margin-bottom:10px">
+                <input type="radio" name="report-filter" value="0" class="nice-check" id="filter1" />
+                <label for="filter1"><span>Nhập kho</span></label>
+            </div>
+            <div class="col-md-2" style="margin-bottom:10px">
+                <input type="radio" name="report-filter" value="3" class="nice-check" id="filter2" />
+                <label for="filter2"><span>Xuất kho</span></label>
+            </div>
+            <div class="col-md-2" style="margin-bottom:10px">
+                <input type="radio" name="report-filter" value="2" class="nice-check" id="filter3" />
+                <label for="filter3"><span>Chuyển kho</span></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-padding" style="margin-top:20px">
+        <div class="row">
+            <div class="col-md-4">
+                <div class='form-group'>
+                    @if (int.Parse(ViewBag.storeId) == 0)
+                    {
+                    <select class="selectpicker" id="item-stores" title="Chọn cửa hàng" multiple>
+                        @foreach (var item in ViewBag.StoreChoose)
+                            {
+                            <option value="@item.ID">@item.ShortName</option>
+                            }
+                    </select>
+                    }
+                </div>
+            </div>
+            <div class="col-md-8" style="margin-bottom:10px">
+                <div class="input-group pull-right">
+
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group-btn FindButtonDateTime">
+                        <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i> Tìm
+                        </a>
+                    </div>
+
+                    <input type="hidden" id="sTime" />
+                    <input type="hidden" id="eTime" />
+                </div>
+            </div>
+            <br />
+            <input type="hidden" value="1" id="exOrim" />
+            <div id="inventory">
+                <table id="tablepaging" class="table table-bordered table-striped table-condensed table-responsive">
+                    <thead>
+                        <tr>
+                            <th><label>STT</label></th>
+                            <th><label>Tên hóa đơn</label></th>
+                            <th><label>Loại</label></th>
+                            <th><label>Cửa hàng</label></th>
+                            <th><label>Cửa hàng nhận</label></th>
+                            <th><label>Ngày tạo</label></th>
+                            <th><label>Người phụ trách</label></th>
+                            <th><label>Trạng thái</label></th>
+                            <th><label>Nhà cung cấp</label></th>
+                            <th><label>Ghi chú</label></th>
+                            <th><label>Tùy chọn</label></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @*<div class="page-content">
+        <div class="page-header">
+            <div class="row small-margin">
+                <div class="col-md-3">
+                    <h1>Danh sách phiếu kho</h1>
+                </div>
+                <div class="col-lg-5">
+                    <div class="row small-margin">
+                        <div class="col-md-3">
+                            <input type="radio" name="report-filter" value="1" class="nice-check" id="filter4" checked />
+                            <label for="filter4">Tất cả</label>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="radio" name="report-filter" value="0" class="nice-check" id="filter1" />
+                            <label for="filter1">Nhập kho</label>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="radio" name="report-filter" value="3" class="nice-check" id="filter2" />
+                            <label for="filter2">Xuất kho</label>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="radio" name="report-filter" value="2" class="nice-check" id="filter3" />
+                            <label for="filter3">Chuyển kho</label>
+                        </div>
+                    </div>
+                </div>
+
+            <div class="col-lg-4 pull-right text-right">
+                <div class="input-group">
+                    <div class="date-picker">
+                        <input type="text" id="date-string" readonly="">
+                        <a id="reportrange"><i class="fa fa-calendar"></i></a>
+                    </div><!-- /input-group -->
+                    <div class="input-group-btn">
+                        <a class="btn btn-success btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>Tìm
+                        </a>
+                    </div>
+                </div>
+                <input type="hidden" id="sTime" />
+                <input type="hidden" id="eTime" />
+            </div>
+            <div class="col-lg-5 col-lg-offset-10">
+                <br />
+                @if (ViewBag.StoreId == 0)
+                {
+                    <div class="col-lg-4 col-lg-offset-1">
+                        <div class='form-group'>
+
+                            <select class="form-control selectpicker" id="item-stores" title="Chọn cửa hàng" multiple>
+                                @foreach (var item in Model)
+                                {
+                                    <option value="@item.ID">@item.ShortName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        </div>
+
+        <input type="hidden" value="1" id="exOrim" />
+
+        <div id="inventory">
+            <table id="tablepaging" class="table table-bordered table-striped table-fixed-header">
+                <thead>
+                    <tr>
+                        <th><label>STT</label></th>
+                        <th><label>Cửa hàng</label></th>
+                        <th><label>Loại</label></th>
+                        <th><label>Tên Hóa Đơn</label></th>
+                        <th><label>Người phụ trách</label></th>
+                        <th><label>Ngày tạo</label></th>
+                        <th><label>Trạng thái</label></th>
+                        <th><label>Ghi chú</th>
+                        <th><label>Nhà cung cấp</th>
+                        <th><label>Cửa hàng nhận</th>
+                        <th><label>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>*@
+
+</div>
+<div id="receiptItems" class="modal fade"></div>
+<style>
+    .input-group .input-group-btn > a.btn {
+        margin-top: 0px !important;
+    }
+</style>
+<script>
+
+    var status = 1;
+    var selectedStores = [];
+
+    $(document).ready(function () {
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+
+            $("#sTime").val(startTime);
+            $("#eTime").val(endTime);
+            $('[data-role=small-date]').html(dateString);
+        };
+
+        cb(moment(), moment(), "Hôm nay");
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+        //"Tìm" button event on click
+        $('#btnSearch').on('click', function () {
+            sStartDate = $("#sTime").val();
+            sEndDate = $("#eTime").val();
+            dStartDate = moment(sStartDate, 'DD/MM/YYYY');
+            dEndDate = moment(sEndDate, 'DD/MM/YYYY');
+
+            if (sStartDate.length > 16 || sEndDate.length > 16) {
+                ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                return;
+            }
+
+            if ((sStartDate.length > 0 && sEndDate.length == 0) || (sEndDate.length > 0 && sStartDate.length == 0) || (dStartDate > dEndDate)) {
+                ShowMessage("Thời gian bắt đầu và kết thúc không phù hợp", 3);
+                return;
+            }
+
+            //$("#storeReportDatatable").dataTable().fnDestroy();
+            //InitDatatable();
+            if ($("#sTime").val() == '' || $("#eTime").val() == '') {
+                $('#dateRange').html('(' + moment().format('DD/MM/YYYY') + ')');
+            } else {
+                $('#dateRange').html('(' + $("#sTime").val() + ($("#sTime").val() === $("#eTime").val() ? '' : (' - ' + $("#eTime").val())) + ')');
+            }
+            //revenueAllStore();
+            //loadIncomeChart();
+            //RefreshTable();
+            RefreshTable();
+        });
+
+        $('#item-stores').on('change', function () {
+            var select = document.getElementById("item-stores");
+            selectedStores.length = 0;
+            //var selected1 = [];
+            for (var i = 0; i < select.length; i++) {
+                if (select.options[i].selected) selectedStores.push(select.options[i].value);
+            }
+            RefreshTable();
+        });
+        $('[name="report-filter"]').change(function (e) {
+            status = $(this).val();
+            RefreshTable();
+            var columnInStore = dt.api().column(9);
+            var columnProvider = dt.api().column(8);
+            if (status == 2) { // OutChangeStore
+                columnInStore.visible(true);
+                columnProvider.visible(false);
+            }
+            else if (status == 1) { //All
+                columnInStore.visible(true);
+                columnProvider.visible(true);
+            }
+            else if (status == 0)// Import
+            {
+                columnInStore.visible(false);
+                columnProvider.visible(true);
+            } else if (status == 3)// Export
+            {
+                columnInStore.visible(false);
+                columnProvider.visible(false);
+            }
+        });
+        window.dt = $('#tablepaging').dataTable({
+            //"sScrollX": "100%",
+            //"sScrollXInner": "100%",
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("GetReceiptsByType", "Inventory")",//"/InventoryManager/ViewBag.storeId/ViewBag.storeName/Inventory/GetReceiptsByType",
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "type", "value": status });
+                aoData.push({ "name": "startTime", "value": $('#sTime').val() });
+                aoData.push({ "name": "endTime", "value": $('#eTime').val() });
+                aoData.push({ "name": "fillteredStores", "value": selectedStores.toString() });
+            },
+            "bDeferRender": true,
+            "sServerMethod": "GET",
+            "oLanguage": {
+                "sSearchPlaceholder": "Tên hóa đơn",
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                },
+
+
+            },
+            "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3, 4, 5, 6, 7, 8, 9],
+                        "bSearchable": false,
+                    },
+                    {
+                        "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+                        "bSortable": false,
+                    },
+
+            ],
+            "bAutoWidth": true,
+            "columns": [
+                        { "data": "STT" },
+                        { "data": "ReceiptName" },
+
+                        {
+                            "data": function (data) {
+                                if (data["Category"] === 0) {
+                                    return "<div class=\"label label-info myCategory\">Nhập Hàng</div>";
+                                } else if (data["Category"] === 2) {
+                                    return "<div class=\"label label-primary myCategory\">Chuyển Kho</div>";
+                                } else if (data["Category"] === 3) {
+                                    return "<div class=\"label label-warning myCategory\">Trả Hàng</div>";
+                                } else if (data["Category"] === 4) {
+                                    return "<div class=\"label label-warning myCategory\">Bán Hàng</div>";
+                                } else if (data["Category"] === 5) {
+                                    return "<div class=\"label label-danger myCategory\">Hủy Hàng</div>";
+                                }
+                            }
+                        },
+                        { "data": "SrcStore" },
+                        { "data": "DesStore" },
+                        { "data": "Date" },
+                        { "data": "Creator" },
+                        {
+                            "data": function (data) {
+                                if (data.Status === 0) {
+                                    return "<div class='label myStatus not-approved meStatus'>chờ duyệt</div>";
+                                } else if (data.Status === 1) {
+                                    return "<div class='label myStatus approved meStatus'>Đã duyệt</div>";
+                                } else if (data.Status === 2) {
+                                    return "<div class='label myStatus canceled meStatus'>Đã hủy</div>";
+                                } else if (data.Status === 3) {
+                                    return "<div class='label myStatus rejected meStatus'>Đã từ chối</div>";
+                                } else if (data.Status === 4) {
+                                    return "<div class='label myStatus closed meStatus'>Đã đóng</div>";
+                                } else if (data.Status === 5) {
+                                    return "<span class=\"label myStatus requestCancel meStatus\">" + data.SrcStore + " </br>yêu cầu hủy</span>";
+                                } else if (data.Status === 6) {
+                                    return "<span class=\"label myStatus requestCancel meStatus\">" + data.DesStore + " </br>yêu cầu hủy</span>";
+                                }
+                            }
+                        },
+                        { "data": "Provider" },
+                        {
+                            "data": "Note",
+                            "bSortable": false
+                        },
+
+
+                        {
+                            "data": function (data) {
+                                return "<button @*href='InventoryReceiptItem/" + data.ReceiptID + "'*@ class=\"btn btn btn-primary btn-sm\"  data-id=\"" + data.ReceiptID
+                                    + "\" onclick=\"receiptDetail(" + data.ReceiptID + ")\"><i class='glyphicon glyphicon-eye-open'></i></button>";
+                                //ViewBag.storeId/ViewBag.storeName/
+                            },
+                            "bSortable": false,
+                        },
+                        //{
+
+                        //    "bSortable": false,
+                        //},
+                        //{
+
+                        //    "bSortable": false,
+                        //},
+            ],
+            //"columnDefs": [
+            //    {
+            //        "aTargets": [0, 1, 3, 4, 5],
+            //        "sClass": "text-center"
+            //    },
+            //    { "bSortable": false, "targets": [0, 1, 2, 3, 4, 7, 8, 9] },
+            //        {
+            //            "visible": false, "targets": []
+            //        },
+            //],
+        }).fnSetFilteringDelay(delaySearch);
+    });
+
+    function receiptDetail(id){
+        $.ajax({
+            type: 'GET',
+            content: 'html',
+            data: {
+                id : id
+            },
+            url: '@Url.Action("InventoryReceiptItem")',
+            success: function(result){
+                $('#receiptItems').html(result);
+                $('#receiptItems').modal('show');
+                renderReceiptItem();
+            },
+        });
+    }
+
+    function renderReceiptItem(){
+        $('#inventoryReceiptItemTable').dataTable({
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+        });
+    }
+
+    function RefreshTable() {
+        $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+            if (oSettings.oFeatures.bServerSide === false) {
+                var before = oSettings._iDisplayStart;
+                oSettings.oApi._fnReDraw(oSettings);
+                //iDisplayStart has been reset to zero - so lets change it back
+                oSettings._iDisplayStart = before;
+                oSettings.oApi._fnCalculateEnd(oSettings);
+            }
+
+            //draw the 'current' page
+            oSettings.oApi._fnDraw(oSettings);
+        };
+        var oTable = $("#tablepaging").dataTable();
+        oTable.fnStandingRedraw();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    };
+    setTimeout(function () {
+        $("#btnSearch").click();
+    }, 500);
+            </script>
+            @*<script>
+                    window.onload = $("#btnSearch").click();
+                </script>*@

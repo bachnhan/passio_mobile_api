@@ -1,0 +1,12 @@
+diff a/HmsService/HmsService/Sdk/AccountApi.cs b/HmsService/HmsService/Sdk/AccountApi.cs	(rejected hunks)
+@@ -102,5 +102,10 @@
+                 return new AccountViewModel(account);
+             }
+         }
++
++        public IQueryable<AccountViewModel> GetActiveAccounts()
++        {
++            return this.BaseService.GetActiveAccount().ProjectTo<AccountViewModel>(this.AutoMapperConfig);
++        }
+     }
+ }

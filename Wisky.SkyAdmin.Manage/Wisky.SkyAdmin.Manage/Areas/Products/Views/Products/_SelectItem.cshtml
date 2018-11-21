@@ -1,0 +1,93 @@
+﻿@model IEnumerable<HmsService.ViewModels.ItemViewModel>
+
+@{ 
+    var total = ViewBag.Total;
+}
+
+<h4>Thành phần đã thêm</h4>
+
+<div class="slim-scroll" data-height="400" style="height:590px; overflow-y: auto;">
+    <table class="table table-striped table-bordered table-hover" id="tableChooseItem">
+        <thead>
+            <tr>
+                <td class="span2">
+                    Thành phần
+                </td>
+                <td class="span2">
+                    Đơn vị
+                </td>
+                <td class="span2">
+                    Số Lượng
+                </td>
+                <td class="span2">Tùy chọn</td>
+            </tr>
+        </thead>
+        @foreach (var item in Model)
+        {
+            <tr id="tr-@item.productID-@item.itemID">
+                <td>
+                    @item.itemName
+                </td>
+                <td class="text-center">
+                    @item.itemUnit
+                </td>
+                <td class="text-center">
+                    @item.quantity                    
+                </td>
+                <td>
+                    <input type="hidden" id="productID-@item.productID-@item.itemID" value="@item.productID" />
+                    <input type="hidden" id="itemID-@item.productID-@item.itemID" value="@item.itemID" />
+                    <button class="btn btn-sm btn-success" onclick="showProductDetailModal(@item.itemID)"><i class='glyphicon glyphicon-pencil'></i></button>
+                    <button class="btn btn-danger btn-minier" data-productId="@item.productID"
+                            onclick='onDeleteButtonClick(this, "productID-@item.productID-@item.itemID", "itemID-@item.productID-@item.itemID" )'
+                            type="button" id="@item.productID-@item.itemID" data-active="remove-composition">
+                        <i class="glyphicon glyphicon-trash"></i>
+                    </button>
+
+                </td>
+            </tr>
+        }
+    </table>
+    <h4>Tổng cộng: @total VND</h4>
+</div>
+<script>
+    function onDeleteButtonClick(btn, productid, itemid) {
+        var idDetail = $(btn).attr("data-productId");
+        $.ajax({
+            "type": "post",
+            "url": "@(Url.Action("DeleteComposition"))",
+            "data": {
+                productId: document.getElementById(productid).value,
+                itemId: document.getElementById(itemid).value
+            },
+            success: function (result) {
+                if (result.success) {
+                    $.ajax({
+                        url: "@Url.Action("ListItemByPro", "Products")",
+                        data: {
+                            productID: idDetail,
+                        },
+                        success: function (result) {
+                            $('#divChooseItem').html(result);
+                        }
+                    });
+                    $.ajax({
+                        url: "@Url.Action("LoadProductCategory", "Products")",
+                        data: {
+                        productId: idDetail,
+                        },
+                    success: function (result) {
+                        $('#divLoadItem').html(result);
+                    }
+                });
+                } else {
+                    ShowAlert("Xóa thất bại, xin vui lòng thử lại !",1);
+                }
+            },
+            error: function (error) {
+                ShowAlert(error.message, 1);
+            }
+
+        });
+    }
+</script>

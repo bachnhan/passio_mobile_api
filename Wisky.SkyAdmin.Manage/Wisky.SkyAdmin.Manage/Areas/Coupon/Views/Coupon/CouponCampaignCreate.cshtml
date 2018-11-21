@@ -1,0 +1,195 @@
+﻿@model HmsService.ViewModels.CouponCampaignEditViewModel
+@{
+    ViewBag.Title = "Tạo chiến dịch Coupon";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<form id="thisForm" role="form" method="post" enctype="multipart/form-data">
+    @this.Html.AntiForgeryToken()
+    <div class="block-header">
+        <h1>Thêm chiến dịch mới</h1>
+        <ul class="actions">
+            <li class="m-r-10">
+                <a href="@(Url.Action("CouponCampaign","Coupon"))" class="btn btn-success comeback">Quay lại</a>
+            </li>
+            <li>
+                <button onclick="Create()" type="submit" class="btn btn-primary" id="btn-submit-product">Hoàn tất</button>
+            </li>
+        </ul>
+    </div>
+
+    @if (this.ViewData.ModelState.Any(q => q.Value.Errors.Count > 0))
+    {
+        <div class="card">
+            <div class="card-body card-padding text-danger">
+                @this.Html.ValidationSummary()
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Thông tin chiến dịch</h2>
+                </div>
+                <div class="card-body card-padding">
+                    <!-- Form group -->
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label for="" class="control-label">Tên chiến dịch<span style="color:red">*</span></label>
+                                <div class="fg-line">
+                                    @Html.TextBoxFor(q => q.Name, new { @class = "form-control", required = "true" })
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="" class="control-label">Nhà cung cấp</label>
+                                <div class="fg-line">
+                                    <div class="select">
+                                        @this.Html.DropDownListFor(q => q.ProviderId, this.Model.AvailableCouponProvider, new {id="provider", @class = "form-control" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Form group -->
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <label for="" class="control-label">Giá trị Coupon<span style="color:red">*</span></label>
+                                <div class="fg-line">
+                                    @this.Html.TextBoxFor(q => q.Price, new { @class = "form-control", required = "true", Value = "", oninput = "checkNumber(this)" })
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="" class="control-label">Giá trị quy đổi<span style="color:red">*</span></label>
+                                <div class="fg-line">
+                                    @this.Html.TextBoxFor(q => q.Value, new { @class = "form-control", required = "true", Value = "", oninput = "checkNumber(this)" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Form group -->
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-sm-6 dateTime">
+                                <label for="" class="control-label">Thời gian</label>
+                                <div class="dateTime">
+                                    <div class="fg-line" id="reportrange">
+                                        <input id="date-string" readonly class="form-control pull-right text-center" ss>
+                                        <a class="myCelenderA"><i class="fa fa-calendar"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="" class="control-label">Mô tả</label>
+                                <div class="fg-line">
+                                    @this.Html.TextAreaFor(q => q.Description, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div>
+                                @Html.HiddenFor(q => q.StartDateStr, new { id = "FromDateStr" })
+                                @Html.HiddenFor(q => q.EndDateStr, new { id = "ToDateStr" })
+                            </div>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+   
+
+    <style>
+        .show-calendar {
+            top: 415px !important;
+        }
+    </style>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.comeback').parent().fixedScroll(70);
+        $('#btn-submit-product').parent().fixedScroll(70);
+    });
+
+    function checkNumber(input) {
+        input.value = input.value.replace(/[^\d]/g, '');
+        input.value = input.value.replace(/^0/, '');
+    }
+
+        $(function () {
+            function cb(start, end, label) {
+                var startTime = start.format("DD/MM/YYYY"),
+                    endTime = end.format("DD/MM/YYYY"),
+                    dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+                if (label != "Tùy chọn") {
+                    $('#date-string').val(label);
+                } else {
+                    $("#date-string").val(dateString);
+                }
+
+                $("#FromDateStr").val(startTime);
+                $("#ToDateStr").val(endTime);
+                $("#dateRange").html(dateString);
+            };
+
+            cb(moment(), moment().add(14, 'days'), "14 ngày");
+
+
+            $('#reportrange').daterangepicker({
+                "opens": "center",
+                "minDate": moment(),
+                "maxDate": '31/12/2100',
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    '14 ngày': [moment(), moment().add(14, 'days')],
+                    'Một tháng': [moment(), moment().add(1, 'month')],
+                }
+            }, cb);
+        });
+        function Create() {
+            $("#thisForm").submit(function (e) {
+                e.preventDefault();
+            });
+
+            if ($("input[name='Name']").val() == "") {
+                ShowMessage("Tên chiến dịch không được bỏ trống", 3);
+                return;
+            }
+            if ($("#provider").text() == "" && $("#provider").val() == null) {
+                ShowMessage("Xin tạo nhà cung cấp trước khi tạo chiến dịch!", 3);
+                return;
+            }
+
+            // Giá trị Coupon phải lớn hơn 0
+            var price = $("input[name='Price']").val();
+            if (price == "") {
+                ShowMessage("Giá trị Coupon không hợp lệ", 3);
+                return;
+            } else if (price.length > 9) {
+                ShowMessage("Giá trị Coupon không vượt quá 9 chữ số", 3);
+                return;
+            }
+
+            // Giá trị quy đổi phải lớn hơn 0
+            var value = $("input[name='Value']").val();
+            if (value == "") {
+                ShowMessage("Giá trị quy đổi không hợp lệ", 3);
+                return;
+            } else if (value.length > 9) {
+                ShowMessage("Giá trị quy đổi không vượt quá 9 chữ số", 3);
+                return;
+            }
+
+            $("#thisForm").submit(function (e) {
+                $("#thisForm").unbind('submit').submit();
+                ShowAlert('Thêm chiến dịch thành công', 2, '@Url.Action("CouponCampaign")');
+            });
+        }
+    </script>

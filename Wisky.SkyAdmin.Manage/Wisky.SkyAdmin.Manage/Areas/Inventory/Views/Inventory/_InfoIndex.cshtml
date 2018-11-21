@@ -1,0 +1,218 @@
+﻿@model HmsService.ViewModels.InfoIndex
+@using System.Globalization;
+<div class="card-padding">
+    <div class="row">
+        <div class="form-group">
+            <div class="col-md-4">
+                <div class="infobox infobox-block infobox-dark infobox-red">
+                    <div class="infobox-icon">
+                        <i class="ace-icon fa fa-usd"></i>
+                    </div>
+                    <div class="infobox-data">
+                        <div class="infobox-content">Giá trị tồn thực tế</div>
+                        <div class="infobox-content">
+                            <span id="tongGiamGia">
+                                @string.Format(CultureInfo.InvariantCulture,
+                                    "{0:0,0}", Model.StockValue)
+                                @*@Model.StockValue.ToString("C0")*@
+
+                            </span> <small> VNĐ</small>
+                        </div>
+
+                    </div>
+                </div> <!-- /.infobox -->
+            </div>
+            <div class="col-md-4">
+                <div class="infobox infobox-block infobox-dark infobox-red">
+                    <div class="infobox-icon">
+                        <i class="ace-icon fa fa-usd"></i>
+                    </div>
+                    <div class="infobox-data">
+                        <div class="infobox-content">Tổng giá trị nhập kho</div>
+                        <div class="infobox-content">
+                            <span id="tongGiamGia">
+                                @string.Format(CultureInfo.InvariantCulture,
+                                    "{0:0,0}", Model.ImportValue)
+                                @*@Model.StockValue.ToString("C0")*@
+
+                            </span> <small> VNĐ</small>
+                        </div>
+                    </div>
+                </div> <!-- /.infobox -->
+            </div>
+            <div class="col-md-4">
+                <div class="infobox infobox-block infobox-dark infobox-red">
+                    <div class="infobox-icon">
+                        <i class="ace-icon fa fa-usd"></i>
+                    </div>
+                    <div class="infobox-data">
+                        <div class="infobox-content">Tổng giá trị COS</div>
+                        <div class="infobox-content">
+                            <span id="tongGiamGia">
+                                @string.Format(CultureInfo.InvariantCulture,
+                                    "{0:0,0}", Model.COSValue)
+                                @*@Model.StockValue.ToString("C0")*@
+
+                            </span> <small> VNĐ</small>
+                        </div>
+                    </div>
+                </div> <!-- /.infobox -->
+            </div>
+
+            @*<div class="infobox infobox-block infobox-dark infobox-green">
+                    <div class="infobox-icon">
+                        <i class="ace-icon fa fa-usd"></i>
+                    </div>
+                    <div class="infobox-data">
+                        <i class="ace-icon fa fa-usd"></i><div class="infobox-content">Giá trị tồn kho</div><span id="tongGiamGia">
+                            @string.Format(CultureInfo.InvariantCulture,
+                            "{0:0,0}", Model.StockValue)
+                            @Model.StockValue.ToString("C0")
+                        </span> <small>VNĐ</small>
+                        <div class="infobox-content">
+                            <span id="tongGiamGia">
+                                @string.Format(CultureInfo.InvariantCulture,
+                            "{0:0,0}", Model.StockValue)
+                                @Model.StockValue.ToString("C0")
+                            </span> <small>VNĐ</small>
+                        </div>
+
+                    </div>
+                </div>*@
+
+        </div> <!-- /.form-group -->
+        <div class="form-group">
+            <div class="col-md-3 infobox-container">
+
+                <div class="infobox infobox-block infobox-red">
+                    <div class="infobox-icon">
+                        <i class="ace-icon fa fa-sign-in"></i>
+                    </div>
+                    <div class="infobox-data">
+                        <span class="infobox-data-number">
+                            @string.Format(CultureInfo.InvariantCulture,
+                                    "{0:0,0}", Model.NumberImport)
+                        </span>
+                        <div class="infobox-content">Số phiếu nhập</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 infobox-container">
+                <div class="infobox infobox-block infobox-red">
+                    <div class="infobox-icon">
+                        <i class="ace-icon fa fa-sign-out"></i>
+                    </div>
+                    <div class="infobox-data">
+                        <span class="infobox-data-number">
+                            @string.Format(CultureInfo.InvariantCulture,
+                                    "{0:0,0}", Model.NumberExport)
+                        </span>
+                        <div class="infobox-content">Số phiếu xuất</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 infobox-container">
+                <div class="infobox infobox-block infobox-red">
+                    <div class="infobox-icon">
+                        <i class="ace-icon glyphicon glyphicon-transfer"></i>
+                    </div>
+                    <div class="infobox-data">
+                        <span class="infobox-data-number">
+                            @string.Format(CultureInfo.InvariantCulture,
+                                    "{0:0,0}", Model.GetTranfer)
+                        </span>
+                        <div class="infobox-content">Số phiếu chuyển kho đến</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3 infobox-container">
+                <div class="infobox infobox-block infobox-red">
+                    <div class="infobox-icon">
+                        <i class="ace-icon glyphicon glyphicon-transfer"></i>
+                    </div>
+                    <div class="infobox-data">
+                        <span class="infobox-data-number">
+                            @string.Format(CultureInfo.InvariantCulture,
+                                    "{0:0,0}", Model.Tranfer)
+                        </span>
+                        <div class="infobox-content">Số phiếu chuyển kho đi</div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- /.form-group -->
+        @*<div class="form-group">
+                <div class="col-md-3 infobox-container">
+                    <div class="infobox infobox-block infobox-green">
+                        <div class="infobox-icon">
+                            <i class="ace-icon fa fa-sign-in"></i>
+                        </div>
+                        <div class="infobox-data">
+                            <span class="infobox-data-number">
+                                @Model.NumberImport
+                            </span>
+                            <div class="infobox-content">Số phiếu nhập</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 infobox-container">
+                    <div class="infobox infobox-block infobox-green">
+                        <div class="infobox-icon">
+                            <i class="ace-icon fa fa-sign-out"></i>
+                        </div>
+                        <div class="infobox-data">
+                            <span class="infobox-data-number">
+                                @Model.NumberExport
+                            </span>
+                            <div class="infobox-content">Số phiếu xuất</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 infobox-container">
+                    <div class="infobox infobox-block infobox-green">
+                        <div class="infobox-icon">
+                            <i class="ace-icon glyphicon glyphicon-transfer"></i>
+                        </div>
+                        <div class="infobox-data">
+                            <span class="infobox-data-number">
+                                @Model.GetTranfer
+                            </span>
+                            <div class="infobox-content">Số phiếu chuyển kho đến</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 infobox-container">
+                    <div class="infobox infobox-block infobox-green">
+                        <div class="infobox-icon">
+                            <i class="ace-icon glyphicon glyphicon-transfer"></i>
+                        </div>
+                        <div class="infobox-data">
+                            <span class="infobox-data-number">
+                                @Model.Tranfer
+                            </span>
+                            <div class="infobox-content">Số phiếu chuyển kho đi</div>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+        @*<div>
+                <button class="btn btn-success fa fa-download" id="btnExportExcel"> Xuất Excel</button>
+            </div>
+            <form class="hidden" id="formReportExcel" action="@Url.Action("ExportExcelEPPlus","Inventory")">
+                <input name="storeId" />
+                <input name="cateId" />
+                <input name="dateTime" />
+
+
+            </form>*@
+    </div>
+</div>
+
+@*<script>
+        $('#btnExportExcel').on('click', null, function () {
+            $('[name=storeId]').val(13);
+            //$('#hiddenStoreId').val()
+            $('[name=cateId]').val(cateId = selectedCategories.toString());
+            $('[name=dateTime]').val(dateTime = $('#date-string').val());
+            $('#formReportExcel').submit();
+        });
+    </script>*@

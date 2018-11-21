@@ -1,0 +1,512 @@
+﻿@using HmsService.ViewModels
+@{
+    ViewBag.Title = "ProductSetting";
+    var ProductId = ViewBag.productId;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3 id="titlePage">Thiết lập cấu hình sản phẩm: </h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <ul class="actions">
+                    <li class="m-r-10">
+                        <a href="@this.Url.Action("Index","Product", new {parameters = currentStoreDomain.Directory})" class="btn btn-success myComeback">Quay lại</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <!-- Customer Table -->
+        <div class="row">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="allcust">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2 id="NameProductTitle"></h2>
+                            </div>
+                            <div class="card-body card-padding row">
+                                <div class="form-group clearfix col-md-4">
+                                    <label for="inputTitle" class="control-label" style="font-weight:bold">Giá niêm yết</label>
+                                    <div class="fg-line" id="FixPrice">
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix col-md-4">
+                                    <label for="inputTitle" class="control-label" style="font-weight:bold">Giảm giá (%)</label>
+                                    <div class="fg-line" id="DiscountPercent">
+                                    </div>
+                                </div>
+                                <div class="form-group clearfix col-md-4">
+                                    <label for="inputTitle" class="control-label" style="font-weight:bold">Giảm giá</label>
+                                    <div class="fg-line" id="DiscountPrice">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Datatable -->
+                    <div class="col-md-12">
+                        <table id="settingProductDatatable" class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label class="">STT</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tên cửa hàng</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Giá (Hệ thống)</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Giảm giá % (Hệ thống)</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Giá (Cửa hàng)</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Giảm giá % (Cửa hàng)</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tình trạng</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tùy chọn</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="EditModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="modalUserHeader"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-7">
+                        <h4 id="titleModal"></h4>
+                        <div class="pmbb-view">
+                            <dl class="dl-horizontal">
+                                <dt>Giá hệ thống</dt>
+                                <dd id="fixPricemodal"></dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Giảm giá (%)</dt>
+                                <dd id="discountPercentmodal"></dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Giảm giá (price)</dt>
+                                <dd id="discountPricemodal"></dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                    <div class="col-md-5">
+                        <h4 id="titleModal">Tình trạng tại cửa hàng</h4>
+                        <div class="col-md-12">
+                            <div class="toggle-switch" data-ts-color="green">
+                                <label for="activeMapping" class="ts-label">Đang bán</label>
+                                <input name="activeMapping" id="activeMapping" type="checkbox" onchange="onChangeActive()" checked="checked" value="true" hidden />
+                                <label for="activeMapping" class="ts-helper"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div class="form-horizontal">
+                    <div class="attribute-panel">
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label" id="lableStoreName"></label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control currency number" id="priceAtStore" value="" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">Giảm giá(%) tại cửa hàng</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control number percent" id="income" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pair-group form-group xs-margin">
+                            <div class="col-sm-4">
+                                <div class="fg-line">
+                                    <label class="control-label">Giảm giá tại cửa hàng</label>
+                                </div>
+                            </div>
+                            <div class="col-sm-8">
+                                <div class="fg-line">
+                                    <input type="text" class="form-control currency number" id="discountAtStore" />
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" value="" id="detailId" />
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top: none;">
+                <button type="button" class="btn btn-primary" id="btnsubmit">Cập Nhật</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+@section scripts {
+    <script>
+        var productname="";
+        var defaultprice = 0;
+        var defaultDiscountpercent = 0;
+        var defaultDiscount = 0;
+        var priceAtstoreTmp = 0;
+        var discountpercentAtstore=0;
+        var discountPriceAtstore =0;
+
+        function onChangeActive() {
+            var tmp = $('#activeMapping')[0].checked;
+            if (tmp){
+                $("#priceAtStore").prop('readonly', false);
+                $("#income").prop('readonly', false);
+                $("#discountAtStore").prop('readonly', false);
+            } else{
+                $("#priceAtStore").prop('readonly', true);
+                $("#priceAtStore").val(toMoney(Math.round(priceAtstoreTmp),',','đ'));
+
+                $("#income").prop('readonly', true);
+                $("#income").val(discountpercentAtstore+"%");
+
+                $("#discountAtStore").prop('readonly', true);
+                $("#discountAtStore").val(toMoney(Math.round(discountPriceAtstore),',','đ'));
+            }
+
+
+        }
+        $(document).ready(function () {
+            ProductSettingProcess();
+            // input number
+            $('.currency').blur(function()
+            {
+                var data =  $(this).val();
+
+                $(this).val(toMoney(data,',','đ')) ;
+            });
+
+            var re = /^((0|[1-9]\d?)(\.\d{1,2})?|100(\.00?)?)$/;
+            $(".percent").blur(function()
+            {
+                var data =  $(this).val();
+                if (re.test(data)){
+                    data = data + "%";
+                    $(this).val(data) ;
+                } else {
+                    var y = parseFloat(data);
+                    if (re.test(y)){
+                        y = y + "%";
+                        $(this).val(y) ;
+                    } else {
+                        $(this).val(discountpercentAtstore+ "%") ;
+                    }
+                }
+            });
+
+            $('#priceAtStore').blur(function()
+            {
+                var str = $(this).val() + "";
+                var data = str.replace(/[,.đ]/g,'');
+                var datapercent = parseFloat($("#income").val());
+                var datatmp =toMoney(Math.round(data*datapercent/100),',','đ');
+                $("#discountAtStore").val(toMoney(Math.round(data*datapercent/100),',','đ'));
+            });
+
+            $('#income').blur(function()
+            {
+                var str = $('#priceAtStore').val() + "";
+                var data = str.replace(/[,.đ]/g,'');
+                var datapercent = parseFloat($(this).val());
+                var datatmp =toMoney(Math.round(data*datapercent/100),',','đ');
+                $("#discountAtStore").val(toMoney(Math.round(data*datapercent/100),',','đ'));
+            });
+
+            $('#discountAtStore').blur(function()
+            {
+                var str = $(this).val() + "";
+                var data = str.replace(/[,.đ]/g,'');
+
+                var str2 = $("#priceAtStore").val() + ""; //giá tại cửa hàng
+                var data2 = str2.replace(/[,.đ]/g,'');
+
+                if (parseInt(data) <= parseInt(data2)){
+                    var datatmp =parseFloat(data/data2*100).toFixed(2);
+                    datatmp = parseFloat(datatmp);
+                    $("#income").val(datatmp+"%");
+                } else {
+                    $("#income").val(discountpercentAtstore+"%");
+                    $("#discountAtStore").val(toMoney(discountPriceAtstore,',','đ'));
+                }
+
+
+            });
+            // validate number
+            $(".number").keydown(function (e) {
+                // Allow: backspace, delete, tab, escape, enter and .
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+                    // Allow: Ctrl+A, Command+A
+                    (e.keyCode === 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+                    // Allow: home, end, left, right, down, up
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    // let it happen, don't do anything
+                    return;
+                }
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                    e.preventDefault();
+                }
+            });
+            $(document).on("click","#btnsubmit",function(){
+                var str =$('#priceAtStore').val();
+                var priceAtStore =str.replace(/[,.đ]/g,'');
+                str = $('#discountAtStore').val();
+                var discountAtStore =str.replace(/[,.đ]/g,'');
+                str = $('#income').val();
+                var discountPercent =str.replace(/[%]/g,'');
+                var status = $('#activeMapping')[0].checked;
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("UpdateProductStoreMapping", "ProductSetting")',
+                    data: {detailId : $('#detailId').val(),priceAtStore: priceAtStore, discountAtStore:discountAtStore,discountPercent:discountPercent, status:status},
+                    success: function(result){
+                        if (result.success == true){
+                            RefreshTable();
+                            $('#EditModal').modal('hide');
+                            ShowMessage("Thành công", 2);
+                        } else {
+                            ShowMessage("Whoops something went wrong!", 1);
+                        }
+                    }
+                });
+            });
+            // validate percent
+
+            $('.myComeback').parent().fixedScroll(70);
+        });
+
+        function ProductSettingProcess() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetDefaultSetting", "ProductSetting")',
+                data: { productId: @ProductId },
+                success: function (result) {
+                    $("#titlePage").text($("#titlePage").text() + result.defaultSetting.ProductName + "-" + result.defaultSetting.ProductCode);
+                    $("#FixPrice").text(toMoney(result.defaultSetting.PriceDefault,',','đ'));
+                    $("#DiscountPercent").text(result.defaultSetting.DiscountPercentDefault + "%");
+                    $("#DiscountPrice").text(toMoney(result.defaultSetting.PriceDiscountDefault,',','đ'));
+
+                    $("#fixPricemodal").text(toMoney(result.defaultSetting.PriceDefault,',','đ'));
+                    $("#discountPercentmodal").text(result.defaultSetting.DiscountPercentDefault+"%");
+                    $("#discountPricemodal").text(toMoney(result.defaultSetting.PriceDiscountDefault,',','đ'));
+
+                    $("#NameProductTitle").text("Thông tin sản phẩm " + result.defaultSetting.ProductName +" tại hệ thống");
+
+                    $("#titleModal").text("Thông tin sản phẩm " + result.defaultSetting.ProductName + " tại hệ thống");
+                    productname = result.defaultSetting.ProductName;
+                    defaultprice = result.defaultSetting.PriceDefault;
+                    defaultDiscountpercent = result.defaultSetting.DiscountPercentDefault;
+                    defaultDiscount = result.defaultSetting.PriceDiscountDefault;
+                    InitUserDatatable();
+                }
+            });
+        };
+        function InitUserDatatable() {
+            var id = @ProductId;
+            $("#settingProductDatatable").dataTable({
+                "bSort": false,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@this.Url.Action("GetDataSetting", "ProductSetting")",
+                "bProcessing": true,
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "productId", "value": id });
+                },
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Tên cửa hàng",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+
+                },
+                "aoColumnDefs": [
+                    {
+                        "bSearchable": false,
+                        "aTargets": [0, 2, 3, 4, 5, 6, 7],
+                        "bSearchable": false,
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [2],
+                        "mRender": function (data, type, row) {
+                            return  toMoney(data,',','đ');
+                        },
+                        "sClass": "text-center"
+                    },
+                     {
+                         "aTargets": [4],
+                         "mRender": function (data, type, row) {
+                             return  toMoney(data,',','đ');
+                         },
+                         "sClass": "text-center"
+                     },
+                     {
+                         "aTargets": [7],
+                         "mRender": function (data, type, row) {
+                             var editButton = '<button class="fa fa-pencil btn btn-sm btn-info" type="button" data-action="edit-child-general" data-status="0" id="Edit">'+
+                                '  Sửa</button>';
+                             return editButton;
+                         },
+                         "sClass": "text-center"
+                     },
+                    {
+                        "aTargets": [3],
+                        "mRender": function (data, type, row) {
+                            var datatmp = toMoney(Math.round(row[2]*row[3]/100),',','đ');
+                            var text = "Giảm giá tại hệ thống: " + datatmp
+                            return "<div class='hover-title' data-title='"+text+"' style='width:100%'>"+data+"%</div>";
+
+                        },
+                        "sClass": "text-center"
+                    },
+                        {
+                            "aTargets": [5],
+                            "mRender": function (data, type, row) {
+                                var datatmp = toMoney(Math.round(row[4]*row[5]/100),',','đ');
+                                var text = "Giảm giá tại hệ thống: " + datatmp
+                                return "<div class='hover-title' data-title='"+text+"' style='width:100%'>"+data+"%</div>";
+                            },
+                            "sClass": "text-center"
+                        },
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var label ="";
+                            if (row[6] == true){
+                                label = '<label class="label label-success">Đang Bán</label>';
+                            }else {
+                                label = '<label class="label label-danger">Dừng Bán</label>';
+                            }
+                            return label;
+                        },
+                        "sClass": "text-center"
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+
+        }
+
+
+
+        ////redraw datatable without reload
+        //function reDrawDatatable(id) {
+        //    $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+        //        if (oSettings.oFeatures.bServerSide === false) {
+        //            var before = oSettings._iDisplayStart;
+        //            oSettings.oApi._fnReDraw(oSettings);
+        //            //iDisplayStart has been reset to zero - so lets change it back
+        //            oSettings._iDisplayStart = before;
+        //            oSettings.oApi._fnCalculateEnd(oSettings);
+        //        }
+
+        //        //draw the 'current' page
+        //        oSettings.oApi._fnDraw(oSettings);
+        //    };
+        //    $(id).dataTable().fnStandingRedraw();
+        //}
+
+        //user datatable
+        function RefreshTable() {
+            var oTable = $("#settingProductDatatable").dataTable();
+            oTable._fnPageChange(0)
+            oTable._fnAjaxUpdate();
+        }
+
+        $('#settingProductDatatable tbody').on( 'click', '#Edit', function () {
+            var table = $('#settingProductDatatable').DataTable();
+            var data = table.row($(this).parents('tr')).data();
+            priceAtstoreTmp = data[4];
+            discountpercentAtstore=data[5];
+            discountPriceAtstore =data[4]*data[5]/100;
+            openEditModel(data);  // @*Id cua Model*@
+        });
+
+        function openEditModel(data) {
+            $('#EditModal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+
+            $("#lableStoreName").text("Giá Tại " +data[1]);
+            $("#modalUserHeader").text("Chỉnh sửa sản phẩm " +productname  + " tại " +data[1]  );
+            $("#priceAtStore").val(toMoney(data[4],',','đ'));
+            $("#income").val(data[5] + "%");
+            $("#discountAtStore").val(toMoney(Math.round(data[4]*data[5]/100),',','đ'));
+            $("#detailId").val(data[8]);
+            if (data[6]){
+                $("#activeMapping").prop("checked", true);
+            } else {
+                $("#activeMapping").prop("checked", false);
+
+                $("#priceAtStore").prop('readonly', true);
+
+                $("#income").prop('readonly', true);
+
+                $("#discountAtStore").prop('readonly', true);
+            }
+            $('#EditModal').modal('show');
+
+        };
+    </script>
+    <style>
+        .dl-horizontal dd {
+            margin-left: 186px;
+        }
+        .label{
+            font-size: 100%;
+        }
+    </style>
+}

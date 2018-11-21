@@ -1,0 +1,92 @@
+﻿@{
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var curentStore = ViewBag.CurrentStore as StoreViewModel;
+    ViewBag.Title = "Index";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>Danh sách nhóm blog</h2>
+            </div>
+            <div class="col-md-4 text-right">
+                @if (curentStore?.HasBlogEditCollections ?? false)
+                {
+                    <a href="@this.Url.Action("Create", new { parameters = currentStoreDomain.Directory })" class="btn btn-primary btn-icon-text waves-effect">
+                        <i class="zmdi zmdi-plus"></i> Thêm chuyên mục
+                    </a>
+                }
+
+            </div>
+        </div>
+    </div>
+    <div class="card-padding">
+        <table id="lst-items" class="table table-striped table-vmiddle">
+            <thead>
+                <tr>
+                    <th data-column-id="Name" data-formatter="NameFromSubproperty">Tên nhóm</th>
+                    <th data-column-id="PostCount">Số bài viết</th>
+                    <th data-column-id="commands" ata-sortable="false" data-formatter="Commands"></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<template id="command-template" class="hidden">
+    <div>
+        @if (curentStore?.HasBlogEditCollections ?? false)
+        {
+            <a class="btn btn-primary btn-sm"
+               data-toggle="tooltip" title="Edit">
+                <i class="fa fa-pencil"></i>
+            </a>
+            <button onclick="onDeleteButtonClick(this);" class="btn btn-danger btn-sm" data-role="Delete"
+                    data-toggle="tooltip" title="Delete">
+                <i class="fa fa-remove"></i>
+            </button>
+        }
+    </div>
+</template>
+
+@section scripts {
+    <script>
+        $(function () {
+            var commandTemplate = $("#command-template").html();
+
+            $("#lst-items").bootgrid({
+                rowCount: [10, 20, 50, ],
+
+                ajax: true,
+                url: "@this.Url.Action("IndexList", new { parameters = currentStoreDomain.Directory })",
+
+                formatters: {
+                    "Commands": function (column, row) {
+                        var template = $(commandTemplate);
+
+                        template.find("[title=Edit]").attr("href", "@(this.Url.Action("Edit", new { parameters = currentStoreDomain.Directory }))/" + row.BlogPostCollection.Id);
+                        if (row.BlogPostCollection.ParentId == null) {
+                            template.find("[title=Delete]").css("display", "none");
+                        } else {
+                            template.find("[title=Delete]").attr("data-id", row.BlogPostCollection.Id);
+                        }
+                        return template[0].outerHTML;
+                    },
+
+                    "NameFromSubproperty": function (column, row) {
+                        return row.BlogPostCollection.Name;
+                    },
+                },
+            });
+        });
+
+        function onDeleteButtonClick(btn) {
+            if (confirm("Are you sure to delete this record?")) {
+                var id = $(btn).attr("data-id");
+                window.location.href = "@this.Url.Action("Delete", new { parameters = currentStoreDomain.Directory })/" + id;
+            }
+        }
+
+    </script>
+}

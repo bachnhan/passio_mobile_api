@@ -1,0 +1,375 @@
+﻿
+@{
+    ViewBag.Title = "IndexProductCategoryReport";
+}
+<style>
+    .tab-nav.tn-justified > li {
+        width: 33% !important;
+        padding: 0px;
+    }
+
+    .dropdown-menu.open {
+        max-height: 200px !important;
+    }
+
+    .dropdown-menu.inner {
+        max-height: 200px !important;
+    }
+
+    .highcharts-container {
+        width: 100% !important;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header" style="padding-bottom:5px">
+        <div class="row">
+            <div class="col-md-4">
+                <h3>Báo cáo doanh thu sản phẩm</h3>
+                <h5 data-role="small-date" id="dateRange"></h5>
+            </div>
+            <div class="col-md-8">
+                <div style="text-align: right;">
+                    <!-- ONE SOTRE -->
+                    <button type="submit" id="exportOneStore" class="btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button><!-- ONE SOTRE END -->
+                </div><!-- EXPORT TO EXCEL END -->
+            </div>
+        </div>
+
+        <hr />
+        <div class="row">
+            <form id="form-create-session" class="form-inline">
+                <div class="col-md-8 m-b-15">
+                    <input id="checkproduct" value="" hidden="">
+                    <div class="col-md-6 m-y-5 group-radio-buttons">
+                        <div class="toggle-switch col-md-12 m-y-10" data-ts-color="green">
+                            <input name="mapping1" id="activeMapping" type="radio" class="nice-check" checked="">
+                            <label for="activeMapping" class="ts-label"><span>Sản phẩm</span></label>
+                        </div>
+                        <div class="toggle-switch col-md-12 m-y-10" data-ts-color="green">
+                            <input name="mapping1" id="deActiveMapping" type="radio" class="nice-check">
+                            <label for="deActiveMapping" class="ts-label"><span>Nhóm sản phẩm</span></label>
+                        </div>
+                    </div>
+
+                    <input id="checkDeal" value="" hidden="">
+                    <div class="col-md-6 m-y-5 group-radio-buttons">
+                        <div class="toggle-switch col-md-12 m-y-10" data-ts-color="green">
+                            <input name="mapping2" id="activeMapping1" type="radio" class="nice-check" checked="">
+                            <label for="activeMapping1" class="ts-label"><span>Trước giảm giá</span></label>
+                        </div>
+                        <div class="toggle-switch col-md-12 m-y-10" data-ts-color="green">
+                            <input name="mapping2" id="deActiveMapping1" type="radio" class="nice-check">
+                            <label for="deActiveMapping1" class="ts-label"><span>Sau giảm giá</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4 m-t-20" style="margin-top: 19px;">
+                    <div class="input-group pull-right" style="padding-top:10px">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="sTime" />
+                    <input type="hidden" id="eTime" />
+                </div>
+                <div class="col-md-12 m-b-10">
+                    <div class="col-md-2">
+                        <button type="button" data-status="hide" id="btnChart" class="btn btn-primary btn-sm" style="width: 150px;">
+                            <i class="fa fa-plus"></i>
+                            Hiển thị biểu đồ
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" id="containerWrapper" style="display:none">
+            <div id="container1" style="width:100%; height:300px"></div>
+        </div>
+    </div>
+    <div class="card-padding">
+
+        <div id="groupCategoryReport1">
+            <table id="groupCategoryReportDatatable1" class="table table-striped table-bordered table-hover" style="width: 100% !important">
+                <thead style="white-space: nowrap; text-overflow: ellipsis;">
+                    <tr>
+                        <th>
+                            <label class="">Tên sản phẩm</label>
+                        </th>
+                        <th>
+                            <label class="">Tỉ trọng</label>
+                        </th>
+                        <th>
+                            <label class="">Tổng tiền trước giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Tổng tiền sau giảm giá</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<form class="hidden" id="ReportProductOneStoreExportExcelEPPlus" action="@Url.Action("ReportProductOneStoreExportExcelEPPlus", "ProductReport")">
+    <input id="startTimeOne" name="startTime" />
+    <input id="endTimeOne" name="endTime" />
+    <input name="storeIdReport" />
+    <input name="checkvalue" />
+    <input name="checkDeal" />
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('#checkproduct').val("loadProducts");
+        $('#checkDeal').val("beforeDeal");
+        cb(moment(), moment(), "Hôm nay");
+        loadDataOnChange();
+
+        // Export to excel. One store.
+        $(document).on('click', '#exportOneStore', function () {
+            $('#startTimeOne').val($('#sTime').val());
+            $('#endTimeOne').val($('#eTime').val());
+            $('input[name=checkDeal]').val($('#checkDeal').val());
+            $('input[name=storeIdReport]').val(@ViewBag.storeId);
+            $('input[name=checkvalue]').val($('#checkproduct').val());
+            $('#ReportProductOneStoreExportExcelEPPlus').submit();
+        });
+
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('week'), moment().endOf('week')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('week'), moment().subtract(1, 'week').endOf('week')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+
+        // seleck and unseleck all click event
+        $('#filter-option').on('click', '#filter-select-all', function () {
+            $('.store-name-filter').prop('checked', "checked");
+            $('#filter').trigger('change');
+        });
+
+        $('#filter-option').on('click', '#filter-unselect-all', function () {
+            $('.store-name-filter').removeAttr('checked');
+            $('#filter').trigger('change');
+        })
+    });
+
+
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+
+        $("#sTime").val(startTime);
+        $("#eTime").val(endTime);
+        $("#dateRange").html(dateString);
+        loadDataOnChange();
+    }
+
+    function productReportOneStore() {
+        $('#exportOneStore').show();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ProductReportOneStore","ProductReport")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'storeIdReport':@ViewBag.storeId, 'checkDeal': $('#checkDeal').val() },
+            success: function (result) {
+                    initProductReportDatatable1(result.datatable, false);
+                    DoanhThuChart1(result.dataChart);
+            }
+        });
+    };
+   function CategoryReportOneStore () {
+        $('#exportOneStore').show();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CategoryReportOneStore","ProductReport")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'storeIdReport': @ViewBag.storeId, 'checkDeal': $('#checkDeal').val() },
+            success: function (result) {
+                initProductReportDatatable1(result.datatable, false);
+                DoanhThuChart1(result.dataChart);
+            }
+        });
+    };
+    function DoanhThuChart1(dataChart) {
+        var seriesOptions = [],
+        seriesCounter = 0
+        $.each(dataChart._ProductName, function (i, name) {
+            seriesOptions[i] = {
+                'name': dataChart._ProductName[i],
+                'y': dataChart._ProductPercent[i],
+            };
+        });
+        $('#container1').highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Doanh thu sản phẩm',
+                style: {
+                    fontFamily: 'Arial',
+                    fontStyle: 'Bold'
+                }
+            },
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.2f}%</b><br/>Doanh thu: <b>{point.y}VNĐ</b>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: 'Tỉ lê',
+                colorByPoint: true,
+                data: seriesOptions
+            }]
+        });
+    };
+
+    var initProductReportDatatable1 = function (data, visible) {
+        $('#groupCategoryReport1').html('<table id="groupCategoryReportDatatable1" class="table table-striped table-bordered table-hover" style="width: 100% !important">'
+                    + '<thead style="white-space: nowrap; text-overflow: ellipsis;"><tr><th><label class="">Tên sản phẩm</label></th>'
+                    + '<th> <label class="">Ngành hàng</label></th><th><label class="">Tỉ trọng(%)</label></th>'
+                    + '<th><label class="">Tổng tiền trước giảm giá</label></th>'
+                    + '<th><label class="">Giảm giá</label></th>'
+                    + '<th><label class="">Tổng tiền sau giảm giá</label></th>'
+                    + '<th><label class="">So sánh</label></th>'
+                    + '</tr></thead><tbody></tbody></table>');
+
+        $("#groupCategoryReportDatatable1").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 150],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+
+            "aoColumnDefs": [
+                {
+                    "visible": false, "targets": [1]
+                },
+                {
+                    "aTargets": [2, 3, 4, 5],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, o) {
+                        return '<a data-catname="' + o[0] + '" data-storeid="' + o[4] + '" class="btn btn-sm btn-info btnComparison"><span class="fa fa-tasks"></span></a>';
+                    },
+                    'visible': visible,
+                },
+                {
+                    'aTargets': [3, 4, 5],
+                    "mRender": function (data, type, row) {
+                        return toMoney(data, ',', '');
+                    }
+                }
+            ],
+            "bAutoWidth": true,
+            "order": [[1, 'asc']],
+        }).fnSetFilteringDelay(delaySearch);
+    };
+
+    $('#btnChart').click(function () {
+        var status = $(this).data('status');
+        if ($.trim($('#container1').html()).length > 0) {
+            if (status == 'show') {
+                $(this).html('<i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                $(this).data('status', 'hide');
+            } else {
+                $(this).html('<i class="fa fa-minus"></i> Ẩn biểu đồ');
+                $(this).data('status', 'show');
+            }
+            $('#containerWrapper').toggle('show');
+        } else {
+            ShowMessage("Xin chọn nhấn Tìm trước khi xem biểu đồ", 3);
+        }
+    });
+    function loadDataOnChange() {
+        if ($('#checkproduct').val() == 'loadProducts') {
+            productReportOneStore();
+        } else {
+            CategoryReportOneStore();
+        }
+    }
+
+    //Gom 4 functions ở trên thành sự kiện radio buttons
+    $(document).ready(function () {
+        $('[name="mapping1"]').change(function (e) {
+            var tmp = $('#activeMapping')[0].checked;
+            if (tmp) {
+                $('#checkproduct').val("loadProducts");
+            } else {
+                $('#checkproduct').val("loadProductCates");
+            }
+            loadDataOnChange();
+        });
+
+        $('[name="mapping2"]').change(function (e) {
+            var tmp = $('#activeMapping1')[0].checked;
+            if (tmp) {
+                $('#checkDeal').val("beforeDeal");
+            } else {
+                $('#checkDeal').val("afterDeal");
+            }
+            loadDataOnChange();
+        });
+    });
+</script>

@@ -1,0 +1,20 @@
+﻿@model System.Boolean?
+
+@{
+    var isRequired = (ViewData.ModelMetadata).ContainerType.GetProperty(ViewData.ModelMetadata.PropertyName).HasRequiredAttribute();
+
+    var displayString = this.ViewData["DisplayString"]?.ToString() ?? this.Html.DisplayNameForModel().ToString();
+}
+
+<div class="row">
+    <label class="col-sm-2 control-label" for="@this.Html.IdForModel()">@(displayString)</label>
+    <div class="col-sm-10">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" name="@this.Html.NameForModel()" id="@this.Html.IdForModel()"
+                       class="form-control" value="true" checked="@(this.Model.GetValueOrDefault() ? "" : null)" />
+                <i class="input-helper"></i>
+            </label>
+        </div>
+    </div>
+</div>

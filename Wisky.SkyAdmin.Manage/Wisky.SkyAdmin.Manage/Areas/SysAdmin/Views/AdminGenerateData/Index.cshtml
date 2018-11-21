@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h3>hello</h3>
+<div id="return"></div>
+@section scripts {
+<script>
+        $(document).ready(function () {
+            ProductDataProcess();
+        });
+
+        function ProductDataProcess() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GenerateProductDetailMapping", "AdminGenerateData")',
+                success: function (result) {
+
+                    $("#return").text("xong");
+                }
+            });
+        };
+</script>
+}
+

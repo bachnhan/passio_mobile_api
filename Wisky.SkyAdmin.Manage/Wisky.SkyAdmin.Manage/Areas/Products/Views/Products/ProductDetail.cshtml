@@ -1,0 +1,62 @@
+﻿@{
+    ViewBag.Title = "ProductDetail";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var productId = ViewBag.ProductId;
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Cấu hình nguyên liệu</h3>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="card-body" style="padding-top: 0px;">
+        <div class="card-padding">
+            <div class="row">
+                <div id="divLoadItem" class="col-md-7">
+                </div>
+                <div id="divChooseItem" class="col-md-5">
+                </div>
+            </div>
+
+
+            <div class="alert alert-block" id="alert-fail" style="top: 50%; position: fixed; width: 800px; display: none; margin-left: 50px;">
+                <button type="button" class="close" data-dismiss="alert">
+                    &times;
+                </button>
+                <h4>Warning!</h4>
+                Sản phẩm đang được order, hoặc còn sử dụng. Bạn không thể xóa...
+            </div>
+        </div>
+    </div>
+    <br />
+</div>
+
+<script>
+    $(document).ready(function () {
+        loadProductDetail();
+    });
+
+    function loadProductDetail() {
+        $.ajax({
+            url: "@Url.Action("LoadProductCategory", "Products")",
+            data: { productId: @productId },
+            success: function (result) {
+                $('#divLoadItem').html(result);
+            }
+        });
+        $.ajax({
+            url: "@Url.Action("ListItemByPro", "Products")",
+            data: { productID: @productId },
+            success: function (result) {
+                $('#divChooseItem').html(result);
+            }
+        });
+    }
+
+
+</script>

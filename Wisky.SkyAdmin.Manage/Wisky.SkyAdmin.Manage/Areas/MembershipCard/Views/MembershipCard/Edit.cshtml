@@ -1,0 +1,75 @@
+﻿
+@model HmsService.ViewModels.MembershipCardEditViewModel
+
+@{
+    ViewBag.Title = "Cập nhật thẻ thành viên";
+
+}
+<form id="editMembership" action="@this.Url.Action("Edit")" method="POST">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4><strong>Cập nhật thẻ thành viên</strong></h4>
+    </div>
+    @Html.HiddenFor(q => q.Id, new { @type = "hidden" })
+    @Html.HiddenFor(q => q.MembershipCardCode, new { @type = "hidden" })
+    @Html.HiddenFor(q => q.CSV, new { @type = "hidden" })
+    @Html.HiddenFor(q => q.CustomerId, new { @type = "hidden" })
+    @Html.HiddenFor(q => q.CustomerName, new { @type = "hidden" })
+    @Html.HiddenFor(q => q.Active, new { @type = "hidden" })
+    @Html.HiddenFor(q => q.Status, new { @type = "hidden" })
+    @Html.HiddenFor(q => q.CreatedTime, new { @type = "hidden" })
+    <div class="modal-body">
+        <div class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-4" for="CustomerList">
+                    Tên khách hàng
+                </label>
+
+                <div class="col-sm-8">
+                    <div class="fg-line" style="background-color : white">                       
+                        <div>
+                            <select id="cusId" name="cusId" style="width:100%;" >
+                                <option value="@Model.CustomerId">@Model.CustomerName - @Model.Customer.Phone</option>
+                                @foreach (var item in Model.CustomerList)
+                                {
+                                    if (item.Value != Model.CustomerId.ToString())
+                                    {
+                                        <option value="@item.Value">@item.Text </option>
+                                    }
+                                }
+                            </select>                           
+                        </div>                  
+                    </div>
+                </div>
+            </div>          
+            <div class="form-group">
+                <label class="col-sm-4">
+                    Loại thành viên
+                </label>
+                <div class="col-sm-8">
+                    @Html.DropDownListFor(model => model.MembershipTypeId, new SelectList(Model.ListTypeMembership, "Value", "Text"), new { id = "membershipType", @class = "form-control" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Hoàn tất</button>
+    </div>
+</form>
+<script>
+    $('document').ready(function () {
+        $("#cusId").select2({
+            minimumInputLength: 3,
+        });
+        var timeoutId = 0;
+        $('.select2-input').keypress(function () {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(getFilteredResultCount, 500);
+        });
+    });
+   
+    $("#cusId").submit(function (e) {
+        $("#editMembership").unbind('submit').submit();
+        ShowMessage('Cập nhật thẻ thành viên thành công', 2, '@Url.Action("Index")');
+    });
+</script>

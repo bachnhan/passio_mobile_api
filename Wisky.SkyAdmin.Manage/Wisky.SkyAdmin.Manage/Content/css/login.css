@@ -1,0 +1,230 @@
+/*.form-control {
+    padding: 6px 12px;
+    border: 1px solid #e0e0e0;
+}*/
+/*body.login-content:before {
+    background-color: #00AA41;
+}*/
+body.login-content .lc-block {
+    margin-top: 0;
+}
+.header {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    font-family: Calibri;
+}
+
+.header h2 {
+    color: #fff;
+    font-size: 30px;
+    line-height: 1.2;
+    text-shadow: 1px 1px 1px #000;
+}
+
+.header span {
+    display: block;
+    font-size: 150%;
+    font-weight: 600;
+}
+.myUsername{
+    font-size: 120%;
+}
+
+/*
+    Author: GiangHNM
+    Date: 28/07/2016
+    Login 
+*/
+.login-content {
+    background-image: url('../images/login/destop-bg.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+body.login-content:before {
+    content: none;
+}
+.login-frame {
+    width: 380px;
+    padding: 30px;
+    padding-left: 45px;
+    min-height: 410px;
+    background: white;
+    display: inline-block;
+    background: url('../images/login/paper.png') no-repeat;
+    background-size: cover;
+    vertical-align: middle;
+    position: relative;
+}
+.login-logo {
+    height: 70px;
+    margin: 0 auto;
+    margin-bottom: 40px;
+}
+    .login-logo img {
+        width: auto;
+        height: 100%;
+    }
+.login-form {
+    text-align: left;
+    font-size: 16px;
+}
+    
+    .login-form .form-group {
+        position: relative;
+    }
+    .login-form .form-group label {
+        margin-bottom: 0;
+    }
+
+.login-form .form-group .form-control {
+    background: transparent;
+    font-size: 16px;
+    padding: 20px 15px;
+    padding-left: 55px;
+    border: 1px solid lightgrey;
+    border-radius: 3px;
+    height: 32px;
+    position: relative;
+    z-index: 99;
+}
+
+/*
+    Checkbox
+*/
+.login-remember {
+    position: absolute;
+}
+.login-remember input {
+    display: none;
+}
+.login-remember label {
+    padding-left: 30px;
+    position: relative;
+    cursor: pointer;
+}
+.login-remember label:before, .login-remember label:after {
+            content: '';
+            display: block;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        .login-remember label:before {
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            border: 2px #00AA41 solid;
+        }
+
+        .login-remember label:after {
+            content: '\f00c';
+            font: normal normal normal 16px/1 FontAwesome;
+            color: white;
+            left: 2px;
+            top: 1px;
+            display: none;
+        }
+
+        .login-remember label > span {
+            position: relative;
+            top: 0px;
+        }
+    .login-remember input:checked ~ label:before {
+        background: #00AA41;
+    }
+
+    .login-remember input:checked ~ label:after {
+        display: block;
+    }
+
+/*
+    Login button
+*/
+.login-button {
+    margin-top: 35px;
+    width: 100%;
+    background: #00AA41;
+    border: none;
+    padding: 8px;
+    color: white;
+    border-radius: 20px;
+}
+.login-button:hover, .login-button:active {
+    background: #009637;
+    transition: all .5s;
+}
+
+/*
+    Login icon of input
+*/
+.login-form .form-group .login-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 42px;
+    height: 100%;
+    text-align: center;
+    color: lightgrey;
+    background: #333333;
+    padding-top: 10px;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    z-index: 100;
+}
+.form-group .login-icon i.fa {
+    font-size: 18px;
+}
+
+
+/*
+    Placeholder for label
+*/
+.form-control:focus::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: #333333;
+    transition: all .5s;
+}
+.form-control:focus:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color: #333333;
+    transition: all .5s;
+}
+.form-control:focus:-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: #333333;
+    transition: all .5s;
+}
+.form-control:focus:-ms-input-placeholder { /* Internet Explorer 10-11 */
+    color: #333333;
+    transition: all .5s;
+}
+
+/*
+    Date: 02/08/2016
+*/
+.form-control ~ .focus-bg {
+    background-color: #edecea;
+    width: 0;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.form-control:focus ~ .focus-bg {
+    transition: 0.5s;
+    width: 100%;
+}
+/*
+    Date: 04/08/2016
+*/
+.login-error {
+    position: absolute;
+    bottom: 93px;
+    left: 45px;
+    color: red;
+}
+.login-error ul {
+    padding-left: 0;
+    list-style-type: none;
+    font-size: 16px;
+}

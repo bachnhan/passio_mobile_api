@@ -1,0 +1,356 @@
+﻿@model HmsService.ViewModels.PromotionDetailViewModel
+<link href="~/Content/plugins/select2-4.0.3/dist/css/select2.min.css" rel="stylesheet" />
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="modalBrandHeader"></h4>
+        </div>
+        <div class="modal-body">
+            <form id="promotionDetailForm">
+                <div class="form-horizontal">
+                    <div id="FormError" class="alert alert-danger" style="display: none; padding: 10px; margin-left: 10px"></div>
+                    <div id="FormSuccess" class="alert alert-success" style="display: none; padding: 10px; margin-left: 10px"></div>
+                    <div class="col-xs-12">
+                        <div class="card-padding">
+                            <div class="modal-body">
+                                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                                @Html.HiddenFor(q => q.PromotionCode)
+                                @Html.HiddenFor(q => q.PromotionDetailCode)
+                                @Html.HiddenFor(q => q.RegExCode, new { id = "RegExCode" })
+                                @Html.HiddenFor(q => q.PromotionDetailID)
+                                <div class="form-horizontal">
+                                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px">
+                                        @if (ViewBag.Promo.IsForMember)
+                                        {
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4" for="Name">Nhóm thẻ</label>
+                                                <div class="col-md-6" style="padding: 0px">
+                                                    @*<div class="col-md-6">
+                                                        <div class="fg-line">
+                                                            <select class="form-control" id="regexinput">
+                                                                <option value="same">Mã thẻ giống</option>
+                                                                <option value="start">Bắt đầu</option>
+                                                                <option value="end">Kết thúc</option>
+                                                                <option value="contain">Có chứa</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>*@
+                                                    <div class="col-md-6" style="padding: 0px">
+                                                        @*<input type="text" class="form-control" style="" id="textinput" />*@
+                                                        <select id="group-membership-code" style="width:207px;height:35px;">
+                                                            <option value="-1">Nothing selected</option>
+                                                            @for (int i = 0; i < Model.MembershipCardTypeList.Count; i++)
+		                    	                                {
+			                                                        <option value="@Model.MembershipCardTypeList[i].AppendCode">
+                                                                        @Model.MembershipCardTypeList[i].TypeName
+                                                                    </option>
+			                                                    }
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            if (ViewBag.Promo.UsingPoint == true)
+                                            {
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-4" for="Name">Point Trade</label>
+                                                    <div class="col-md-6" style="padding: 0px">
+                                                        <div class="fg-line">
+                                                            @Html.TextBoxFor(q => q.PointTrade, new { id = "pointTradeId", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-4" for="Name">Min Point</label>
+                                                    <div class="col-md-6" style="padding: 0px">
+                                                        <div class="fg-line">
+                                                            @Html.TextBoxFor(q => q.MinPoint, new { id = "minPointApply", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)", placeholder = "Bỏ trống nếu không apply" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="control-label col-md-4" for="Name">Max Point</label>
+                                                    <div class="col-md-6" style="padding: 0px">
+                                                        <div class="fg-line">
+                                                            @Html.TextBoxFor(q => q.MaxPoint, new { id = "maxPointApply", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)", placeholder = "Bỏ trống nếu không giới hạn" })
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        @if (ViewBag.Promo.ApplyLevel == 0)
+                                        {
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4" for="Name">Tổng tiền tối thiểu (VNĐ)<span style="color:red">*</span></label>
+                                                <div class="col-md-6" style="padding: 0px">
+                                                    <div class="fg-line">
+                                                        @Html.TextBoxFor(q => q.MinOrderAmount, new { id = "MinOrderAmount", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)" })
+                                                        
+                                                     </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4" for="Name">Tổng tiền tối đa (VNĐ)</label>
+                                                <div class="col-md-6"style="padding: 0px">
+                                                    <div class="fg-line">
+                                                        @Html.TextBoxFor(q => q.MaxOrderAmount, new { id = "MaxOrderAmount", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)", placeholder="Bỏ trống nếu không giới hạn" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (ViewBag.Promo.ApplyLevel == 1)
+                                        {
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4" for="Name">Sản phẩm áp dụng<span style="color:red">*</span></label>
+                                                <div class="col-md-6" style="padding: 0px">
+                                                    <div class="fg-line">
+                                                        <input id="productApplyList" name="productApply" class="form-control" style="width: 100%" />
+                                                        @*@if (Model.BuyProductCode == null)
+                                                        {
+                                                            <label style="font-weight:bold; color:red">(Bỏ trống nếu không chọn)</label>
+                                                        }*@
+                                                        @Html.HiddenFor(q => q.BuyProductCode, new { @id = "BuyProductCode" })
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4" for="Name">Số lượng tối thiểu<span style="color:red">*</span></label>
+                                                <div class="col-md-6" style="padding: 0px">
+                                                    <div class="fg-line">
+                                                        @Html.TextBoxFor(q => q.MinBuyQuantity, new { id = "MinBuyQuantity", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)" })
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4" for="Name">Số lượng tối đa</label>
+                                                <div class="col-md-6" style="padding: 0px">
+                                                    <div class="fg-line">
+                                                        @Html.TextBoxFor(q => q.MaxBuyQuantity, new { id = "MaxBuyQuantity", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)", placeholder="Bỏ trống nếu không giới hạn" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+
+                                        @if (@ViewBag.Promo.GiftType == 1)
+                                        {
+
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4" for="Name">Sản phẩm KM<span style="color:red">*</span></label>
+                                                <div class="col-md-6" style="padding: 0px">
+                                                    <div class="fg-line">
+                                                        <input id="giftApplyList" name="productApply" class="form-control" style="width: 100%" />
+                                                        @*@if (ViewBag.Promo.GiftType == 0 && Model.GiftProductCode == null)
+                                                        {
+                                                            <label style="font-weight:bold; color:red">(Bỏ trống nếu không chọn)</label>
+                                                        }*@
+                                                        @Html.HiddenFor(q => q.GiftProductCode, new { @id = "GiftProductCode" })
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4" for="Name">Số lượng<span style="color:red">*</span></label>
+                                                <div class="col-md-6"style="padding: 0px">
+                                                    <div class="fg-line">
+                                                        @Html.TextBoxFor(q => q.GiftQuantity, new { id = "GiftQuantity", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)" })
+                                                        
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (@ViewBag.Promo.GiftType == 0 || @ViewBag.Promo.GiftType == 3)
+                                        {
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4" for="Name">Giảm giá (%)<span style="color:red">*</span></label>
+                                                <div class="col-md-6" style="padding: 0px">
+                                                    <div class="fg-line">
+                                                        @Html.TextBoxFor(q => q.DiscountRate, new { id = "DiscountRate", @class = "form-control", @type = "number"})
+                                                        
+                                                    
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                        else if (@ViewBag.Promo.GiftType == 2 || @ViewBag.Promo.GiftType == 4)
+                                        {
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4" for="Name">Giảm giá (Tiền mặt)<span style="color:red">*</span></label>
+                                                <div class="col-md-6" style="padding: 0px">
+                                                    <div class="fg-line">
+                                                        @Html.TextBoxFor(q => q.DiscountAmount, new { id = "DiscountAmount", @class = "form-control", onkeyup = "this.value = checkDigit(this.value)" })
+                                                        
+                                                      </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer" style="border-top: none;">
+            <button type="button" class="btn btn-success" data-dismiss="modal">Đóng</button>
+            <input type="button" onclick="confirmSubmit(this)" value="Hoàn tất" class="btn btn-primary" />
+        </div>
+    </div><!-- /.modal-content -->
+</div>
+<style>
+    /*#select2-drop {
+        left: 618.484px !important;
+        width: 191px !important;
+    }*/
+</style>
+<script src="~/Content/plugins/select2-4.0.3/dist/js/select2.full.min.js"></script>
+<script>
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    }
+
+    function promoValidator(){
+        var min = $('#MinBuyQuantity').val();
+        var max = $('#MaxBuyQuantity').val();
+        var minOr = $('#MinOrderAmount').val();
+        var maxOr = $('#MaxOrderAmount').val();
+
+        var minPoint = $('#minPointApply').val();
+        var maxPoint = $('#maxPointApply').val();
+        var pointTrade =  $("#pointTradeId").val();
+
+        //if($('#isMember').val() == '1'){
+        //    if($('#textinput').val() == "")
+        //    {
+        //        ShowMessage("Vui lòng nhập mã thẻ.", 1);
+        //        return false;
+        //    }
+        //    if( /[^a-zA-Z0-9\-]/.test($('#textinput').val()) ){
+        //        ShowMessage("Không được chứa ký tự đặc biệt!", 1);
+        //        return false;
+        //    }
+        //}
+        if('@ViewBag.Promo.IsForMember' == "True"){
+            if($('#group-membership-code').val() == '-1') // -1 nghĩa là k chọn j hết
+            {
+                ShowMessage("Xin hãy chọn nhóm thẻ!", 1);
+                return false;
+            }
+        }
+        //if ($('#productApplyList').val() == "") {
+        //    ShowMessage("Xin chọn sản phẩm áp dụng!", 1);
+        //    return false;
+        //}
+        if(parseInt($('#MinBuyQuantity').val())<0 || min == ""){
+            ShowMessage("Lượng mua tối thiểu không được nhỏ hơn 0!", 1);
+            return false;
+        }
+        if(max != "" && parseInt($('#MaxBuyQuantity').val())<0){
+            ShowMessage("Lượng mua tối đa không được nhỏ hơn 0!", 1);
+            return false;
+        }
+        if(parseInt(max) >= 10000){
+            ShowMessage("Lượng mua tối đa không được vượt mức 10000", 1);
+            return false;
+        }
+        if(parseInt(minOr)<0 || minOr ==""){
+            ShowMessage("Tổng tiền hóa đơn tối thiểu không được nhỏ hơn 0!", 1);
+            return false;
+        }
+        if(maxOr != "" && parseInt(maxOr) < 0){
+            ShowMessage("Tổng tiền hóa đơn tối đa không được nhỏ hơn 0!", 1);
+            return false;
+        }
+        if ($('#MaxBuyQuantity').val() != "" && ($('#MinBuyQuantity').val()) >= parseInt($('#MaxBuyQuantity').val())) {
+            ShowMessage("Lượng mua tối đa phải lớn hơn lượng mua tối thiểu!", 1);
+            return false;
+        }
+        if (maxOr != "" && parseInt(minOr) >= parseInt(maxOr) ) {
+            ShowMessage("Tổng tiền hóa đơn tối đa phải lớn hơn tổng tiền hóa đơn tối thiểu!", 1);
+            return false;
+        }
+        if(parseInt(maxOr ) >= 100000000){
+            ShowMessage("Tổng tiền hóa đơn tối đa không được trên 100 triệu", 1);
+            return false;
+        }
+        if (minPoint&& parseInt(minPoint) < 0){
+            return false;
+        }
+        if (maxPoint){
+            if (minPoint.Trim() == ""){
+                return false;
+            } else { 
+                if (parseInt(minPoint) <= parseInt(maxPoint)){
+                    return false;
+                }
+            }
+        }
+        if (pointTrade != "" && parseInt(pointTrade)<=0){
+            return false;
+        } 
+        //else{
+        //    if( /[^a-zA-Z0-9\-\/]/.test($('#textinput').val()) ){
+        //        ShowMessage("Không được chứa ký tự đặc biệt!", 1);
+        //        return false;
+        //    }
+        //    else if (min != "" && max != "" && parseInt(min) >= parseInt(max)) {
+        //        ShowMessage("Lượng mua tối đa phải lớn hơn lượng mua tối thiểu!", 1);
+        //        return false;
+        //    }
+        //    else if (minOr != "" && maxOr != "" && parseInt(minOr) >= parseInt(maxOr)) {
+        //        ShowMessage("Tổng tiền hóa đơn tối đa phải lớn hơn tổng tiền hóa đơn tối thiểu!", 1);
+        //        return false;
+        //    }
+        //}
+        if(@ViewBag.Promo.GiftType == 0 || @ViewBag.Promo.GiftType == 3){
+            if($('#DiscountRate').val() == ""|| parseInt($('#DiscountRate').val())>100||parseInt($('#DiscountRate').val())<=0)
+            {
+                ShowMessage("Tỉ lệ giảm giá không hợp lệ", 1);
+                return false;
+            }
+        }
+        if(@ViewBag.Promo.GiftType == 1){
+            if($('#giftApplyList').val()=="")
+            {
+                ShowMessage("Vui lòng chọn sản phẩm KM", 1);
+                return false;
+            }
+            if(@ViewBag.Promo.ApplyLevel == 1)
+            {
+                if($('#GiftQuantity').val() == ""|| parseInt($('#GiftQuantity').val())<=0 )
+                {
+                    ShowMessage("Số lượng quà tặng không hợp lệ", 1);
+                    return false;
+                }
+
+            }
+        }
+        return true;
+        //if ($('#textinput').val() != "") {
+        //    if ($('#regexinput').val() == "start") {
+        //        $('#RegExCode').val("/^" + $('#textinput').val() + "/");
+        //    }
+        //    else if ($('#regexinput').val() == "end") {
+        //        $('#RegExCode').val("/" + $('#textinput').val() + "$/");
+        //    }
+        //    else if ($('#regexinput').val() == "contain") {
+        //        $('#RegExCode').val("/" + $('#textinput').val() + "/");
+        //    }
+        //    else if($('#regexinput').val() == "same"){
+        //        $('#RegExCode').val("^" + $('#textinput').val() + "$");
+        //    }
+        //    createDetail();
+        //}
+    
+}
+
+</script>

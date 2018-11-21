@@ -1,0 +1,256 @@
+﻿@model CustomerViewModel
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&libraries=places&key=AIzaSyDwJA7jUX5F9KR44NAKvfJsxn-9cjQwzZk"></script>
+<div class="card">
+    <form id="createCustomerForm" method="post">
+        @this.Html.AntiForgeryToken()
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-8">
+                    <h3>Thêm Khách Hàng</h3>
+                </div>
+                <div class="col-md-4 text-right">
+                    <ul class="actions">
+                        <li>
+                            <a id="backButton" href="@Url.Action("Index")" style="height: 32px;" class="btn btn-success">Quay về</a>
+                        </li>
+                        <li>
+                            <button id="submitButton" type="button" class="btn btn-primary">Tạo khách hàng</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 p-l-45 p-r-45">
+                <!--Customer Info-->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin khách hàng</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Name">Tên Khách Hàng <span style="color:red">*</span></label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(q => q.Name, new { id = "Name", @class = "form-control", required = "true", maxlength = "30" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Gender">Giới Tính</label>
+                                <div class="col-md-8">
+                                    <div class="dropdown" style="background-color : white">
+                                        @*@Html.DropDownList("Gender", new SelectList(Model.AvailableGender, "Value", "Text"), new { @class = "selectpicker ", data_live_search = "true" })*@
+                                        <select class="selectpicker" name="Gender">
+                                            <option value="true">Nam</option>
+                                            <option value="false">Nữ</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="BirthDay">Ngày Sinh</label>
+                                <div class="col-md-8">
+                                    <input class="form-control" type="text" name="BirthDay" value="01/01/2010" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Name">Mã Khách Hàng <span style="color:red">*</span></label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(q => q.CustomerCode, new { id = "CustomerCode", @class = "form-control", maxlength = "20" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="AvailableType">Loại</label>
+                                <div class="col-md-8" tabindex="-1">
+                                    <div class="dropdown" style="background-color : white">
+                                        @*@Html.DropDownListFor(q => q.CustomerTypeId, Model.AvailableType, new { @class = "selectpicker", data_live_search = "true" })*@
+                                        <select class="selectpicker" name="CustomerTypeId">
+                                            @{
+                                                foreach (var type in ViewBag.CustomerTypeList)
+                                                {
+                                                    <option value=@type.Value>@type.Text</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Address">Số CMND</label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(q => q.IDCard, new { id = "IDCard", @class = "form-control", oninput = "correctIDCard()", maxlength = "12" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--Address Info-->
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Thông tin liên lạc</h2>
+                    </div>
+                    <div class="card-body card-padding row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Phone">Số điện thoại <span style="color:red">*</span></label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(q => q.Phone, new { id = "Phone", @class = "form-control input-mask", required = "true", data_mask = "000-00-0000000", placeholder = "vd: 000-00-0000000", maxlength = "12", autocomplete = "off", oninput = "correctPhone()" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Address">Email </label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(q => q.Email, new { id = "Email", type = "email", @class = "form-control", maxlength = "30" })
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Address">Địa chỉ </label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(q => q.Address, new { id = "Address", @class = "form-control", required = "true", maxlength = "50" })
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="Address">Quận/Huyện </label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(q => q.District, new { id = "District", @class = "form-control", maxlength = "30" })
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" for="City">Thành Phố </label>
+                                <div class="col-md-8">
+                                    @Html.TextBoxFor(q => q.City, new { id = "City", @class = "form-control", maxlength = "30" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <div id="map-canvas" style="width: 100%; height: 300px;"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </form>
+</div>
+<style>
+    .daterangepicker {
+        margin-top: initial !important;
+    }
+</style>
+<script src="~/Content/frontend/js/skyplus-customer-addr.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#backButton').parent().parent().css('z-index', '6');
+        $('#backButton').parent().fixedScroll(70);
+        $('#submitButton').parent().fixedScroll(70);
+        $('input[name="BirthDay"]').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+        },
+       function (start, end, label) {
+           var years = moment().diff(start, 'years');
+       });
+
+    })
+    function createCustomer() {
+        var formData = $('#createCustomerForm').serialize();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Create", "Customer")',
+            dataType: 'JSON',
+            data: formData,
+            success: function (result) {
+                if (result.success) {
+                    ShowMessage(result.message, 2);
+                    window.location.href = '@Url.Action("Index", "Customer")';
+                }else{
+                    ShowMessage("Tạo khách hàng không thành công", 1);
+
+                }
+
+            },
+
+            error: function (error) {
+                alert("@Resources.Message_VI_Resources.ErrorOccured");
+            }
+        });
+    }
+
+    //autocorrect phone field
+    function correctPhone() {
+        var phoneNum = $('#Phone').val().replace(/[^\d]/g, '');
+        phoneNum = phoneNum.replace(/^00/, '0');
+
+        $('#Phone').val(phoneNum);
+    }
+
+    //autocorrect CMND field
+    function correctIDCard() {
+        var phoneNum = $('#IDCard').val().replace(/[^\d]/g, '');
+        $('#IDCard').val(phoneNum);
+    }
+
+    $('#submitButton').click(function () {
+
+        if ($("input[name='Name']").val() == "") {
+            ShowMessage("Tên khách hàng không được bỏ trống", 1);
+            return;
+        }
+        if ($('input[name="CustomerCode"]').val() == "") {
+            ShowMessage("Mã khách hàng không được để trống", 1);
+            return;
+        }
+        if($("input[name='IDCard']").val().length > 12){
+            ShowMessage("Số chứng minh nhân dân ko hợp lệ", 1);
+            return;
+        }
+        if ($("input[name='Address']").val() == "") {
+            ShowMessage("Địa chỉ không được bỏ trống", 1);
+            return;
+        }
+        var phoneNumber = $("input[name='Phone']").val();
+        if (phoneNumber == "") {
+            ShowMessage("Số điện thoại không được bỏ trống", 1);
+            return;
+        } else if (!phoneNumber.match(/^([0-9]{10,12})$/)) {
+            ShowMessage("Số điện thoại không không hợp lệ", 1);
+            return;
+        }
+        if ($('input[name="District"]').val() == "") {
+            ShowMessage("Quận/huyện không được để trống", 1);
+            return;
+        }
+        if ($('input[name="Email"]').val() == "") {
+            ShowMessage("Email không được để trống", 1);
+            return;
+        }
+        if (/^(([^<>()\[\]\\.,;:\s@("@")"]+(\.[^<>()\[\]\\.,;:\s@("@")"]+)*)|(".+"))@("@")((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test($('input[name="Email"]').val()) == false){
+            ShowMessage("Địa chỉ email không hợp lệ", 1);
+            return;
+        }
+         if ($('input[name="City"]').val() == "") {
+            ShowMessage("Tên thành phố không được để trống", 1);
+            return;
+        }
+        
+
+        createCustomer();
+    });
+</script>

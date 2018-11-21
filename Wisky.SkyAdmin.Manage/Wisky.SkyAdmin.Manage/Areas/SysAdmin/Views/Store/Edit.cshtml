@@ -1,0 +1,284 @@
+﻿@*@model StoreEditViewModel
+
+    @{
+        ViewBag.Title = "Edit";
+    }
+
+    <form class="form-horizontal" method="post">
+        @this.Html.AntiForgeryToken()
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Edit Store</h2>
+            </div>
+
+            <div class="card-body card-padding">
+                @this.Html.ValidationSummary()
+
+                @this.Html.EditorFor(q => q.Name)
+                @this.Html.EditorFor(q => q.ShortName)
+                @this.Html.EditorFor(q => q.Address)
+
+                @this.Html.EditorFor(q => q.HasNews)
+                @this.Html.EditorFor(q => q.HasProducts)
+                @this.Html.EditorFor(q => q.HasImageCollections)
+                @this.Html.EditorFor(q => q.HasMultipleLanguage)
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Save</button>
+                </div>
+            </div>
+
+        </div>
+    </form>*@
+
+@model HmsService.ViewModels.StoreEditViewModel
+
+@{
+    Layout = null;
+}
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <form id="CreateEditForm" method="post" action="@Url.Action("Edit")">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Thông tin cửa hàng</h4>
+            </div>
+
+            <div class="modal-body">
+                @Html.HiddenFor(q => q.BrandId)
+                @Html.HiddenFor(q => q.ID)
+                <div class="form-horizontal">
+                    <div id="FormError" class="alert alert-danger" style="display: none; padding: 10px; margin-left: 10px"></div>
+                    <div id="FormSuccess" class="alert alert-success" style="display: none; padding: 10px; margin-left: 10px"></div>
+                    <div class="form-group">
+                        @Html.Label("Tên cửa hàng", htmlAttributes: new { @class = "control-label col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(q => q.Name, new { name = "Name", @class = "col-sm-12" })
+                            @Html.ValidationMessage("Name", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("Tên viết tắt", htmlAttributes: new { @class = "control-label col-md-3 col-md-offset-2" })<span style="color:red">*</span>
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(q => q.ShortName, new { @class = "col-sm-12" })
+                            @Html.ValidationMessage("ShortName", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("Địa chỉ", htmlAttributes: new { @class = "control-label col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(q => q.Address, new { name = "Address", @class = "col-sm-12" })
+                            @Html.ValidationMessage("Address", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("Kinh độ", htmlAttributes: new { @class = "control-label col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(q => q.Lat, new { name = "Lat", @class = "col-sm-12" })
+                            @Html.ValidationMessage("Lat", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Vĩ độ", htmlAttributes: new { @class = "control-label col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(q => q.Lon, new { name = "Lon", @class = "col-sm-12" })
+                            @Html.ValidationMessage("Lon", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("Email", htmlAttributes: new { @class = "control-label col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(q => q.Email, new { name = "Email", @class = "col-sm-12" })
+                            @Html.ValidationMessage("Email", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Số điện thoại", htmlAttributes: new { @class = "control-label col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(q => q.Phone, "", new { name = "Phone", @class = "col-sm-12" })
+                            @Html.ValidationMessage("Phone", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Fax", htmlAttributes: new { @class = "control-label col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(q => q.Fax, new { name = "Fax", @class = "col-sm-12" })
+                            @Html.ValidationMessage("Fax", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Loại cửa hàng", htmlAttributes: new { @class = "control-label col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            @Html.EnumDropDownListFor(q => q.StoreTypeEnum, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Thời gian mở cửa", htmlAttributes: new { @class = "control-label col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            <div class="col-sm-12">
+                                <div class='input-group date' id='OpenTime'>
+                                    <input type='text' class="form-control" name="OpenTime" id="InputOpenTime" readonly style="background-color:#ffffff; color:#000000;" />
+                                    <span class="input-group-addon">
+                                        <i class="glyphicon glyphicon-time"></i>
+                                        <span></span> <b class="caret"></b>
+                                    </span>
+                                </div>
+                            </div>
+                            @Html.ValidationMessage("OpenTime", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.Label("Thời gian đóng cửa", htmlAttributes: new { @class = "col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            <div class="col-sm-12">
+                                <div class='input-group date' id='CloseTime'>
+                                    <input type='text' class="form-control" name="CloseTime" id="InputCloseTime" readonly style="background-color:#ffffff; color:#000000;" />
+                                    <span class="input-group-addon">
+                                        <i class="glyphicon glyphicon-time"></i>
+                                        <span></span> <b class="caret"></b>
+                                    </span>
+                                </div>
+                            </div>
+                            @Html.ValidationMessage("CloseTime", htmlAttributes: new { @class = "error-message", style = "color: red;" })
+                        </div>
+                    </div>
+                    <div class="form-group" id="Fstatus">
+                        @Html.Label("Hoạt động", htmlAttributes: new { @class = "col-md-3 col-md-offset-2" })
+                        <div class="col-md-5">
+                            <div class="checkbox">
+                                <label>
+                                    <input id="isAvailable" type="checkbox" name="isAvailable" value="true" @((this.Model.isAvailable.HasValue ? (this.Model.isAvailable.Value ? "checked" : null) : null)) />
+                                    <i class="input-helper"></i>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Đóng</button>
+                <input type="button" id="btnSubmit" value="Lưu" onclick="confirmSubmit(this)"class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+        @if (this.Model.OpenTime.HasValue) {
+            <text>$('#InputOpenTime').val('@this.Model.OpenTime.Value.ToShortTimeString()').change()</text>
+        }
+    @if (this.Model.CloseTime.HasValue)
+        {
+            <text>$('#InputCloseTime').val('@this.Model.CloseTime.Value.ToShortTimeString()').change()</text>
+        }
+    $(document).ready(function () {
+        $('#OpenTime').datetimepicker({
+            format: 'LT',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#CloseTime').datetimepicker({
+            format: 'LT',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+    });
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    };
+    function validateEmail(email) {
+        var re = /^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    };
+    function confirmSubmit(btn) {
+        if ($("input[name='Name']").val() == "") {
+            ShowMessage("Vui lòng nhập tên cửa hàng.", 3);
+            return;
+        }
+        else if ($("input[name='Address']").val() == "") {
+            ShowMessage("Vui lòng nhập địa chỉ.", 3);
+            return;
+        }
+        //else if ($("input[name='Lat']").val() == "") {
+        //    ShowMessage("Vui lòng nhập Kinh độ.", 3);
+        //    return;
+        //}
+        if (!$("input[name='Lat']").val() == "") {
+            if (!isNumerString($("input[name='Fax']").val())) {
+                ShowMessage("Kinh độ không nhập chữ", 3);
+            }
+        }
+        //else if ($("input[name='Lon']").val() == "") {
+        //    ShowMessage("Vui lòng nhập Vĩ độ.", 3);
+        //    return;
+        //}
+        if (!$("input[name='Lon']").val() == "") {
+            if (!isNumerString($("input[name='Fax']").val())) {
+                ShowMessage("Vĩ độ không nhập chữ", 3);
+            }
+        }
+        else if ($("input[name='Email']").val() == "") {
+            ShowMessage("Vui lòng nhập email.", 3);
+            return;
+        }
+        else if (!validateEmail($("input[name='Email']").val())) {
+            ShowMessage("Email không hợp lệ.", 3);
+            return;
+        }
+        else if ($("input[name='Phone']").val() == "") {
+            ShowMessage("Vui lòng nhập số điện thoại.", 3);
+            return;
+        }
+        if (!$("input[name='Fax']").val() == "") {
+            if (!isNumerString($("input[name='Fax']").val())) {
+                ShowMessage("Fax không nhập chữ", 3);
+            }
+        }
+        else if ($("input[name='OpenTime']").val() == "") {
+            ShowMessage("Vui lòng chọn giờ mở cửa.", 3);
+            return;
+        }
+        else if ($("input[name='CloseTime']").val() == "") {
+            ShowMessage("Vui lòng chọn giờ đóng cửa.", 3);
+            return;
+        }
+        else {
+            createStore();
+        }
+    }
+
+    function createStore() {
+        var formData = $('#CreateEditForm').serialize();
+
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Edit")',
+            dataType: 'JSON',
+            data: formData,
+            success: function (result) {
+                if (result) {
+                    ShowMessage(result.message, 2);
+                    $("#editStorePanel").html("");
+                    $("#editStorePanel").modal("hide");
+                    RefreshTable();
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+
+            //error: function (error) {
+            //    ShowMessage(error.message,1);
+            //}
+        });
+    }
+</script>

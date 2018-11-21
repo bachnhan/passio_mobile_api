@@ -1,0 +1,284 @@
+﻿@model HmsService.ViewModels.AccountViewModel
+
+
+@{
+    ViewBag.Title = "Sửa tài khoản";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    //Layout = null;
+}
+
+<div class="card">
+    @Html.ValidationSummary()
+    <form id="editAccount" action="@this.Url.Action("Edit")" method="post">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3>Chỉnh sửa tài khoản</h3>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <ul class="actions">
+                                <li class="m-r-10">
+                                    <a href="@Url.Action("CustomerDetail","Customer")/@Model.Customer.CustomerID" class="btn btn-primary">Quay về</a>
+                                </li>
+                                <li>
+                                    <button type="submit" class="btn btn-success" onclick="duplicateAccountCode()">Hoàn tất</button>
+                                    @*<button type="button" id="btn-submit-card" class="btn btn-success" onclick="duplicateAccountCode()">Hoàn tất</button>*@
+                                   
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <hr />
+
+                </div>
+
+            <div class="card-body">
+                <div class="form-horizontal">
+                    <div class="col-md-2"></div>
+
+                    <div class="col-md-10">
+                        <div class="row group-info" style="margin-left:-2px; margin-right:-2px; margin-top:12px; padding-top:20px; padding-bottom:22px;">
+                            @Html.HiddenFor(q => q.Customer.CustomerID)
+                            @Html.HiddenFor(q => q.AccountID)
+                            @Html.TextBoxFor(q => q.AccountTypeId, new { id = "AccountTypeId", @hidden = "hidden" })
+                            @Html.TextBoxFor(q => q.MembershipCardId, new { id = "MembershipCardId", @hidden = "hidden" })
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="AccountCode">Mã số thẻ<span style="color:red"></span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(q => q.AccountCode, new { id = "AccountCode", @class = "form-control fg-line", placeholder = "Nhập mã số thẻ", required = "required", @readonly = "readonly" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="AccountName">Tên tài khoản<span style="color:red"></span></label>
+                                <div class="col-md-6">
+                                    @Html.TextBoxFor(q => q.AccountName, new { id = "AccountName", @class = "form-control fg-line", placeholder = "Nhập tên tài khoản", required = "required" })
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="LevelAccount">Cấp bậc tài khoản<span style="color:red"></span></label>
+                                <div class="col-md-6">
+                                    <select id = "list_level" class = "form-control fg-line" placeholder = "" required = "required"> 
+                                        <option value="@Model.Level_" selected>Cấp bậc hiện tại là @Model.Level_</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                    </select>
+                                    @Html.HiddenFor(q => q.Level_, new { id = "LevelAccount", @class = "form-control fg-line", placeholder = "", required = "required", @min = "1", @max = "3" })
+                                </div>
+                            </div>
+                            <script>
+                                $('#list_level').on('change', function () {
+                                    
+                                    document.getElementById("LevelAccount").value = document.getElementById("list_level").value;
+                                });
+
+                            </script>
+                            <div class="form-group">
+                                <label class="col-md-4 control-label">Ngày bắt đầu - Ngày hết hạn</label>
+                                <div class="col-md-6 dateTime">
+                                    <div class="fg-line">
+                                        <div id="reportrange" class="btn-datetime pull-right form-control">
+                                            <i class="fa fa-calendar"></i>
+                                            <span></span> <b class="caret"></b>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" id="StartDate" name="StartDate" value="@(String.Format("{0:dd-MM-yyyy}",this.Model.StartDate))" />
+                                <input type="hidden" id="FinishDate" name="FinishDate" value="@(String.Format("{0:dd-MM-yyyy}",this.Model.FinishDate))" />
+                            </div>
+                            
+                            <div class="form-group" id="balance-field">
+                                <label class="col-md-4 control-label">Tiền hiện có</label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Balance, new { @type ="number",id = "Balance", @class = "form-control fg-line", placeholder = "Nhập vào giá trị", oninput = "correctBalance()" })
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                    </div>
+                   
+                </div>
+            </div>
+            <div class="modal-footer">
+                @*<a href="@Url.Action("IndexAccounts")" class="btn btn-default">Đóng</a>
+                <button type="submit" class="btn btn-primary">Lưu</button>*@
+            </div>
+
+    </form>
+</div>
+
+<script>
+    $('#IsCredit').change(function () {
+        if ($(this).prop('checked')) {
+            $('#BankName').attr("required", "");
+            $('#BankAccountNo').attr("required", "");
+            $('#OwnerName').attr("required", "");
+        } else {
+            $('#BankName').removeAttr("required", "");
+            $('#BankAccountNo').removeAttr("required", "");
+            $('#OwnerName').removeAttr("required", "");
+        }
+        $('#bank-field').slideToggle();
+    });
+    $('#IsAsset').change(function () {
+        $('#balance-field').slideToggle();
+        if ($(this).prop('checked')) {
+            $('#Balance').attr("required", "");
+        }
+        else {
+            $('#Balance').removeAttr("required", "");
+        }
+    });
+    $('#IsDetailAccount').change(function () {
+        $('#detail-account-field').slideToggle();
+    });
+
+
+    function checkDetailAccount() {
+        $('#detail-account-field').slideToggle();
+    }
+
+    function checkAsset() {
+        $('#balance-field').slideToggle();
+        if ($('#IsAsset').prop('checked')) {
+            $('#Balance').attr("required", "");
+        }
+        else {
+            $('#Balance').removeAttr("required", "");
+        }
+    }
+
+    function correctBalance() {
+        var balance = $('#Balance').val().replace(/[^\d]/g, '');
+        $('#Balance').val(balance);
+    }
+
+    function checkCredit() {
+        if ($('#IsCredit').prop('checked')) {
+            $('#BankName').attr("required", "");
+            $('#BankAccountNo').attr("required", "");
+            $('#OwnerName').attr("required", "");
+        } else {
+            $('#BankName').removeAttr("required", "");
+            $('#BankAccountNo').removeAttr("required", "");
+            $('#OwnerName').removeAttr("required", "");
+        }
+        $('#bank-field').slideToggle();
+    }
+
+    $(document).ready(function () {
+        setupDaterangepicker();
+
+        @if(Model.StartDate.HasValue) {
+            <text>
+        var start = '@Model.StartDate.GetValueOrDefault().ToString("MM/dd/yyyy")';
+        var end = '@Model.FinishDate.GetValueOrDefault().ToString("MM/dd/yyyy")';
+        $('#reportrange span').html(moment(start).format('MMMM D, YYYY') + ' - ' + moment(end).format('MMMM D, YYYY'));
+        var startDate = $('#reportrange').data('daterangepicker').startDate.toISOString();
+        var finishDate = $('#reportrange').data('daterangepicker').endDate.toISOString();
+        $('#StartDate').val(startDate);
+        $('#FinishDate').val(finishDate);
+        </text>
+        }
+    });
+
+    function setupDaterangepicker() {
+        @if (Model.StartDate.HasValue) {
+            <text>
+        var start = moment('@Model.StartDate.GetValueOrDefault().ToString("MM/dd/yyyy")').format("DD/MM/YYYY");
+        var end = moment('@Model.FinishDate.GetValueOrDefault().ToString("MM/dd/yyyy")').format("DD/MM/YYYY");
+        </text>
+        }
+        else
+        {
+            <text>
+        var start = moment().add(0, 'days');
+        var end = moment().add(0, 'days');
+        //$('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        </text>
+        }
+        //$('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        $('#reportrange').daterangepicker({
+            "locale": {
+                "format": "DD/MM/YYYY",
+                "separator": " - ",
+                minDate: '01/01/2012',
+                maxDate: '31/12/2100',
+                "showDropdowns": true,
+                "showWeekNumbers": true,
+                "timePicker": false,
+                "timePicker12Hour": true,
+                "autoUpdateInput": false,
+                "parentEl": '.modal-body',
+                "applyLabel": "Apply",
+                "cancelLabel": "Cancel",
+                "fromLabel": "From",
+                "toLabel": "To",
+                "opens": "left",
+                "customRangeLabel": "Custom",
+                "daysOfWeek": [
+                    "Su",
+                    "Mo",
+                    "Tu",
+                    "We",
+                    "Th",
+                    "Fr",
+                    "Sa"
+                ],
+                "monthNames": [
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December"
+                ],
+                "firstDay": 1
+            },
+            "startDate": start,
+            "endDate": end,
+            "opens": "left"
+        }, function (start, end, label) {
+            //console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+            $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        });
+
+        $('#reportrange').on('apply.daterangepicker', function (ev, picker) {
+            startDate = picker.startDate.toISOString();
+            endDate = picker.endDate.toISOString();
+            $('#StartDate').val(startDate);
+            $('#FinishDate').val(endDate);
+        });
+    }
+
+    function duplicateAccountCode() {
+
+        var rs = document.getElementById("AccountCode").value;
+        $.ajax({
+            "type": "post",
+            "url": "@(Url.Action("ValidateAccountCode","Account"))",
+            "data": {
+                AccountCode: rs
+            },
+            success: function (result) {
+                if (result == "duplicated") {
+                    alert("Mã tài khoản này đã tồn tại");
+                }
+                else {
+                    ShowMessage("Chỉnh sửa tài khoản thành công", 3);
+                    document.getElementById('editAccount').submit();
+                }
+            }
+        });
+    }
+
+</script>

@@ -1,0 +1,442 @@
+﻿@using HmsService.ViewModels;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Mẫu xuất kho
+                </h3>
+            </div>
+            <div class="col-md-6">
+                <a data-toggle="modal" id="btnCreate" role="button" class="btn btn-primary btn-sm pull-right">
+                    <i class="zmdi zmdi-plus" hidden></i> Thêm mẫu
+                </a>
+                <a id="btnReturn" href="@Url.Action("Index", "Inventory")" class="btn btn-success btn-sm pull-right m-r-15">
+                    <i class="fa fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row">
+            <div class="col-md-12">
+                <table id="templateDt" class="table table-condensed table-responsive table-hover">
+                    <thead>
+                        <tr>
+                            <th><label>STT</label></th>
+                            <th><label>Tên mẫu</label></th>
+                            <th><label>Miêu tả</label></th>
+                            <th><label>Tùy chọn</label></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            @*<div class="col-md-6">
+                    <h3>Chi tiết mẫu</h3>
+                    <div class="well well-success">
+                        <div class="row small-margin">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        Nhóm hàng
+                                    </label>
+                                    <select class="form-control" id="item-categories">
+                                        @foreach (var item in itemCates)
+                                        {
+                                            <option value="@item.CateID">@item.CateName</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label class="control-label">
+                                        Tên hàng
+                                    </label>
+                                    <select class="form-control" id="item-product"></select>
+                                </div>
+                            </div>
+                            @*<div class="col-md-1">
+                                    <div class="form-group">
+                                        <label class="control-label">
+                                            Đơn vị
+                                        </label>
+                                        <select class="form-control" id="item-unit"></select>
+                                    </div>
+                                </div>
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <label class="control-label" style="display: block">Độ ưu tiên</label>
+                                    <input name="quantity" class="form-control text-center" type="number" min="1" max="99" value="1" id="quantity" oninput="this.value= this.value.replace(/[^0-9.]/g,'');" />
+                                    <input name="price" type="hidden" id="price" />
+                                    @*<label> (<span id="lblUnit"></span>)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-2" style="margin-top: 23px">
+                                <div class="form-group">
+                                    <label class="control-label"> </label>
+                                    <button id="btn-save-item" class="btn btn-primary form-control pull-right">
+                                        Thêm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <table id="item-import" class="table table-bordered table-striped table-fixed-header">
+                        <thead>
+                            <tr>
+                                <th><label>Tên sản phẩm</label></th>
+                                <th><label>Nhóm sản phẩm</label></th>
+                                <th><label>Đô ưu tiên</label></th>
+                                <th><label>Tùy chọn</label></th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>*@
+
+        </div>
+    </div>
+</div>
+<div id="createTemplatePanel" class="modal fade"></div>
+<div id="editTemplatePanel" class="modal fade"></div>
+<div id="templateItemsPanel" class="modal fade"></div>
+
+<script>
+    $(document).ready(function () {
+        initTemplateDt();
+        //$("#assignModal").on("shown.bs.modal", function () {
+        //    renderItemsDt();
+        //});
+    });
+    //function renderItemsDt() {
+    //    $("#item-import").dataTable({
+    //        "bFilter": false,
+    //        "bLengthChange": false,
+    //        "lengthMenu": [[5], [5]],
+    //        "aaData": [],
+    //        "aoColumns": [
+    //            { 'mDataProp': "name" },
+    //            { 'mDataProp': "category" },
+    //            { 'mDataProp': "priority" },
+    //            {
+    //                'mDataProp': function (data) {
+    //                    return "<button title='Xóa' class=\"btn btn-danger btn-sm\" data-action=\"remove-inventory-item\" data-id=\"" + data.id + "\"><i class='glyphicon glyphicon-trash'></i></button>";
+    //                }
+    //            }
+    //        ],
+    //        "aoColumnDefs": [
+    //            {
+    //                "aTargets": [1, 2, 3],
+    //                "sClass": "text-center"
+    //            },
+
+    //        ],
+    //        "oLanguage": {
+    //            "sSearch": "Tìm kiếm:",
+    //            "sZeroRecords": "Không có dữ liệu phù hợp",
+    //            "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+    //            "sEmptyTable": "Không có dữ liệu",
+    //            "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+    //            "sLengthMenu": "Hiển thị _MENU_ dòng",
+    //            "sProcessing": "Đang xử lý...",
+    //            "oPaginate": {
+    //                "sNext": "<i class='fa fa-chevron-right'></i>",
+    //                "sPrevious": "<i class='fa fa-chevron-left'></i>"
+    //            }
+    //        },
+    //    }).fnSetFilteringDelay(delaySearch);
+    //}
+    var initCategories = function () {
+        $.ajax({
+            url: "@(Url.Action("SelectChangeItemByCategoryId", "ProductInventory"))",
+            type: "GET",
+            data: { itemCatId: parseInt($("#item-categories").val()) },
+            dataType: "json",
+            success: function (result) {
+                renderProductByData(result.data);
+            }
+        });
+    };
+
+    $(document).on("change", "#item-categories", function (e) {
+        $("#item-product").empty();
+        initCategories();
+    });
+
+    var renderTemplateDt = function (data) {
+        $("#templateDt").dataTable({
+            "bServerSide": false,
+            "bRetrieve": false,
+            "bDestroy": true,
+            "data": data,
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 3],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [3],
+                    "mRender": function (data, type, row) {
+                        var edit = "<a href='javascript:showEditTemplatePanel(" + data + ")' title='Chỉnh sửa' class='btn btn-sm btn-info'><i class='glyphicon glyphicon-pencil'></i></a>"
+                        var assign = "<a href='javascript:showAssignItems(" + data + ")' title='Thêm mẫu sản phẩm' class='btn btn-success btn-assign btn-sm'><i class='fa fa-user-plus'></i></a>"
+                        var remove = "<a href='javascript:deleteTemplate(" + data + ")' title='Hủy mẫu' class='btn btn-sm btn-danger'><i class='glyphicon glyphicon-trash'></i></a>";
+                        return edit + ' ' + assign + ' ' + remove;
+                    }
+                }
+            ]
+        });
+    }
+
+    var initTemplateDt = function () {
+        $.ajax({
+            url: "@Url.Action("LoadAllTemplates")",
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                if (result.success) {
+                    renderTemplateDt(result.data);
+                }
+            },
+            error: function () {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+        });
+    }
+
+    function confirmSubmit(btn, action) {
+        if ($("#Name").val() == "") {
+            ShowMessage("Vui lòng nhập tên mẫu xuất kho.", 3);
+            return;
+        }
+        else {
+            if (action == 'create') {
+                createTemplate();
+            } else if (action == 'edit') {
+                editTemplate();
+            }
+        }
+    }
+
+    function createTemplate() {
+        var formData = $('#inventoryTemplateForm').serialize();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Create")',
+            dataType: 'JSON',
+            data: formData,
+            success: function (result) {
+                if (result) {
+                    ShowMessage(result.message, 2);
+                    initTemplateDt();
+                    $('#createTemplatePanel').modal('hide');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+
+            error: function (error) {
+                ShowMessage(error.message, 1);
+            }
+        });
+    }
+
+    function editTemplate() {
+        var formData = $('#inventoryTemplateForm').serialize();
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("Edit")',
+            dataType: 'JSON',
+            data: formData,
+            success: function (result) {
+                if (result) {
+                    ShowMessage(result.message, 2);
+                    initTemplateDt();
+                    $('#editTemplatePanel').modal('hide');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+
+            error: function (error) {
+                ShowMessage(error.message, 1);
+            }
+        });
+    }
+
+    function deleteTemplate(id) {
+        $.ajax({
+            url: '@Url.Action("Deactivate")',
+            data: { templateId: id },
+            type: "POST",
+            success: function (result) {
+                if (result.success) {
+                    initTemplateDt();
+                    ShowMessage(result.message, 3);
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage(result, 1);
+            }
+        });
+    }
+
+    $("#btnCreate").on("click", function () {
+        showCreateTemplatePanel();
+    });
+
+    function showCreateTemplatePanel() {
+        $.ajax({
+            url: '@Url.Action("Create")',
+            type: "GET",
+            success: function (result) {
+                $("#createTemplatePanel").modal("show");
+                $("#createTemplatePanel").html(result);
+            },
+            error: function (result) {
+                ShowMessage(result, 1);
+            }
+        });
+    }
+
+    function showEditTemplatePanel(id) {
+        $.ajax({
+            url: '@Url.Action("Edit")',
+            data: { templateId: id },
+            type: "GET",
+            success: function (result) {
+                $("#editTemplatePanel").modal("show");
+                $("#editTemplatePanel").html(result);
+            },
+            error: function (result) {
+                ShowMessage(result, 1);
+            }
+        });
+    }
+
+    function showAssignItems(id) {
+        $.ajax({
+            url: '@Url.Action("AssignItems")',
+            data: { templateId: id },
+            type: "GET",
+            success: function (result) {
+                $("#templateItemsPanel").modal("show");
+                $("#templateItemsPanel").html(result);
+                var data = getTemplateItems();
+                renderItemsDt(data);
+                initCategories();
+            },
+            error: function (result) {
+                ShowMessage(result, 1);
+            }
+        });
+    }
+
+    var renderProductByData = function (data) {
+        $("#item-product").empty();
+        $.each(data, function (i, item) {
+            //var unitList = [item.Unit];
+            //if (item.Unit2 != undefined)
+            //    unitList.push(item.Unit2);
+            $("#item-product").append($("<option>", {
+                value: item.ItemId,
+                text: item.ItemName,
+                'data-priority': item.IndexPriority,
+                //'data-price': item.Price,
+                //'unit-rate': item.UnitRate,
+            }));
+        });
+        $("#item-product").trigger("change");
+    };
+    //var saveItemToInventory = function () {
+    //    // Support method: Get index of given item in the list. Return -1 if item doesn't exist
+    //    function indexOfItem(item, list) {
+    //        var index = -1;
+    //        $.each(list, function (i, e) {
+    //            if (item.id === e.id) index = i;
+    //        });
+    //        return index;
+    //    }
+
+    //    // Transfer to smallest unit
+    //    //function getLowestUnitName() {
+    //    //    var $selected = $("#item-unit :selected");
+    //    //    var unitRate = parseInt($selected.attr('unit-rate'));
+    //    //    if (unitRate > 1) return $selected.siblings().eq(0).html();
+    //    //    return $selected.html();
+    //    //}
+
+    //    // Init variables
+    //    var $table = $("#item-import tbody"),
+    //        $storeField = $("#listItemReceipt"),
+    //        newItem = {
+    //            id: parseInt($("#item-product").val()),
+    //            name: $("#item-product :selected").text(),
+    //            category: $("#item-categories :selected").text(),
+    //            priority: parseInt($("#priority").val()),
+    //        };
+    //    var data = $storeField.data("items") || [];
+    //    // Add item to data list
+    //    var newItemIndex = indexOfItem(newItem, data);
+    //    //if (newItem.unitRate >= 1) {
+    //    var minUnit = ($("#item-unit").find("option"));
+    //    //console.log(minUnit);
+    //    //}
+    //    if (newItemIndex >= 0) { // Case 1: if new item exist, update quantity
+    //        data[newItemIndex].priority = newItem.priority;
+    //    } else { // Case 2: if new item does not exist, create new one
+    //        data.push(newItem);
+    //    }
+
+    //    // Save to hidden field
+    //    $storeField.data("items", data);
+    //    // and update table
+    //    dt.fnClearTable();
+    //    dt.fnAddData(data);
+    //};
+
+    //function validateInput() {
+    //    if ($('#sTime').data('daterangepicker').startDate.toISOString() === "") {
+    //        ShowMessage("Bạn chưa chọn ngày nhập/xuất hàng", 1);
+    //        return false;
+    //    } else if ($('#creator').val() === "") {
+    //        ShowMessage("Bạn chưa chọn người nhập/xuất hàng", 1);
+    //        return false;
+    //    } else if ($('#invoice-number-import').val() === "") {
+    //        ShowMessage("Bạn chưa nhập mã hóa đơn", 1);
+    //        return false;
+    //    } else if ($("#listItemReceipt").data("items") === undefined) {
+    //        ShowMessage("Bạn chưa chọn sản phẩm", 1);
+    //        return false;
+    //    } else return true;
+    //}
+</script>
+<style>
+    .daterangepicker {
+        margin-top: 0px !important;
+    }
+</style>
+
+

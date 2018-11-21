@@ -1,0 +1,305 @@
+﻿@model CustomerEditViewModel
+
+@{
+    ViewBag.Title = "Transaction";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    hr {
+        border-color: lightgray;
+    }
+</style>
+
+<div class="card">
+    <form id="form">
+        <div class="card-header p-b-0">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Danh sách giao dịch</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <ul class="actions">
+                        <li class="m-r-10">
+                            <a href="@this.Url.Action("CustomerDetail", "Customer")/@Model.CustomerID" class="btn btn-success myComeback">Quay lại</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <hr />
+        </div>
+
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12">
+                        <h3>Thông tin thẻ</h3>
+                    </div>
+                    <div class="col-md-6 p-10">
+                        <div class="form-group">
+                            <label class="col-md-4"><b>Tên khách hàng:</b></label>
+                            <label class="col-md-6">@Model.Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-10">
+                        <div class="form-group">
+                            <label class="col-md-4"><b>Mã thẻ:</b></label>
+                            <label class="col-md-6">@Model.MembershipCard.MembershipCardCode</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-10">
+                        <div class="form-group">
+                            <label class="col-md-4"><b>CSV:</b></label>
+                            <label class="col-md-6">@Model.MembershipCard.CSV</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-10">
+                        <div class="form-group">
+                            <label class="col-md-4"><b>Ngày tạo:</b></label>
+                            <label class="col-md-6">@Model.MembershipCard.CreatedTime.ToString("dd/MM/yyyy")</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-10">
+                        <div class="form-group">
+                            <label class="col-md-4"><b>Loại thẻ:</b></label>
+                            <label class="col-md-6">@Model.MembershipCard.MembershipCardTypeName</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr />
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 m-b-5">
+                        <h3>Thông tin giao dịch</h3>
+                    </div>
+                    @*@if (Model.AllAccounts.Count() > 0)
+                        {*@
+                    <div class="col-md-12 form-group">
+                        <div class="col-md-10 pull-left">
+                            <label class="m-t-8 m-r-15 pull-left"><strong>Lọc theo tài khoản:</strong></label>
+                            <div class="col-md-9">
+                                <div class="group-radio-buttons myGroup-radio-buttons " style="padding-bottom: 10px">
+                                    <div class="row small-margin">
+                                        <div class="col-md-3">
+                                            <input type="radio" name="filterCard" value="-1" class="nice-check" id="filterCard1" checked />
+                                            <label for="filterCard1"><span>Tất cả</span></label>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="radio" name="filterCard" value="1" class="nice-check" id="filterCard2" />
+                                            <label for="filterCard2"><span>Thanh toán</span></label>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="radio" name="filterCard" value="2" class="nice-check" id="filterCard3" style="margin-top: 0px!important;" />
+                                            <label for="filterCard3"><span>Sản phẩm</span></label>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <input type="radio" name="filterCard" value="3" class="nice-check" id="filterCard4" style="margin-top: 0px!important;" />
+                                            <label for="filterCard4"><span>Tích điểm</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        @*<div class="col-md-2">
+                            <a id="showCreateTransaction" data-toggle='modal' class='btn btn-sm btn-primary pull-right'><i class='glyphicon glyphicon-plus'></i> Thêm giao dịch</a>
+                        </div>*@
+                    </div>
+                    <div class="col-md-12 form-group">
+                        <div class="col-md-6">
+                            <label class="m-t-8 m-r-15"><strong>Tài khoản:</strong></label>
+                            <select class="selectpicker col-md-8" id="selectedAccount" onchange="RefresTransactionTable();">
+                                <option value="0" selected>Tất cả tài khoản</option>
+                                @foreach (var item in Model.AllAccounts)
+                                {
+                                    <option value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+
+                        @*<div class="col-md-6 pull-right">
+                                <div class="col-md-8 pull-right" style="padding-right: 0px;">
+                                    <input id="date-string-tab3" readonly class="form-control pull-right text-center store-filter" style="background-color:#FFFFFF;" />
+                                    <a class="myCelenderA" id="reportrange-tab3" style="margin-right: 20px;"><i class="fa fa-calendar"></i></a>
+                                    <input type="hidden" id="FromDateStr-tab3" />
+                                    <input type="hidden" id="ToDateStr-tab3" />
+                                </div>
+                            </div>*@
+                    </div>
+                    @*}*@
+                    <div class="col-md-12 form-group">
+                        <table id="voucher-table" class="table-condensed table-bordered table-striped table-hover">
+                            <thead>
+                                <tr style="background-color: #4caf50; color: white;">
+                                    <th>
+                                        <label>STT</label>
+                                    </th>
+                                    <th>
+                                        <label>Tài khoản</label>
+                                    </th>
+                                    <th>
+                                        <label>Hoạt động</label>
+                                    </th>
+                                    <th>
+                                        <label>Số tiền</label>
+                                    </th>
+                                    <th>
+                                        <label>Tiền tệ</label>
+                                    </th>
+                                    <th>
+                                        <label>Thời gian</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        @*<div class="modal-footer">
+                <label class="btn btn-success pull-right" data-dismiss="modal">Thoát</label>
+            </div>*@
+    </form>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker({
+            size: 10,
+            liveSearch: true,
+        });
+
+        InitTransactionDatatable();
+
+        $('[name="filterCard"]').change(function (e) {
+            loadTracsactionAccountCombobox();
+        });
+    });
+
+    //$('#btn-submit-product').parent().parent().css('z-index', '6');
+    //$('.myComeback').parent().fixedScroll(70);
+    //$('#btn-submit-product').parent().fixedScroll(70);
+
+    function loadTracsactionAccountCombobox() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GetAccountsWithFilter", "Account")',
+            data: {
+                id: '@Model.MembershipCard.Id',
+                filterCard: $('input[name=filterCard]:checked').val()
+            },
+            success: function (result) {
+                if (result.success) {
+                    $('#selectedAccount').html("");
+                    var content = "";
+                    if (result.accountList.length > 0) {
+                        $('#selectedAccount').html("");
+                        content += "<option value='0'>Tất cả tài khoản</option>";
+                        for (var i = 0; i < result.accountList.length; ++i) {
+                            content += "<option value='" + result.accountList[i].Value + "'>" + result.accountList[i].Text + "</option>";
+                        }
+                    } else {
+                        content += "<option value='0'>Không có tài khoản</option>";
+                    }
+                    $('#selectedAccount').html(content);
+                    $('#selectedAccount').selectpicker('refresh');
+                } else {
+                    ShowMessage("Có lỗi xảy ra, vui lòng thử lại.", 1);
+                }
+            },
+        });
+    }
+
+    function RefresTransactionTable() {
+        var oTable = $("#voucher-table").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+        //loadTransactionOverview();
+    }
+
+    function InitTransactionDatatable() {
+        $("#voucher-table").dataTable({
+            "bFilter": true,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "bSort": false,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "Id", "value": $("#selectedAccount").val() });
+                aoData.push({ "name": "cardId", "value": '@Model.MembershipCard.Id' });
+            },
+            "sAjaxSource": "@(Url.Action("LoadTransactionByAccountOrCustomer", "Account"))",
+            //"sAjaxSource": "/1/CRM/Account/LoadTransactionByAccount",
+            "bProcessing": true,
+            "bFilter": true,
+            "aLengthMenu": [10, 20, 100],
+            "iDisplayLength": "10",
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Tài khoản",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                 {
+                     "aTargets": [0, 2, 3, 4, 5],
+                     "className": "dt-center"
+                 },
+                //{
+                //    "aTargets": [5],
+                //    "mRender": function (data, type, row) {
+                //        var data = row[5];
+                //        //var edit = "<a data-toggle='modal' onclick='showEditTransaction(" + data + ")' data-target='#editTransactionPanel' class='btn btn-sm btn-primary'><i class='glyphicon glyphicon-pencil'></i></a>"
+                //        //var deleteVoucher = " <a class='btn btn-sm btn-primary' onclick='deleteVoucher(" + data + ")'><i class='fa fa-close'></i></a>";
+                //        //return edit + deleteVoucher;
+                //    },
+                //    "bSortable": false,
+                //
+                //},
+                {
+                    "aTargets": [3],
+                    "mRender": function (data, type, row) {
+                        var data = row[6];
+                        if (data) {
+                            return '<span style="color: green"><i class="fa fa-level-up"></i> +' + row[3] + '</span>';
+                        }
+                        else {
+                            return '<span style="color: orange"><i class="fa fa-level-down"></i> -' + row[3] + '</span>';
+                        }
+                    },
+                    "bSortable": false,
+
+                },
+                {
+                    "aTargets": [2],
+                    "mRender": function (data, type, row) {
+                        var data = row[2];
+                        if (data) {
+                            return '<i class="glyphicon glyphicon-ok"></i>';
+                        }
+                        else {
+                            return '<i class="glyphicon glyphicon-remove"></i>';
+                        }
+                    },
+                    "bSortable": false,
+
+                },
+            ],
+            "bAutoWidth": false
+        });
+    }
+</script>

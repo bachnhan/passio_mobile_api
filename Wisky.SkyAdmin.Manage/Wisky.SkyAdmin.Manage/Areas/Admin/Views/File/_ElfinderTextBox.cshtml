@@ -1,0 +1,68 @@
+﻿@model string
+@{
+    Layout = null;
+}
+<link href="~/Content/plugins/jquery-ui-1.11.4/jquery-ui.min.css" rel="stylesheet" />
+<link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+
+<style>
+    .elfinder-selectFile {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        border: 1px solid #ccc;
+        background: #f6f6f6 url("images/ui-bg_glass_100_f6f6f6_1x400.png") 50% 50% repeat-x;
+        font-weight: bold;
+        color: #1c94c4;
+        padding: 2px 14px;
+        border-radius: 4px;
+    }
+</style>
+
+<div id="finder_browse"></div>
+
+<template id="tmpPhotoBlock">
+    <li class="col-md-4 photo-item removeable">
+        <div class="ratio-wrapper ratio-wrapper-1-1">
+            <div class="ratio-item">
+                <input type="hidden" name="picurl" value="" />
+                <div class="img-container">
+                    <img />
+                </div>
+            </div>
+        </div>
+    </li>
+</template>
+
+<!-- Gallery item used for Gallery pages-->
+<template id="tmpGalleryItem">
+    <div class="col-md-3">
+        <div class="removeable">
+            <div class="gallery-item">
+                <div class="ratio-wrapper ratio-wrapper-4-3">
+                    <div class="ratio-item">
+                        <div class="img-container">
+                            <img class="img-responsive" src="~/Content/images/default_product.jpg" />
+                        </div>
+
+                    </div>
+                </div>
+                <div class="caption">
+                    <input class="form-control" placeholder="Chú thích" />
+                </div>
+            </div>
+            <a class="btn-remove" href="#"><i class="fa fa-times"></i></a>
+        </div>
+    </div>
+</template>
+@Html.Partial("_Constant")
+<script src="~/Content/js/jquery-1.9.1.js"></script>
+<script src="~/Content/plugins/jquery-ui-1.11.4/jquery-ui.min.js"></script>
+<script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+<script src="~/Content/js/script.js"></script>
+<script>
+    $(function () {
+        SKYWEB.Admin.General.setupElfinderView();
+        SKYWEB.Admin.General.initElfinderEvent();
+    });
+</script>

@@ -1,0 +1,424 @@
+﻿@{
+    ViewBag.Title = "Báo cáo COS";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Báo cáo COS
+                </h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div>
+            <div class="col-md-6">
+                <div class="text-right">
+                    <button type="submit" id="exportproductitem" class="btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row" style="margin-top: 19px;">
+            <div class="col-md-6" style="padding-top: 12px;">
+                Tỉ lệ giá trị nguyên liệu sau giảm giá: <input id="portionItemValue" class="saleRatio" readonly />
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <!-- Daterange picker -->
+                    @*<div class="date-picker text-right">
+                        <input id="datestring" hidden />
+                        <div id="reportrange">
+                            <input class="p-7 width230" type="text" id="date-string" readonly />
+                            <a id="" class="CelenderA"><i class="fa fa-calendar"></i></a>
+                        </div>
+                    </div>
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>  Tìm
+                        </a>
+                    </div>*@
+
+                    <div class="dateTime width230 pull-right">
+                        <input id="datestring" hidden />
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group-btn FindButtonDateTime">
+                        <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                            <i class="left-icon fa fa-search"></i> Tìm
+                        </a>
+                    </div>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+    <div class="card-padding">
+        <div id="myTab" style="display: none;">
+        </div>
+        <input type="text" style="display: none" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" />
+        <input type="text" style="display: none" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" />
+        <div id="tblProductItemReportArea">
+            <table id="tblProductItemReport" class="table table-striped table-bordered table-hover" style="width: 100% !important;">
+                <thead style="white-space: nowrap;">
+                    <tr>
+                        <th>
+                            <label class="">STT</label>
+                        </th>
+                        <th>
+                            <label class="">Tên nguyên liệu</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng</label>
+                        </th>
+                        <th>
+                            <label class="">Đơn vị</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+@* <div class="page-content">
+    <div class="page-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>
+                    Báo cáo COS <small data-role="small-date"></small>
+                </h1>
+            </div>
+            <div class="col-md-3 col-md-offset-3">
+                <div class="input-group">
+                    <div class="date-picker">
+                        <input type="text" id="date-string" readonly />
+                        <a id="reportrange"><i class="fa fa-calendar"></i></a>
+                    </div><!-- /input-group -->
+
+                    <div class="input-group-btn">
+                        <a class="btn btn-success btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>Tìm
+                        </a>
+                    </div>
+                </div><!-- /input-group -->
+            </div>
+        </div>
+    </div>
+    <div class="form-inline">
+        <input type="text" style="display: none" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" />
+        <input type="text" style="display: none" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" />
+        <div style="margin-right:15px;">
+            <button type="submit" id="exportproductitem" class="btn btn-success btn-sm">
+                <i class="fa fa-download"></i>
+                Xuất ra file Excel
+            </button>
+            <div>
+                Tỉ lệ giá trị nguyên liệu sau giảm giá: <input id="portionItemValue" readonly style="color: #FF2500;border:none;background: rgba(255,255,255,.15) !important" />
+            </div>
+        </div>
+
+        <div id="tblProductItemReportArea">
+            <table id="tblProductItemReport" class="table table-striped table-bordered table-hover" style="width: 100% !important;">
+                <thead style="white-space: nowrap;">
+                    <tr>
+                        <th>
+                            <label class="">STT</label>
+                        </th>
+                        <th>
+                            <label class="">Tên nguyên liệu</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng</label>
+                        </th>
+                        <th>
+                            <label class="">Đơn vị</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+
+        <div id="myTab" style="display: none;">
+           <div>  *@
+@*<ul class="nav nav-tabs">
+                                    <li class="active">
+                                            <a data-toggle="tab" href="#tab1"><i class="left-icon icon-money"></i>Hóa đơn</a>
+                                        </li>*
+                                    <li class="active">
+                                        <a data-toggle="tab" href="#tab2"><i class="left-icon icon-gift"></i>Sản phẩm</a>
+                                    </li>
+
+                                    <li class="active">
+                                        <a data-toggle="tab" href="#tab3"><i class="left-icon icon-food"></i>Nguyên liệu</a>
+                                    </li>
+
+                                </ul>@
+                                @*<div class="tab-content">
+                                  <div id="tab2" class="tab-pane fade in active">
+                        <br />
+                        <!-- export to excel -->
+                        <div style="margin-right:15px;">
+                            <button type="submit" id="exportproduct" class="btn btn-success btn-sm">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button>
+                        </div>
+                        <div id="tblProductReportArea">
+                            <table id="tblProductReport" class="table table-striped table-bordered table-hover" style="width: 100% !important;">
+                                <thead style="white-space: nowrap;">
+                                    <tr>
+                                        <th>
+                                            <label class="">STT</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Tên sản phẩm</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Số lượng bán ra</label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="tab3" class="tab-pane fade">
+                        <br />
+                        <!-- export to excel -->
+                        <div style="margin-right:15px;">
+                            <button type="submit" id="exportproductitem" class="btn btn-success btn-sm">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button>
+                        </div>
+                        <div id="tblProductItemReportArea">
+                            <table id="tblProductItemReport" class="table table-striped table-bordered table-hover" style="width: 100% !important;">
+                                <thead style="white-space: nowrap;">
+                                    <tr>
+                                        <th>
+                                            <label class="">STT</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Tên nguyên liệu</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Số lượng</label>
+                                        </th>
+                                        <th>
+                                            <label class="">Đơn vị</label>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                                </div>
+                @*</div>
+            </div>
+        </div>
+    </div>*@
+
+<form class="hidden" id="formQuantitativeReportExcel" action="@Url.Action("ExportProductItemQuantitativeExcelEPPlus","StoreReport")">
+    <input id="startTimeAll" name="startTime" />
+    <input id="endTimeAll" name="endTime" />
+</form>
+<script>
+
+    $(document).ready(function () {
+        //var currentTime = '(' + moment().startOf('month').format('DD/MM/YYYY') + ' - ' + moment().subtract(1, 'days').format('DD/MM/YYYY') + ')';
+
+        function cb(start, end, label) {
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $('#date-string').val(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+            }
+
+            var startTime = start.format('DD/MM/YYYY'),
+                endTime = end.format('DD/MM/YYYY');
+
+            $('#sTime').val(startTime);
+            $('#eTime').val(endTime);
+
+            $('[data-role=small-date]').html('(' + startTime + (startTime == endTime ? '' : ' - ' + endTime) + ')');
+        }
+        cb(moment().startOf('month'), moment().endOf('month'), 'Tháng này');
+
+        $('#reportrange').daterangepicker({            
+            maxDate: moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+        //console.log('(' + moment().startOf('month').format('DD/MM/YYYY') + ' - ' + moment().subtract(1, 'days').format('DD/MM/YYYY') + ')');
+
+        $('[data-role=small-date]').html('(' + moment().startOf('month').format('DD/MM/YYYY') + ' - ' + moment().subtract(1, 'days').format('DD/MM/YYYY') + ')');
+
+        $('#btnSearch').on('click', function () {
+            if ($("#eTime").val().length > 16 || $("#sTime").val().length > 16) {
+                ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                return;
+            }
+
+            TabQuantityReport();
+        });
+
+
+        TabQuantityReport();
+    });
+
+
+    function TabQuantityReport() {
+        var startTime = $('#sTime').val(),
+            endTime = $('#eTime').val();
+
+        $.ajax({
+            url: '@Url.Action("LoadQuantitativeReport", "StoreReport")',
+            type: 'POST',
+            data: { 'startTime': startTime, 'endTime': endTime },
+            success: function (rs) {
+                //console.log(rs);
+                $('#portionItemValue').val(rs.portionItemValue);
+                InitDatatable(rs.dataTable);
+            },
+            error: function (e) {
+                ShowMessage("Không thể xem chi tiết do lỗi server!", 1);
+            }
+        });
+    }
+    var InitDatatable = function (data) {
+        //$('#tblProductReportArea').html('<table id="tblProductReport" class="table table-striped table-bordered table-hover" style="width: 100% !important;">'
+        //                        + '<thead style="white-space: nowrap;">'
+        //                            + '<tr>'
+        //                                + '<th>'
+        //                                    + '<label class="">STT</label>'
+        //                                + '</th>'
+        //                                + '<th>'
+        //                                    + '<label class="">Tên sản phẩm</label>'
+        //                                + '</th>'
+        //                                + '<th>'
+        //                                    + '<label class="">Số lượng bán ra</label>'
+        //                                + '</th>'
+        //                            + '</tr>'
+        //                        + '</thead>'
+        //                        + '<tbody></tbody>'
+        //                    + '</table>');
+
+        $('#tblProductItemReportArea').html('<table id="tblProductItemReport" class="table table-striped table-bordered table-hover" style="width: 100% !important;">'
+                                + '<thead style="white-space: nowrap;">'
+                                    + '<tr>'
+                                        + '<th>'
+                                            + '<label class="">STT</label>'
+                                        + '</th>'
+                                        + '<th>'
+                                            + '<label class="">Tên nguyên liệu</label>'
+                                        + '</th>'
+                                        + '<th>'
+                                            + '<label class="">Số lượng</label>'
+                                        + '</th>'
+                                        + '<th>'
+                                            + '<label class="">Đơn vị</label>'
+                                        + '</th>'
+                                        + '<th>'
+                                            + '<label class="">Giá trị</label>'
+                                        + '</th>'
+                                    + '</tr>'
+                                + '</thead>'
+                                + '<tbody></tbody>'
+                            + '</table>');
+
+        //    $("#tblProductReport").dataTable({
+        //        "bSort": false,
+        //        "bRetrieve": true,
+        //        "bScrollCollapse": true,
+        //        "data": data.listProduct,
+        //        "iDisplayLength": 50,
+        //        "aLengthMenu": [50, 100],
+        //        "oLanguage": {
+        //            "sSearch": "Tìm kiếm:",
+        //            "sZeroRecords": "Không có dữ liệu phù hợp",
+        //            "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+        //            "sEmptyTable": "Không có dữ liệu",
+        //            "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+        //            "sLengthMenu": "Hiển thị _MENU_ dòng",
+        //            "sProcessing": "Đang xử lý..."
+        //        },
+        //        "aoColumnDefs": [
+        //            {
+        //                "aTargets": [0, 1, 2],
+        //                "bSortable": false
+        //            },
+        //        ],
+        //        "bAutoWidth": false
+        //    }
+        //);
+        $("#tblProductItemReport").dataTable({
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data.listProductItem,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3],
+                    "bSortable": false
+                },
+                {
+                    "aTargets": [0, 2, 3],
+                    "sClass": "text-center"
+                },
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    }
+
+    // export to excel
+    $(document).on('click', '#exportproduct', function () {
+        $('#startTimeAll').val($('#sTime').val());
+        $('#endTimeAll').val($('#eTime').val());
+        $('#formHourReportAllExcel').submit();
+    });
+    // export to excel
+    $(document).on('click', '#exportproductitem', function () {
+        $('#startTimeAll').val($('#sTime').val());
+        $('#endTimeAll').val($('#eTime').val());
+        $('#formQuantitativeReportExcel').submit();
+    });
+</script>

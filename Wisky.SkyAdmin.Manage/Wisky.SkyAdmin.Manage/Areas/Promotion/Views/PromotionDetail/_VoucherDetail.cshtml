@@ -1,0 +1,66 @@
+﻿@using HmsService.ViewModels;
+
+<div class="card-padding" style="overflow: hidden">
+    <div class="row">
+        <div class="col-md-12" style="">
+            @*colorbackground: #4f953b*@
+
+            <h3><b style="color:#383A3F;margin-left:12px;">Danh sách voucher</b></h3>
+
+        </div>
+        <div class="col-md- col- text-right pull-right" style="padding-top: 10px">
+            <button class="btn btn-primary btn-sm" onclick="showCreate(@Model.PromotionID)">
+                Thêm quy định
+            </button>
+        </div>
+    </div>
+</div>
+<br />
+<br />
+<table id="promotionDetailTable" class="table-striped table-hover">
+    <thead>
+        <tr class="gray">
+            <th class="">STT</th>
+            @*Apply level 0 là cấp độ hóa đơn*@
+            @if (Model.ApplyLevel == 0)
+            {
+                if (Model.IsForMember == true)
+                {
+                    <th class="">Mã số thành viên</th>
+                }
+                <th class="">Tổng tiền tối thiểu (VNĐ)</th>
+                <th class="">Tổng tiền tối đa (VNĐ)</th>
+            }
+            @* Apply leve 1 là cấp độ sản phẩm*@
+            else if (Model.ApplyLevel == 1)
+            {
+                if (Model.IsForMember == true)
+                {
+                    <th class="">Mã số thành viên</th>
+                }
+                <th class="">Sản phẩm áp dụng</th>
+                <th class="">Số lượng tối thiểu</th>
+                            <th class="">Số lượng tối đa</th>
+            }
+            @*Apply leve 1 là khuyến mải theo hình thức quà tặng*@
+            @if (Model.GiftType == 1)
+            {
+                <th class="">Sản phẩm KM</th>
+                <th class="">Số lượng</th>
+            }
+            @*Apply leve 0 là khuyến mải theo hình thức giảm giá*@
+            else if (Model.GiftType == 0)
+            {
+                <th class="">Giảm giá (%)</th>
+            }
+            else if (Model.GiftType == 2)
+            {
+                <th class="">Giảm giá (tiền mặt)</th>
+            }
+            <th class="opt">Tùy chọn</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+

@@ -1,0 +1,93 @@
+﻿@{
+    var products = (List<Tuple<int, string, int>>)ViewBag.Product;
+    var productItems = (List<Tuple<int, string, int, string>>)ViewBag.ProductItem;
+    var countProduct = 0;
+    var countProductItem = 0;
+    var start = ViewBag.StartTime;
+    var end = ViewBag.EndTime;
+}
+<div>
+    <h3>Báo cáo từ ngày: @ViewBag.Start.ToString("dd/MM/yyyy") đến @ViewBag.End.ToString("dd/MM/yyyy") </h3>
+    <ul class="nav nav-tabs">
+        @*<li class="active">
+                <a data-toggle="tab" href="#tab1"><i class="left-icon icon-money"></i>Hóa đơn</a>
+            </li>*@
+        <li class="active">
+            <a data-toggle="tab" href="#tab2"><i class="left-icon icon-gift"></i>Sản phẩm</a>
+        </li>
+
+        <li class="">
+            <a data-toggle="tab" href="#tab3"><i class="left-icon icon-food"></i>Nguyên liệu</a>
+        </li>
+
+    </ul>
+    <div class="tab-content">
+        <div id="tab2" class="tab-pane fade in active">
+            <br />
+            <div>
+                <table id="tblProductReport" class="table table-striped table-bordered table-hover" style="width: 100% !important;">
+                    <thead style="white-space: nowrap;">
+                        <tr>
+                            <th>
+                                <label class="">STT</label>
+                            </th>
+                            <th>
+                                <label class="">Tên sản phẩm</label>
+                            </th>
+                            <th>
+                                <label class="">Số lượng bán ra</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in products)
+                        {
+
+                            <tr>
+                                <td>@(++countProduct)</td>
+                                <td>@item.Item2</td>
+                                <td>@item.Item3</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="tab3" class="tab-pane fade">
+            <br />
+
+            <div>
+                <table id="tblProductItemReport" class="table table-striped table-bordered table-hover" style="width: 100% !important;">
+                    <thead style="white-space: nowrap;">
+                        <tr>
+                            <th>
+                                <label class="">STT</label>
+                            </th>
+                            <th>
+                                <label class="">Tên nguyên liệu</label>
+                            </th>
+                            <th>
+                                <label class="">Số lượng</label>
+                            </th>
+                            <th>
+                                <label class="">Đơn vị</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in productItems)
+                        {
+
+                            <tr>
+                                <td>@(++countProductItem)</td>
+                                <td>@item.Item2</td>
+                                <td>@item.Item3</td>
+                                <td>@item.Item4</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

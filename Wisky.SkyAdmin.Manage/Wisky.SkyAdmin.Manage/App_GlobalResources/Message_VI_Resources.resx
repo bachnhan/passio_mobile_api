@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AgeFromIsNotLargerThanAgeTo" xml:space="preserve">
+    <value>"Tuổi từ" không được lớn hơn "Tuổi đến"</value>
+    <comment>Message is shown when user input age from larger than age to</comment>
+  </data>
+  <data name="BirthDayMonthIsOutOfRange" xml:space="preserve">
+    <value>Tháng trong năm phải nằm trong khoảng 1 - 12</value>
+    <comment>Message is shown when user input birth day month not from 1 to 12</comment>
+  </data>
+  <data name="CreateAccountFailed" xml:space="preserve">
+    <value>Tạo tài khoản thất bại! Xin vui lòng thử lại</value>
+    <comment>Message is shown when create account failed</comment>
+  </data>
+  <data name="CreateAccountSuccessfully" xml:space="preserve">
+    <value>Tạo tài khoản thành công!</value>
+    <comment>Message is shown when create account successfully</comment>
+  </data>
+  <data name="CreateCustomerFailed" xml:space="preserve">
+    <value>Thêm khách hàng thất bại! Xin thử lại!</value>
+    <comment>Message is shown when create customer failed</comment>
+  </data>
+  <data name="CreateCustomerSuccessfully" xml:space="preserve">
+    <value>Thêm khách hàng thành công!</value>
+    <comment>Message is shown when create customer successfully</comment>
+  </data>
+  <data name="CreateCustomerTypeFailed" xml:space="preserve">
+    <value>Thêm loại khách hàng thất bại! Vui lòng thử lại</value>
+    <comment>Message is shown when create customer type failed</comment>
+  </data>
+  <data name="CreateCustomerTypeSuccessfully" xml:space="preserve">
+    <value>Thêm loại khách hàng thành công!</value>
+    <comment>Message is shown when create customer type successfully</comment>
+  </data>
+  <data name="CreateFilterFailed" xml:space="preserve">
+    <value>Thêm bộ lọc thất bại! Xin thử lại!</value>
+    <comment>Message is shown when create filter failed</comment>
+  </data>
+  <data name="CreateFilterSuccessfully" xml:space="preserve">
+    <value>Thêm bộ lọc thành công!</value>
+    <comment>Message is shown when create filter successfully</comment>
+  </data>
+  <data name="CreateVoucherProviderFailed" xml:space="preserve">
+    <value>Thêm nhà cung cấp thất bại! Vui lòng thử lại</value>
+    <comment>Message is shown when create voucher provider failed</comment>
+  </data>
+  <data name="CreateVoucherProviderSuccessfully" xml:space="preserve">
+    <value>Thêm nhà cung cấp thành công!</value>
+    <comment>Message is shown when create voucher provider successfully</comment>
+  </data>
+  <data name="DeleteAccountFailed" xml:space="preserve">
+    <value>Xoá tài khoản thất bại! Xin vui lòng thử lại</value>
+    <comment>Message is shown when delete account failed</comment>
+  </data>
+  <data name="DeleteAccountSuccessfully" xml:space="preserve">
+    <value>Xoá tài khoản thành công!</value>
+    <comment>Message is shown when delete account successfully</comment>
+  </data>
+  <data name="DeleteCustomerFailed" xml:space="preserve">
+    <value>Xoá khách hàng thất bại! Xin thử lại!</value>
+    <comment>Message is shown when delete customer failed</comment>
+  </data>
+  <data name="DeleteCustomerSuccessfully" xml:space="preserve">
+    <value>Xoá khách hàng thành công!</value>
+    <comment>Message is shown when delete customer successfully</comment>
+  </data>
+  <data name="DeleteCustomerTypeFailed" xml:space="preserve">
+    <value>Xoá loại khách hàng thất bại! Vui lòng thử lại</value>
+    <comment>Message is shown when delete customer type failed</comment>
+  </data>
+  <data name="DeleteCustomerTypeSuccessfully" xml:space="preserve">
+    <value>Xóa loại khách hàng thành công!</value>
+    <comment>Message is shown when delete customer type successfully</comment>
+  </data>
+  <data name="DeleteFilterFailed" xml:space="preserve">
+    <value>Xoá bộ lọc thất bại! Xin thử lại!</value>
+    <comment>Message is shown when delete filter failed</comment>
+  </data>
+  <data name="DeleteFilterSuccessfully" xml:space="preserve">
+    <value>Xoá bộ lọc thành công!</value>
+    <comment>Message is shown when delete filter successfully</comment>
+  </data>
+  <data name="DeleteVoucherProviderFailed" xml:space="preserve">
+    <value>Xoá nhà cung cấp thất bại! Vui lòng thử lại</value>
+    <comment>Message is shown when delete voucher provider failed</comment>
+  </data>
+  <data name="DeleteVoucherProviderSuccessfully" xml:space="preserve">
+    <value>Xoá nhà cung cấp thành công!</value>
+    <comment>Message is shown when delete voucher provider successfully</comment>
+  </data>
+  <data name="EditAccountFailed" xml:space="preserve">
+    <value>Cập nhật thông tin tài khoản thất bại! Xin vui lòng thử lại</value>
+    <comment>Message is shown when edit account failed</comment>
+  </data>
+  <data name="EditAccountSuccessfully" xml:space="preserve">
+    <value>Cập nhật thông tin tài khoản thành công!</value>
+    <comment>Message is shown when edit account successfully</comment>
+  </data>
+  <data name="EditCustomerFailed" xml:space="preserve">
+    <value>Cập nhật thông tin khách hàng thất bại! Xin thử lại!</value>
+    <comment>Message is shown when edit customer failed</comment>
+  </data>
+  <data name="EditCustomerSuccessfully" xml:space="preserve">
+    <value>Cập nhật thông tin khách hàng thành công!</value>
+    <comment>Message is shown when edit customer successfully</comment>
+  </data>
+  <data name="EditCustomerTypeFailed" xml:space="preserve">
+    <value>Sửa loại khách hàng thất bại! Vui lòng thử lại</value>
+    <comment>Message is shown when edit customer type failed</comment>
+  </data>
+  <data name="EditCustomerTypeSuccessfully" xml:space="preserve">
+    <value>Sửa loại khách hàng thành công!</value>
+    <comment>Message is shown when edit customer type successfully</comment>
+  </data>
+  <data name="EditFilterFailed" xml:space="preserve">
+    <value>Sửa bộ lọc thất bại! Xin thử lại!</value>
+    <comment>Message is shown when edit filter failed</comment>
+  </data>
+  <data name="EditFilterSuccessfully" xml:space="preserve">
+    <value>Sửa bộ lọc thành công!</value>
+    <comment>Message is shown when edit filter successfully</comment>
+  </data>
+  <data name="EditVoucherProviderFailed" xml:space="preserve">
+    <value>Cập nhật thông tin nhà cung cấp thất bại! Vui lòng thử lại</value>
+    <comment>Message is shown when edit voucher provider failed</comment>
+  </data>
+  <data name="EditVoucherProviderSuccessfully" xml:space="preserve">
+    <value>Cập nhật thông tin nhà cung cấp thành công!</value>
+    <comment>Message is shown when edit voucher provider successfully</comment>
+  </data>
+  <data name="ErrorOccured" xml:space="preserve">
+    <value>Có lỗi xảy ra, xin vui lòng liên hệ admin!</value>
+    <comment>Message is shown when unknow error occoured</comment>
+  </data>
+  <data name="VisitTimesFromMustNotLargerThanVisitTimesTo" xml:space="preserve">
+    <value>"Số lần đến cửa hàng từ" phải nhỏ hơn "Số lần đến cửa hàng đến"!</value>
+    <comment>Message is shown when user input visit times from larger than visit times to</comment>
+  </data>
+</root>

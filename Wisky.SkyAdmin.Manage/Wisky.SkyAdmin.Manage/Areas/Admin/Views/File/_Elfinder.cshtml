@@ -1,0 +1,111 @@
+﻿@{
+    Layout = null;
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+}
+
+<div id="elfinder">
+
+</div>
+<link href="~/Content/plugins/jquery-ui-1.11.4/jquery-ui.min.css" rel="stylesheet" />
+<link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+
+<script src="~/Content/js/jquery-1.9.1.js"></script>
+<script src="~/Content/plugins/jquery-ui-1.11.4/jquery-ui.min.js"></script>
+<script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+@*@section scripts {*@
+
+<script type="text/javascript">
+
+    function getUrlParam(paramName) {
+        var reParam = new RegExp('(?:[\?&]|&amp;)' + paramName + '=([^&]+)', 'i');
+        var match = window.location.search.match(reParam);
+        return (match && match.length > 1) ? match[1] : '';
+    }
+
+    $(function () {
+        var funcNum = getUrlParam('CKEditorFuncNum');
+        var myCommands = elFinder.prototype._options.commands;
+        var disabled = ['extract', 'archive', 'help', 'select'];
+        $.each(disabled, function (i, cmd) {
+            (idx = $.inArray(cmd, myCommands)) !== -1 && myCommands.splice(idx, 1);
+        });
+        var selectedFile = null;
+        var options = {
+            url: '@(Url.Action("LoadFile","File", new { parameters = currentStoreDomain.Directory }))',
+            commands: myCommands,
+            lang: 'en',
+            uiOptions: {
+                toolbar: [
+                    ['back', 'forward'],
+                    ['reload'],
+                    ['home', 'up'],
+                    ['mkdir', 'mkfile', 'upload'],
+                    ['open', 'download'],
+                    ['info'],
+                    ['quicklook'],
+                    ['copy', 'cut', 'paste'],
+                    ['rm'],
+                    ['duplicate', 'rename', 'edit', 'resize'],
+                    ['view', 'sort']
+                ]
+            },
+            getFileCallback: function (file) {
+                var url = file.url;
+                if (url.slice(0, options.url.length) == options.url)
+                    url = '/' + url;
+                window.opener.CKEDITOR.tools.callFunction(funcNum, file.url);
+                window.close();
+            },
+            handlers: {
+                select: function (event, elfinderInstance) {
+
+                    if (event.data.selected.length == 1) {
+                        var item = $('#' + event.data.selected[0]);
+                        if (!item.hasClass('directory')) {
+                            selectedFile = event.data.selected[0];
+                            $('#elfinder-selectFile').show();
+                            return;
+                        }
+                    }
+                    else if (event.data.selected.length >= 1) {
+                        var items = $('#' + event.data.selected);
+                        if (!items.hasClass('directory')) {
+                            selectedFile = event.data.selected;
+                            $('#elfinder-selectFile').show();
+                            return;
+                        }
+                    }
+                    $('#elfinder-selectFile').hide();
+                    selectedFile = null;
+                }
+            }
+        };
+        $('#elfinder').elfinder(options).elfinder('instance');
+
+
+        //Add more button for add multi picture
+        $('.elfinder-toolbar:first').append('<div class="ui-widget-content ui-corner-all elfinder-menubutton elfinder-buttonset" id="elfinder-selectFile" style="display:none; float:right;">' +
+             '<div class="ui-state-default elfinder-button" title="Select" style="width: 100px;text-align: center;font-size: 15px;">Chọn</div>');
+
+        $('.elfinder-toolbar:first').append('<div class="ui-widget-content ui-corner-all elfinder-buttonset"><div class="ui-state-default elfinder-button" title="Preview"><span class="elfinder-button-icon elfinder-button-icon-quicklook"></span></div></div>');
+
+        $('#elfinder-selectFile').click(function () {
+            if (selectedFile != null)
+                var postData = { values: selectedFile };
+            $.ajax({
+                type: "POST",
+                url: "selectFile",
+                data: postData,
+                success: function (data) {
+                    for (var filePath in data) {
+                        $("#images-preview").append("<img style='width: 200px;' value='" + filePath + "' src='" + filePath + "'/>");
+                    }
+                    window.close();
+                },
+                dataType: "json",
+                traditional: true
+            });
+
+        });
+    });
+</script>

@@ -1,0 +1,1332 @@
+﻿@{
+    ViewBag.Title = "Overview Date Dashboard";
+    var storeId = ViewBag.storeId;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<link href="~/Content/css/OverviewDashBoard.css" rel="stylesheet" />
+<div class="card p-t-0 p-b-10">
+    <!-------------------------Header Dasht board------------------------------------------------------------------------------>
+    <div class="card-header p-b-0 p-t-0">
+        <div class="row date-header m-t-0">
+            <div class="col-md-8 col-xs-6">
+                <h3 style="padding-top: 10px;" id="title-date">Tổng quan ngày: </h3>
+                <h5 data-role="small-date" id="dateRange"></h5>
+            </div>
+            <!------------------------------------Date Picker--------------------------------------->
+            <div class="col-md-4 col-xs-6 p-t-15 pull-right">
+                <div class="input-group">
+                    <div class="input-group date" id="datetimepicker" style="float: right">
+                        <input id="date-time" type="text" class="input-group-addon form-control myInputCelender" style="padding-left: 0px !important;height: 37px; margin-top: -1px;" />
+                        <span class="input-group-addon myCerlenderSpan">
+                            <span class="fa fa-calendar"></span>
+                        </span>
+                    </div>
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>     Tìm
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <!------------------------------------Date Picker--------------------------------------->
+        </div>
+    </div>
+    <!-------------------------Header Dasht board------------------------------------------------------------------------------>
+
+    <div class="card-padding">
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active" id="Report_Data_Tab">
+                <a href="#Report_Data" role="tab" data-toggle="tab">Tổng quan doanh thu</a>
+            </li>
+            @if (int.Parse(storeId) == 0)
+            {
+                <li role="presentation" id="Report_StoreTab">
+                    <a href="#Report_Store" role="tab" data-toggle="tab">Top doanh thu cửa hàng</a>
+                </li>
+            }
+
+            <li role="presentation" id="Report_ProductTab">
+                <a href="#Report_Product" role="tab" data-toggle="tab">Chi tiết doanh thu sản phẩm</a>
+            </li>
+            <li role="presentation" id="Report_CashierTab">
+                <a href="#Cashier_Data" role="tab" data-toggle="tab">Thống kê nhân viên</a>
+            </li>
+        </ul>
+        <div class="card">
+            <div class="tab-content" style="padding-top:0px !important">
+                <div class="card-body card-padding tab-pane fade in active" id="Report_Data">
+                    <div class="row" style="padding: 0px 10px;">
+                        <span class="headerTopic">I. Doanh Thu & Hóa đơn</span>
+                    </div>
+                    <div class="row m-t-0 p-t-20">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div class="padding15 margin-in-col widget-rev-odd">
+                                <div class="clearfix text-center header-title">
+                                    <h3>Tổng doanh thu</h3>  <span style="color:black"> (3) + (4) | Đơn vị (VNĐ)</span>
+                                    <div class="col-md-12">
+                                        <i class="fa fa-3x fa-usd pull-left"></i>
+                                        <div class="pull-right">
+                                            <h3 id="TotalRevenueWithoutDiscount">0</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="margin-in-col widget-rev">
+                                <div class="clearfix">
+                                    <div class="header-item">Doanh thu trước giảm giá (1)</div>
+                                    <div class="col-md-6 pull-right">
+                                        <div class="pull-right">
+                                            <h2 id="TotalRevenueWithDiscount">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="margin-in-col widget-rev-odd">
+                                <div class="clearfix">
+                                    <div class="header-item">Giảm giá bán hàng (2)</div>
+                                    <div class="col-md-6 pull-right">
+                                        <div class="pull-right">
+                                            <h2 id="TotalDiscount">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="margin-in-col widget-rev">
+                                <div class="clearfix">
+                                    <div class="header-item">
+                                        Doanh thu Thực Tế (3)
+                                    </div>
+                                    <div class="col-md-6 pull-right">
+                                        <div class="pull-right">
+                                            <h2 id="TotalRevenueWithoutDiscountAndCard">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="margin-in-col widget-rev-odd">
+                                <div class="clearfix">
+                                    <div class="header-item">
+                                        Doanh thu nạp thẻ (4)
+                                    </div>
+                                    <div class="col-md-6 pull-right">
+                                        <div class="pull-right">
+                                            <h2 id="TotalRevenueCard">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div>
+                                <div class="padding15 margin-in-col bgm-blue">
+                                    <div class="clearfix text-center header-title">
+                                        <h3>Tổng số hóa đơn</h3>
+                                        <span style="color:black">(1) + (2) + (3) + (4) | Đơn vị (Hóa đơn)</span>
+                                        <div class="col-md-12">
+                                            <i class="fa fa-3x fa-exchange pull-left"></i>
+                                            <div class="pull-right">
+                                                <h2 id="TotalBill">0</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-in-col bgm-lightblue">
+                                    <div class="clearfix">
+                                        <div class="header-item">Tại quán (1)</div>
+                                        <div class="inline">
+                                            <div class="col-md-6 pull-right">
+                                                <div class="pull-right">
+                                                    <h2 id="TotalBillAtStore">0</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-in-col bgm-blue">
+                                    <div class="clearfix">
+                                        <div class="header-item">Mang đi (2)</div>
+                                        <div class="inline">
+                                            <div class="col-md-6 pull-right">
+                                                <div class="pull-right">
+                                                    <h2 id="TotalBillTakeAway">0</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-in-col bgm-lightblue">
+                                    <div class="clearfix">
+                                        <div class="header-item">Giao hàng (3)</div>
+                                        <div class="inline">
+                                            <div class="col-md-6 pull-right">
+                                                <div class="pull-right">
+                                                    <h2 id="TotalBillDelivery">0</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-in-col bgm-blue">
+                                    <div class="clearfix">
+                                        <div class="header-item">Nạp Thẻ (4)</div>
+                                        <div class="col-md-6 pull-right">
+
+                                            <div class="pull-right">
+                                                <h2 id="TotalBillCard">0</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Thành phần doanh thu-->
+                    <div class="row" style="padding: 0px 10px;">
+                        <span style="font-size: 23px;color: green;">II. Thành phần doanh thu</span>
+                    </div>
+                    <!-- Overview -->
+                    <div class="row">
+                        <div class="col-md-3 col-xs-12 p-10">
+                            <div class="infobox infobox-block infobox-dark bgm-teal">
+                                <div class="infobox-icon">
+                                    <i class="ace-icon fa fa-2x fa-usd"></i>
+                                </div>
+                                <div class="infobox-data part-block">
+                                    <div>Doanh thu</div>
+                                    <div class="inline">
+                                        <div class="pull-right">
+                                            <small>Đơn vị(VNĐ)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 p-0">
+                                    <h2 class="pull-right" id="finalRevenue">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-12 p-10">
+                            <div class="infobox infobox-block infobox-dark bgm-blue">
+                                <div class="infobox-icon">
+                                    <i class="ace-icon fa fa-2x fa-cubes"></i>
+                                </div>
+                                <div class="infobox-data part-block">
+                                    <div>Tổng hóa đơn</div>
+                                    <div class="inline">
+                                        <div class="pull-right">
+                                            <small>Đơn vị(Hóa đơn)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 p-0">
+                                    <h2 class="pull-right" id="finalTotalBill">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-12 p-10">
+                            <div class="infobox infobox-block infobox-dark bgm-lightgreen">
+                                <div class="infobox-icon">
+                                    <i class="ace-icon fa fa-2x fa-calculator"></i>
+                                </div>
+                                <div class="infobox-data part-block">
+                                    <div>Bình Quân hóa đơn</div>
+                                    <div class="inline">
+                                        <div class="pull-right">
+                                            <small>VNĐ/Hoá đơn</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 p-0">
+                                    <h2 class="pull-right" id="avgFinalReceipt">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-12 p-10">
+                            <div class="infobox infobox-block infobox-dark bgm-yellow">
+                                <div class="infobox-icon">
+                                    <i class="ace-icon fa fa-2x fa-product-hunt"></i>
+                                </div>
+                                <div class="infobox-data part-block">
+                                    <div>Bình quân sản phẩm</div>
+                                    <div class="inline">
+                                        <div class="pull-right">
+                                            <small>Sản phẩm/Hoá đơn</small>
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                                <div class="col-md-12 p-0">
+                                    <h2 class="pull-right" id="avgTotalProductPerReceipt">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row m-t-10">
+                        <div class="col-md-6 col-sm-12 p-10">
+                            <div class="bhoechie-tab-container p-t-20" id="revenuePieChart"></div>
+                        </div>
+                        <div class="col-md-6 col-sm-12 p-10">
+                            <div class="bhoechie-tab-container p-t-20" id="billPieChart"></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 col-xs-6">
+                            <div class="padding15 margin-in-col wdidget-as-odd">
+                                <div class="clearfix">
+                                    <center>
+                                        <i class="fa fa-4x fa-home"></i>
+                                        <br />
+                                        Tại cửa hàng
+                                    </center>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col wdidget-as">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>VNĐ</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">Doanh thu</div>
+                                    <h2 class="pull-right" id="TotalRevenueAtStorePart">0</h2>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col wdidget-as-odd">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">Tổng hóa đơn</div>
+                                    <h2 class="pull-right" id="TotalBillAtStorePart">0</h2>
+                                </div>
+                            </div>
+
+                            <div class="padding15 margin-in-col wdidget-as">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>VNĐ/Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">TB hóa đơn</div>
+                                    <h2 class="pull-right" id="AvgRevenureAtstorePart">0</h2>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col wdidget-as-odd">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>Sản phẩm/Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">TB sản phẩm</div>
+                                    <h2 class="pull-right" id="AvgProductAtstorePart">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-6">
+                            <div class="padding15 margin-in-col widget-del-odd">
+                                <div class="clearfix">
+                                    <center>
+                                        <i class="fa fa-4x fa-motorcycle"></i>
+                                        <br />
+                                        Giao hàng
+                                    </center>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col widget-del">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>VNĐ</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">Doanh thu</div>
+                                    <h2 class="pull-right" id="TotalRevenueDeliveryPart">0</h2>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col widget-del-odd">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">Tổng hóa đơn</div>
+                                    <h2 class="pull-right" id="TotalBillDeliveryPart">0</h2>
+                                </div>
+                            </div>
+
+                            <div class="padding15 margin-in-col widget-del">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>VNĐ/Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">TB hóa đơn</div>
+                                    <h2 class="pull-right" id="AvgRevenureDeliveryPart">0</h2>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col widget-del-odd">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>Sản phẩm/Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">TB sản phẩm</div>
+                                    <h2 class="pull-right" id="AvgProductDeliveryPart">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-6">
+                            <div class="padding15 margin-in-col wdidget-ta-odd">
+                                <div class="clearfix">
+                                    <center>
+                                        <i class="fa fa-4x fa-shopping-bag"></i>
+                                        <br />
+                                        Mang về
+                                    </center>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col wdidget-ta">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>VNĐ</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">Doanh thu</div>
+                                    <h2 class="pull-right" id="TotalRevenueTakeAwayPart">0</h2>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col wdidget-ta-odd">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">Tổng hóa đơn</div>
+                                    <h2 class="pull-right" id="TotalBillTakeAwayPart">0</h2>
+                                </div>
+                            </div>
+
+                            <div class="padding15 margin-in-col wdidget-ta">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>VNĐ/Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">TB hóa đơn</div>
+                                    <h2 class="pull-right" id="AvgRevenureTakeAwayPart">0</h2>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col wdidget-ta-odd">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>Sản phẩm/Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">TB sản phẩm</div>
+                                    <h2 class="pull-right" id="AvgProductTakeAwayPart">0</h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-xs-6">
+                            <div class="padding15 margin-in-col widget-rev-odd">
+                                <div class="clearfix">
+                                    <center>
+                                        <i class="fa fa-4x fa-times"></i>
+                                        <br />
+                                        Hóa đơn hủy
+                                    </center>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col widget-rev">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>VNĐ</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">Tổng giá trị</div>
+                                    <h2 class="pull-right" id="TotalRevenueCancelPart">0</h2>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col widget-rev-odd">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">Tổng hóa đơn</div>
+                                    <h2 class="pull-right" id="TotalBillCancelPart">0</h2>
+                                </div>
+                            </div>
+
+                            <div class="padding15 margin-in-col widget-rev">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>VNĐ/Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">Hủy Trước Chế Biến</div>
+                                    <h2 class="pull-right" id="AvgPreCancelPart">0/0</h2>
+                                </div>
+                            </div>
+                            <div class="padding15 margin-in-col widget-rev-odd">
+                                <div class="clearfix m-r-10">
+                                    <div class="pull-right">
+                                        <small>VNĐ/Hóa đơn</small>
+                                    </div>
+                                    <div class="infobox-content m-l-10">Hủy Sau Chế Biến</div>
+                                    <h2 class="pull-right" id="AvgAfterCancelPart">0/0</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--Thanh Toán-->
+                    <div class="row" style="padding: 0px 10px;">
+                        <span style="font-size: 23px;color: green;">III. Thanh Toán & Thu Ngân</span>
+                    </div>
+
+                    <!-- Payment -->
+                    <div class="row m-t-0 p-t-20">
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div class="padding15 margin-in-col widget-pay-odd">
+                                <div class="clearfix text-center header-title">
+                                    <h3>Tổng thanh toán</h3>  <span style="color:black"> (1) + (2) + (3) + (4) + (5) + (6)| Đơn vị (VNĐ)</span>
+                                    <div class="col-md-12">
+                                        <i class="fa fa-3x fa-money pull-left"></i>
+                                        <div class="pull-right">
+                                            <h2 id="TotalPayment">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="margin-in-col widget-pay">
+                                <div class="clearfix">
+                                    <div class="header-item">Tiền mặt bán hàng (1)</div>
+                                    <div class="col-md-6 pull-right">
+                                        <div class="pull-right">
+                                            <h2 id="TotalPaymentSales">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="margin-in-col widget-pay-odd">
+                                <div class="clearfix">
+                                    <div class="header-item">Tiền mặt [nạp thẻ] (2)</div>
+                                    <div class="col-md-6 pull-right">
+                                        <div class="pull-right">
+                                            <h2 id="TotalPaymentBuyCards">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="margin-in-col widget-pay">
+                                <div class="clearfix">
+                                    <div class="header-item">Thẻ thành viên (3)</div>
+                                    <div class="col-md-6 pull-right">
+                                        <div class="pull-right">
+                                            <h2 id="TotalPaymentWithMemberCard">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="margin-in-col widget-pay-odd">
+                                <div class="clearfix">
+                                    <div class="header-item">
+                                        Ví điện tử (4)
+                                    </div>
+                                    <div class="col-md-12 p-0">
+                                        <div class="col-md-6">
+                                            Momo :
+                                        </div>
+                                        <div class="col-md-6 left">
+                                            <h4 id="TotalPaymentE-Wallet-Momo" class="text-right p-b-0">0</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12 p-0">
+                                        <div class="col-md-6">
+                                            Gift Talk :
+                                        </div>
+                                        <div class="col-md-6 left">
+                                            <h4 id="TotalPaymentE-Wallet-GiftTalk" class="text-right p-b-0">0</h4>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 pull-right">
+                                        <div class="pull-right">
+                                            <h2 id="TotalPaymentE-Wallet">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="margin-in-col widget-pay">
+                                <div class="clearfix">
+                                    <div class="header-item">
+                                        Ngân hàng (5)
+                                    </div>
+                                    <div class="col-md-6 pull-right">
+                                        <div class="pull-right">
+                                            <h2 id="TotalPaymentBank">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="margin-in-col widget-pay-odd">
+                                <div class="clearfix">
+                                    <div class="header-item">
+                                        Thanh toán khác (6)
+                                    </div>
+                                    <div class="col-md-6 pull-right">
+                                        <div class="pull-right">
+                                            <h2 id="TotalPaymentOther">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-sm-12 col-xs-12">
+                            <div>
+                                <div class="padding15 margin-in-col bgm-blue">
+                                    <div class="clearfix text-center header-title">
+                                        <h3>Tổng lượt thanh toán</h3>
+                                        <span style="color:black">(1) + (2) + (3) + (4) + (5) + (6)| Đơn vị (Hóa đơn)</span>
+                                        <div class="col-md-12">
+                                            <i class="fa fa-3x fa-exchange pull-left"></i>
+                                            <div class="pull-right">
+                                                <h2 id="TotalTransactionPayments">0</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-in-col bgm-lightblue">
+                                    <div class="clearfix">
+                                        <div class="header-item">Tiền mặt[Bán hàng] (1)</div>
+                                        <div class="inline">
+                                            <div class="col-md-6 pull-right">
+                                                <div class="pull-right">
+                                                    <h2 id="TotalTransactionPaymentCashSales">0</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-in-col bgm-blue">
+                                    <div class="clearfix">
+                                        <div class="header-item">Thẻ thành viên (2)</div>
+                                        <div class="inline">
+                                            <div class="col-md-6 pull-right">
+                                                <div class="pull-right">
+                                                    <h2 id="TotalTransactionPaymentCashCards">0</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-in-col bgm-lightblue">
+                                    <div class="clearfix">
+                                        <div class="header-item">Thẻ thành viên (3)</div>
+                                        <div class="inline">
+                                            <div class="col-md-6 pull-right">
+                                                <div class="pull-right">
+                                                    <h2 id="TotalTransactionPaymentMembershipCard">0</h2>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-in-col bgm-blue">
+                                    <div class="clearfix">
+                                        <div class="header-item">Ví điện tử (4)</div>
+                                        <div class="col-md-12 p-0">
+                                            <div class="col-md-6">
+                                                Momo :
+                                            </div>
+                                            <div class="col-md-6 left">
+                                                <h4 id="TotalTransactionPaymentE-Wallet-Momo" class="text-right p-b-0">0</h4>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12 p-0">
+                                            <div class="col-md-6">
+                                                Gift Talk :
+                                            </div>
+                                            <div class="col-md-6 left">
+                                                <h4 id="TotalTransactionPaymentE-Wallet-GiftTalk" class="text-right p-b-0">0</h4>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 pull-right">
+                                            <div class="pull-right">
+                                                <h3 id="TotalTransactionPaymentE-Wallet">0</h3>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-in-col bgm-lightblue">
+                                    <div class="clearfix">
+                                        <div class="header-item">Ngân Hàng (5)</div>
+                                        <div class="col-md-6 pull-right">
+
+                                            <div class="pull-right">
+                                                <h2 id="TotalTransactionPaymentBank">0</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="margin-in-col bgm-blue">
+                                    <div class="clearfix">
+                                        <div class="header-item">Khác (6)</div>
+                                        <div class="col-md-6 pull-right">
+                                            <div class="pull-right">
+                                                <h2 id="TotalTransactionPaymentOther">0</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--Doanh Thu Cua Hang-->
+                <div class="card-body card-padding tab-pane fade in" id="Report_Store">
+                    @if (int.Parse(storeId) == 0)
+                    {
+                        <!--Top Doanh Thu Cua Hang-->
+                        <div class="row" style="padding: 0px 10px;">
+                            <span style="font-size: 23px;color: green;">IV. Top Doanh Thu Cửa Hàng</span>
+                        </div>
+                        <div class="row m-t-0 p-t-20">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding ">
+                                <table id="storeReportDatatable" class="table table-condensed table-striped table-bordered table-hover">
+                                    <!-- class="table table-condensed table-striped table-bordered table-hover">-->
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <label class="">STT</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Cửa hàng</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Hóa Đơn Bán Hàng</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Hóa đơn nạp thẻ</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Tổng sản phẩm</label>
+                                            </th>
+                                            <th>
+                                                <label class="">DT bán hàng</label>
+                                            </th>
+                                            <th>
+                                                <label class="">DT nạp thẻ</label>
+                                            </th>
+                                            <th>
+                                                <label class="">Tổng doanh thu</label>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+                <div class="card-body card-padding tab-pane fade in" id="Report_Product">
+                    @if (int.Parse(storeId) == 0)
+                    {
+                        <div class="col-md-3 p-l-10 p-b-10">
+                            <div class="fg-line">
+                                <select id="listStoreIdForProduct" class="selectpicker" data-live-search="true" data-size="7"></select>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-3 p-l-10 p-b-10" style="display:none">
+                            <div class="fg-line">
+                                <select id="listStoreIdForProduct" class="selectpicker" data-live-search="true" data-size="7">
+                                    <option value='@storeId'>storeId</option>
+                                </select>
+                            </div>
+                        </div>
+                    }
+                    <!--Top Doanh Thu-->
+                    <div class="row" style="padding: 0px 10px;">
+                        <span style="font-size: 23px;color: green;">@(int.Parse(storeId) != 0 ? Html.Raw("V") : Html.Raw("IV")). Top Doanh Thu Sản Phẩm</span>
+                    </div>
+
+                    <div class="row m-t-0 p-t-20">
+                        <div class="col-md-12 col-sm-12 col-xs-12 p-l-10 p-r-10">
+                            <div id="productContent" class="tab-pane fade in active">
+                                <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+                                    <table id="tblProduct" class="table table-condensed table-striped table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2">
+                                                    <label class="">STT</label>
+                                                </th>
+                                                <th rowspan="2">
+                                                    <label class="">Tên sản phẩm</label>
+                                                </th>
+                                                <th rowspan="2">
+                                                    <label class="">Số lượng bán ra</label>
+                                                </th>
+                                                <th colspan="2">
+                                                    <label class="">Doanh thu</label>
+                                                </th>
+                                            </tr>
+                                            <tr>
+                                                <th><small>Trước giảm giá</small></th>
+                                                <th><small>Sau giảm giá</small></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <!--Cashier-->
+                <div class="card-body card-padding tab-pane fade in" id="Cashier_Data">
+                    <div class="row" style="padding: 0px 10px;">
+                        <span style="font-size: 23px;color: green;">Thống kê doanh thu theo nhân viên</span>
+                    </div>
+                    <div class="row m-t-0 p-t-20">
+                        @if (int.Parse(storeId) == 0)
+            {
+                            <div class="col-md-3 p-l-10 p-b-10">
+                                <div class="fg-line">
+                                    <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7"></select>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-3 p-l-10 p-b-10" style="display:none">
+                                <div class="fg-line">
+                                    <select id="listStoreId" class="selectpicker" data-live-search="true" data-size="7">
+                                        <option value='@storeId'>storeId</option>
+                                    </select>
+                                </div>
+                            </div>
+                        }
+                        <div class="col-md-12 col-sm-12 col-xs-12 p-l-10 p-r-10">
+                            <table id="tblCashier" class="table table-condensed table-striped table-bordered table-hover">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">
+                                            <label class="">Họ và tên</label>
+                                        </th>
+                                        <th colspan="5">
+                                            <label>Thành phần</label>
+                                        </th>
+                                        <th rowspan="2">
+                                            <label class="">Tổng</label>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            <b class=""><small>Tiền mặt [Sales]</small></b>
+                                        </th>
+                                        <th>
+                                            <b class=""><small>Thẻ thành viên</small></b>
+                                        </th>
+                                        <th>
+                                            <b class=""><small>E-Wallet</small></b>
+                                        </th>
+                                        <th>
+                                            <b class=""><small>Bank</small></b>
+                                        </th>
+                                        <th>
+                                            <b class=""><small>Other</small></b>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+<input type="hidden" id="modeReport" value="@(int.Parse(storeId))" />
+@section scripts{
+
+    <script>
+        var storeMode = @storeId;
+        $(function () {
+            $('#datetimepicker').datetimepicker({
+                'maxDate': moment(),
+                format: 'DD/MM/YYYY',
+                defaultDate: moment(),
+            });
+        });
+        $(document).ready(function () {
+            setupListStoreFilter();
+            var isCurrentTab = 1;
+            var isOpenTabProduct = false;
+            var isOpenTabCashier = false;
+            var isOpenTabStore = false;
+            var isOpenTabOverview = false;
+            var isSearch = false;
+
+            $("#Report_Data_Tab").on('click', function () {
+                if (!isOpenTabOverview) {
+                    isCurrentTab = 1;
+                    isOpenTabOverview = true;
+                    LoadDataOverview();
+                }
+            })
+            $("#Report_ProductTab").on('click', function () {
+                if (!isOpenTabProduct) {
+                    isCurrentTab = 3;
+                    isOpenTabProduct = true;
+                    LoadDatatableTabProductReport();
+                }
+            });
+            $("#Report_CashierTab").on('click', function () {
+                if (!isOpenTabCashier) {
+                    isCurrentTab = 4;
+                    isOpenTabCashier = true;
+                    LoadDatatableTabCashierReport();
+                }
+            });
+            $("#Report_StoreTab").on('click', function () {
+                if (!isOpenTabStore) {
+                    isCurrentTab = 2;
+                    isOpenTabStore = true;
+                    LoadDatatableTabStoreReport();
+                }
+            });
+            var titleTmp = "Tổng quan ngày: " + $("#date-time").val();
+            var timeRange = moment().format("HH:mm");
+            $("#title-date").text(titleTmp);
+            $("#dateRange").text("Tính đến " + timeRange);
+            $('#btnSearch').on('click', function () {
+                //Text Time
+                $("#title-date").text("Tổng quan ngày: " + $("#date-time").val());
+                var now = new Date();
+                var month = now.getMonth() + 1;
+                var strnow = now.getDate() + "/" + month + "/" + now.getFullYear();
+                var date = $("#date-time").val();
+                if (strnow != date) {
+                    $("#dateRange").text("");
+                }
+                // Reset All status
+                isOpenTabCashier = false;
+                isOpenTabProduct = false;
+                isOpenTabStore = false;
+                isOpenTabOverview = false;
+
+                if (isCurrentTab == 1) {
+                    isOpenTabOverview = true;
+                    LoadDataOverview();
+                }
+                if (isCurrentTab == 2) {
+                    isOpenTabStore = true;
+                    LoadDatatableTabStoreReport();
+                }
+                if (isCurrentTab == 3) {
+                    isOpenTabProduct = true;
+                    LoadDatatableTabProductReport();
+                }
+                if (isCurrentTab == 4) {
+                    isOpenTabCashier = true;
+                    LoadDatatableTabCashierReport();
+                }
+            });
+            LoadDataOverview();
+        })
+
+        function setupListStoreFilter() {
+            if (storeMode != 0) {
+                var content = "";
+                content += "<option value='" + storeMode + "'>" + "Data" + "</option>";
+                $("#listStoreId").html(content);
+                $("#listStoreIdForProduct").html(content);
+                $("#listStoreId").selectpicker('refresh');
+                $("#listStoreIdForProduct").selectpicker('refresh');
+            } else {
+                $.ajax({
+                    type: "GET",
+                    url: "@(Url.Action("GetListStore", "OverviewMonthDashBoard"))",
+                    success: function (data) {
+                        var content = "";
+                        content += "<option value='0'>" + "Hệ Thống" + "</option>";
+                        for (var i = 0; i < data.listresult.length; ++i) {
+                            content += "<option value='" + data.listresult[i].storeId + "'>" + data.listresult[i].storeName + "</option>";
+                        }
+                        $("#listStoreId").html(content);
+                        $("#listStoreIdForProduct").html(content);
+                        $("#listStoreId").selectpicker('refresh');
+                        $("#listStoreIdForProduct").selectpicker('refresh');
+                    },
+                    error: function (error) {
+                        alert("Error Occured")
+                    }
+                });
+            }
+        }
+        var setupRevenuePieChart = function (overViewData) {
+            $('#revenuePieChart').highcharts({
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Doanh thu thực tế'
+                },
+                subtitle: {
+                    text: 'Tổng số: <b>' + toMoney(overViewData.TotalRevenueWithoutDiscountAndCard, ',', '') + '</b> VNĐ'
+                },
+                tooltip: {
+                    headerFormat: '',
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>:<br/>Doanh thu: <b>{point.y}</b> VNĐ'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false
+                        },
+                        showInLegend: true,
+                    }
+                },
+                series: [{
+                    name: 'Doanh thu thực tế',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'Tại cửa hàng',
+                        y: overViewData.TotalRevenueAtStore,
+                        color: 'rgba(200, 81, 81, 1)'
+                    }, {
+                        name: 'Giao hàng',
+                        y: overViewData.TotalRevenueDelivery,
+                        color: 'rgba(204, 155, 30, 1)'
+                    }, {
+                        name: 'Mang về',
+                        y: overViewData.TotalRevenueTakeAway,
+                        color: 'darkolivegreen'
+                    },
+                    ]
+                }]
+
+            });
+        }
+
+        var setupBillPieChart = function (overViewData) {
+            //HighCharts
+            $('#billPieChart').highcharts({
+                chart: {
+                    type: 'pie'
+                },
+                title: {
+                    text: 'Hóa đơn bán hàng'
+                },
+                subtitle: {
+                    text: 'Tổng hóa đơn bán hàng: <b>' + (overViewData.TotalOrder - overViewData.TotalOrderCard) + '</b>'
+                },
+                plotOptions: {
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false
+                        },
+                        showInLegend: true
+                    }
+                },
+
+                tooltip: {
+                    headerFormat: '',
+                    pointFormat: '<span style="color:{point.color}">{point.name}</span>:<br/>Số lượng: <b>{point.y}</b>'
+                },
+                series: [{
+                    name: 'Hóa đơn bán hàng',
+                    colorByPoint: true,
+                    data: [{
+                        name: 'Tại cửa hàng',
+                        y: overViewData.TotalOrderAtStore,
+                        color: 'rgba(200, 81, 81, 1)'
+                    }, {
+                        name: 'Giao hàng',
+                        y: overViewData.TotalOrderDelivery,
+                        color: 'rgba(204, 155, 30, 1)'
+                    }, {
+                        name: 'Mang về',
+                        y: overViewData.TotalOrderTakeAway,
+                        color: 'darkolivegreen'
+                    },
+                    ]
+                }]
+
+            });
+        }
+
+        function LoadDatatableTabProductReport() {
+            if (!$.fn.DataTable.isDataTable('#tblProduct')) {
+                initProductDatatable();
+            } else {
+                RefreshDatatable("#tblProduct");
+            }
+        }
+        function LoadDatatableTabStoreReport() {
+            var typeReport = parseInt($("#modeReport").val());
+            if (typeReport == 0) {
+                if (!$.fn.DataTable.isDataTable('#storeReportDatatable')) {
+                    initStoreDatatable();
+                } else {
+                    RefreshDatatable("#storeReportDatatable");
+                }
+            }
+        }
+        function LoadDatatableTabCashierReport() {
+            if (!$.fn.DataTable.isDataTable('#tblCashier')) {
+                InitCashierDatatable();
+            } else {
+                RefreshDatatable("#tblCashier");
+            }
+        }
+
+
+        function LoadDataOverview() {
+            $.ajax({
+                type: "GET",
+                data: { "dateSearch": $("#date-time").val() },
+                url: "@Url.Action("GetDataDashBoard")",
+                success: function (result) {
+                    //Revenue
+                    $("#TotalRevenueWithoutDiscount").text(toMoney(result.OverviewData.TotalRevenueWithDiscount - result.OverviewData.TotalDiscount, ',', ''));
+                    //$("#TotalRevenueWithoutDiscount").text(toMoney(result.OverviewData.TotalRevenue, ',', ''));
+                    $("#TotalRevenueWithDiscount").text(toMoney(result.OverviewData.TotalRevenueWithDiscount - result.OverviewData.TotalRevenueCard, ',', ''));
+                    $("#TotalDiscount").text(toMoney(result.OverviewData.TotalDiscount, ',', ''));
+                    $("#TotalRevenueWithoutDiscountAndCard").text(toMoney(result.OverviewData.TotalRevenueWithoutDiscountAndCard, ',', ''));
+                    $("#TotalRevenueCard").text(toMoney(result.OverviewData.TotalRevenueCard, ',', ''));
+
+                    //Total Order
+                    $("#TotalBill").text(toMoney(result.OverviewData.TotalOrder, ',', ''));
+                    $("#TotalBillAtStore").text(toMoney(result.OverviewData.TotalOrderAtStore, ',', ''));
+                    $("#TotalBillTakeAway").text(toMoney(result.OverviewData.TotalOrderTakeAway, ',', ''));
+                    $("#TotalBillDelivery").text(toMoney(result.OverviewData.TotalOrderDelivery, ',', ''));
+                    $("#TotalBillCard").text(toMoney(result.OverviewData.TotalOrderCard, ',', ''));
+
+                    //PartII
+                    //PartII-1 Doanh thu ban hang
+                    $("#finalRevenue").text(toMoney(result.OverviewData.TotalRevenueWithoutDiscountAndCard, ',', ''));
+                    $("#finalTotalBill").text(toMoney(result.OverviewData.TotalOrder - result.OverviewData.TotalOrderCard, ',', ''));
+                    $("#avgFinalReceipt").text(toMoney(result.OverviewData.AvgRevenueOrder, ',', ''));
+                    $("#avgTotalProductPerReceipt").text(result.OverviewData.AvgProductOrder.toFixed(2));
+                    //Chart
+                    setupRevenuePieChart(result.OverviewData);
+                    setupBillPieChart(result.OverviewData)
+                    //Part
+                    $("#TotalRevenueAtStorePart").text(toMoney(result.OverviewData.TotalRevenueAtStore, ',', ''));
+                    $("#TotalBillAtStorePart").text(toMoney(result.OverviewData.TotalOrderAtStore, ',', ''));
+                    $("#AvgRevenureAtstorePart").text(toMoney((result.OverviewData.TotalRevenueAtStore / result.OverviewData.TotalOrderAtStore).toFixed(0), ',', ''));
+                    $("#AvgProductAtstorePart").text(result.OverviewData.AvgProductOrderAtStore.toFixed(2));
+                    //Part
+                    $("#TotalRevenueDeliveryPart").text(toMoney(result.OverviewData.TotalRevenueDelivery, ',', ''));
+                    $("#TotalBillDeliveryPart").text(toMoney(result.OverviewData.TotalOrderDelivery, ',', ''));
+                    $("#AvgRevenureDeliveryPart").text(toMoney((result.OverviewData.TotalRevenueDelivery / result.OverviewData.TotalOrderDelivery).toFixed(0), ',', ''));
+                    $("#AvgProductDeliveryPart").text(result.OverviewData.AvgProductOrderDelivery.toFixed(2));
+                    //Part
+                    $("#TotalRevenueTakeAwayPart").text(toMoney(result.OverviewData.TotalRevenueTakeAway, ',', ''));
+                    $("#TotalBillTakeAwayPart").text(toMoney(result.OverviewData.TotalOrderTakeAway, ',', ''));
+                    $("#AvgRevenureTakeAwayPart").text(toMoney((result.OverviewData.TotalRevenueTakeAway / result.OverviewData.TotalOrderTakeAway).toFixed(0), ',', ''));
+                    $("#AvgProductTakeAwayPart").text(result.OverviewData.AvgProductOrderTakeAway.toFixed(2));
+                    //Part
+                    $("#TotalRevenueCancelPart").text(toMoney(result.OverviewData.TotalRevenuePrecancel + result.OverviewData.TotalRevenueAftercancel, ',', ''));
+                    $("#TotalBillCancelPart").text(toMoney(result.OverviewData.TotalOrderAfterCancel + result.OverviewData.TotalOrderPreCancel, ',', ''));
+                    $("#AvgPreCancelPart").text(toMoney(result.OverviewData.TotalRevenuePrecancel, ',', '') + "/" + result.OverviewData.TotalOrderPreCancel);
+                    $("#AvgAfterCancelPart").text(toMoney(result.OverviewData.TotalRevenueAftercancel, ',', '') + "/" + result.OverviewData.TotalOrderAfterCancel);
+
+                    //Payment
+                    $("#TotalPayment").text(toMoney(result.PaymentData.TotalPayment, ',', ''));
+                    $("#TotalPaymentSales").text(toMoney(result.PaymentData.TotalPaymentForSales, ',', ''));
+                    $("#TotalPaymentBuyCards").text(toMoney(result.PaymentData.TotalPaymentBuyCard, ',', ''));
+                    $("#TotalPaymentWithMemberCard").text(toMoney(result.PaymentData.TotalPaymentCard, ',', ''));
+                    $("#TotalPaymentE-Wallet").text(toMoney(result.PaymentData.TotalPaymentE_Wallet, ',', ''));
+                    $("#TotalPaymentE-Wallet-Momo").text(toMoney(result.PaymentData.TotalPaymentE_Wallet_Momo, ',', ''));
+                    $("#TotalPaymentE-Wallet-GiftTalk").text(toMoney(result.PaymentData.TotalPaymentE_Wallet_GiftTalk, ',', ''));
+                    $("#TotalPaymentBank").text(toMoney(result.PaymentData.TotalPaymentBank, ',', ''));
+                    $("#TotalPaymentOther").text(toMoney(result.PaymentData.TotalPaymentOther, ',', ''));
+
+                    $("#TotalTransactionPayments").text(toMoney(result.PaymentData.TotalTransactionPayment, ',', ''));
+                    $("#TotalTransactionPaymentCashSales").text(toMoney(result.PaymentData.TotalTransactionPaymentForSales, ',', ''));
+                    $("#TotalTransactionPaymentCashCards").text(toMoney(result.PaymentData.TotalTransactionPaymentBuyCard, ',', ''));
+                    $("#TotalTransactionPaymentMembershipCard").text(toMoney(result.PaymentData.TotalTransactionPaymentCard, ',', ''));
+                    $("#TotalTransactionPaymentE-Wallet").text(toMoney(result.PaymentData.TotalTransactionPaymentE_Wallet, ',', ''));
+                    $("#TotalTransactionPaymentE-Wallet-Momo").text(toMoney(result.PaymentData.TotalTransactionPaymentE_Wallet_Momo, ',', ''));
+                    $("#TotalTransactionPaymentE-Wallet-GiftTalk").text(toMoney(result.PaymentData.TotalTransactionPaymentE_Wallet_GiftTalk, ',', ''));
+                    $("#TotalTransactionPaymentBank").text(toMoney(result.PaymentData.TotalTransactionPaymentBank, ',', ''));
+                    $("#TotalTransactionPaymentOther").text(toMoney(result.PaymentData.TotalTransactionPaymentOther, ',', ''));
+
+                },
+                error: function () {
+                    ShowMessage("Có lỗi xảy ra", 1);
+                }
+            });
+        }
+
+
+        function RefreshDatatable(datatableId) {
+            var oTable = $(datatableId).dataTable();
+            oTable._fnPageChange(0);
+            oTable._fnAjaxUpdate();
+        }
+
+        function InitCashierDatatable() {
+            $("#tblCashier").dataTable({
+                "bFilter": false,
+                "bSort": true,
+                "bRetrieve": true,
+                "bDestroy": true,
+                "bServerSide": false,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("CashierData", "OverviewDateDashBoard")",
+                "bProcessing": true,
+                "iDisplayLength": 50,
+                "aLengthMenu": [50],
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "dateSearch", "value": $("#date-time").val() });
+                    aoData.push({ "name": "selectedStore", "value": $('#listStoreId').val() });
+                },
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                    "sSearchPlaceholder": "Tên danh mục"
+                },
+                "aoColumnDefs": [
+                     {
+                         "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                         "sClass": "text-center"
+                     },
+                    {
+                        "aTargets": [1, 2, 3, 4, 5],
+                        "mRender": function (data, type, row) {
+                            var money = toMoney(data, ',', '');
+                            return money;
+                        }
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var money = toMoney(row[1] + row[2] + row[3] + row[4] + row[5], ',', '');
+                            return money;
+                        }
+                    }
+                ],
+                "bAutoWidth": false
+            }),
+            function (error) {
+                console.log(error)
+            }
+        }
+
+        var initProductDatatable = function () {
+            $("#tblProduct").dataTable({
+                "bFilter": false,
+                "bSort": true,
+                "bRetrieve": false,
+                "bDestroy": true,
+                "bScrollCollapse": true,
+                "bServerSide": false,
+                "bDeferRender": true,
+                "sAjaxSource": "@Url.Action("ProductData", "OverviewDateDashBoard")",
+                "bProcessing": true,
+                "iDisplayLength": 50,
+                "aLengthMenu": [50],
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "dateSearch", "value": $("#date-time").val() });
+                    aoData.push({ "name": "selectedStore", "value": $('#listStoreIdForProduct').val() });
+                },
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3, 4],
+                    },
+                    {
+                        "aTargets": [0, 2, 3, 4],
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [3, 4],
+                        "mRender": function (data, type, row) {
+                            var money = toMoney(data, ',', '');
+                            return money;
+                        }
+                    }
+                ],
+                "bAutoWidth": false
+            });
+        }
+        var initStoreDatatable = function () {
+            $("#storeReportDatatable").dataTable({
+                "bFilter": false,
+                "bSort": true,
+                "bRetrieve": true,
+                "bDestroy": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("GetDataStore", "OverviewDateDashBoard")",
+                "bProcessing": true,
+                "iDisplayLength": 50,
+                "aLengthMenu": [50],
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "dateSearch", "value": $("#date-time").val() })
+                },
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                    "sSearchPlaceholder": "Tên cửa hàng"
+
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3, 4, 5, 6, 7],
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [0, 1],
+                        "bSortable": false
+                    },
+                    {
+                        "aTargets": [5, 6, 7],
+                        "mRender": function (data, type, row) {
+                            var money = toMoney(data, ',', '');
+                            return money;
+                        }
+                    }],
+                "bAutoWidth": false
+            });
+        }
+
+    </script>
+}

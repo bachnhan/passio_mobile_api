@@ -1,0 +1,1521 @@
+﻿<!-- Overall statistics -->
+<style>
+    .chartOption {
+        cursor: pointer;
+    }
+
+    .widget-header {
+        cursor: pointer;
+    }
+
+    .infobox {
+        height: 100px !important;
+    }
+
+    .chartOptionActive {
+        font-weight: bold;
+    }
+
+    #storePieChart {
+        margin-top: 80px;
+    }
+
+    /*  bhoechie tab */
+    div.bhoechie-tab-container {
+        z-index: 10;
+        background-color: #ffffff;
+        padding: 0;
+        border-radius: 4px;
+        -moz-border-radius: 4px;
+        /*border: 1px solid #ddd;*/
+        -webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        -moz-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+        background-clip: padding-box;
+        opacity: 0.97;
+        filter: alpha(opacity=97);
+    }
+
+    div.bhoechie-tab-menu {
+        padding-right: 0;
+        padding-left: 0;
+        padding-bottom: 0;
+        background-color: rgba(44, 73, 73, 1);
+        border-top-right-radius: 4px;
+        border-top-left-radius: 4px;
+    }
+
+    a.list-group-item {
+        color: #ffffff !important;
+        background-color: rgba(44, 73, 73, 1) !important;
+        border: 0 !important;
+    }
+
+        a.list-group-item:hover,
+        button.list-group-item:hover,
+        a.list-group-item:focus,
+        button.list-group-item:focus {
+            text-decoration: none !important;
+            color: #ffffff !important;
+            background-color: rgba(44, 73, 73, 1) !important;
+        }
+
+    .no-padding {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .bhoechie-tab-menu .list-group {
+        margin-bottom: 0;
+        /*border: 0;*/
+    }
+
+        .bhoechie-tab-menu .list-group li {
+            width: 25%;
+        }
+
+        .bhoechie-tab-menu .list-group a {
+            margin-bottom: 0;
+        }
+
+            .bhoechie-tab-menu .list-group a .glyphicon,
+            .bhoechie-tab-menu .list-group a .fa {
+                color: #fff;
+            }
+
+            .bhoechie-tab-menu .list-group a:first-child {
+                border-radius: 0;
+                -moz-border-radius: 0;
+            }
+
+            /*.bhoechie-tab-menu .list-group  a:last-child {
+            border-bottom-right-radius: 0;
+            -moz-border-bottom-right-radius: 0;
+        }*/
+
+            .bhoechie-tab-menu .list-group a.active,
+            .bhoechie-tab-menu .list-group a.active .glyphicon,
+            .bhoechie-tab-menu .list-group a.active .fa {
+                background-color: #fff !important;
+                color: rgba(44, 73, 73, 1) !important;
+            }
+
+                .bhoechie-tab-menu .list-group a.active:after {
+                    content: '';
+                    position: absolute;
+                    top: 100%;
+                    margin-left: -44px;
+                    /* border-left: 0; */
+                    border-right: 13px solid transparent;
+                    border-left: 13px solid transparent;
+                    border-top: 10px solid rgba(44, 73, 73, 1);
+                }
+
+    div.bhoechie-tab-content {
+        background-color: #ffffff;
+        /* border: 1px solid #eeeeee; */
+        padding-left: 10px;
+        padding-top: 10px;
+    }
+
+    a.list-group-item,
+    button.list-group-item {
+        color: #fff;
+    }
+
+    /*div.bhoechie-tab-content > .col-lg-6, .col-md-6 {
+        padding-top: 50px;
+    }
+
+    div.bhoechie-tab-content > .col-sm-12, .col-xs-12 {
+        padding-top: 20px;
+    }
+
+    div.bhoechie-tab div.bhoechie-tab-content:not(.active) {
+        display: none;
+    }*/
+
+    .row {
+        margin-top: 10px;
+    }
+
+    .clearfix > * {
+        color: #fff;
+    }
+
+    .nav-tabs {
+        border-bottom: 1px solid rgba(44, 73, 73, 1);
+    }
+
+    .infobox-data > h1, h2, h3, h4 {
+        color: #fff;
+        margin-top: 0;
+    }
+
+    .padding15 {
+        padding-bottom: 15px;
+        padding-top: 15px;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .bgm-wheat {
+        background-color: wheat !important;
+    }
+
+    .bgm-cadet {
+        background-color: cadetblue;
+    }
+
+    .bgm-seagreen {
+        background-color: seagreen;
+    }
+
+    .bgm-sandbrown {
+        background-color: sandybrown;
+    }
+
+    .margin-in-col {
+        margin-left: -5px;
+        margin-right: -5px;
+    }
+
+    .my-widget {
+        border-radius: 10px;
+        margin-right: 15px;
+    }
+
+    .widget-rev {
+        background-color: darkslategrey;
+    }
+
+    .widget-rev-odd {
+        background-color: rgba(44, 73, 73, 1);
+    }
+
+    .wdidget-as {
+        background-color: rgba(200, 81, 81, 1);
+    }
+
+    .wdidget-as-odd {
+        background-color: rgba(191, 79, 79, 1);
+    }
+
+    .widget-del {
+        background-color: rgba(204, 155, 30, 1);
+    }
+
+    .widget-del-odd {
+        background-color: rgba(195, 148, 29, 1);
+    }
+
+    .wdidget-ta {
+        background-color: darkolivegreen;
+    }
+
+    .wdidget-ta-odd {
+        background-color: rgba(83, 103, 50, 1);
+    }
+
+    .infobox-content {
+        visibility: hidden;
+    }
+
+    .dataTables_wrapper.no-footer .dataTables_scrollBody {
+        border-bottom: 1px solid lightgray;
+    }
+
+    #storeReportDatatable > thead {
+        visibility: hidden;
+        border: 0;
+    }
+
+    #storeReportDatatable tr[role=row] {
+        cursor: pointer;
+    }
+
+    .tableDiv-responsive {
+        width: 100%;
+    }
+</style>
+
+<!--Revenue-->
+
+
+<div id="monthOverviewChartContainer" class="row" style="display:none">
+    <div class="container-fluid">
+        <div class="bhoechie-tab-container" id="revenueMonthChart"></div>
+    </div>
+</div>
+<div class="row" style="padding: 0px 10px;">
+    <span style="font-size: 23px;color: green;">I. Doanh Thu & Hóa đơn</span>
+</div>
+<div class="row m-t-0 p-t-20">
+    
+    <div class="col-md-6 col-xs-12">
+        <div class="padding15 margin-in-col widget-rev-odd">
+            <div class="clearfix text-center" style="color:white">
+                <h3>Tổng doanh thu</h3>  (3) + (4)
+                <center style="font-weight: bolder">
+                    <i class="fa fa-3x fa-usd pull-left"></i>
+                    <div class="pull-right">
+                        <h1 style="margin-bottom: 0; margin-top: 0; color:white" id="totalRevenue"></h1>
+                    </div>
+                </center>
+                @*<div id="date"></div>*@
+            </div>
+        </div>
+        @*<div class="padding15 margin-in-col widget-rev">
+            <div class="clearfix">
+                <div>Doanh thu hoạt động kinh doanh(Bán hàng + Nạp thẻ)</div>
+                <div class="col-md-6">
+                    <div id="avgTotalAmount" style="display: none;" class="">
+                        <span style="font-size: 14px">Avg </span> <strong style="font-size: 20px"></strong><small> VNĐ/</small>ngày
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="totalRevenue"></h2>
+                    </div>
+                </div>
+            </div>
+            </div>*@
+
+        <div class="padding15 margin-in-col widget-rev-odd">
+            <div class="clearfix">
+                <div>Doanh thu trước giảm giá (1)</div>
+                <div class="col-md-6">
+                    <div id="avgTotalAmount" style="display: none;" class="">
+                        <span style="font-size: 14px">Avg </span> <strong style="font-size: 20px"></strong><small> VNĐ/</small>ngày
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="tongDoanhThu"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="padding15 margin-in-col widget-rev">
+            <div class="clearfix">
+                <div>Giảm giá bán hàng (2)</div>
+                <div class="col-md-6">
+                    <div id="avgTotalDiscount" style="display: none;" class="">
+                        <span style="font-size: 14px">Avg </span> <strong style="font-size: 20px"></strong><small> VNĐ/</small>ngày
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="tongGiamGia"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="padding15 margin-in-col widget-rev-odd">
+            <div class="clearfix">
+                <div>
+                    Doanh thu Thực Tế (3)
+                    <br /> (3) = (1) - (2)
+                </div>
+                <div class="col-md-6">
+                    <div id="avgFinalAmountCash" style="display: none;" class="">
+                        <span style="font-size: 14px">Avg </span> <strong style="font-size: 20px"></strong><small> VNĐ/</small>ngày
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="sauGiamGiaTienMat"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="padding15 margin-in-col widget-rev">
+            <div class="clearfix">
+                <div>Doanh thu nạp thẻ (4 )</div>
+                <div class="col-md-6">
+                    <div id="avgFinalAmountCard" style="display: none;" class="">
+                        <span style="font-size: 14px">Avg </span> <strong style="font-size: 20px"></strong><small> VNĐ/</small>ngày
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="sauGiamGiaThe"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-xs-12">
+        <div>
+            <div class="padding15 margin-in-col bgm-blue">
+                <div class="clearfix text-center" style="color:white">
+                    <h3>Tổng số hóa đơn</h3>
+
+                    <center style="font-weight: bolder">
+                        <i class="fa fa-3x fa-exchange pull-left"></i>
+                        <div class="pull-right">
+                            <h2 style="margin-bottom: 0; margin-top: 0;" id="totalBillOrder"></h2>
+                        </div>
+                    </center>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-lightblue">
+                <div class="clearfix">
+                    <div>Tại quán</div>
+                    <div class="inline">
+                        @*<div class="col-md-6">
+                            <h2 style="margin-bottom: 0; margin-top: 0; font-size: 27px" id="numberCashPayment"></h2>
+                        </div>*@
+                        <div class="col-md-6 col-md-offset-6">
+                            <div class="pull-right">
+                                <h2 style="margin-bottom: 0; margin-top: 0" id="totalBillAtStore"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-blue">
+                <div class="clearfix">
+                    <div>Mang đi</div>
+                    <div class="inline">
+                        @*<div class="col-md-6">
+                        <h2 style="margin-bottom: 0; margin-top: 0; font-size: 27px" id="numberMemberPayment"></h2>
+                    </div>*@
+                        <div class="col-md-6 col-md-offset-6">
+                            <div class="pull-right">
+                                <h2 style="margin-bottom: 0; margin-top: 0;" id="totalBillTakeAway"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="padding15 margin-in-col bgm-lightblue">
+                <div class="clearfix">
+                    <div>Giao hàng</div>
+                    <div class="inline">
+                        @*<div class="col-md-6">
+                            <h2 style="margin-bottom: 0; margin-top: 0; font-size: 27px" id="numberCashPaymentOrderCard"></h2>
+                        </div>*@
+                        <div class="col-md-6 col-md-offset-6">
+                            <div class="pull-right">
+                                <h2 style="margin-bottom: 0; margin-top: 0" id="totalBillDelivery"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="padding15 margin-in-col bgm-blue">
+                <div class="clearfix">
+                    <div>Nạp Thẻ</div>
+                            <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="totalBillCardPayment"></h2>
+                            </div>
+                        </div>
+                    </div>
+
+            @*<div class="padding15 margin-in-col bgm-lightblue">
+                <div class="clearfix">
+                    <div>MasterCard</div>
+                    <div class="inline">
+                        <div class="col-md-6">
+                            <h2 style="margin-bottom: 0; margin-top: 0; font-size: 27px" id="numberMasterCardPayment"></h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <h2 style="margin-bottom: 0; margin-top: 0;" id="totalMasterCardPayment"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-blue">
+                <div class="clearfix">
+                    <div>VisaCard</div>
+                    <div class="inline">
+                        <div class="col-md-6">
+                            <h2 style="margin-bottom: 0; margin-top: 0; font-size: 27px" id="numberVisaCardPayment"></h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <h2 style="margin-bottom: 0; margin-top: 0;" id="totalVisaCardPayment"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-lightblue">
+                <div class="clearfix">
+                    <div>Khác</div>
+                    <div class="inline">
+                        <div class="col-md-6">
+                            <h2 style="margin-bottom: 0; margin-top: 0; font-size: 27px" id="numberOtherPayment"></h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <h2 style="margin-bottom: 0; margin-top: 0;" id="totalOtherPayment"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-blue">
+                <div class="clearfix">
+                    <center>
+                        <div>Tổng</div>
+                    </center>
+                    <div class="inline">
+                        <div class="col-md-6">
+                            <h2 style="margin-bottom: 0; margin-top: 0; font-size: 27px" id="numberTotalPayment"></h2>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="pull-right">
+                                <h2 style="margin-bottom: 0; margin-top: 0;" id="totalPayment"></h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>*@
+        </div>
+        @*<div class="col-md-6">
+            <div class="padding15 margin-in-col bgm-blue">
+                <div class="clearfix">
+                    <center>
+                        <i class="fa fa-4x fa-exchange"></i>
+                        <br/>
+                        Loại hình thanh toán
+                        <br/>
+                        <br/>
+                    </center>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-lightblue">
+                <div class="clearfix">
+                    <div>Tiên mặt</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="numberCashPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-blue">
+                <div class="clearfix">
+                    <div>Thẻ thành viên</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="numberMemberPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-lightblue">
+                <div class="clearfix">
+                    <div>Thẻ Momo</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="numberMomoPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-lightblue">
+                    <div class="clearfix">
+                        <div>MasterCard</div>
+                        <div class="pull-right">
+                            <h2 style="margin-bottom: 0; margin-top: 0;" id="numberMasterCardPayment"></h2>
+                        </div>
+                    </div>
+                </div>
+            <div class="padding15 margin-in-col bgm-blue">
+                <div class="clearfix">
+                    <div>VisaCard</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="numberVisaCardPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-lightblue">
+                <div class="clearfix">
+                    <div>Khác</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="numberOtherPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col bgm-blue">
+                <div class="clearfix">
+                    <center>
+                        <div>Tổng</div>
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="numberTotalPayment"></h2>
+                    </center>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="padding15 margin-in-col widget-del-odd">
+                <div class="clearfix">
+                    <center>
+                        <i class="fa fa-4x fa-calculator"></i>
+                        <br/>
+                        Lượng tiền thanh toán
+                        <br/>
+                        <br/>
+                    </center>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col widget-del">
+                <div class="clearfix">
+                    <div>Tiên mặt</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="totalCashPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col widget-del-odd">
+                <div class="clearfix">
+                    <div>Thẻ thành viên</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="totalMemberPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col widget-del">
+                <div class="clearfix">
+                    <div>Thẻ Momo</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="totalMomoPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col widget-del">
+                <div class="clearfix">
+                    <div>MasterCard</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="totalMasterCardPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col widget-del-odd">
+                <div class="clearfix">
+                    <div>VisaCard</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="totalVisaCardPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col widget-del">
+                <div class="clearfix">
+                    <div>Khác</div>
+                    <div class="pull-right">
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="totalOtherPayment"></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="padding15 margin-in-col widget-del-odd">
+                <div class="clearfix">
+                    <center>
+                        <div>Tổng</div>
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="totalPayment"></h2>
+                    </center>
+                </div>
+            </div>
+        </div>*@
+    </div>
+
+    @*<div class="col-md-3 col-xs-12">
+        <div class="infobox infobox-block infobox-dark bgm-teal">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-calculator"></i>
+            </div>
+            <div class="infobox-data padding15">
+                <div>Tổng doanh thu</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>VNĐ</small>
+                    </div>
+                    <div>
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="sauGiamGiaTienMat"></h2>
+                    </div>
+                </div>
+                <div id="avgFinalAmountCash" style="display: none;">
+                    <div class="pull-right">
+                        <small>VNĐ/</small>ngày
+                    </div>
+                    <span style="font-size: 14px">Avg</span> <strong style="font-size: 16px"></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-xs-12">
+        <div class="infobox infobox-block infobox-dark bgm-lightblue">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-calculator"></i>
+            </div>
+            <div class="infobox-data padding15">
+                <div>Doanh thu theo thẻ</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>VNĐ</small>
+                    </div>
+                    <div>
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="sauGiamGiaThe"></h2>
+                    </div>
+                </div>
+                <div id="avgFinalAmountCard" style="display: none;">
+                    <div class="pull-right">
+                        <small>VNĐ/</small>ngày
+                    </div>
+                    <span style="font-size: 14px">Avg</span> <strong style="font-size: 16px"></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-xs-12">
+        <div class="infobox infobox-block infobox-dark infobox-brown">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-2x fa-money"></i>
+            </div>
+            <div class="infobox-data padding15">
+                <div>Doanh thu trước giảm giá</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>VNĐ</small>
+                    </div>
+                    <div>
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="tongDoanhThu"></h2>
+                    </div>
+                </div>
+                <div id="avgTotalAmount" style="display: none;">
+                    <div class="pull-right">
+                        <small>VNĐ/</small>ngày
+                    </div>
+                    <span style="font-size: 14px">Avg</span> <strong style="font-size: 16px"></strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-xs-12">
+        <div class="infobox infobox-block infobox-dark bgm-seagreen">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-tags"></i>
+            </div>
+            <div class="infobox-data padding15">
+                <div>Tổng giảm giá</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>VNĐ</small>
+                    </div>
+                    <div>
+                        <h2 style="margin-bottom: 0; margin-top: 0;" id="tongGiamGia"></h2>
+                    </div>
+                </div>
+                <div id="avgTotalDiscount" style="display: none;">
+                    <div class="pull-right">
+                        <small>VNĐ/</small>ngày
+                    </div>
+                    <span style="font-size: 14px">Avg</span> <strong style="font-size: 16px"></strong>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+</div>
+<!-- American Pies -->
+<div class="row" style="padding: 0px 10px;">
+    <span style="font-size: 23px;color: green;">II. Thành phần doanh thu</span>
+</div>
+<!-- Overview -->
+<div class="row">
+    <div class="col-md-3 col-xs-12 p-10" style="margin-bottom:20px;">
+        <div class="infobox infobox-block infobox-dark bgm-teal">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-2x fa-tag"></i>
+            </div>
+            <div class="infobox-data padding15">
+                <div>Doanh thu</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>Hoá đơn</small>
+                    </div>
+                    <div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="finalRevenue"></h2>
+                    </div>
+    </div>
+    </div>
+</div>
+            </div>
+    <div class="col-md-3 col-xs-12 p-10" style="margin-bottom:20px;">
+        <div class="infobox infobox-block infobox-dark infobox-brown">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-2x fa-recycle"></i>
+        </div>
+            <div class="infobox-data padding15">
+                <div>Tổng hóa đơn</div>
+                <div class="inline">
+                <div class="pull-right">
+                        <small>Hoá đơn</small>
+                    </div>
+                    <div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="finalTotalBill"></h2>
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+    <div class="col-md-3 col-xs-12 p-10">
+        <div class="infobox infobox-block infobox-dark bgm-seagreen">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-2x fa-calculator"></i>
+        </div>
+            <div class="infobox-data padding15">
+                <div>Bình Quân hóa đơn</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>VNĐ/Hoá đơn</small>
+                    </div>
+                    <div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="avgFinalReceipt"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-xs-12 p-10">
+        <div class="infobox infobox-block infobox-dark bgm-sandbrown">
+            <div class="infobox-icon">
+                <i class="ace-icon fa fa-2x fa-calculator"></i>
+        </div>
+            <div class="infobox-data padding15">
+                <div>Bình quân sản phẩm</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>Sản phẩm/Hoá đơn</small>
+                    </div>
+                    <div>
+                        <h2 style="margin-bottom:0; margin-top:0;" id="avgTotalProductPerReceipt"></h2>
+                    </div>
+                </div>
+            </div>
+                    </div>
+                    </div>
+
+                </div>
+
+<div class="row m-t-15">
+    @*<div class="container-fluid">*@
+    <div class="col-md-6 p-10" @*style="left: -10px; padding-right: 15px; padding-left: 15px; padding-top: 20px; margin-right: 5px;"*@>
+        <div class="bhoechie-tab-container p-t-20" id="revenuePieChart"></div>
+            </div>
+    <div class="col-md-6 p-10" @*style="padding-right: 15px; padding-left: 15px; padding-top: 20px;"*@>
+        <div class="bhoechie-tab-container p-t-20" id="billPieChart"></div>
+        </div>
+    @*</div>*@
+    </div>
+
+
+
+<!-- Widget overview -->
+
+
+<div class="row">
+    <div class="col-md-3 col-xs-6">
+        <div class="padding15 margin-in-col wdidget-as-odd">
+            <div class="clearfix">
+                <center>
+                    <i class="fa fa-4x fa-home"></i>
+                    <br />
+                    Tại cửa hàng
+                </center>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col wdidget-as">
+            <div class="clearfix">
+                <div class="pull-right">
+                    <small>VNĐ</small>
+                </div>
+                <div class="infobox-content">Doanh thu</div>
+                <h2 style="margin-bottom:0; margin-top:0;" id="revenueAtStore"></h2>
+                <div class="infobox-data" id="avgRevenueAtStore" style="display: none;">
+                    <div class="pull-right">
+                        <small>VNĐ/ngày</small>
+                    </div>
+                    <small>Avg</small> <strong></strong>
+                </div>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col wdidget-as-odd">
+            <div class="clearfix">
+                <div class="infobox-content">Tổng hóa đơn</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="margin-bottom:0; margin-top:0;" id="finalTotalBillAtStore"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="padding15 margin-in-col wdidget-as-odd">
+            <div class="clearfix">
+                <div class="infobox-content">Bình quân hóa đơn</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>VNĐ/Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="margin-bottom:0; margin-top:0;" id="avgFinalAtStore"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col wdidget-as">
+            <div class="clearfix">
+                <div class="infobox-content">Bình quân sản phẩm</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>Sản phẩm/Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="" id="avgProductAtStoretPerReceipt"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-xs-6">
+        <div class="padding15 margin-in-col widget-del-odd">
+            <div class="clearfix">
+                <center>
+                    <i class="fa fa-4x fa-motorcycle"></i>
+                    <br />
+                    Giao hàng
+                </center>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col widget-del">
+            <div class="clearfix">
+                <div class="pull-right">
+                    <small>VNĐ</small>
+                </div>
+                <div class="infobox-content">Doanh thu</div>
+                <h2 style="margin-bottom:0; margin-top:0;" id="revenueDelivery"></h2>
+                <div class="infobox-data" id="avgRevenueDelivery" style="display: none;">
+                    <div class="pull-right">
+                        <small>VNĐ/ngày</small>
+                    </div>
+                    <small>Avg</small> <strong></strong>
+                </div>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col widget-del-odd">
+            <div class="clearfix">
+                <div class="infobox-content">Tổng số hóa đơn</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="margin-bottom:0; margin-top:0;" id="finalTotalBillDelivery"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="padding15 margin-in-col widget-del-odd">
+            <div class="clearfix">
+                <div class="infobox-content">Bình quân hóa đơn</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>VNĐ/Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="margin-bottom:0; margin-top:0;" id="avgFinalDelivery"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="padding15 margin-in-col widget-del">
+            <div class="clearfix">
+                <div class="infobox-content">Bình quân sản phẩm</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>Sản phẩm/Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="" id="avgProductDeliveryPerReceipt"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-xs-6">
+        <div class="padding15 margin-in-col wdidget-ta-odd">
+            <div class="clearfix">
+                <center>
+                    <i class="fa fa-4x fa-shopping-bag"></i>
+                    <br />
+                    Mang về
+                </center>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col wdidget-ta">
+            <div class="clearfix">
+                <div class="pull-right">
+                    <small>VNĐ</small>
+                </div>
+                <div class="infobox-content">Doanh thu</div>
+                <h2 style="margin-bottom:0; margin-top:0;" id="revenueTakeAway"></h2>
+                <div class="infobox-data" id="avgRevenueTakeAway" style="display: none;">
+                    <div class="pull-right">
+                        <small>VNĐ/ngày</small>
+                    </div>
+                    <small>Avg</small> <strong></strong>
+                </div>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col wdidget-ta-odd">
+            <div class="clearfix">
+                <div class="infobox-content">Tổng hóa đơn</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="margin-bottom:0; margin-top:0;" id="finalTotalBillTakeAway"></h2>
+            </div>
+        </div>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col wdidget-ta-odd">
+            <div class="clearfix">
+                <div class="infobox-content">Bình quân hóa đơn</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>VNĐ/Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="margin-bottom:0; margin-top:0;" id="avgFinalTakeAway"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="padding15 margin-in-col wdidget-ta">
+            <div class="clearfix">
+                <div class="infobox-content">Bình quân sản phẩm</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>Sản phẩm/Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="" id="avgProductTakeAwayPerReceipt"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3 col-xs-6">
+        <div class="padding15 margin-in-col widget-rev-odd">
+            <div class="clearfix">
+                <center>
+                    @*<div class="infobox-icon">
+                        <i class="ace-icon fa fa-calculator"></i>
+                        </div>*@
+                    <i class="fa fa-4x fa-times"></i>
+                    <br />
+                    Hóa đơn hủy
+                </center>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col widget-rev">
+            <div class="clearfix">
+                <div class="pull-right">
+                    <small>VNĐ</small>
+                </div>
+                <div>Tổng giá trị</div>
+                <h2 style="margin-bottom:0; margin-top:0;" id="finalReceiptTotalCancel"></h2>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col widget-rev-odd">
+            <div class="clearfix">
+                <div>Tổng hóa đơn</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="margin-bottom:0; margin-top:0;" id="totalOrderCancel"></h2>
+</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="padding15 margin-in-col widget-rev-odd">
+            <div class="clearfix">
+                <div>Hủy Trước Chế Biến</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>VNĐ/Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="margin-bottom:0; margin-top:0;" id="finalAVGPreCancel"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="padding15 margin-in-col widget-rev">
+            <div class="clearfix">
+                <div>Hủy Sau Chế Biến</div>
+                <div class="inline">
+                    <div class="pull-right">
+                        <small>VNĐ/Hóa đơn</small>
+                    </div>
+                    <div class="infobox-data">
+                        <h2 style="" id="finalAVGAfterCancel"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+<!-- Tables -->
+<div class="row">
+    <div class="col-md-12">
+        <ul id="TabList" class="tab-nav tn-justified" style="overflow: hidden;width: 100%">
+            <li class="waves-effect">
+                <a data-toggle="tab" id="storeTab" href="#storeContent" title="Cửa hàng">
+                    <i class="fa fa-2x fa-home"></i> Cửa hàng
+                </a>
+            </li>
+            <li class="waves-effect active">
+                <a id="productTab" href="#productContent" data-toggle="tab" title="Sản phẩm">
+                    <i class="fa fa-2x fa-gift"></i> Sản phẩm
+                </a>
+            </li>
+            <li class="waves-effect">
+                <a id="staffTab" href="#staffContent" data-toggle="tab" title="Nhân viên">
+                    <i class="fa fa-2x fa-users"></i> Nhân viên
+                </a>
+            </li>
+            <li class="waves-effect">
+                <a id="cardPaymentTab" href="#cardPaymentContent" data-toggle="tab" title="Giao dịch">
+                    <i class="fa fa-2x fa-credit-card"></i> Thanh toán
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="tab-content">
+
+    @*hệ thống*@
+    <!-- store section (for brandMgr only) -->
+    @*cửa hàng*@
+    <div id="storeContent" class="tab-pane fade">
+        <div id="storeContainer" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            @*<button class="btn btn-success btn-sm" id="exportExcelProduct">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>*@
+            <table id="storeReportDatatable" class="table table-condensed table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label class="">STT</label>
+                        </th>
+                        <th>
+                            <label class="">Cửa hàng</label>
+                        </th>
+                        <th>
+                            <label class="">Tổng số hóa đơn</label>
+                        </th>
+                        <th>
+                            <label class="">Trung bình HĐ</label>
+                        </th>
+                        <th>
+                            <label class="">DT bán hàng</label>
+                        </th>
+                        <th>
+                            <label class="">DT nạp thẻ</label>
+                        </th>
+                        <th>
+                            <label class="">Tổng doanh thu</label>
+                        </th>
+                        <th>
+                            <label class="">Loại hình bán chạy</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="storeChartContainer" class="col-lg-5 col-md-5 col-sm-12 col-xs-12" style="display:none">
+            <div id="storePieChart"></div>
+        </div>
+    </div>
+    @*cửa hàng*@
+    <div id="productContent" class="tab-pane fade in active">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+            @*<button class="btn btn-success btn-sm" id="exportExcelProduct">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>*@
+            <table id="tblProduct" class="table table-condensed table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th rowspan="2">
+                            <label class="">STT</label>
+                        </th>
+                        <th rowspan="2">
+                            <label class="">Tên sản phẩm</label>
+                        </th>
+                        <th rowspan="2">
+                            <label class="">Số lượng bán ra</label>
+                        </th>
+                        <th colspan="2">
+                            <label class="">Doanh thu</label>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th><small>Trước giảm giá</small></th>
+                        <th><small>Sau giảm giá</small></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        @*table và chart*@
+        <div class="style=" padding:25px;"">
+            @*<div>
+                <button type="submit" id="export" class="width230 btn btn-primary btn-sm pull-right">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>
+                <button type="button" data-show="show" id="buttonChart" class="btn btn-primary btn-sm" style="width:150px" onclick="ShowChart1()">
+                    <i class="fa fa-plus">
+                    </i> Hiển thị biểu đồ
+                </button>
+            </div>*@
+
+            <form class="hidden" id="formDateReportExcel" action="@Url.Action("ExportDateStoreReportToExcel","TimeReport")">
+                <input id="startTime" name="startTime" />
+                <input id="endTime" name="endTime" />
+                <input id="selectedStoreId" name="selectedStoreId" />
+            </form>
+
+            <div id="chartCuaHang" style="min-width: 300px; height: 290px;" hidden="hidden"></div>
+            <div id="datatableCuaHang" style="padding-top: 5px">
+            </div>
+        </div>
+    </div>
+    @*nhóm*@
+    <div id="staffContent" class="tab-pane fade">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            @*<div><h3 style="color:black">Nhân viên</h3></div>*@
+            @*<button type="submit" id="exportExcelCashier" class="btn btn-success btn-sm">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>*@
+            <table id="tblCashier" class="table table-condensed table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        @*<th rowspan="2">
+                                <label class="">STT</label>
+                            </th>*@
+                        <th rowspan="2">
+                            <label class="">Họ và tên</label>
+                        </th>
+                        @*<th rowspan="2">
+                                <label class="">Tên đăng nhập</label>
+                            </th>*@
+                        @*<th colspan="2">
+                            <label>Ca sáng (trước 12h)</label>
+                        </th>
+                        <th colspan="2">
+                            <label>Ca tối (sau 12h)</label>
+                        </th>*@
+                        <th colspan="4">
+                            <label>Tổng</label>
+                        </th>
+                    </tr>
+                    <tr>
+                        @*<th>
+                            <b><small>Hóa đơn</small></b>
+                        </th>
+                        <th>
+                            <b class=""><small>Tiền thu được</small></b>
+                        </th>
+                        <th>
+                            <b class=""><small>Hóa đơn</small></b>
+                        </th>
+                        <th>
+                            <b class=""><small>Tiền thu được</small></b>
+                        </th>*@
+                        <th>
+                            <b class=""><small>Hóa đơn</small></b>
+                        </th>
+                        <th>
+                            <b class=""><small>Hóa đơn hủy</small></b>
+                        </th>
+                        <th>
+                            <b class=""><small>Hóa đơn thật</small></b>
+                        </th>
+                        <th>
+                            <b class=""><small>Tiền thu được</small></b>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <div id="cardPaymentContent" class="tab-pane fade">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            @*<div><h3 style="color:black">Thanh toán bằng thẻ</h3></div>*@
+            @*<button type="submit" id="exportExcelCashier" class="btn btn-success btn-sm">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>*@
+            <div class="col-md-6 p-10" @*style="left: -10px; padding-right: 15px; padding-left: 15px; padding-top: 20px; margin-right: 5px;"*@>
+                <div class="bhoechie-tab-container p-t-20" id="orderCardPieChart"></div>
+            </div>
+            <div class="col-md-6 p-10" @*style="left: -10px; padding-right: 15px; padding-left: 15px; padding-top: 20px; margin-right: 5px;"*@>
+                <div class="bhoechie-tab-container p-t-20" id="orderCardRevenuePieChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+@*<div class="row p-5">
+        <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12 bhoechie-tab-container">
+            <div class="col-md-12 bhoechie-tab-menu">
+                <ul class="nav nav-tabs bhoechie-tab-menu list-group">
+                    <li>
+                        <a id="storeTab" href="#" class="list-group-item text-center" title="Cửa hàng" style="display:none;">
+                            <h4 class="fa fa-2x fa-home"></h4>
+                            <br />
+                            Cửa hàng
+                        </a>
+                    </li>
+                    <li>
+                        <a id="productTab" href="#" class="list-group-item text-center active" title="Sản phẩm">
+                            <h4 class="fa fa-2x fa-gift"></h4>
+                            <br />
+                            Sản phẩm
+                        </a>
+                    </li>
+                    <li>
+                        <a id="staffTab" href="#" class="list-group-item text-center" title="Nhân viên">
+                            <h4 class="fa fa-2x fa-users"></h4>
+                            <br />
+                            Nhân viên
+                        </a>
+                    </li>
+                    <li>
+                        <a id="cardPaymentTab" href="#" class="list-group-item text-center" title="Giao dịch">
+                            <h4 class="fa fa-2x fa-credit-card"></h4>
+                            <br />
+                            Giao dịch
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            @*<div class="col-lg-1 col-md-1 col-sm-1 col-xs-2 bhoechie-tab-menu">
+                    <div class="list-group clearfix">
+                        <a id="storeTab" href="#" class="list-group-item text-center" title="Cửa hàng" style="display:none;">
+                            <h4 class="fa fa-2x fa-home"></h4>
+                            Cửa hàng
+                        </a>
+                        <a id="productTab" href="#" class="list-group-item text-center active" title="Sản phẩm">
+                            <h4 class="fa fa-2x fa-gift"></h4>
+                            <br />
+                            Sản phẩm
+                        </a>
+                        <a id="staffTab" href="#" class="list-group-item text-center" title="Nhân viên">
+                            <h4 class="fa fa-2x fa-users"></h4>
+                            <br />
+                            Nhân viên
+                        </a>
+                    </div>
+                </div>
+            <div id="storeTabContainer" class="col-lg-12 col-md-12 col-sm-12 col-xs-12 bhoechie-tab">
+                <!-- store section (for brandMgr only) -->
+                <div id="storeContent" class="bhoechie-tab-content">
+                    <div id="storeContainer" class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div><h3 style="color:black">Cửa hàng</h3></div>
+                        <button class="btn btn-success btn-sm" id="exportExcelProduct">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button>
+                        <table id="storeReportDatatable" class="table table-condensed table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label class="">STT</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Cửa hàng</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tổng số hóa đơn</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Sản phẩm/ Hóa đơn</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Doanh thu/ Hóa đơn</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Doanh thu</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Loại hình bán chạy</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                    <div id="storeChartContainer" class="col-lg-5 col-md-5 col-sm-12 col-xs-12" style="display:none">
+                        <div id="storePieChart"></div>
+                    </div>
+                </div>
+                <!-- product section -->
+                <div id="productContent" class="bhoechie-tab-content active">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+                        <div><h3 style="color:black">Sản phẩm</h3></div>
+                        @*<button class="btn btn-success btn-sm" id="exportExcelProduct">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button>
+                        <table id="tblProduct" class="table table-condensed table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th rowspan="2">
+                                        <label class="">STT</label>
+                                    </th>
+                                    <th rowspan="2">
+                                        <label class="">Tên sản phẩm</label>
+                                    </th>
+                                    <th rowspan="2">
+                                        <label class="">Số lượng bán ra</label>
+                                    </th>
+                                    <th colspan="2">
+                                        <label class="">Doanh thu</label>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th><small>Trước giảm giá</small></th>
+                                    <th><small>Sau giảm giá</small></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+
+                </div>
+                <!-- staff section -->
+                <div id="staffContent" class="bhoechie-tab-content">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div><h3 style="color:black">Nhân viên</h3></div>
+
+                        <table id="tblCashier" class="table table-condensed table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+
+                                    <th rowspan="2">
+                                        <label class="">Họ và tên</label>
+                                    </th>
+
+                                    <th colspan="2">
+                                        <label>Ca sáng (trước 12h)</label>
+                                    </th>
+                                    <th colspan="2">
+                                        <label>Ca tối (sau 12h)</label>
+                                    </th>
+                                    <th colspan="2">
+                                        <label>Tổng</label>
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        <b"><small>Hóa đơn</small></b>
+                                    </th>
+                                    <th>
+                                        <b class=""><small>Tiền thu được</small></b>
+                                    </th>
+                                    <th>
+                                        <b class=""><small>Hóa đơn</small></b>
+                                    </th>
+                                    <th>
+                                        <b class=""><small>Tiền thu được</small></b>
+                                    </th>
+                                    <th>
+                                        <b class=""><small>Hóa đơn</small></b>
+                                    </th>
+                                    <th>
+                                        <b class=""><small>Tiền thu được</small></b>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <!-- card payment section -->
+                <div id="cardPaymentContent" class="bhoechie-tab-content">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div><h3 style="color:black">Thanh toán bằng thẻ</h3></div>
+
+                        <div class="col-md-6 p-10" style="left: -10px; padding-right: 15px; padding-left: 15px; padding-top: 20px; margin-right: 5px;">
+                            <div class="bhoechie-tab-container p-t-20" id="orderCardPieChart"></div>
+                        </div>
+                        <div class="col-md-6 p-10" style="left: -10px; padding-right: 15px; padding-left: 15px; padding-top: 20px; margin-right: 5px;">
+                            <div class="bhoechie-tab-container p-t-20" id="orderCardRevenuePieChart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>*@
+
+
+
+
+
+
+<form class="hidden" id="formProductExportExcel" action="@Url.Action(" ExportProductTableToExcel","DateDashBoard")">
+    <input id="startTimeProduct" name="_startDate" />
+    <input id="endTimeProduct" name="_endDate" />
+</form>
+
+<form class="hidden" id="formCashierExportExcel" action="@Url.Action(" ExportCashierTableToExcel","DateDashBoard")">
+    <input id="startTimeCashier" name="_startDate" />
+    <input id="endTimeCashier" name="_endDate" />
+</form>
+
+
+<form class="hidden" id="formProductMonthExportExcel" action="@Url.Action(" ExportProductTableToExcel","MonthDashBoard")">
+    <input id="startTimeMonthProduct" name="_startDate" />
+    <input id="endTimeMonthProduct" name="_endDate" />
+</form>
+
+<form class="hidden" id="formCashierMonthExportExcel" action="@Url.Action(" ExportCashierTableToExcel","MonthDashBoard")">
+    <input id="startTimeMonthCashier" name="_startDate" />
+    <input id="endTimeMonthCashier" name="_endDate" />
+</form>
+
+<script>
+    $(document).ready(function () {
+        var today = new Date();
+        $('#date').html("Ngày: " + today.getDate() + "/" + (today.getMonth() + 1) + "/" + (today.getFullYear()));
+    })
+</script>

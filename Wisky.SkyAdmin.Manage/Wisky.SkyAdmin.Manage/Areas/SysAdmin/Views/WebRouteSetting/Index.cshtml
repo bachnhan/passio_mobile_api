@@ -1,0 +1,159 @@
+﻿@{
+    ViewBag.Title = "StoreConfig";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Quản lý Store Website</h3>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="styled-select blue semi-square" style="width: 150px;">
+        <select id="brandMenu">
+            <option value="0">Tất cả Brand</option>
+        </select>
+    </div>
+    <div class="card-padding">
+        <div class="row">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="allcust">
+                    <!-- Theme Datatable -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <table id="storeDatatable" class="table table-striped table-bordered table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <label class="">STT</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Tên website</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Mã cửa hàng</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Địa chỉ</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Logo</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Phone</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Email</label>
+                                                </th>
+                                                <th>
+                                                    <label class="">Tùy chọn</label>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Theme Datatable -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        InitThemeDatatable();
+
+        // event Delete Theme click
+        $(document).on("click", ".deleteTheme", function () {
+            DeleteTheme($(this).attr("id").trim());
+        });
+    });
+
+    function InitThemeDatatable() {
+        $("#storeDatatable").dataTable({
+            "bFilter": true,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": '@Url.Action("GetListStoreTheme")',
+            "bProcessing": true,
+            "bFilter": true,
+            "oLanguage": {
+                "sSearch": "",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>",
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 3, 4, 5, 6],
+                    "bSortable": false,
+                },
+                {
+                    "aTargets": [7],
+                    "mRender": function (data, type, row) {
+                        var data = row[7];
+                        var setting = "<a title='Cấu hình' class='btn btn-sm btn-primary waves-effect waves-light' href='@Url.Action("Setting", "WebRouteSetting")\/" + data + "\'><i class='glyphicon glyphicon-pencil'></i></a>";
+                        return setting;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [4],
+                    "mRender": function (data, type, row) {
+                        var data = row[4];
+                        if (data != null && data != '' && data != 'null' && data != 'undefined') {
+                            var result = "<img src='" + data + "' title='" + row[1] + "' width='50' height='60' />";
+                            return result;
+                        } else {
+                            return data;
+                        }
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center"
+                }
+
+            ],
+            "bAutoWidth": false,
+        }).fnSetFilteringDelay(delaySearch);
+    }
+
+
+    //redraw datatable without reload
+    function reDrawDatatable(id) {
+        $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+            if (oSettings.oFeatures.bServerSide === false) {
+                var before = oSettings._iDisplayStart;
+                oSettings.oApi._fnReDraw(oSettings);
+                //iDisplayStart has been reset to zero - so lets change it back
+                oSettings._iDisplayStart = before;
+                oSettings.oApi._fnCalculateEnd(oSettings);
+            }
+            //draw the 'current' page
+            oSettings.oApi._fnDraw(oSettings);
+        };
+        $(id).dataTable().fnStandingRedraw();
+    }
+
+    function loadBrand(data) {
+        for (var i = 0; i < data.length; i++) {
+            $('#brandMenu').append('<option value="' + data[i].ID + '">' + data[i].Name + '</option>');
+        }
+    }
+</script>

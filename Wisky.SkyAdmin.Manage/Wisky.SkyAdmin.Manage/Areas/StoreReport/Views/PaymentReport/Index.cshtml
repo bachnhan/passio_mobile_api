@@ -1,0 +1,278 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    //Dictionary<string, double> paymentChart = ViewBag.PaymentChart;
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>
+                    Báo cáo theo hình thức thanh toán
+                </h3>
+                <h5 data-role="small-date"></h5>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row m-t-20">
+            <div class="col-md-4 pull-right">
+                <div class="input-group pull-right">
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                            <input type="hidden" id="startTime" />
+                            <input type="hidden" id="endTime" />
+                        </div>
+                    </div>
+
+                    <div class="fg-line m-t-5">
+                        <button type="submit" id="exportExcel" class="btn btn-primary btn-sm pull-right">
+                            <i class="fa fa-download"></i>
+                            Xuất ra file Excel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            @*<div class="col-md-12 m-t-25">
+                    <button id="chart-btn" class="btn btn-sm btn-primary">Hiển thị biểu đồ</button>
+                    <div id="payment-chart-container" style="display:none">
+                    </div>
+                </div>*@
+            <div class="col-md-12 m-t-25">
+                <table id="payment-dt" class="table table-condensed table-hover table-responsive table-striped">
+                    <thead>
+                        <tr>
+                            <th><label>Ngày</label></th>
+                            <th><label>Thanh toán tiền mặt</label></th>
+                            <th><label>thẻ thành viên</label></th>
+                            <th><label>Voucher</label></th>
+                            <th><label>MasterCard</label></th>
+                            <th><label>VisaCard</label></th>
+                            <th><label>Khác</label></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<form class="hidden" id="ExportPaymentExcel" action="@Url.Action("ExportPaymentStoreExcel", "PaymentReport")">
+    >
+    <input id="startTimeOne" name="sTime" />
+    <input id="endTimeOne" name="eTime" />
+
+</form>
+<script>
+    $(document).on('click', '#exportExcel', function () {
+        $('#startTimeOne').val($('#startTime').val());
+        $('#endTimeOne').val($('#endTime').val());
+        $('#ExportPaymentExcel').submit();
+        //alert(123);
+    });
+    var chartData;
+    $(document).ready(function () {
+        setupDaterangepicker();
+        //renderPaymentDt();
+    });
+
+    $('#chart-btn').on('click', function () {
+        $('#payment-chart-container').toggle();
+        var chart = $('#payment-chart-container').highcharts();
+        if (chart == undefined) {
+            getDataChart();
+        }
+    });
+
+    $('#selectedStore').on('change', function () {
+        renderPaymentDt();
+    });
+
+    function getDataChart() {
+        $.ajax({
+            type: 'get',
+            contentType: "application/json; charset=utf-8",
+            data: { 'sTime': $("#startTime").val(), 'eTime': $("#endTime").val() },
+            url: '@Url.Action("GetPaymentReportData")',
+            success: function (result) {
+                if (result.success) {
+                    renderChart(result.datachart);
+                } else {
+                    ShowAlert(result.message, 1)
+                }
+            },
+            error: function () {
+                ShowAlert("Có lỗi nha", 1);
+            }
+        });
+    }
+
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+        $("#startTime").val(startTime);
+        $("#endTime").val(endTime);
+        renderPaymentDt();
+        //getDataChart();
+    }
+
+    function setupDaterangepicker() {
+        cb(moment(), moment(), 'Hôm nay');
+        $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'), "Tháng này");
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+    }
+
+    function RefreshOrderTable(id) {
+        var oTable = $(id).dataTable();
+        oTable._fnAjaxUpdate();
+    }
+
+    function renderPaymentDt() {
+        $('#payment-dt').dataTable({
+            "bAutoWidth": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("GetPaymentReportData")",
+            "bProcessing": true,
+            "bSort": false,
+            "bFilter": false,
+            "bDestroy": true,
+            "bScrollCollapse": true,
+            "bInfo": true,
+            "bPaginate": true,
+            "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "sTime", "value": $("#startTime").val() });
+                aoData.push({ "name": "eTime", "value": $("#endTime").val() });
+            }, "columns": [
+                { "data": "time" },
+                { "data": "cash" },
+                { "data": "creditCard" },
+                { "data": "voucher" },
+                { "data": "masterCard" },
+                { "data": "visaCard" },
+                { "data": "orther" }
+            ],
+            "oLanguage": {
+                "sSearchPlaceholder": "Tên nguyên liệu",
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " ",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                 {
+                     "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                     "sClass": "text-center"
+                 },
+                 {
+                     "aTargets": [1 ,2 ,3 ,4 ,5 ,6],
+                     "mRender": function (data, type, row) {
+                         if (data == null || data == ""){
+                             return toMoney(0, ',', 'VNĐ');
+                         } else {
+                             return toMoney(data, ',', 'VNĐ');
+                         }
+
+                     }
+                 }
+            ]
+
+        }).fnSetFilteringDelay(800);
+    }
+
+    function renderChart(data) {
+        var seriesOptions = [];
+        var categories = [];
+        $.each(data, function (i, item) {
+            seriesOptions.push({
+                name: item['PaymentType'],
+                y: item['Amount']
+            });
+            categories.push(item['PaymentType']);
+        });
+        $('#payment-chart-container').highcharts({
+            //chart: {
+            //    type: 'column'
+            //},
+
+            //xAxis: {
+            //},
+
+            //series: [{
+            //    data: seriesOptions
+            //}]
+            chart: {
+                type: 'column',
+                style: {
+                    fontFamily: 'Arial'
+                }
+            },
+            title: {
+                text: 'DOANH THU THEO HÌNH THỨC THANH TOÁN',
+                x: -20 //center
+            },
+            //subtitle: {
+            //    x: -20
+            //},
+            xAxis: {
+                categories: categories
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh Thu'
+                }
+            },
+            tooltip: {
+                valueSuffix: ' VNĐ'
+            },
+            legend: {
+                layout: 'horizontal',
+                align: 'center',
+                verticalAlign: 'bottom',
+                borderWidth: 0
+            },
+            series: [{
+                data: seriesOptions
+            }]
+        });
+    }
+
+</script>

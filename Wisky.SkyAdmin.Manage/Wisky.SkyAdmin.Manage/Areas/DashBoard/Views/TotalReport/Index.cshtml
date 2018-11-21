@@ -1,0 +1,981 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var storeId = ViewBag.StoreId;
+    var brandId = ViewBag.BrandId;
+    //Dictionary<string, double> paymentChart = ViewBag.PaymentChart;
+}
+
+<style>
+    .m-t-25 {
+        margin-top: 0px !important;
+    }
+
+    .m-t-20 {
+        margin-top: 1px !important;
+    }
+
+    .btnh4 {
+        color: white;
+    }
+
+    .downLoadIcon {
+        font-size: 1.5em;
+        margin-left: 1em;
+    }
+    .control-label {
+        font-weight: 600;
+        font-size: 14px;
+        padding-top: 15px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-4">
+                <h3>
+                    Xuất file báo cáo
+                </h3>
+                <h5 data-role="small-date"></h5>
+            </div>
+            <!--Stores-->
+            <div class="col-md-4" id="listStore">
+                <select class="selectpicker" id="listStoreId">
+                    <option value="0">Tất cả cửa hàng</option>
+                </select>
+            </div>
+            <!--Date time picker-->
+            <div class="col-md-4">
+                <form id="" class="form-inline">
+                    <div class="input-group pull-right">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                </form>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-body">
+        <input id="brand" type="hidden" value="@brandId" />
+        <input id="store" type="hidden" value="@storeId" />
+        <!--OrderReport-->
+        <div class="card m-t-10">
+            <div class="card-body">
+                <!--Title-->
+                <div class="col-md-10">
+                    <h3 style="color:black">Hóa đơn</h3>
+                </div>
+                <div class="col-md-2">
+                    <div style="text-align: right">
+                        <button type="submit" id="exportOrderToExcel" class="btn btn-primary btn-sm waves-effect">
+                            <i class="fa fa-download"></i>
+                            Xuất ra file Excel
+                        </button>
+                        <form class="hidden" id="formOrderReportExcel" action="@Url.Action("ExportOrderToExcel2","Order", new { Area = "Orders"})">
+                            <input type="hidden" name="selectedstoreId" id="order_selectedstoreId" value="0">
+                            <input type="hidden" name="sTime" id="order_startTime" value="">
+                            <input type="hidden" name="eTime" id="order_endTime" value="">
+                            <input type="hidden" name="status" id="order_status" value="">
+                            <input type="hidden" name="type" id="order_type" value="">
+                        </form>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="card-padding">
+                        <div class="row" style="margin-top:-10px;margin-bottom:10px">
+                            <div class="col-md-4">
+                                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#demo" style="margin-bottom:10px !important">Bộ lọc hóa đơn</button>
+                            </div>
+                            <div id="demo" class="collapse">
+                                <div class="group-radio-buttons myGroup-radio-buttons " style="padding-bottom: 10px">
+                                    <div class="col-md-12">
+                                        <h4 style="margin-bottom:20px;font-weight:bold;">Tình trạng hóa đơn</h4>
+                                    </div>
+                                    <div class="row small-margin">
+                                        <div class="col-md-2">
+                                            <input type="radio" name="report-filter-status" value="0" class="nice-check" id="filter1" checked />
+                                            <label for="filter1"><span>Tất cả</span></label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="radio" name="report-filter-status" value="@((int) OrderStatusEnum.Finish)" class="nice-check" id="filter2" />
+                                            <label for="filter2"><span>Hoàn thành</span></label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="radio" name="report-filter-status" value="@((int) OrderStatusEnum.Cancel)" class="nice-check" id="filter3" style="margin-top: 0px!important;" />
+                                            <label for="filter3"><span>Hủy sau chế biến</span></label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="radio" name="report-filter-status" value="@((int) OrderStatusEnum.PreCancel)" class="nice-check" id="filter4" style="margin-top: 0px!important;" />
+                                            <label for="filter4"><span>Hủy trước chế biến</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="group-radio-buttons myGroup-radio-buttons" style="padding-bottom:15px">
+                                    <div class="col-md-12">
+                                        <h4 style="margin-bottom:20px;font-weight:bold;">Loại hóa đơn</h4>
+                                    </div>
+                                    <div class="row small-margin">
+                                        <div class="col-md-2">
+                                            <input type="radio" name="report-filter-type" value="0" class="nice-check" id="filter-type1" checked />
+                                            <label for="filter-type1"><span>Tất cả</span></label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="radio" name="report-filter-type" value="@((int) OrderTypeEnum.AtStore)" class="nice-check" id="filter-type2" />
+                                            <label for="filter-type2"><span>Tại quán</span></label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="radio" name="report-filter-type" value="@((int) OrderTypeEnum.Delivery)" class="nice-check" id="filter-type3" style="margin-top: 0px!important;" />
+                                            <label for="filter-type3"><span>Giao hàng</span></label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="radio" name="report-filter-type" value="@((int) OrderTypeEnum.TakeAway)" class="nice-check" id="filter-type4" style="margin-top: 0px!important;" />
+                                            <label for="filter-type4"><span>Mang đi</span></label>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <input type="radio" name="report-filter-type" value="@((int) OrderTypeEnum.OrderCard)" class="nice-check" id="filter-type5" style="margin-top: 0px!important;" />
+                                            <label for="filter-type5"><span>Nạp thẻ</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--DateReport trong controller ExportDateStoreReportToExcel2 chay vong for nhung chi in ra 1 ngay-->
+        <div class="card m-t-12">
+            <div class="card-body">
+                <!--Title-->
+                <div class="row">
+                    <div class="card-padding">
+                        <div class="col-md-10">
+                            <h3 style="color:black">Doanh thu</h3>
+                        </div>
+                        <!--Content-->
+                        <div class="col-md-2">
+                            <div style="text-align: right">
+                                <div>
+                                    <button type="submit" id="export" class="btn btn-primary btn-sm pull-right">
+                                        <i class="fa fa-download"></i>
+                                        Xuất ra file Excel
+                                    </button>
+                                </div>
+                                <!--Store-->
+                                <form class="hidden" id="formDateReportExcel" action="@Url.Action("ExportDateStoreReportToExcel2","TimeReport", new { Area = "StoreReport" })">
+                                    <input id="dateRep_startTime" name="startTime" />
+                                    <input id="dateRep_endTime" name="endTime" />
+                                    <input id="dateRep_selectedStoreId" name="selectedStoreId" />
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--ComparisonReport-->
+        <div class="card m-t-12">
+            <div class="card-body">
+                <div class="card-padding">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>
+                                Báo cáo so sánh theo cửa hàng
+                            </h3>
+                            <h5 data-role="small-date"></h5>
+                        </div>
+                        <div class="col-md-6">
+                            <div style="text-align: right">
+                                <button type="submit" id="exportAllStoreGroup" class="btn btn-primary btn-sm">
+                                    <i class="fa fa-download"></i>
+                                    Xuất ra file Excel
+                                </button>
+                            </div>
+                            <form class="hidden" id="formComparisonReportExcel" action="@Url.Action("ExportExcelGroupReport","ComparisonReport", new { Area = "SystemReport"})">
+                                <input type="hidden" name="startTime" />
+                                <input type="hidden" name="endTime" />
+                                <input type="hidden" name="selectedItems" />
+                                <input type="hidden" name="printStore" />
+                            </form>
+                        </div>
+                    </div>
+                    <hr />
+
+                    <div class="card-padding">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="col-md-6" style="padding-left: 0px;">
+                                    <label class="control-label col-md-3 row">Chọn loại :</label>
+                                    <input type="hidden" value="loadStores" id="filterStoreType" />
+                                    <div id="checkproduct" class="group-radio-buttons col-md-9 row">
+                                        <div class="toggle-switch col-md-6 m-y-10">
+                                            <input name="mapping1" id="activeMapping" type="radio" class="nice-check" checked value="loadStores" />
+                                            <label for="activeMapping" class="ts-label"><span>Cửa hàng</span></label>
+                                        </div>
+                                        <div class="toggle-switch col-md-6 m-y-10">
+                                            <input name="mapping1" id="deActiveMapping" type="radio" class="nice-check" value="loadStoreGroups" />
+                                            <label for="deActiveMapping" class="ts-label"><span>Nhóm cửa hàng</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row m-y-25">
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="control-label col-md-12">Cửa hàng 1:</label>
+                                    <div class="col-md-9 filterStoreTypeItem-container">
+                                        <select id="store1" title="Chọn cửa hàng 1" class="selectpicker" data-live-search="true"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="control-label col-md-12">Cửa hàng 2:</label>
+                                    <div class="col-md-9 filterStoreTypeItem-container">
+                                        <select id="store2" title="Chọn cửa hàng 2" class="selectpicker" data-live-search="true"></select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group row">
+                                    <label class="control-label col-md-12">Cửa hàng 3:</label>
+                                    <div class="col-md-9 filterStoreTypeItem-container">
+                                        <select id="store3" title="Chọn cửa hàng 3" class="selectpicker" data-live-search="true"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--ProductReport-->
+        <div class="card m-t-12">
+            <div class="card-body" style="padding-bottom:5px">
+                <div class="card-padding">
+                <div class="row">
+                    <div class="col-md-5">
+                        <h3>Báo cáo doanh thu sản phẩm</h3>
+                        <h5 data-role="small-date" id="dateRange"></h5>
+                    </div>
+                    <div class="col-md-7">
+                        <div style="text-align: right;">
+                            <!-- ALL STORE -->
+                            <button type="submit" id="exportAllStore" class="btn btn-primary btn-sm">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button><!-- ALL STORE END -->
+                            <!-- ONE SOTRE -->
+                            <button hidden type="submit" id="exportOneStore" class="btn btn-primary btn-sm">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button><!-- ONE SOTRE END -->
+                            <button hidden type="submit" id="exportStoreGroup" class="btn btn-primary btn-sm">
+                                <i class="fa fa-download"></i>
+                                Xuất ra file Excel
+                            </button>
+                        </div><!-- EXPORT TO EXCEL END -->
+                    </div>
+                </div>
+
+                <hr />
+                <ul id="TabList" class="tab-nav tn-justified" style="overflow: hidden;width: 100%">
+                    <li class="active waves-effect col-lg-6"><a data-toggle="tab" id="tab1" onclick="openCity(event, 'tab1')" href="#storesTab"><i class="fa fa-home"></i> Cửa hàng</a></li>
+                    <li class="waves-effect col-lg-6"><a data-toggle="tab" id="tab3" onclick="openCity(event, 'tab3')" href="#all"><i class="fa fa-globe"></i> Hệ Thống</a></li>
+                    <li class="waves-effect col-lg-6"><a data-toggle="tab" id="tab2" onclick="openCity(event, 'tab2')" href="#storesGroupTab"><i class="fa fa-users"></i> Nhóm cửa hàng</a></li>
+                </ul>
+                <div class="row">
+                    <form id="form-create-session" class="form-inline">
+                        <div class="col-md-12" style="margin-top: 19px;">
+                            <div class="col-md-3" id="cbhethong">
+                                <label>Chọn Cửa hàng:</label>
+                                <select class="selectpicker" id="groupStoreId"></select>
+                            </div>
+                            <div class="col-md-3" id="cbnhomcuahang" hidden>
+                                <label>Nhóm Cửa hàng: &nbsp;</label>
+                                <select class="selectpicker" id="groupStoreGroupId" style="width : auto"></select>
+                            </div>
+                            <input type="hidden" id="sTime" />
+                            <input type="hidden" id="eTime" />
+                        </div>
+
+                        <div class="col-md-12 m-b-15">
+                            <input id="checkproduct" value="" hidden="">
+                            <div class="col-md-6 m-y-5 group-radio-buttons">
+                                <div class="toggle-switch col-md-12 m-y-10" data-ts-color="green">
+                                    <input name="mapping1" id="activeMapping" type="radio" class="nice-check" checked>
+                                    <label for="activeMapping" class="ts-label"><span>Sản phẩm</span></label>
+                                </div>
+                                <div class="toggle-switch col-md-12 m-y-10" data-ts-color="green">
+                                    <input name="mapping1" id="deActiveMapping" type="radio" class="nice-check">
+                                    <label for="deActiveMapping" class="ts-label"><span>Nhóm sản phẩm</span></label>
+                                </div>
+                            </div>
+
+                            <input id="checkDeal" value="" hidden="">
+                            <div class="col-md-6 m-y-5 group-radio-buttons">
+                                <div class="toggle-switch col-md-12 m-y-10" data-ts-color="green">
+                                    <input name="mapping2" id="activeMapping1" type="radio" class="nice-check" checked>
+                                    <label for="activeMapping1" class="ts-label"><span>Trước giảm giá</span></label>
+                                </div>
+                                <div class="toggle-switch col-md-12 m-y-10" data-ts-color="green">
+                                    <input name="mapping2" id="deActiveMapping1" type="radio" class="nice-check">
+                                    <label for="deActiveMapping1" class="ts-label"><span>Sau giảm giá</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+                <form class="hidden" id="formProductCategoryReportAllExcel" action="@Url.Action("ReportProductAllStoreExportExcelEPPlus", "ProductReport", new { Area = "SystemReport" })">
+                    <input id="startTimeAll" name="startTime" />
+                    <input id="endTimeAll" name="endTime" />
+                    <input name="checkvalue" />
+                    <input name="checkDeal" />
+                </form>
+
+                <form class="hidden" id="ReportProductStoreGroupExportExcelEPPlus" action="@Url.Action("ReportProductStoreGroupExportExcelEPPlus", "ProductReport", new { Area = "SystemReport" })">
+                    <input id="startTimeGroup" name="startTime" />
+                    <input id="endTimeGroup" name="endTime" />
+                    <input name="storeGroupIdReport" />
+                    <input name="checkvalue" />
+                    <input name="checkDeal" />
+                </form>
+
+                <form class="hidden" id="ReportProductOneStoreExportExcelEPPlus" action="@Url.Action("ReportProductOneStoreExportExcelEPPlus", "ProductReport", new { Area = "SystemReport" })">
+                    <input id="startTimeOne" name="startTime" />
+                    <input id="endTimeOne" name="endTime" />
+                    <input name="storeIdReport" />
+                    <input name="checkvalue" />
+                    <input name="checkDeal" />
+                </form>
+            </div>
+            <div class="row">
+                <div class="col-md-12" id="containerWrapper" style="display:none">
+                    <div id="container1" style="width:100%; height:300px"></div>
+                    <div id="container2" style="width:100%; height:300px"></div>
+                    <div id="container3" style="width:100%; height:300px"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!--PaymentTypeReport-->
+        <div class="card m-t-12">
+            <div class="card-padding">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h3>
+                            Báo cáo theo hình thức thanh toán
+                        </h3>
+                        <h5 data-role="small-date"></h5>
+                    </div>
+                    <div class="col-md-4 pull-right">
+                        <div class="input-group pull-right">
+                            <div class="fg-line m-t-5">
+                                <button style="width:230px;" type="submit" id="exportPaymentTypeExcel" class="btn btn-primary btn-sm pull-right">
+                                    <i class="fa fa-download"></i>
+                                    Xuất ra file Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <form class="hidden" id="ExportPaymentExcel" action="@Url.Action("ExportPaymentExcel", "PaymentReport", new { Area = "SystemReport"})">
+            <input id="payment_startTime" name="sTime" />
+            <input id="payment_endTime" name="eTime" />
+            <input id="payment_storeId" name="selectedStoreId" />
+            <input id="payment_brandId" name="brandId" />
+
+        </form>
+    </div>
+</div>
+@section scripts {
+    <script>
+        var brandId = @ViewBag.brandId;
+        var storeId = @ViewBag.StoreId;
+
+        @*$(document).on('click', '#exportExcel', function () {
+            $('#startTimeOne').val($('#startTime').val());
+            $('#endTimeOne').val($('#endTime').val());
+            $('#storeId').val($('#listStoreId').val());
+            $('#brandId').val(@ViewBag.brandId);
+            $('#ExportPaymentExcel').submit();
+            //alert(123);
+        });*@
+        $(document).ready(function () {
+            //setupListStoreFilter()
+            setupDaterangepicker();
+            GetStoreList();
+            //renderPaymentDt();
+            //$('#listStoreId').on('change', function () {
+            //    renderPaymentDt();
+            //});
+        });
+
+        function GetStoreList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStoreList", "TotalReport")',
+            jsonp: "$callback",
+            success: function (result) {
+                for (var i = 0; i < result.store.length; i++) {
+                    $('#listStoreId').append('<option value="' + result.store[i].ID + '">' + result.store[i].Name + '</option>')
+                }
+                $('#listStoreId').selectpicker('refresh');
+            }
+        });
+        }
+
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+            $("#sTime").val(startTime);
+            $("#eTime").val(endTime);
+            //renderPaymentDt();
+            //getDataChart();
+        }
+
+        function setupDaterangepicker() {
+            cb(moment(), moment(), 'Hôm nay');
+            $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'), "Tháng này");
+            $('#reportrange').daterangepicker({
+                "opens": "left",
+                "maxDate": moment(),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    'Hôm nay': [moment(), moment()],
+                    'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                    'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                    'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                    'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+        }
+
+        function setupListStoreFilter() {
+            $.ajax({
+                url: "@(Url.Action("LoadStoreList", "TotalReport", new { Area = "SystemReport"}))",
+                success: function (data) {
+                    var content = "";
+                    content += "<option value='0'>" + "Hệ Thống" + "</option>";
+                    for (var i = 0; i < data.listresult.length; ++i) {
+                        content += "<option value='" + data.listresult[i].storeId + "'>" + data.listresult[i].storeName + "</option>";
+                    }
+                    $("#listStoreId").html(content);
+                    $("#listStoreId").selectpicker('refresh');
+                },
+                error: function (error) {
+                    alert("Error Occured")
+                }
+            });
+        }
+        ///Order
+        $(document).on('click', '#exportOrderToExcel', function () {
+            $('#order_selectedstoreId').val($('#listStoreId').val());
+            $('#order_startTime').val($('#sTime').val());
+            $('#order_endTime').val($('#eTime').val());
+            $('#order_status').val($('input[name=report-filter-status]:checked').val());
+            $('#order_type').val($('input[name=report-filter-type]:checked').val());
+            $('#formOrderReportExcel').submit();
+        });
+
+        ///DayReport Doanh thu
+        $(document).on('click', '#export', function () {
+            $('#dateRep_startTime').val($('#sTime').val());
+            $('#dateRep_endTime').val($('#eTime').val());
+            $("#dateRep_selectedStoreId").val($('#listStoreId').val());
+            $('#formDateReportExcel').submit();
+        });
+
+        ///ComparsionStores
+        var storesCbxContent = "";
+        var groupsCbxContent = "";
+        $(document).ready(function () {
+            loadComboboxStores();
+            loadComboboxStoreGroups();
+        });
+        //Radio groups change
+        $('#activeMapping').on('change', function () {
+            //$("#filterStoreTypeItem").html(storesCbxContent);
+            //$('#filterStoreTypeItem').selectpicker({ title: 'Chọn cửa hàng' }).selectpicker('render');
+            //$("#filterStoreTypeItem").selectpicker('refresh');
+            $('#store1').html(storesCbxContent);
+            $('#store2').html(storesCbxContent);
+            $('#store3').html(storesCbxContent);
+            $('#store1').selectpicker({ title: 'Chọn cửa hàng 1' }).selectpicker('render');
+            $('#store2').selectpicker({ title: 'Chọn cửa hàng 2' }).selectpicker('render');
+            $('#store3').selectpicker({ title: 'Chọn cửa hàng 3' }).selectpicker('render');
+            $('#store1').selectpicker('refresh');
+            $('#store2').selectpicker('refresh');
+            $('#store3').selectpicker('refresh');
+            $('#filterStoreType').val($('#activeMapping').val());
+        });
+
+        $('#deActiveMapping').on('change', function () {
+            //$('#filterStoreTypeItem').html(groupsCbxContent);
+            //$('#filterStoreTypeItem').selectpicker({ title: 'Chọn nhóm cửa hàng' }).selectpicker('render');
+            //$('#filterStoreTypeItem').selectpicker('refresh');
+            $('#store1').html(groupsCbxContent);
+            $('#store2').html(groupsCbxContent);
+            $('#store3').html(groupsCbxContent);
+            $('#store1').selectpicker({ title: 'Chọn nhóm cửa hàng 1' }).selectpicker('render');
+            $('#store2').selectpicker({ title: 'Chọn nhóm cửa hàng 2' }).selectpicker('render');
+            $('#store3').selectpicker({ title: 'Chọn nhóm cửa hàng 3' }).selectpicker('render');
+            $('#store1').selectpicker('refresh');
+            $('#store2').selectpicker('refresh');
+            $('#store3').selectpicker('refresh');
+            $('#filterStoreType').val($('#deActiveMapping').val());
+        });
+        function loadComboboxStores() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("GetAllStores", "ComparisonReport", new { Area = "SystemReport"})',
+            success: function (result) {
+                if (result.success) {
+                    for (var i = 0; i < result.list.length; ++i) {
+                        storesCbxContent += "<option value='" + result.list[i].Value + "'>" + result.list[i].Text + "</option>";
+                    }
+                    //$("#filterStoreTypeItem").html(storesCbxContent);
+                    $("#store1").html(storesCbxContent);
+                    $("#store2").html(storesCbxContent);
+                    $("#store3").html(storesCbxContent);
+                    //$("#filterStoreTypeItem").selectpicker('refresh');
+                    $("#store1").selectpicker('refresh');
+                    $("#store2").selectpicker('refresh');
+                    $("#store3").selectpicker('refresh');
+                } else {
+                    ShowMessage(result.message, 1);
+                }
+            },
+            error: function (result) {
+                ShowMessage("Có lỗi xảy ra", 1);
+            }
+            });
+        };
+
+        function loadComboboxStoreGroups() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("GetAllStoreGroups", "ComparisonReport", new { Area = "SystemReport" })',
+                success: function (result) {
+                    if (result.success) {
+                        //var content = "";
+                        for (var i = 0; i < result.list.length; ++i) {
+                            groupsCbxContent += "<option value='" + result.list[i].Value + "'>" + result.list[i].Text + "</option>";
+                        }
+                        //$("#filterStoreTypeItem").html(groupsCbxContent);
+                        //$("#filterStoreTypeItem").selectpicker('refresh');
+                    } else {
+                        ShowMessage(result.message, 1);
+                    }
+                },
+                error: function (result) {
+                    ShowMessage("Có lỗi xảy ra", 1);
+                }
+            });
+        };
+
+        $(".filterStoreTypeItem-container").on("hide.bs.dropdown", function () {
+            LoadDataOnChange();
+        });
+
+        function LoadDataOnChange() {
+            var items = [];
+            if ($('#store1').val() != null && $('#store1').val() != "") {
+                items.push($('#store1').val());
+            }
+            if ($('#store2').val() != null && $('#store2').val() != "") {
+                items.push($('#store2').val());
+            }
+            if ($('#store3').val() != null && $('#store3').val() != "") {
+                items.push($('#store3').val());
+            }
+            if (items.length >= 1) {
+                selectedItems = items;
+                if ($("#filterStoreType").val() == "loadStores") {
+                    //loadStoreReport();
+                    isLoadStore = true;
+                } else {
+                    //loadStoreGroupReport();
+                    isLoadStore = false;
+                }
+
+                $("#filterSaleType").val($("#filterSaleType option:first").val());
+                $("#filterSaleType").selectpicker('refresh');
+            }
+        }
+
+        $('#exportAllStoreGroup').on('click', null, function () {
+            if (selectedItems != null && selectedItems.length > 0) {
+                $('[name=startTime]').val($('#sTime').val());
+                $('[name=endTime]').val($('#eTime').val());
+
+                var items = JSON.stringify(selectedItems);
+                $('[name=selectedItems]').val(items);
+                $('[name=printStore]').val(isLoadStore);
+                $('#formComparisonReportExcel').submit();
+            } else {
+                ShowMessage("Xin chọn cửa hàng trước khi xuất file excel", 2);
+            }
+        });
+
+        ///ProductReport
+            var checktab = 1;
+        //flag initial load
+        var flagStoreList = false;
+        var flagStoreGroupList = false;
+        $(document).ready(function () {
+            //inital load data
+            $('#checkDeal').val("beforeDeal");
+            $('#checkproduct').val("loadProducts");
+            //Initial tab
+
+            $('#exportAllStore').hide();
+            $('#exportStoreGroup').hide();
+            $('#container1').show();
+            $('#container2').hide();
+            $('#container3').hide();
+            $('#groupCategoryReport1').show();
+            $('#groupCategoryReport2').hide();
+            $('#groupCategoryReport3').hide();
+
+            GetStoreListProduct();
+            GetStoreGroupListProduct();
+
+
+
+            // handle datetime
+            function cb(start, end, label) {
+                var startTime = start.format("DD/MM/YYYY"),
+                    endTime = end.format("DD/MM/YYYY"),
+                    dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+                if (label != "Tùy chọn") {
+                    $('#date-string').val(label);
+                } else {
+                    $("#date-string").val(dateString);
+                }
+
+                $("#sTime").val(startTime);
+                $("#eTime").val(endTime);
+                $("#dateRange").html(dateString);
+                loadDataOnChange();
+            }
+            cb(moment(), moment(), "Hôm nay");
+
+            $('#reportrange').daterangepicker({
+                "opens": "left",
+                "maxDate": moment(),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    'Hôm nay': [moment(), moment()],
+                    'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                    'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                    'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                    'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                    'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+
+
+            // seleck and unseleck all click event
+            $('#filter-option').on('click', '#filter-select-all', function () {
+                $('.store-name-filter').prop('checked', "checked");
+                $('#filter').trigger('change');
+            });
+
+            $('#filter-option').on('click', '#filter-unselect-all', function () {
+                $('.store-name-filter').removeAttr('checked');
+                $('#filter').trigger('change');
+            })
+
+            // Export to excel. All store.
+            $(document).on('click', '#exportAllStore', function () {
+                $('#startTimeAll').val($('#sTime').val());
+                $('#endTimeAll').val($('#eTime').val());
+                $('input[name=checkDeal]').val($('#checkDeal').val());
+                $('input[name=checkvalue]').val($('#checkproduct').val());
+                $('#formProductCategoryReportAllExcel').submit();
+            });
+            // Export to excel. One storeGruop.
+            $(document).on('click', '#exportStoreGroup', function () {
+                $('#startTimeGroup').val($('#sTime').val());
+                $('#endTimeGroup').val($('#eTime').val());
+                console.log($('#checkDeal').val());
+                $('input[name=checkDeal]').val($('#checkDeal').val());
+                $('input[name=storeGroupIdReport]').val($('#groupStoreGroupId').val());
+                $('input[name=checkvalue]').val($('#checkproduct').val());
+                $('#ReportProductStoreGroupExportExcelEPPlus').submit();
+            });
+            // Export to excel. One store.
+            $(document).on('click', '#exportOneStore', function () {
+                $('#startTimeOne').val($('#sTime').val());
+                $('#endTimeOne').val($('#eTime').val());
+                console.log($('#checkDeal').val());
+                $('input[name=checkDeal]').val($('#checkDeal').val());
+                $('input[name=storeIdReport]').val($('#groupStoreId').val());
+                $('input[name=checkvalue]').val($('#checkproduct').val());
+                $('#ReportProductOneStoreExportExcelEPPlus').submit();
+            });
+
+            $('#btnChart').click(function () {
+                var status = $(this).data('status');
+                if ($.trim($('#container1').html()).length > 0) {
+                    if (status == 'show') {
+                        $(this).html('<i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                        $(this).data('status', 'hide');
+                    } else {
+                        $(this).html('<i class="fa fa-minus"></i> Ẩn biểu đồ');
+                        $(this).data('status', 'show');
+                    }
+                    $('#containerWrapper').toggle('show');
+                } else {
+                    ShowMessage("Xin tìm trước khi xem biểu đồ", 3);
+                }
+            });
+
+            $('#groupStoreId').on('change', function () {
+                loadDataOnChange();
+            });
+            $('#groupStoreGroupId').on('change', function () {
+                loadDataOnChange();
+            });
+        });
+
+        function loadDataOnChange() {
+            if (flagStoreList && flagStoreGroupList) {
+                if (checktab == 1) {
+                    if ($('#checkproduct').val() == 'loadProducts') {
+                        productReportOneStore();
+                    } else {
+                        CategoryReportOneStore();
+                    }
+                } else if (checktab == 2) {
+                    if ($('#checkproduct').val() == 'loadProducts') {
+                        productReportStoreGroup();
+                    } else {
+                        CategoryReportStoreGroup();
+                    }
+                } else if (checktab == 3) {
+                    if ($('#checkproduct').val() == 'loadProducts') {
+                        productReportAllStore();
+                    } else {
+                        CategoryReportAllStore();
+                    }
+                }
+            }
+
+        }
+
+        //Gom 4 functions ở trên thành sự kiện radio buttons
+        $(document).ready(function () {
+            $('[name="mapping1"]').change(function (e) {
+                var tmp = $('#activeMapping')[0].checked;
+                if (tmp) {
+                    $('#checkproduct').val("loadProducts");
+                } else {
+                    $('#checkproduct').val("loadProductCates");
+                }
+                loadDataOnChange();
+            });
+
+            $('[name="mapping2"]').change(function (e) {
+                var tmp = $('#activeMapping1')[0].checked;
+                if (tmp) {
+                    $('#checkDeal').val("beforeDeal");
+                } else {
+                    $('#checkDeal').val("afterDeal");
+                }
+                loadDataOnChange();
+            });
+        });
+
+        function openCity(evt, cityName) {
+            // Declare all variables
+            var i, tabcontent, tablinks;
+
+            // Get all elements with class="tabcontent" and hide them
+
+
+            // Get all elements with class="tablinks" and remove the class "active"
+            tablinks = document.getElementsByClassName("waves-effect col-lg-6");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+
+            // Show the current tab, and add an "active" class to the link that opened the tab
+            evt.currentTarget.className += " active";
+
+            if (cityName == 'tab1') {
+                checktab = 1;
+                loadDataOnChange();
+                $('#cbhethong').show();
+                $('#cbnhomcuahang').hide();
+                $('#container1').show();
+                $('#container2').hide();
+                $('#container3').hide();
+                $('#groupCategoryReport1').show();
+                $('#groupCategoryReport2').hide();
+                $('#groupCategoryReport3').hide();
+            } else if (cityName == 'tab2') {
+                checktab = 2;
+                loadDataOnChange();
+                $('#cbhethong').hide();
+                $('#cbnhomcuahang').show();
+                $('#container1').hide();
+                $('#container2').show();
+                $('#container3').hide();
+                $('#groupCategoryReport1').hide();
+                $('#groupCategoryReport2').show();
+                $('#groupCategoryReport3').hide();
+            }
+            else {
+                checktab = 3;
+                loadDataOnChange();
+                $('#cbhethong').hide();
+                $('#cbnhomcuahang').hide();
+                $('#container1').hide();
+                $('#container2').hide();
+                $('#container3').show();
+                $('#groupCategoryReport1').hide();
+                $('#groupCategoryReport2').hide();
+                $('#groupCategoryReport3').show();
+            }
+        }
+        function GetStoreListProduct() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("LoadStoreList", "ProductReport", new { Area = "SystemReport" })',
+                success: function (result) {
+                    for (var i = 0; i < result.store.length; i++) {
+                        $('#groupStoreId').append('<option value="' + result.store[i].ID + '">' + result.store[i].Name + '</option>')
+                    }
+                    $('#groupStoreId').selectpicker('refresh');
+                    flagStoreList = true;
+                    loadDataOnChange();
+                    //productReportOneStore();
+                }
+            });
+        }
+        function GetStoreGroupListProduct() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("LoadStoreGroupList", "ProductReport", new { Area = "SystemReport" })',
+                success: function (result) {
+                    $('#groupStoreGroupId').html("");
+                    for (var i = 0; i < result.storeGroup.length; i++) {
+                        $('#groupStoreGroupId').append('<option value="' + result.storeGroup[i].GroupID + '">' + result.storeGroup[i].GroupName + '</option>')
+                    }
+                    $('#groupStoreGroupId').selectpicker('refresh');
+                    if ($('#groupStoreGroupId').val() == null) {
+                        $('#tab2').hide();
+                    }
+                    flagStoreGroupList = true;
+                    loadDataOnChange();
+                },
+            });
+        }
+
+        function productReportOneStore() {
+            $('#exportAllStore').hide();
+            $('#exportStoreGroup').hide();
+            $('#exportOneStore').show();
+            var test = $('#groupStoreId').val();
+
+        };
+        var CategoryReportOneStore = function () {
+            $('#exportAllStore').hide();
+            $('#exportStoreGroup').hide();
+            $('#exportOneStore').show();
+        };
+        var productReportStoreGroup = function () {
+            console.log($('#groupStoreId').val());
+            $('#exportAllStore').hide();
+            $('#exportStoreGroup').show();
+            $('#exportOneStore').hide();
+        };
+        var CategoryReportStoreGroup = function () {
+            console.log($('#groupStoreId').val());
+            $('#exportAllStore').hide();
+            $('#exportStoreGroup').show();
+            $('#exportOneStore').hide();
+        };
+
+        var productReportAllStore = function () {
+            console.log($('#groupStoreId').val());
+            $('#exportAllStore').show();
+            $('#exportStoreGroup').hide();
+            $('#exportOneStore').hide();
+        };
+        var CategoryReportAllStore = function () {
+            console.log($('#groupStoreId').val());
+            $('#exportAllStore').show();
+            $('#exportStoreGroup').hide();
+            $('#exportOneStore').hide();
+        };
+
+    </script>
+    
+    <script> //PaymentTypeReport
+        $(document).on('click', '#exportPaymentTypeExcel', function () {
+        $('#payment_startTime').val($('#sTime').val());
+        $('#payment_endTime').val($('#eTime').val());
+        $('#payment_storeId').val($('#listStoreId').val());
+        $('#payment_brandId').val(@ViewBag.brandId);
+        $('#ExportPaymentExcel').submit();
+        //alert(123);
+    });
+    var chartData;
+    $(document).ready(function () {
+        GetStoreList();
+        //renderPaymentDt();
+        $('#listStoreId').on('change', function () {
+            renderPaymentDt();
+        });
+    });
+
+    $('#chart-btn').on('click', function () {
+        $('#payment-chart-container').toggle();
+        var chart = $('#payment-chart-container').highcharts();
+        if (chart == undefined) {
+            getDataChart();
+        }
+    });
+
+    $('#listStoreId').on('change', function () {
+        renderPaymentDt();
+    });
+
+</script>
+}

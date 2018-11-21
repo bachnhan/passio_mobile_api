@@ -1,0 +1,217 @@
+﻿@{
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+}<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h2>Danh sách đơn hàng</h2>
+            </div>
+        </div>
+    </div>
+
+    <table id="data-table-command" class="table table-striped table-vmiddle">
+        <thead>
+            <tr>
+                <th data-column-id="RentID" data-type="numeric" data-sortable="false">Mã đơn hàng</th>
+                <th data-column-id="CustomerName" data-sortable="false">Người đặt hàng</th>
+                <th data-column-id="CreateTimeStr" data-sortable="false">Thời gian đặt hàng</th>
+                <th data-column-id="FinalAmount" data-sortable="false">Tổng hóa đơn</th>
+                <th data-column-id="commands" data-formatter="Commands" data-sortable="false"></th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<template id="command-template" class="hidden">
+    <a class="btn btn-primary btn-sm" data-role="btn-order-detail" onclick="showOrderDetail()"
+       data-toggle="tooltip" title="Chi tiết">
+        <i class="fa fa-info"></i>
+    </a>
+</template>
+
+<!-- Modal Large -->
+<div class="modal fade" id="order-detail-modal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="zmdi zmdi-info m-r-5"></i> Thông tin đơn hàng</h3>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>Người đặt hàng</h4>
+                        <div class="pmbb-view">
+                            <dl class="dl-horizontal">
+                                <dt>Họ tên</dt>
+                                <dd data-model="Customer.Name">Trung Nguyen</dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Điện thoại</dt>
+                                <dd data-model="Customer.Phone">0603651003</dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Email</dt>
+                                <dd data-model="Customer.Email">trungndt@gmail.com</dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Địa chỉ</dt>
+                                <dd data-model="Customer.Address">Quận 12</dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Phương thức</dt>
+                                <dd data-model="Order.Att1">Chuyển khoản</dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4>Người nhận hàng</h4>
+                        <div class="pmbb-view">
+                            <dl class="dl-horizontal">
+                                <dt>Họ tên</dt>
+                                <dd data-model="Order.DeliveryReceiver">Trung Nguyen</dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Điện thoại</dt>
+                                <dd data-model="Order.DeliveryPhone">0603651003</dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Địa chỉ</dt>
+                                <dd data-model="Order.DeliveryAddress">Quậ n 12</dd>
+                            </dl>
+                            <dl class="dl-horizontal">
+                                <dt>Ghi chú</dt>
+                                <dd data-model="Order.Notes">Ghi chú</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <h3><i class="zmdi zmdi-shopping-basket m-r-5"></i> Danh sách sản phẩm</h3>
+                <table class="table table-striped table-vmiddle table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Mã SP</th>
+                            <th>Hình ảnh</th>
+                            <th>Sản phẩm</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Tổng giảm giá</th>
+                            <th>Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-link" data-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<template id="order-detail-template">
+    <tr>
+        @*PhuongTA update*@
+        @*<td data-model="ProductID">SP001</td>*@
+        <td data-model="ProductCode">#AAA0001</td>
+        <td>
+            <div class="img-container w-100">
+                <div class="ratio-wrapper ratio-wrapper-3-2">
+                    <div class="ratio-item">
+                        <img class="img-responsive" data-attr-model="src:ProductImage" src="~/Content/images/default_product.jpg" />
+                    </div>
+                </div>
+            </div>
+        </td>
+        <td>
+            <h4 data-model="ProductName">Máy lạnh Daikin 1,0 Hp</h4>
+            @*<p data-model="ProductCode"># FTKC25PVMV</p>*@
+        </td>
+        <td>
+            <p data-model="UnitPrice">7.600.000 VND</p>
+        </td>
+        <td>
+            <p data-model="Quantity">1</p>
+        </td>
+        <td><p data-model="Discount">7.600.000 VND</p></td>
+        <td><p data-model="FinalAmount">7.600.000 VND</p></td>
+    </tr>
+</template>
+
+@section scripts {
+    <script>
+        var commandTemplate = $("#command-template").html();
+        function flatten(obj) {
+            var root = {};
+            (function tree(obj, index) {
+                var suffix = toString.call(obj) == "[object Array]" ? "]" : "";
+                for (var key in obj) {
+                    if (!obj.hasOwnProperty(key)) continue;
+                    root[index + key + suffix] = obj[key];
+                    if (toString.call(obj[key]) == "[object Array]") tree(obj[key], index + key + suffix + "[");
+                    if (toString.call(obj[key]) == "[object Object]") tree(obj[key], index + key + suffix + ".");
+                }
+            })(obj, "");
+            return root;
+        }
+        var orderDetailTemplate = $("#order-detail-template").html(); function showOrderDetail() {
+            $.ajax({
+                "url": "@(Url.Action("OrderDetail", new { parameters = currentStoreDomain.Directory }))",
+                "method": "POST",
+                "data": {
+                    "id": $(window.event.currentTarget).data("id")
+                },
+                "success": function (data) {
+                    var order = flatten(data.data);
+                    $("#order-detail-modal [data-model]").each(function (i, e) {
+                        var modelProp = $(e).data("model");
+                        $(e).html(order[modelProp]);
+                    });
+                    $("#order-detail-modal table tbody").empty();
+                    for (var i = 0; i < data.data.OrderDetails.length; i++) {
+                        var orderDetail = flatten(data.data.OrderDetails[i]);
+                        var template = $(orderDetailTemplate);
+
+                        template.find("[data-model]").each(function (i, e) {
+                            var modelProp = $(e).data("model");
+                            $(e).html(orderDetail[modelProp]);
+                        });
+                        template.find("[data-attr-model]").each(function (i, e) {
+                            var modelPropAttr = $(e).data("attr-model");
+                            var modelPropAttrSplit = modelPropAttr.split(":");
+                            if (modelPropAttrSplit.length == 2) {
+                                var attr = modelPropAttr.split(":")[0];
+                                var modelProp = modelPropAttr.split(":")[1];
+                                $(e).attr(attr, orderDetail[modelProp]);
+                            }
+                        });
+                        $("#order-detail-modal table tbody").append(template);
+                        $("#order-detail-modal").modal("show");
+                    }
+                },
+                "error": function (data) {
+
+                }
+            })
+        }
+        $(function () {
+
+            $("#data-table-command").bootgrid({
+                rowCount: [10, 20, 50, ],
+
+                ajax: true,
+                url: "@this.Url.Action("IndexList", new { parameters = currentStoreDomain.Directory })",
+
+                formatters: {
+                    "Commands": function (column, row) {
+                        var template = $(commandTemplate);
+                        template.attr("data-id", row.RentID);
+                        return template[0].outerHTML;
+                    }
+                },
+            });
+        });
+
+
+    </script>
+}

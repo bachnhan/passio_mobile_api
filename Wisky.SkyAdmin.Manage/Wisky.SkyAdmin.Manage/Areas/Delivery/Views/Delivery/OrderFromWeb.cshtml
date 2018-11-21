@@ -1,0 +1,488 @@
+﻿
+@{
+    ViewBag.Title = "Đặt hàng từ Website";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Danh sách đặt hàng từ website</h3>
+            </div>
+            <div class="col-md-6">
+                @*<a class="btn btn-success btn-sm pull-right" data-toggle="modal" data-target="#modalNewDelivery">
+                        <i class="left-icon fa fa-plus"></i>Thêm mới
+                    </a>*@
+                @*<a class="btn btn-success btn-sm pull-right" data-action="open-create-delivery-modal">
+                        <i class="left-icon fa fa-plus"></i>Thêm mới
+                    </a>*@
+                @*<a class="btn btn-primary btn-sm pull-right" href="@Url.Action("Create","Delivery")">
+                    <i class="zmdi zmdi-plus"></i> Thêm mới
+                </a>*@
+            </div>
+
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="card-padding">
+            <div class="row" style="margin-top:-10px;margin-bottom:10px">
+                <div class="col-md-12 p-0">
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#btnBoLoc" style="height:37px">Bộ lọc</button>
+                    </div>
+                    <div class="col-md-6 pull-right p-0">
+                        <div class="pull-right text-right myDatetimePicker">
+                            <div class="input-group">
+                                <div class="dateTime width230 pull-right">
+                                    <div class="fg-line m-t-5">
+                                        <div id="time-range-picker">
+                                            <input id="date-string" readonly class="form-control text-center">
+                                            <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="input-group-btn FindButtonDateTime">
+                                    <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                                        <i class="left-icon fa fa-search"></i>  Tìm
+                                    </a>
+                                </div>
+                            </div>
+                            <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                            <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="collapse" id="btnBoLoc">
+                @*<div class="col-md-12" style="">*@
+                <div class="group-radio-buttons" myGroup-radio-buttons " style="padding-bottom: 10px">
+                    @*<a class="btn btn-primary btn-sm pull-right" href="#btnBoLoc">
+                            <i class="zmdi zmdi-plus"></i> Bộ lọc
+                        </a>*@
+                    <div class="col-md-12" style="">
+                        <h4 style="margin-bottom:5px;font-weight:bold;">Tìm kiếm: </h4>
+                    </div>
+                    <div class="row small-margin">
+                        <div class="col-md-3" style="padding-left:100px">
+                            <input type="radio" name="searchBy" value="1" class="nice-check" id="byCode" checked />
+                            <label for="byCode"><span>Tìm mã hóa đơn</span></label>
+                        </div>
+                        <div class="col-md-3" style="padding-left:100px">
+                            <input type="radio" name="searchBy" value="0" class="nice-check" id="byName" />
+                            <label for="byName"><span>Tìm tên khách hàng</span></label>
+                        </div>
+                        <div class="col-md-3" style="padding-left:100px">
+                            <input type="radio" name="searchBy" value="2" class="nice-check" id="byPlace" />
+                            <label for="byPlace"><span>Tìm địa chỉ giao hàng</span></label>
+                        </div>
+                        <div class="col-md-3" style="padding-left:100px">
+                            <input type="radio" name="searchBy" value="3" class="nice-check" id="byStore" />
+                            <label for="byStore"><span>Tìm theo cửa hàng</span></label>
+                        </div>
+                    </div>
+                    <!--Tinh trang-->
+                    @*<div class="group-radio-buttons" style="padding-bottom: 10px">
+                        <div class="col-md-12" style="margin-bottom:0px; margin-top:10px;">
+                            <h4 style="margin-bottom:5px;font-weight:bold;">Tình trạng: </h4>
+                        </div>
+                        <div class="row small-margin">
+                            <div class="col-md-3" style="padding-left:100px;padding-top: 10px;padding-bottom: 10px;">
+                                <input type="radio" name="searchByStatus" value="10" class="nice-check" id="byAll" checked />
+                                <label for="byAll"><span>Tất cả</span></label>
+                            </div>
+                            <div class="col-md-3" style="padding-left:100px;padding-top: 10px;">
+                                <input type="radio" name="searchByStatus" value="4" class="nice-check" id="byDeliveryFinish" />
+                                <label for="byDeliveryFinish"><span>Hoàn thành</span></label>
+                            </div>
+                            <div class="col-md-3" style="padding-left:100px;padding-top: 10px;">
+                                <input type="radio" name="searchByStatus" value="5" class="nice-check" id="byDeliveryPreCancel" />
+                                <label for="byDeliveryPreCancel"><span>Đã hủy trước chế biến</span></label>
+                            </div>
+                            <div class="col-md-3" style="padding-left:100px;padding-top: 10px;">
+                                <input type="radio" name="searchByStatus" value="6" class="nice-check" id="byDeliveryCancel" />
+                                <label for="byDeliveryCancel"><span>Đã hủy sau chế biến</span></label>
+                            </div>
+                            <div class="col-md-12" style="margin-bottom:0px; margin-top:10px;">
+                            </div>
+                            <div class="col-md-3" style="padding-left:100px">
+                                <input type="radio" name="searchByStatus" value="7" class="nice-check" id="byDeliveryAssigned" />
+                                <label for="byDeliveryAssigned"><span>Cửa hàng chưa xử lý</span></label>
+                            </div>
+                            <div class="col-md-3" style="padding-left:100px;padding-bottom: 10px;">
+                                <input type="radio" name="searchByStatus" value="8" class="nice-check" id="byDelivery" />
+                                <label for="byDelivery"><span>Đang đi giao</span></label>
+                            </div>
+                            <div class="col-md-3" style="padding-left:100px;padding-bottom: 10px;">
+                                <input type="radio" name="searchByStatus" value="3" class="nice-check" id="byDeliveryFail" />
+                                <label for="byDeliveryFail"><span>Hóa đơn lỗi</span></label>
+                            </div>
+                            <div class="col-md-3" style="padding-left:100px;padding-bottom: 10px;">
+                                <input type="radio" name="searchByStatus" value="9" class="nice-check" id="byDeliveryNew" />
+                                <label for="byDeliveryNew"><span>Mới tạo</span></label>
+                            </div>
+                        </div>
+                    </div>*@
+                    <!--./Tinh trang-->
+                </div>
+            </div>
+            <div class="row" style="margin-top:20px">
+                <table id="orders-table" class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th><label>STT</label></th>
+                            <th><label>Mã hóa đơn</label></th>
+                            <th><label>Tên khách hàng</label></th>
+                            <th><label>Địa chỉ giao hàng</label></th>
+                            <th><label>Điện thoại</label></th>
+                            <th><label>Thời gian đặt hàng</label></th>
+                            <th><label>Cửa hàng</label></th>
+                            <th><label>Trạng thái</label></th>
+                            <th><label>Tùy chọn</label></th>
+                            <th><label>Ghi chú</label></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade " tabindex="-1" id="orderDetailPanel" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+
+</div>
+
+<template id="templateOrderParent">
+    <tr class="bold main-order-row">
+        <td><span data-role="name"></span><span class="red">(*)</span></td>
+        <td class="align-right" data-role="unitPrice"></td>
+        <td class="align-center" data-role="quantity"></td>
+        <td class="align-right" data-role="totalPrice"></td>
+
+        <td>
+            <a class="blue"
+               data-orderid=""
+               data-action="open-edit-order-modal"
+               data-type=""
+               data-hasextra="">
+                <i class="fa fa-pencil"></i>
+            </a>
+        </td>
+        <td class="align-center">
+            <a class="red" data-id="" data-action="remove-single-order"><i class="fa fa-times"></i></a>
+        </td>
+    </tr>
+</template>
+
+<template id="templateOrderChildren">
+    <tr class="italic">
+        <td class="pl-20" data-role="name"></td>
+        <td class="align-right" data-role="unitPrice"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+</template>
+
+<template id="paymentRow">
+    <tr class="payment-row">
+        <td data-role="icon"><i class="fa"></i></td>
+        <td data-role="due"></td>
+        <td data-role="tender" class="payment-tender" contenteditable="true"></td>
+        <td data-role="change" class="payment-change"></td>
+        <td data-role="description" contenteditable="true" data-ph="Ghi chú..."></td>
+        <td data-role="control"><a class="btn-remove" data-action="remove-payment-item"><i class="fa fa-times"></i></a></td>
+    </tr>
+</template>
+
+<script>
+    var currentId = -1;
+    var orderDetailTable = null;
+    var ordersTable = null;
+    //Set up Daterange picker
+    function setupDaterangepicker() {
+        cb(moment().startOf('day'), moment(), "Hôm nay");
+        //$('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+        $('#time-range-picker').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment().startOf('day'), moment().endOf('day')],
+                'Hôm qua': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+    }
+
+    //Set up display daytime
+    function cb(start, end, label) {
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string').val(label);
+        } else {
+            $("#date-string").val(dateString);
+        }
+
+        $("#sTime").val(startTime);
+        $("#eTime").val(endTime);
+        $("#date-string").html(dateString);
+        initdatatable();
+    }
+
+    function initdatatable() {
+        $('#orders-table').dataTable({
+            "bSort": false,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": '@Url.Action("LoadDeliveryOrdersNotAssign")',
+            "bProcessing": true,
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "check", "value": $('input:radio[name=searchBy]:checked').val() });
+                //aoData.push({ "name": "checkStatus", "value": $('input:radio[name=searchByStatus]:checked').val() });
+                aoData.push({ "name": "starttime", "value": $('#sTime').val() });
+                aoData.push({ "name": "endtime", "value": $('#eTime').val() });
+            },
+            "bStateSave": true,
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 4, 7, 8],
+                    "sClass": "text-center"
+                },
+                { "aTargets": [0, 1, 2, 3, 4], "bSortable": false },
+                {
+                    "aTargets": [8],
+                    "mRender": function (data, type, o) {
+                        var btn = $('<a/>', {
+                            'class': 'btn btn-sm btn-primary',
+                            'html': $('<span/>', {
+                                'class': 'glyphicon glyphicon-eye-open'
+                            }),
+                            'data-id': o[8],
+                            'data-customer-name': o[2],
+                            'data-customer-phone': o[4],
+                            'data-delivery-address': o[3],
+                            'data-store-name': o[6],
+                            'data-order-time': o[5],
+                            'data-status': o[10],
+                            'data-storeId': o[9],
+                            'data-role': 'detail'
+                        });
+
+                        var trash = "<button id='delOrderOnline' class='btn btn-sm btn-danger' onclick='DeleteOrderOnline(" + o[8] + ")' style='display:none'><span class='glyphicon glyphicon-trash icon-white'></span></button>";
+                        return btn[0].outerHTML + trash;
+                        //return "<a class='btn btn-sm btn-info' data-action='open-edit-delivery-modal' data-rentId='" + o.aData[8] + "'><span class='icon-edit icon-white'></span></a>";
+                    }
+                },
+                {
+                    "aTargets": [7],
+                    "mRender": function (data, type, o) {
+                        var status = "";
+                        var color = "";
+                        var text = HMS.deliveryManagement.getDeliveryStatusText(o[7]);
+                        var btn = $('<span/>', {
+                            'class': 'label label-' + text.color,
+                            'html': text.status
+                        });
+                        return btn[0].outerHTML;
+                    }
+                },
+                {
+                    "aTargets": [9],
+                    "mRender": function (data, type, o) {
+                        return o[11];
+                    }
+                }
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+    }
+
+    $(document).ready(function () {
+        setupDaterangepicker();
+        $('[name=searchBy]').change(function () {
+            RefreshOrderTable();
+        });
+        $('[name=searchByStatus]').change(function () {
+            RefreshOrderTable();
+        });
+        $('#btnSearch').on('click', function () {
+            RefreshOrderTable();
+        });
+
+        function RefreshOrderTable() {
+            var oTable = $("#orders-table").dataTable();
+            oTable._fnPageChange(0);
+            oTable._fnAjaxUpdate();
+        }
+
+       
+        $(document).on('click', '[data-role=detail]', function () {
+            currentId = $(this).attr('data-id');
+            statusInt = $(this).attr('data-status');
+            $.ajax({
+                url: '@Url.Action("OrderDetail","Delivery")',
+                type: 'GET',
+                data: {
+                    Id: currentId
+                },
+                dataType: 'html',
+                success: function (result) {
+                    $('#orderDetailPanel').html(result);
+                    $('#orderDetailPanel').modal('show');
+                    setStatus(statusInt);
+                    initOrderDetailTable();
+                },
+                error: function (error) {
+                    ShowMessage("Error Occured", 1);
+                }
+            });
+        });
+
+        function setStatus(statusInt) {
+            var status = HMS.deliveryManagement.getDeliveryStatusText(parseInt(statusInt));
+            //if ($(this).attr('data-status') == 9 || $(this).attr('data-status') == 0 || $(this).attr('data-status') == 4) {
+            if (statusInt == 5 || statusInt == 0) {
+                $('#order-detail-submit').show();
+            } else {
+                $('#order-detail-submit').hide();
+            }
+            var btn = $('<span/>', {
+                'class': 'label label-' + status.color,
+                'html': status.status
+            });
+            $('#orderDetailPanel [data-role=status]').html(btn);
+        }
+
+        function initOrderDetailTable() {
+            $('#order-detail-table').dataTable({
+                "bRetrieve": true,
+                "bServerSide": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("LoadOrderDetail")",
+                "bProcessing": true,
+                "fnServerParams": function (aoData) {
+                    aoData.push({ "name": "id", "value": currentId },
+                                { "name": "check", "value": $('input:radio[name=searchBy]:checked').val() });
+                },
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Tên sản phẩm",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+
+                },
+                "aoColumnDefs": [
+                    { "aTargets": [0, 1, 2, 3, 4], "bSortable": false },
+                    { "aTargets": [2], className: "text-right" },
+                    { "aTargets": [3], className: "text-center" },
+                    //{
+                    //    "aTargets": [2],
+                    //    "fnRender": function (o) {
+                    //        var money = o.aData[2].toMoney(0, ',', '.');
+                    //        return money;
+                    //    }
+                    //}
+                ],
+                "bAutoWidth": false
+            }).fnSetFilteringDelay(delaySearch);
+        }
+
+
+        $(document).on('click', '#order-detail-submit', function () {
+            //console.log(currentId, $('#store-list').val());
+            $.ajax({
+                url: '@Url.Action("ChangeDeliveryStore","Delivery")',
+                type: 'POST',
+                data: {
+                    id: currentId,
+                    newStoreId: $('#store-list').val()
+                },
+                success: function (rp) {
+                    if (rp.success) {
+                        ShowMessage('Thay đổi cửa hàng thành công', 2);
+                        RefreshOrderTable();
+                        $('#orderDetailPanel').modal('hide');
+                    } else {
+                        ShowMessage('Thay đổi cửa hàng thất bại', 1);
+                    }
+                },
+                fail: function () {
+                    ShowMessage('Thay đổi cửa hàng thất bại', 1);
+                }
+            });
+        });
+        setInterval(function () {
+            var oTable = $("#orders-table").dataTable();
+            oTable.fnDraw(false);
+        }, 180000);
+    });
+    //function DeleteOrderOnline(orderId) {
+    //    bootbox.dialog({
+    //        title: "<h5>Xác nhận<h5>",
+    //        message: "<div style='font-size:15px'>Bạn có muốn xóa hóa đơn này không?</div>",
+    //        buttons: {
+    //            "ok": {
+    //                "label": "<i class='fa fa-ok'></i> Đồng ý",
+    //                "className": "btn-sm btn-success",
+    //                "callback": function () {
+    //                    window.OnlineOrder.removeOrderDetail(orderId);
+    //                }
+    //            },
+    //            "close": {
+    //                "label": "<i class='fa fa-remove'></i> Đóng",
+    //                "className": "btn-sm btn-danger",
+    //                "callback": function () {
+    //                    bootbox.hideAll();
+    //                }
+    //            }
+    //        }
+    //    });
+    //}
+
+    //$.fn.serializeObject = function () {
+    //    var o = {};
+    //    var a = this.serializeArray();
+    //    $.each(a, function () {
+    //        if (o[this.name] !== undefined) {
+    //            if (!o[this.name].push) {
+    //                o[this.name] = [o[this.name]];
+    //            }
+    //            o[this.name].push(this.value || '');
+    //        } else {
+    //            o[this.name] = this.value || '';
+    //        }
+    //    });
+    //    return o;
+    //};
+</script>

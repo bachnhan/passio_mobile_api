@@ -1,0 +1,403 @@
+﻿
+@{
+    ViewBag.Title = "IndexMonth";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    IEnumerable<HmsService.ViewModels.ProductItemCategoryViewModel> productCategories = ViewBag.ProductCategories;
+    IQueryable<HmsService.ViewModels.StoreViewModel> stores = ViewBag.Stores;
+}
+
+<style>
+    .input-group .input-group-btn > a.btn {
+        margin-top: 0px !important;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-12">
+                <h3>Tồn kho trong tháng</h3>
+                <h5 data-role="small-date" class="smallDate">(@ViewBag.FirstDate - @ViewBag.LastDate)</h5>
+            </div>
+        </div>
+        <hr />
+        <div class="row" style="margin-top: 19px;">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <select class="selectpicker" id="item-categories" title="Tất cả loại nguyên liệu" multiple>
+                        @foreach (var item in productCategories)
+                        {
+                            <option value="@item.CateID">@item.CateName</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            @if (stores.Count() != 0)
+            {
+                <div class="col-md-3">
+                    <div class="form-group">
+                        <select class="selectpicker" id="selectedStore">
+                            <option value="0">Tất cả cửa hàng</option>
+                            @foreach (var item in stores)
+                            {
+                                <option value="@item.ID">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            }
+
+            <div class="col-md-6 pull-right text-right">
+                @*<div class="input-group">
+                        <div class="date-picker">
+                            <input class="p-7-30" type="text" id="date-string" readonly="">
+                            <a class="CelenderA" id="reportrange"><i class="fa fa-calendar"></i></a>
+                        </div>
+                        <div class="input-group-btn">
+                            <a class="btn btn-primary btn-sm" id="btnSearch">
+                                <i class="left-icon fa fa-search"></i>Tìm
+                            </a>
+                        </div>
+                    </div>*@
+                <div class="input-group">
+                    <!-- Daterange picker -->
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group-btn FindButtonDateTime">
+                        <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                            <i class="left-icon fa fa-search"></i> Tìm
+                        </a>
+                    </div>
+                </div>
+                <input type="hidden" id="sTime" />
+                <input type="hidden" id="eTime" />
+            </div>
+        </div>
+        <div class="m-t-20">
+            <div class="form-horizontal" id="infoIndex"></div>
+            <table class="table table-striped table-hover table-bordered" style="width:100%" id="main-table">
+                <thead>
+                    <tr>
+                        <th><label>STT</label></th>
+                        <th><label>Mã sản phẩm</label></th>
+                        <th><label>Tên sản phẩm</label></th>
+                        <th><label>Phân loại</label></th>
+                        <th><label>Đơn vị</label></th>
+                        <th><label>Giá tiền</label></th>
+                        <th><label>Tồn đầu</label></th>
+                        <th><label>Tồn cuối</label></th>
+                        <th><label>Thành tiền</label></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr id="total1">
+                        <th colspan="8" style="text-align:left; font-weight: bold; font-size: large">Tổng tiền:</th>
+                        <th style="font-weight: bold; font-size: large"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    var selectedCategories = [];
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker({
+            size: 10,
+        });
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+
+            $("#sTime").val(startTime);
+            $("#eTime").val(endTime);
+            $('[data-role=small-date]').html(dateString);
+        };
+
+        cb(moment().startOf('month'), moment(), "Tháng này");
+        $('#reportrange').daterangepicker({
+            startDate: moment().startOf('month'),
+            endDate: moment(),
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+
+                'Tháng này': [moment().startOf('month'), moment()],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'Hai tháng trước': [moment().subtract(2, 'month').startOf('month'), moment().subtract(2, 'month').endOf('month')]
+            }
+        }, cb);
+
+        loadInfoIndex($("#sTime").val(), $("#eTime").val());
+
+        //"Tìm" button event on click
+        $('#btnSearch').on('click', function () {
+            sStartDate = $("#sTime").val();
+            sEndDate = $("#eTime").val();
+            dStartDate = moment(sStartDate, 'DD/MM/YYYY');
+            dEndDate = moment(sEndDate, 'DD/MM/YYYY');
+
+            if (sStartDate.length > 16 || sEndDate.length > 16) {
+                ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                return;
+            }
+
+            if ((sStartDate.length > 0 && sEndDate.length == 0) || (sEndDate.length > 0 && sStartDate.length == 0) || (dStartDate > dEndDate)) {
+                ShowMessage("Thời gian bắt đầu và kết thúc không phù hợp", 3);
+                return;
+            }
+
+            //$("#storeReportDatatable").dataTable().fnDestroy();
+            //InitDatatable();
+            //if ($("#sTime").val() == '' || $("#eTime").val() == '') {
+            //    $('#dateRange').html('(' + moment().format('DD/MM/YYYY') + ')');
+            //} else {
+            //    $('#dateRange').html('(' + $("#sTime").val() + ($("#sTime").val() === $("#eTime").val() ? '' : (' - ' + $("#eTime").val())) + ')');
+            //}
+            $('[data-role=small-date]').html('(' + $("#sTime").val() + ($("#sTime").val() === $("#eTime").val() ? '' : (' - ' + $("#eTime").val())) + ')');
+            loadInfoIndex($("#sTime").val(), $("#eTime").val());
+            ProductFilter();
+            RefreshTable();
+        });
+
+        //$('#item-categories').on('change', function () {
+        //    ProductFilter();
+        //});
+
+        //$('#selectedStore').on('change', function () {
+        //    ProductFilter();
+        //});
+
+        function ProductFilter() {
+            var select = document.getElementById("item-categories");
+            selectedCategories.length = 0;
+            for (var i = 0; i < select.length; i++) {
+                if (select.options[i].selected) selectedCategories.push(select.options[i].value);
+            }
+            //RefreshTable();
+        };
+
+        function loadInfoIndex(sTime, eTime) {
+            $.ajax({
+                url: "@Url.Action("InfoIndex", "Inventory")",
+                type: "GET",
+                data: { sTime: sTime, eTime: eTime },
+            dataType: 'html',
+            success: function (result) {
+                $('#infoIndex').html(result);
+            }
+        });
+    }
+
+        Number.prototype.formatMoney = function (c, d, t) {
+            var n = this,
+                c = isNaN(c = Math.abs(c)) ? 2 : c,
+                d = d == undefined ? "." : d,
+                t = t == undefined ? "," : t,
+                s = n < 0 ? "-" : "",
+                i = parseInt(n = Math.abs(+n || 0).toFixed(c)) + "",
+                j = (j = i.length) > 3 ? j % 3 : 0;
+            return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
+        };
+        var tester;
+        window.TableHistory = $('#main-table').dataTable({
+            //"bPaginate": false,
+            "bAutoWidth": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadIndexMonth","Inventory")",
+            "bProcessing": true,
+            "bSortable": true,
+            //"bScrollCollapse": true,
+            "bInfo": false,
+            //"bPaginate": false,
+            "lengthMenu": [10, 20, 50, 100],
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "cateId", "value": selectedCategories.toString() });
+                aoData.push({ "name": "startTime", "value": $("#sTime").val() });
+                aoData.push({ "name": "endTime", "value": $("#eTime").val() });
+                aoData.push({ "name": "selectedStoreId", "value": $("#selectedStore").val() });
+            },
+            "columns": [
+                { "data": "No" },
+                { "data": "ItemCode" },
+                { "data": "itemName" },
+                {
+                    "data": "itemType",
+                    "mRender": function (data, type, row) {
+                        var result = "";
+                        if (data === 1) {
+                            result = "<span>Nguyên vật liệu</span>";
+                        }
+                        else if (data === 2) {
+                            result = "<span>Vật tư lẻ</span>";
+                        }
+                        return result;
+                    }
+                },
+                { "data": "unit" },
+                { "data": "unitPrice" },
+                { "data": "firstRealQuantity" },
+                { "data": "lastRealQuantity" },
+                { "data": "TotalRealAmount" },
+            ],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " ",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                },
+                "sSearchPlaceholder": "Tên sản phẩm"
+
+            },
+            "columnDefs": [
+                {
+                    "visible": false, "targets": [3]
+                },
+                  {
+                      "targets": [0, 3, 4, 5, 6, 7],
+                      "sClass": "text-center"
+                  },
+            ],
+            "order": [[3, "desc"]],
+            //"displayLength": 50,
+
+            "drawCallback": function (settings) {
+                var api = this.api();
+                var rows = api.rows({ page: 'current' }).nodes();
+                var last = null;
+
+                //api.column(3, {page:'current'} ).data().each( function ( group, i ) {
+                //    if ( last !== group ) {
+                //        $(rows).eq( i ).before(
+                //            '<tr class="group" style="background-color:yellow"><td colspan="9" style="font-weight: bold; font-size: large">'+group+'</td></tr>'
+                //        );
+
+                //        last = group;
+                //    }
+                //});
+                api.column(3, { page: 'current' }).data().each(function (group, i) {
+                    val = api.row(api.row($(rows).eq(i)).index()).data();
+                    var type;
+                    if (group == "1") {
+                        type = "Nguyên vật liệu";
+                    }
+                    else {
+                        type = "Vật tư lẻ";
+                    }
+                    if (last !== group) {
+                        $(rows).eq(i).before(
+                        $("<tr></tr>", {
+                            "class": "group",
+                            "data-id": group,
+                            "style": "background-color: brown; color: white"
+                        }).append($("<td></td>", {
+                            "colspan": 7,
+                            "class": "pocell",
+                            "text": type,
+                            "style": "font-weight: bold; font-size: large"
+                        })).append($("<td></td>", {
+                            "id": "sub" + group,
+                            "class": "noCount",
+                            "text": "0",
+                            "style": "font-weight: bold; font-size: large"
+                        })).prop('outerHTML'));
+                        last = group;
+                    }
+                    var intVal = function (i) {
+                        return typeof i === 'string' ?
+                            i.replace(/[\$,]/g, '') * 1 :
+                            typeof i === 'number' ?
+                            i : 0;
+                    };
+                    totalRealAmount = intVal($("#sub" + group).text()) + intVal(val.TotalRealAmount);
+                    //ShowMessage($("#sub" + group).text(),3);
+                    $("#sub" + group).text(totalRealAmount.formatMoney(0, '.', ','));//
+                });
+
+                //var total = 0;
+                //$("#main-table tbody tr").each(function (index) {
+                //    if ($(this).find('td:first.group').html()) {
+                //        total = 0;
+                //    } else {
+                //        total = parseFloat(total) + parseFloat(this.cells[3].innerHTML);
+                //        $(this).closest('tr').prevAll('tr:has(td.group):first').find("div").html(total);
+                //    }
+                //});
+            },
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(), data;
+                var data1 = data.totalType1;
+                // Remove the formatting to get integer data for summation
+                var intVal = function (i) {
+                    return typeof i === 'string' ?
+                        i.replace(/[\$,]/g, '') * 1 :
+                        typeof i === 'number' ?
+                        i : 0;
+                };
+
+                // Total over all pages
+                total = api
+                    .column(8)
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Total over this page
+                pageTotal = api
+                    .column(8, { page: 'current' })
+                    .data()
+                    .reduce(function (a, b) {
+                        return intVal(a) + intVal(b);
+                    }, 0);
+
+                // Update footer
+                //$("#total").text(pageTotal.formatMoney(3, '.', ','))
+                $(api.column(8).footer("#total")).html(
+                    pageTotal.formatMoney(0, '.', ',')
+                );
+            }
+        }).fnSetFilteringDelay(delaySearch);
+        $('#main-table tbody').on('click', 'tr.group', function () {
+            var currentOrder = TableHistory.order()[0];
+            if (currentOrder[0] === 3 && currentOrder[1] === 'asc') {
+                TableHistory.order([3, 'desc']).draw();
+            }
+            else {
+                TableHistory.order([3, 'asc']).draw();
+            }
+        });
+    });
+    function RefreshTable() {
+        var oTable = $("#main-table").dataTable();
+        oTable._fnPageChange(0);
+        oTable._fnAjaxUpdate();
+    };
+</script>

@@ -1,0 +1,106 @@
+﻿@model Wisky.SkyAdmin.Manage.Areas.Admin.Models.ViewModels.ProductEditViewModel
+
+@{
+    ViewBag.Title = "Edit Product";
+}
+@this.Html.Partial("Editor", this.Model)
+
+@section scripts {
+
+    <link href="~/Content/plugins/elfinder/css/elfinder.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/elfinder/css/theme.css" rel="stylesheet" />
+
+    <script src="~/Content/plugins/dropzone/dropzone.js"></script>
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script src="~/Content/plugins/elfinder/js/elfinder.full.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            SKYWEB.Admin.Product.addAdvanceSetting();
+        });
+        $(document).ready(function () {
+            var currentProductId = 0;
+            var productId = document.getElementById('ProductId');
+            var productName = document.getElementById('ProductName');
+
+
+            window.HMS.ProductSingle.init();
+
+            SKYWEB.Admin.Product.init();
+            SKYWEB.Admin.General.setupElfinderToCkeditor('Description');
+
+            $('#btn-submit-product').click(function () {
+                var code = $('#Code').val();
+                var seoName = $('#SeoName').val();
+                if ($('#ProductName').val().trim() == '') {
+                    ShowMessage("Vui lòng nhập tên dòng sản phẩm", 3);
+                    return;
+                }
+                else if ($('#Code').val().trim() == '') {
+                    ShowMessage("Vui lòng nhập mã sản phẩm", 3);
+                    return;
+                }
+                else {
+                    $.ajax({
+                        url: '@Url.Action("CheckCodeEdit")',
+                        type: 'POST',
+                        data: {
+                            code: code,
+                            seoName: seoName,
+                            id: $('#ProductID').val()
+                        },
+                        success: function (result) {
+                            if (result.success) {
+                                var $form = $('form');
+
+                                var specNames = $form.find("[name='Specifications.Name']");
+                                var specValues = $form.find("[name='Specifications.Value']");
+
+                                //Generate seo name
+                                if ($('#SeoName').val() == "") {
+                                    var e = $('.seo-source[data-seo-target]');
+                                    var target = e.attr("data-seo-target");
+                                    $(target).val(generateSeoTitle(e.val()));
+                                }
+
+                                for (var i = 0; i < specNames.length; i++) {
+                                    var $specName = $(specNames[i]);
+                                    var $specValue = $(specValues[i]);
+
+                                    $specName.removeAttr('required');
+                                    $specValue.removeAttr('required');
+
+                                    var specName = $specName.val();
+                                    var specValue = $specValue.val();
+
+                                    if (specName && !specValue) {
+                                        $specValue.attr('required', 'required');
+                                        $form.find(':submit').click();
+                                    } else if (!specName && specValue) {
+                                        $specName.attr('required', 'required');
+                                        $form.find(':submit').click();
+                                    }
+                                }
+
+                                $form.find("[name='Specifications.Name']").each(function (i, e) {
+                                    $(e).attr("name", "Specifications[" + i + "].Name");
+                                });
+
+                                $form.find("[name='Specifications.Value']").each(function (i, e) {
+                                    $(e).attr("name", "Specifications[" + i + "].Value");
+                                });
+                                $form.find(':submit').click();
+                                ShowMessage("Cập nhật thông tin thành công", 2);
+
+                            }
+                        },
+                        error: function (error) {
+                            ShowMessage("Có lỗi xảy ra", 1);
+                        }
+                    });
+                }
+            });
+        });
+
+    </script>
+}

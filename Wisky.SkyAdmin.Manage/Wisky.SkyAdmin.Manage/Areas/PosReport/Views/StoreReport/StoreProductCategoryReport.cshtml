@@ -1,0 +1,601 @@
+﻿@{
+    ViewBag.Title = "Báo cáo doanh thu sản phẩm";
+    //   Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Báo cáo theo sản phẩm</h3>
+                <h5 data-role="small-date" id="dateRange"></h5>
+                <h5 data-role="small-date" id="timeRange"></h5>
+            </div>
+            <div class="col-md-6">
+                <div id="exportArea" style="text-align: right;">
+                    <button id="export" class="btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row" style="margin-top: 19px;">
+            <div class="col-md-12">
+                <form id="form-create-session" class="form-inline">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-1 myTimeLabel">Từ </div>
+                                <!-- START HOUR -->
+                                
+                                <div class="col-md-3 myTime">
+                                    <div class="select">
+                                        <select id="startHour" class="form-control valid fg-line">
+                                            <option value="-1"></option>
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                            <option value="13">13</option>
+                                            <option value="14">14</option>
+                                            <option value="15">15</option>
+                                            <option value="16">16</option>
+                                            <option value="17">17</option>
+                                            <option value="18">18</option>
+                                            <option value="19">19</option>
+                                            <option value="20">20</option>
+                                            <option value="21">21</option>
+                                            <option value="22">22</option>
+                                            <option value="23">23</option>
+                                            <option value="24">24</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-1 myTimeLabel"> giờ </div><div class="col-md-1 myTimeLabel">-</div><!-- START HOUR END -->
+                                <!-- END HOUR -->
+                                <div class="col-md-1 myTimeLabel">tới </div>
+                                <div class="col-md-3 myTime">
+                                    <div class="select">
+                                        <select id="endHour" class="form-control valid fg-line">
+                                            <option value="-1"></option>
+                                            <option value="0">0</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                            <option value="11">11</option>
+                                            <option value="12">12</option>
+                                            <option value="13">13</option>
+                                            <option value="14">14</option>
+                                            <option value="15">15</option>
+                                            <option value="16">16</option>
+                                            <option value="17">17</option>
+                                            <option value="18">18</option>
+                                            <option value="19">19</option>
+                                            <option value="20">20</option>
+                                            <option value="21">21</option>
+                                            <option value="22">22</option>
+                                            <option value="23">23</option>
+                                            <option value="24">24</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-1 myTimeLabel">giờ</div><!-- END HOUR END -->
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group pull-right">
+                                <!-- Daterange picker -->
+                                <div class="dateTime width230 pull-right">
+                                    <input id="datestring" hidden />
+                                    <div class="fg-line m-t-5">
+                                        <div id="reportrange">
+                                            <input id="date-string" readonly class="form-control text-center">
+                                            <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="input-group-btn FindButtonDateTime">
+                                    <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                                        <i class="left-icon fa fa-search"></i> Tìm
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- DATE PICKER -->
+
+                    <div>
+                        <input type="hidden" id="sTime" />
+                        <input type="hidden" id="eTime" />
+                        <input type="hidden" id="sHour" />
+                        <input type="hidden" id="eHour" />
+                    </div><!-- STORE DATE AND HOUR END -->
+                    <!-- HOUR SELECTION -->
+                    <!-- HOUR SELECTION END -->
+                </form>
+            </div>
+        </div>
+
+        <div id="container" style="width:100%;height:auto"></div><!-- MAIN CHART END -->
+
+    </div>
+    <div class="card-padding">
+        <div id="groupCategoryReport">
+            <table id="groupCategoryReportDatatable" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label class="">Tên sản phẩm</label>
+                        </th>
+                        <th>
+                            <label class="">Ngành hàng</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng</label>
+                        </th>
+                        <th>
+                            <label class="">Tổng tiền</label>
+                        </th>
+                        @*<th>
+                                <label class="">Số lượng (AtStore)</label>
+                            </th>
+                            <th>
+                                <label class="">Số lượng (TakeAway)</label>
+                            </th>
+                            <th>
+                                <label class="">Số lượng (Delivery)</label>
+                            </th>
+                            <th>
+                                <label class="">Giảm giá</label>
+                            </th>*@
+                        @*<th>
+                                <label class="">Tổng hóa đơn</label>
+                            </th>*@
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div><!-- CATEGORIES TABLE END -->
+    </div>
+</div>
+@*<div class="page-content">
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="row">
+            <!-- HEADER NAME -->
+            <div class="col-md-6">
+                <h1>Báo cáo sản phẩm</h1>
+                <h1><small data-role="small-date" id="dateRange"></small><small data-role="small-date" id="timeRange"></small></h1>
+            </div><!-- HEADER NAME END -->
+            <!-- SEARCH -->
+            <div class="col-md-6 text-right">
+                <form id="form-create-session" class="form-inline">
+                    <!-- HOUR SELECTION -->
+                    <div class="input-group" style="margin-right: 5px">
+                        <!-- START HOUR -->
+                        <span> Từ </span>
+                        <select id="startHour">
+                            <option value="-1"></option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option>
+                            <option value="22">22</option>
+                            <option value="23">23</option>
+                            <option value="24">24</option>
+                        </select>
+                        <span style="margin-right: 10px">giờ</span><!-- START HOUR END -->
+                        <!-- END HOUR -->
+                        <span> tới </span>
+                        <select id="endHour">
+                            <option value="-1"></option>
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option>
+                            <option value="22">22</option>
+                            <option value="23">23</option>
+                            <option value="24">24</option>
+                        </select>
+                        <span>giờ</span><!-- END HOUR END -->
+                    </div><!-- HOUR SELECTION END -->
+                    <!-- DATE PICKER -->
+                  <div class="input-group pull-right">
+                        <!-- Daterange picker -->
+                        <div class="date-picker" style="width:250px">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange" class="btn-datetime form-control formIndexHourReport">
+                                    <i class="fa fa-calendar"></i>
+                                    <span></span> <b class="caret"></b>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="input-group-btn FindButtonDateTime">
+                            <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch">
+                                <i class="left-icon fa fa-search"></i>  Tìm
+                            </a>
+                        </div>
+                    </div><!-- DATE PICKER -->
+                    <!-- STORE DATE AND HOUR -->
+                    <div>
+                        <input type="hidden" id="sTime" />
+                        <input type="hidden" id="eTime" />
+                        <input type="hidden" id="sHour" />
+                        <input type="hidden" id="eHour" />
+                    </div><!-- STORE DATE AND HOUR END -->
+                </form>
+            </div><!-- SEARCH END -->
+        </div>
+    </div><!-- PAGE HEADER END -->
+    <!-- MAIN CHART -->
+    <div id="container" style="width:100%;height:auto"></div><!-- MAIN CHART END -->
+    <!-- EXPORT TO EXCEL -->
+    <div id="exportArea" style="margin-right:15px;">
+        <button id="export" class="btn btn-success btn-sm">
+            <i class="fa fa-download"></i>
+            Xuất ra file Excel
+        </button>
+    </div><!-- EXPORT TO EXCEL END -->
+    <!-- CATEGORIES TABLE -->
+    <div id="groupCategoryReport">
+        <table id="groupCategoryReportDatatable" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <th>
+                        <label class="">Tên sản phẩm</label>
+                    </th>
+                    <th>
+                        <label class="">Ngành hàng</label>
+                    </th>
+                    <th>
+                        <label class="">Số lượng</label>
+                    </th>
+                    <th>
+                        <label class="">Tổng tiền</label>
+                    </th>
+                    @*<th>
+                            <label class="">Số lượng (AtStore)</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng (TakeAway)</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng (Delivery)</label>
+                        </th>
+                        <th>
+                            <label class="">Giảm giá</label>
+                        </th>*@
+@*<th>
+                                <label class="">Tổng hóa đơn</label>
+                            </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div><!-- CATEGORIES TABLE END -->
+    </div>*@
+
+<form class="hidden" id="formProductCategoryReportExcel" action="@Url.Action("ExportProductCategoryTableToExcel","StoreReport")">
+    <input id="startTime" name="startTime" />
+    <input id="endTime" name="endTime" />
+    <input id="storeId" name="storeId" />
+    <input id="startHour" name="startHour" />
+    <input id="endHour" name="endHour" />
+</form>
+
+<script>
+    $(document).ready(function () {
+        function cb(start, end, label) {
+            var startTime = start.format('DD/MM/YYYY'),
+                endTime = end.format('DD/MM/YYYY');
+
+            var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $('#date-string').val(dateRange);
+            }
+            //Prepare start time and end time format
+
+            $('#sTime').val(startTime);
+            $('#eTime').val(endTime);
+
+            //Chage date at page header
+            $('#dateRange').html('(' + dateRange + ')');
+        }
+        // show date range input
+        cb(moment(), moment(), 'Hôm nay');
+
+        $('#reportrange').daterangepicker({
+            //timePicker: true,
+            //timePickerIncrement: 5,
+            startDate: moment(),
+            endDate: moment(),
+            maxDate: moment(),
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+        $("#startHour").change(function () {
+            var hour = $("#startHour").val();
+            if (hour == -1) {
+                $("#sHour").val("");
+            } else {
+                $("#sHour").val(hour);
+            }
+        });
+
+        $("#endHour").change(function () {
+            var hour = $("#endHour").val();
+            if (hour == -1) {
+                $("#eHour").val("");
+            } else {
+                $("#eHour").val(hour);
+            }
+        });
+
+        // Export to excel.
+        $('#exportArea').on('click', '#export', function () {
+            $('#startTime').val($('#sTime').val());
+            $('#endTime').val($('#eTime').val());
+            $('#storeId').val(@ViewBag.storeId);
+            $('#startHour').val($("#sHour").val());
+            $('#endHour').val($("#eHour").val());
+            $('#formProductCategoryReportExcel').submit();
+        });
+
+        //InitProDatatable();
+        getData();
+    });
+
+    function getData() {
+        var sHour = $("#sHour").val();
+        var eHour = $("#eHour").val();
+
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadProductCategoryReport", "StoreReport")',
+            data: {
+                'startTime': $('#sTime').val(),
+                'endTime': $('#eTime').val(),
+                'storeId': @ViewBag.storeId,
+                "startHour": sHour,
+                "endHour": eHour ,
+            },
+            //dataType: 'html',
+            success: function (rs) {
+                var timeRange = '';
+                if (sHour != '' && eHour != '') {
+                    timeRange = "(" + sHour + "h" + " - " + eHour + "h" + ")";
+                }
+                $("#timeRange").html(timeRange);
+                InitProDatatable(rs.dataTable);
+
+                var dataChart = rs.dataChart;
+                if (dataChart) {
+                    $('#container').show();
+                    setUpMainChart(dataChart);
+                } else {
+                    $('#container').hide();
+                }
+            }
+        });
+    };
+
+    function InitProDatatable(data) {
+        $('#groupCategoryReport').html('<table id="groupCategoryReportDatatable" class="table table-striped table-bordered table-hover">'
+            + '<thead>'
+                + '<tr>'
+                    + '<th>'
+                        + '<label class="">Tên sản phẩm</label>'
+                    + '</th>'
+                    + '<th>'
+                        + '<label class="">Ngành hàng</label>'
+                    + '</th>'
+                    + '<th>'
+                        + '<label class="">Số lượng</label>'
+                    + '</th>'
+                    + '<th>'
+                        + '<label class="">Tổng tiền</label>'
+                    + '</th>'
+                + '</tr>'
+            + '</thead>'
+            + '<tbody></tbody>'
+        + '</table>');
+
+        $("#groupCategoryReportDatatable").dataTable({
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "bProcessing": true,
+            "iDisplayLength": 25,
+            "aLengthMenu": [25, 50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6, 7],
+                    "bSortable": false,
+                },
+
+            ],
+            "aoColumnDefs": [
+               {
+                   "visible": false, "targets": 1
+               },
+               {
+                   "aTargets": [2],
+                   "sClass": "text-center",
+               },
+            ],
+            "bAutoWidth": true,
+            "order": [[1, 'asc']],
+            "drawCallback": function (settings) {
+                var api = this.api();
+                var rows = api.rows({ page: 'current' }).nodes();
+                var last = null;
+
+                api.column(1, { page: 'current' }).data().each(function (group, i) {
+                    if (last !== group) {
+                        $(rows).eq(i).before(
+                            '<tr><td class="bg-warning" colspan="8">' + group + '</td></tr>'
+                        );
+
+                        last = group;
+                    }
+                });
+            },
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+
+        $('table').wrap('<div class="tableDiv-responsive" />');
+    };
+
+    $('#btnSearch').on('click', function () {
+        var sHour = $("#sHour").val();
+        var eHour = $("#eHour").val();
+
+        if ($("#eTime").val().length > 20 || $("#sTime").val().length > 20) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        if ((sHour == '' && eHour != '') || (sHour != '' && eHour == '')) {
+            ShowMessage('Vui lòng nhập đầy đủ thời gian bắt đầu và kết thúc', 3);
+            return;
+        }
+        else {
+            getData();
+            //InitProDatatable();
+            //RefreshTable();
+        }
+    });
+
+
+
+    function setUpMainChart(data) {
+
+        var series = [];
+        var listProductName = data.listProductName;
+        var listPercentQuantity = data.listPercentQuantity;
+
+        for (var i = 0; i < listProductName.length; i++) {
+            var temp = {
+                'name': listProductName[i],
+                'y': listPercentQuantity[i]
+            };
+
+            series.push(temp);
+        }
+
+        //console.log("Chart data lenght: " + series.length);
+        //console.log("Chart data: " + listProductName);
+        //console.log("Chart data: " + listPercentQuantity);
+        $('#container').highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'Số lượng sản phẩm'
+            },
+            tooltip: {
+                valueDecimals: 1,
+                valueSuffix: '',
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.y} ',
+                        style: {
+                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                        }
+                    }
+                }
+            },
+            series: [{
+                name: 'Số lượng',
+                colorByPoint: true,
+                data: series,
+            }]
+        });
+    };
+</script>

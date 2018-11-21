@@ -1,0 +1,259 @@
+﻿@model HmsService.ViewModels.PromotionEditViewModel
+@{
+    ViewBag.Title = "Index";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Báo cáo khách hàng</h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div>
+        </div>
+        <hr />
+        <div class="row m-t-20">
+            <div class="form-horizontal col-md-12">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="pull-left m-t-10">Cửa hàng:</label>
+                        <div class="col-md-8">
+                            <select class="selectpicker" id="storeCombobox"></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="dateTime width230 pull-right">
+                    <div class="fg-line m-t-5">
+                        <div id="reportrange3" class="height-fix">
+                            <input id="date-string3" size="23" readonly class="form-control text-center pull-right">
+                            <a class="myCelenderA" id=""> <i class="fa fa-calendar"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <form id="form-create-session" class="form-inline" style="display:none">
+                    <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" />
+                    <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" />
+                </form>
+            </div>
+        </div>
+        <div style="padding-top:10px">
+            <table id="CustomerTable" class="table table-condensed table-striped table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>
+                            <label>Tên khách hàng</label>
+                        </th>
+                        <th>
+                            <label>Số lần sử dụng thẻ</label>
+                        </th>
+                        <th>
+                            <label>Số tiền</label>
+                        </th>
+                        <th>
+                            <label>Số tiền giảm giá</label>
+                        </th>
+                        <th>
+                            <label>Thanh toán</label>
+                        </th>
+                        <th>
+                            <label>Xem các hóa đơn</label>
+                        </th>
+                        @*<th>
+                                <label></label>
+                            </th>*@
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+
+    </div>
+</div>
+<script>
+    var once = 0;
+    $(document).ready(function () {
+        var startTimePromo;
+        var endTimePromo;
+        $('.selectpicker').selectpicker({
+            size: 8,
+        });
+        LoadStoreComboBox();
+
+        $('#storeCombobox').on('change', function () {
+            reDrawDatatable("#CustomerTable");
+        });
+    });
+
+    function LoadStoreComboBox() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStore", "PromotionReport", new { area = "SystemReport" })',
+            success: function (result) {
+                $('#storeCombobox').append('<option value="0">Tất cả cửa hàng</option>');
+                for (var i = 0; i < result.stores.length; i++) {
+                    $('#storeCombobox').append('<option value=' + result.stores[i].Value + '>' + result.stores[i].Text + '</option>');
+                }
+                $('#storeCombobox').selectpicker('refresh');
+                setupDaterangerpicker1();
+
+            }
+        });
+    }
+
+    function convertNETDateTime(sNetDate) {
+        if (sNetDate == null) return null;
+        if (sNetDate instanceof Date) return sNetDate;
+        var r = /\/Date\(([0-9]+)\)\//i
+        var matches = sNetDate.match(r);
+        if (matches.length == 2) {
+            return new Date(parseInt(matches[1]));
+        }
+        else {
+            return sNetDate;
+        }
+    }
+
+    function InitDatatable() {
+        $("#CustomerTable").dataTable({
+            "bFilter": true,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "bDeferRender": true,
+            "bServerSide": true,
+            "sAjaxSource": '@Url.Action("ListCustomerInPromo", "PromotionReport", new { area = "SystemReport"})',
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "promoID", "value": @Model.PromotionID }),
+                aoData.push({ "name": "selectedStoreId", "value": $('#storeCombobox').val() }),
+                aoData.push({ "name": "startTime", "value": startTimePromo }),
+                aoData.push({ "name": "endTime", "value": endTimePromo })
+            },
+            "bProcessing": true,
+            "bPaginate": true,
+            "aLengthMenu": [25, 50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sSearchPlaceholder": "Tên khách hàng",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "columns": [
+                { "data": "CustomerName" },
+                { "data": "OrderQty" },
+                { "data": "SumAmount" },
+                { "data": "SumDiscount" },
+                { "data": "SumFinal" },
+                { "data": function (data) {
+                    var detail = "<a title='Chi tiết'class='btn btn-sm btn-success' href='@Url.Action("CustomerOrder", "PromotionDetail")?customerId=" + data.Id + "&promotionId=" + data.PromoId + "&sTime=" + startTimePromo + "&eTime=" + endTimePromo + "&selectedStoreId=" + $('#storeCombobox').val() + "' target='_blank'><i class='glyphicon glyphicon-eye-open'></i></a>";
+                    return detail;
+                }}
+            ],
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5],
+                    "bSortable": false,
+                    "sClass": "text-center"
+                },
+                @*{
+                    "aTargets": [5],
+                    "mRender": function (data, type, row) {
+                        var detail = "<a title='Chi tiết'class='btn btn-sm btn-success' href='@Url.Action("CustomerOrder", "PromotionDetail")?customerId=" + row[6] + "&promotionId=" + row[5] + "&sTime=" + startTimePromo + "&eTime=" + endTimePromo + "&selectedStoreId=" + $('#storeCombobox').val() + "' target='_blank'><i class='glyphicon glyphicon-eye-open'></i></a>";
+                        return detail;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center",
+                }*@
+            ],
+
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+    };
+    function reDrawDatatable(id) {
+        $(id).dataTable()._fnPageChange(0);
+        $(id).dataTable()._fnAjaxUpdate();
+    }
+    function cb(start, end, label) {
+        //console.log(start.toISOString(), end.toISOString(), label);
+
+        //Prepare start time and end time format
+        var startTime = start.format("DD/MM/YYYY"),
+            endTime = end.format("DD/MM/YYYY"),
+            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+        if (label != "Tùy chọn") {
+            $('#date-string3').val(label);
+        } else {
+            $('#date-string3').val(dateString);
+        }
+
+        $('#sTime').val(startTime);
+        $('#eTime').val(endTime);
+        //startTimePromo = start.format("MM/DD/YYYY");
+        //endTimePromo = end.format("MM/DD/YYYY");
+        startTimePromo = startTime;
+        endTimePromo = endTime;
+        //Chage date at page header
+        $('[data-role=small-date]').html(dateString);
+        if (once == 0) {
+            InitDatatable();
+            once = 1;
+        }
+        else {
+            reDrawDatatable("#CustomerTable");
+        }
+
+        $('#date-string3 span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+    };
+    function setupDaterangerpicker1() {
+        cb(moment(), moment(), "Hôm nay");
+        $('#reportrange3').daterangepicker({
+            startDate: moment(),
+            endDate: moment(),
+            minDate: '@Html.Raw(Model.FromDateStr)',
+            maxDate: '@Html.Raw(Model.ToDateStr)',
+            dateLimit: { days: 365 },
+            showDropdowns: true,
+            showWeekNumbers: true,
+            timePicker: false,
+            timePickerIncrement: 1,
+            timePicker12Hour: true,
+            //parentEl: '.modal-body',
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            },
+            opens: 'left',
+            drops: 'down',
+            buttonClasses: ['btn', 'btn-sm'],
+            applyClass: 'btn-primary',
+            cancelClass: 'btn-success',
+            separator: ' to ',
+            locale: {
+                format: 'DD/MM/YYYY',
+                applyLabel: 'Chọn',
+                cancelLabel: 'Hủy',
+                fromLabel: 'Từ',
+                toLabel: 'Đến',
+                customRangeLabel: 'Tùy chọn',
+                daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                firstDay: 1
+            }
+        }, cb);
+
+        $('#reportrange3').on('apply.daterangepicker', function (ev, picker) {
+            reDrawDatatable("#CustomerTable");
+        });
+    }
+</script>

@@ -1,0 +1,678 @@
+﻿@using HmsService.Models
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var isbreakcount = (int)BreakCountEnum.IsBreakCount;
+    var isbreaknotcount = (int)BreakCountEnum.IsBreakNotCount;
+
+    var EarlyInMode = (int)InModeEnum.EarlyInMode;
+    var ExactlyInMode = (int)InModeEnum.ExactlyInMode;
+    var ConfirmInMode = (int)InModeEnum.ConfirmInMode;
+    var LateOutMode = (int)OutModeEnum.LateOutMode;
+    var ExactlyOutMode = (int)OutModeEnum.ExactlyOutMode;
+    var ConfirmOutMode = (int)OutModeEnum.ConfirmOutMode;
+    var TimeFrameMode1 = (int)TimeFrameModeEnum.Mode1;
+    var TimeFrameMode2 = (int)TimeFrameModeEnum.Mode2;
+    var TimeFrameMode3 = (int)TimeFrameModeEnum.Mode3;
+
+}
+<style>
+    .myHr {
+        border-bottom: 1px solid lightgray;
+        margin-top: 0px !important;
+    }
+</style>
+@* ------ Biến FLAG hidden dùng chứa val() check hành động Thêm hoăc Sửa *@
+@* ------ Biến TMP hidden dùng làm biến tạm đỡ TimeFrameId (data) khi bấm nút sửa*@
+<input type="hidden" id="FLAG" />
+<input type="hidden" id="TMP" />
+@*--------------------------------------*@
+
+<div class="card">
+    <div class="card-header">
+        <div class="box-header p-b-0">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Quản lý khung giờ làm việc</h3>
+                </div>
+                <div class="col-md-6 text-right p-t-5">
+                    <ul class="actions">
+                        <li class="m-r-10">
+                            <button class="btn btn-success btn-sm pull-right" onclick="callShowCreateModal()">
+                                <i class="glyphicon glyphicon-plus"></i> THÊM KHUNG GIỜ MỚI
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="allcust">
+                    <div style="padding-left:20px">
+                        <div class="row small-margin">
+                            <div class="col-md-4" style="float:left">
+                                <h4>Nhóm:</h4>
+                                <select data-live-search="true" data-size="7" class="form-control selectpicker" name="groupId" id="groupId">
+                                    <option value="-1">Tất cả</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Datatable -->
+                    <div class="col-md-12">
+
+                        <table id="time-frame-table" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th><label>STT</label></th>
+                                    <th><label>Tên khung giờ</label></th>
+                                    <th><label>Giờ bắt đầu</label></th>
+                                    <th><label>Giờ kết thúc</label></th>
+                                    <th><label>Thời gian nghỉ</label></th>
+                                    <th><label>Thời lượng</label></th>
+                                    <th><label>Tùy chọn</label></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Model container-->
+<div id="create-modal-container">
+    <div class="modal" id="create-edit-timeFrame-modal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="form-horizontal">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="Title_Create_Edit">Title (Thêm - Sửa)</h4>
+                    </div>
+
+                    <div class="modal-body col-md-12">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <input type="hidden" id="TimeFrameId" />
+
+                                <label class="col-sm-4 control-label">Tên khung giờ</label>
+                                <div class="col-sm-8">
+                                    <input type="text" onchange="changeInfor()"  class="form-control" id="TimeFrameName" name="TimeFrameName" placeholder="Tên khung giờ làm việc">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <span class="col-md-4 control-label p-t-10">Nhóm</span>
+                                <div class="col-md-8">
+                                    <select data-live-search="true" data-size="7" class="form-control selectpicker" name="groupIdAdd" id="groupIdAdd">
+                                        <option value="-1">Chọn nhóm</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Thời gian nghỉ</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="BreakTime" name="BreakTime" placeholder="Thời gian nghỉ" onblur="SetDuration()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Tính thời gian nghỉ</label>
+                                <div class="col-sm-8" style="padding-top:15px;">
+                                    <div class="toggle-switch" data-ts-color="green">
+                                        <input id="checkboxSample" data-active="" data-code="" onchange="SetDuration()" type="checkbox" hidden="hidden">
+                                        <label for="checkboxSample" class="ts-helper"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Thiết lập nâng cao</label>
+                                <div class="col-sm-8" style="padding-top:10px;">
+                                    <div class="toggle-switch" data-ts-color="green">
+                                        <input id="checkboxTimeMode" data-active="" data-code="" onchange="ShowStoreMode()" type="checkbox" hidden="hidden">
+                                        <label for="checkboxTimeMode" class="ts-helper"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group" id="storeMode" style="display: none">
+                                <label class="col-sm-4 control-label">Loại khung giờ :</label>
+                                <div class="col-sm-8" style="padding-top:10px;">
+                                    <input type="checkbox" onchange="changeMode(this)" checked="checked" value="@TimeFrameMode1" /> @TimeFrameModeEnum.Mode1.DisplayName()
+                                    <input type="checkbox" onchange="changeMode(this)" value="@TimeFrameMode2" /> @TimeFrameModeEnum.Mode2.DisplayName()
+                                    <input type="checkbox" onchange="changeMode(this)" value="@TimeFrameMode3" /> @TimeFrameModeEnum.Mode3.DisplayName()
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Giờ bắt đầu</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="TimeFrameStart" name="TimeFrameStart" placeholder="Giờ bắt đầu" onblur="SetDuration()">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Giờ Kết thúc</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="TimeFrameEnd" name="TimeFrameEnd" placeholder="Giờ kết thúc" onblur="SetDuration()" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Thời lượng làm việc</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="TimeFrameDuration" name="TimeFrameDuration" placeholder="Thời lượng làm việc" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-body col-md-12">
+
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <span class="col-md-4 control-label p-t-10">Cách tính thời gian vào</span>
+                                <div class="col-md-8">
+                                    <select data-live-search="true" data-size="7" onchange="changeInfor()" class="form-control selectpicker" name="EmployeeInModeEnum" id="EmployeeInModeEnum">
+                                        <option value="-1">Chọn nhóm</option>
+                                        <option value=@EarlyInMode selected="selected">@InModeEnum.EarlyInMode.DisplayName()</option>
+                                        <option value=@ExactlyInMode>@InModeEnum.ExactlyInMode.DisplayName()</option>
+                                        <option value=@ConfirmInMode>@InModeEnum.ConfirmInMode.DisplayName()</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-4 control-label">Thời gian cho phép vào sớm</label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control" id="EmployeeCheckinExpandTime" name="EarlyTime" placeholder="Thời gian cho phép vào sớm" onblur="SetDuration()">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <span class="col-md-3 control-label p-t-10">Cách tính thời gian ra</span>
+                                <div class="col-md-9">
+                                    <select data-live-search="true" data-size="7" onchange="changeInfor()" class="form-control selectpicker" name="EmployeeOutModeEnum" id="EmployeeOutModeEnum">
+                                        <option value="-1">Chọn nhóm</option>
+                                        <option value=@LateOutMode selected="selected">@OutModeEnum.LateOutMode.DisplayName()</option>
+                                        <option value=@ExactlyOutMode>@OutModeEnum.ExactlyOutMode.DisplayName()</option>
+                                        <option value=@ConfirmOutMode>@OutModeEnum.ConfirmOutMode.DisplayName()</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-sm-3 control-label">Thời gian cho phép vào trễ</label>
+                                <div class="col-sm-9">
+                                    <input type="text" class="form-control" id="EmployeeCheckoutExpandTime" name="TimeLate" placeholder="Thời gian cho phép vào trễ" onblur="SetDuration()">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-dismiss="modal">Đóng</button>
+                        <button type="submit" id="btnAction" onclick="actionTimeFrame()" class="btn btn-success btn-sm pull-right">(Thêm mới - Hoàn Tất)</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+<script>
+        // --- Load datatable
+        $(document).ready(function () {
+            getListGroup();
+            $('#groupIdAdd').val(-1);
+            $('#groupID').val(-1);
+            loadTimeFrameTable();
+            var table = $('#time-frame-table').DataTable();
+            $('#groupId').change(function (e) {
+                RefreshTableFilter("#time-frame-table", true);
+                loadTimeFrameTable();
+            });
+            $('#TimeFrameStart').datetimepicker({
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+            $('#TimeFrameEnd').datetimepicker({
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+            $('#BreakTime').datetimepicker({
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+            $('#EmployeeCheckinExpandTime').datetimepicker({
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+            $('#EmployeeCheckoutExpandTime').datetimepicker({
+                format: 'HH:mm',
+                ignoreReadonly: true,
+                toolbarPlacement: 'bottom'
+            });
+            //$('#TimeFrameDuration').datetimepicker({
+            //    format: 'HH:mm',
+            //    ignoreReadonly: true,
+            //    toolbarPlacement: 'bottom'
+            //});
+        });
+
+        function loadTimeFrameTable() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetAllTimeFrame")',
+                data: {
+                    groupID: $('#groupId').val(),
+                },
+                success: function (result) {
+                    initTimeFrameDatatable(result.datatable);
+                }
+            });
+        }
+
+        function initTimeFrameDatatable(data) {
+            $("#time-frame-table").dataTable().fnDestroy();
+            $("#time-frame-table").dataTable({
+                stateSave: true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Thành phần",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                        "sClass": "text-center",
+                        "bSortable": false,
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var edit =
+                                "<a title='Chỉnh sửa' class='btn btn-sm btn-primary' onclick='callShowEditModal(" +
+                                    data +
+                                    ")'><i class='glyphicon glyphicon-pencil'></i></a>";
+                            var del = "<a title='Xóa' class='btn btn-sm btn-danger' onclick='deleteTimeFrame(" +
+                                data +
+                                ")'><i class='glyphicon glyphicon-trash'></i></a>";
+                            return edit + " " + del;
+                        },
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+        //------------- Goi hàm show modal
+        function callShowCreateModal() {
+            $('#FLAG').val('ADD');
+            showModal();
+        }
+
+        function callShowEditModal(data) {
+            $('#FLAG').val('FIX');
+            $('#TMP').val(data);
+            showModal();
+
+        }
+
+        // --- Show Modal them TimeFrame
+        function resetData() {
+            $('#TimeFrameName').val(""),
+            $('#TimeFrameStart').val(""),
+            $('#TimeFrameEnd').val(""),
+            $('#TimeFrameDuration').val(""),
+            $('#BreakTime').val(""),
+            $('#groupIdAdd').selectpicker('val', [-1]);
+            $('#groupid').selectpicker('val', [-1]);
+            RefreshTableFilter("#time-frame-table", true);
+            $('#storeMode input')[0].checked = true;
+            $('#storeMode input')[1].checked = false;
+            $('#storeMode input')[2].checked = false;
+        }
+
+        function showModal() {
+            var check = $('#FLAG').val();
+            $('#storeMode').css('display',($('#checkboxTimeMode').prop('checked'))?'block':'none');
+            if (check == "ADD") {
+                resetData();
+                $('#Title_Create_Edit').text("Thêm khung giờ làm việc");
+                $('#btnAction').text("Thêm mới");
+                document.getElementById("btnAction").disabled = true;
+                showCreateModal();
+            } else if (check == "FIX") {
+                $('#btnAction').text("Hoàn tất");
+                $('#Title_Create_Edit').text("Sửa thông tin khung giờ làm việc");
+                showEditModal($('#TMP').val());
+                document.getElementById("btnAction").disabled = false;
+            }
+        }
+
+        function showCreateModal() {
+            $('#create-edit-timeFrame-modal').modal('show');
+        }
+
+        function showEditModal(data) {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("PrepareEdit", "TimeFrame")',
+                data: {
+                    TimeFrameId: data
+                },
+                success: function (result) {
+                    $('#create-edit-timeFrame-modal').modal('show');
+                    $('#TimeFrameId').val(result.rs.id);
+                    $('#TimeFrameName').val(result.rs.name);
+                    $('#TimeFrameStart').val(result.rs.startTime);
+                    $('#TimeFrameEnd').val(result.rs.endTime);
+                    $('#TimeFrameDuration').val(result.rs.duration);
+                    $('#BreakTime').val(result.rs.breakTime);
+                    //$('#groupIdAdd').val(result.rs.group);
+                    $('#groupIdAdd').selectpicker('val', [result.rs.group]);
+                    var storeFilter = Number(result.rs.storeFilter);
+                    var allInput = $('#storeMode input');
+                    $.each(allInput,(i,e)=>{
+                        e.checked = false;
+                        if((2**Number(e.getAttribute('value'))) & storeFilter || false) e.checked = true;
+                    })
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            })
+        }
+        //----- action: thêm và sửa TimeFrame -------------
+
+        function actionTimeFrame() {
+            var check = $('#FLAG').val();
+            if (check == "ADD") {
+                createTimeFrame();
+            } else if (check == "FIX") {
+                editTimeFrame();
+            }
+        }
+
+        function compareTwoTimeFrame(start, end) {
+            var startStrArr = start.split(":");
+            var endStrArr = end.split(":");
+            var startTime = parseInt(startStrArr[0]) * 60 + parseInt(startStrArr[1]);
+            var endTime = parseInt(endStrArr[0]) * 60 + parseInt(endStrArr[1]);
+            if (startTime < endTime) {
+                return 1;
+            } else if (startTime == endTime) {
+                return 0;
+            } else {
+                return -1;
+            }
+        }
+        function calcStoreFilter(){
+            var storeFilter = 0;
+            $.each($('#storeMode input'), (i,e)=>{
+                if(e.checked){
+                    storeFilter += 2**(Number(e.getAttribute('value')));
+                }
+            });
+            return storeFilter;
+        }
+        function createTimeFrame() {
+            if ($('#TimeFrameName').val().trim() == "" || $('#TimeFrameName').val() == null) {
+                ShowAlert("Tên khung giờ không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+            if ($('#TimeFrameStart').val().trim() == "" || $('#TimeFrameStart').val() == null) {
+                ShowAlert("Giờ bắt đầu không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+            if ($('#TimeFrameEnd').val().trim() == "" || $('#TimeFrameStart').val() == null) {
+                ShowAlert("Giờ kết thúc không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+            if (compareTwoTimeFrame($('#TimeFrameStart').val(), $('#TimeFrameEnd').val()) != 1) {
+                ShowAlert("Giờ bắt đầu phải ở trước giờ kết thúc. Vui lòng nhập lại", 1);
+                return;
+            }
+            if ($('#groupIdAdd').val() == -1) {
+                ShowAlert("Phải chọn nhóm", 1);
+                return;
+            }
+            if ($('#BreakTime').val().trim() == "" || $('#BreakTime').val() == null) {
+                ShowAlert("Thời lượng thêm không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+
+            //if ($('#TimeFrameStart').val() >= $('#TimeFrameEnd').val()) {
+            //    ShowAlert("Thời gian kết thúc không thể sớm hơn thời gian bắt đầu. Vui lòng nhập lại", 1);
+            //    return;
+            //}
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CreateTimeFrame", "TimeFrame")',
+                data: {
+                    name: $('#TimeFrameName').val(),
+                    startTime: $('#TimeFrameStart').val(),
+                    duration: $('#TimeFrameDuration').val(),
+                    endTime: $('#TimeFrameEnd').val(),
+                    breakTime: $('#BreakTime').val(),
+                    inmode: $('#EmployeeInModeEnum option:selected').val(),
+                    outmode: $('#EmployeeOutModeEnum option:selected').val(),
+                    breakcount: $("#checkboxSample").prop("checked") ? @isbreakcount : @isbreaknotcount,
+                    checkinExpandtime: $('#EmployeeCheckinExpandTime').val(),
+                    checkoutExpandtime: $('#EmployeeCheckoutExpandTime').val(),
+                    groupEmp: $('#groupIdAdd').val(),
+                    storeFilter : calcStoreFilter()
+                },
+                success: function (result) {
+                    if (result.rs == true) {
+                        ShowAlert("Thêm thành công", 2);
+                        $('#create-edit-timeFrame-modal').modal('hide');
+                        resetData();
+                        loadTimeFrameTable();
+                    } else {
+                        ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            })
+        }
+
+        function editTimeFrame() {
+            if ($('#TimeFrameName').val().trim() == "" || $('#TimeFrameName').val() == null) {
+                ShowAlert("Tên khung giờ không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+            if ($('#TimeFrameStart').val().trim() == "" || $('#TimeFrameStart').val() == null) {
+                ShowAlert("Giờ bắt đầu không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+            if ($('#TimeFrameEnd').val().trim() == "" || $('#TimeFrameStart').val() == null) {
+                ShowAlert("Giờ kết thúc không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+            if ($('#groupIdAdd').val() == -1) {
+                ShowAlert("Phải chọn nhóm", 1);
+                return;
+            }
+            if ($('#BreakTime').val().trim() == "" || $('#BreakTime').val() == null) {
+                ShowAlert("Thời lượng thêm không được bỏ trống. Vui lòng nhập lại", 1);
+                return;
+            }
+            //if ($('#TimeFrameStart').val() >= $('#TimeFrameEnd').val()) {
+            //    ShowAlert("Thời gian kết thúc không thể sớm hơn thời gian bắt đầu. Vui lòng nhập lại", 1);
+            //    return;
+            //}
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("EditTimeFrame", "TimeFrame")',
+                data: {
+                    idtp: $('#TimeFrameId').val(),
+                    name: $('#TimeFrameName').val(),
+                    startTime: $('#TimeFrameStart').val(),
+                    duration: $('#TimeFrameDuration').val(),
+                    endTime: $('#TimeFrameEnd').val(),
+                    breakTime: $('#BreakTime').val(),
+                    inmode: $('#EmployeeInModeEnum option:selected').val(),
+                    outmode: $('#EmployeeOutModeEnum option:selected').val(),
+                    breakcount: $("#checkboxSample").prop("checked") ? @isbreakcount : @isbreaknotcount,
+                    checkinExpandtime: $('#EmployeeCheckinExpandTime').val(),
+                    checkoutExpandtime: $('#EmployeeCheckoutExpandTime').val(),
+                    groupEmp: $('#groupIdAdd').val(),
+                    storeFilter : calcStoreFilter()
+                },
+                success: function (result) {
+                    if (result.rs == true) {
+                        ShowAlert("Sửa thành công", 2);
+                        $('#create-edit-timeFrame-modal').modal('hide');
+                        resetData();
+                        loadTimeFrameTable();
+                    } else {
+                        ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                    }
+                },
+                error: function (error) {
+                    ShowAlert("Có lỗi xảy ra, vui lòng thử lại", 1);
+                }
+            })
+        }
+
+
+        //------------- Xóa TimeFrame
+        function deleteTimeFrame(id) {
+            ShowConfirm("Bạn có muốn xóa khung giờ làm việc này?",
+                function () {
+                    $.ajax({
+                        type: 'POST',
+                        url: '@Url.Action("DeleteTimeFrame")',
+                        data: { TimeFrameId: id },
+
+                        success: function (data) {
+                            if (data) {
+                                ShowAlert("Xóa thành công", 2);
+                                loadTimeFrameTable();
+                            } else {
+                                ShowAlert("Thất bại. Vui lòng thử lại", 1);
+                            }
+
+
+                        },
+                        error: function (error) {
+                            showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                        }
+                    });
+                });
+        }
+
+        function goToAddPage() {
+            window.location.replace('@Url.Action("AddShiftFromBrand", "Shift")');
+        }
+
+        function getListGroup() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetAllGroupEmp")',
+
+                success: function (result) {
+                    loadListGroupInDrodownList(result);
+                    loadListGroupInDrodownList2(result);
+                },
+                error: function (error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+        function loadListGroupInDrodownList2(listData) {
+            for (i = 0; i < listData.length; i++) {
+                $("#groupId").append('<option value="' + listData[i].Id + '">' + listData[i].NameGroup + '</option>');
+            }
+            $("#groupId").selectpicker('refresh');
+        }
+        function loadListGroupInDrodownList(listData) {
+            for (i = 0; i < listData.length; i++) {
+                $("#groupIdAdd").append('<option value="' + listData[i].Id + '">' + listData[i].NameGroup + '</option>');
+            }
+            $("#groupIdAdd").selectpicker('refresh');
+        }
+        function changeInfor() {
+            document.getElementById("btnAction").disabled = false;
+        }
+
+        //function SetDuration() {
+        //    var dateStart = moment($("#TimeFrameStart").val(), "hmm");
+        //    var dateEnd = moment($("#TimeFrameEnd").val(), "hmm");
+        //    var duration = moment.duration($("#BreakTime").val());
+        //    var timeSpan = dateEnd.subtract(dateStart);
+        //    var totalTime = timeSpan.subtract(duration);
+        //    $("#TimeFrameDuration").val(moment(totalTime).format("HH:mm"));
+        //}
+        function SetDuration() {
+            if ($('#TimeFrameStart').val() != "" && $('#TimeFrameEnd').val() != "") {
+                var dateStart = moment($("#TimeFrameStart").val(), "hmm");
+                var dateEnd = moment($("#TimeFrameEnd").val(), "hmm");
+                var timeSpan = dateEnd.subtract(dateStart);
+                $("#TimeFrameDuration").val(moment(timeSpan).format("HH:mm"));
+                if ($("#checkboxSample").prop("checked")) {
+                    $("#TimeFrameDuration").val(moment(timeSpan).format("HH:mm"));
+                }
+                else {
+                    var duration = moment($("#BreakTime").val(), "hmm");
+                    var totalTime = timeSpan.subtract(duration);
+                    $("#TimeFrameDuration").val(moment(totalTime).format("HH:mm"));
+                }
+            }
+        }
+        function ShowStoreMode(){
+            $('#storeMode').slideToggle(20);
+        }
+        function changeMode(element){
+            var allInput = $('#storeMode input');
+            var check = false;
+            $.each(allInput,(i,e)=>{
+                if(!check) check = e.checked;
+            })
+            if(!check){
+                element.checked = true;
+                swal('Thất bại','Khung giờ phải có ít nhất 1 loại','error');
+                return;
+            }
+        }
+</script>
+}

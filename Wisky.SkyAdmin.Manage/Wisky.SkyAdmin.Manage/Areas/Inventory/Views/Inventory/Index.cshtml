@@ -1,0 +1,682 @@
+﻿@model HmsService.ViewModels.ProductItemCategoryViewModel
+@using System.Globalization;
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    IEnumerable<HmsService.ViewModels.ProductItemCategoryViewModel> productCategories = ViewBag.ProductCategories;
+    IEnumerable<HmsService.ViewModels.InventoryTemplateReportViewModel> inventoryTemplates = ViewBag.InventoryTemplates;
+    IEnumerable<HmsService.ViewModels.StoreViewModel> stores = ViewBag.Stores;
+    var storeId = ViewBag.StoreId;
+
+}
+
+<style>
+    .input-group .input-group-btn > a.btn {
+        margin-top: 0px !important;
+    }
+
+    .modal-content .input-group .fg-line input {
+        height: 37px;
+    }
+
+    .control-label {
+        font-weight: 600;
+        font-size: 14px;
+        padding-top: 15px;
+    }
+
+    .p-l-100 {
+        padding-left: 100px;
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Tồn kho cuối ngày</h3>
+                <h5 class="smallDate" data-role="small-date">@ViewBag.InstockDate</h5>
+            </div>
+            <div class="col-md-6">
+                <div class="pull-right">
+                    <button id="btnExportExcel" class="btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button>
+                    <form class="hidden" id="formReportExcel" action="@Url.Action("ExportExcelEPPlus","Inventory")">
+                        <input name="selectedStore" />
+                        <input name="templateId" />
+                        <input name="cateId" />
+                        <input name="dateTime" />
+                    </form>
+                </div>
+                @if (int.Parse(storeId) != 0)
+                {
+                <div id="importContainer" class="pull-right" style="margin-right:15px;">
+                    <div style="display: none">
+                        <input type="file" hidden id="updateByExcel" accept=".xlsx,xls,.csv" />
+                    </div>
+                    <button type="button" id="btnUploadExcel" class="btn btn-sm btn-success">
+                        <i class="fa fa-upload"></i> Cập nhật dữ liệu từ file Excel
+                    </button>
+                </div>
+                }
+            </div>
+
+        </div>
+        <hr />
+        <div class="row m-t-20">
+            <div class="col-md-8 small-margin">
+                @*<div class="col-md-2 text-center" style="width:80px;">
+                        <label class="control-label p-t-5">Lọc theo:</label>
+                    </div>
+                    <div class="group-radio-buttons row">
+                        <div class="medium-radio-button-width col-md-3">
+                            <input type="radio" name="report-filter" value="3" class="nice-check" id="filter" checked />
+                            <label for="filter"><span>Loại sản phẩm</span></label>
+                        </div>
+                        <div class="medium-radio-button-width col-md-3">
+                            <input type="radio" name="report-filter" value="3" class="nice-check" id="filter2" />
+                            <label for="filter2"><span>Mẫu báo cáo</span></label>
+                        </div>
+                    </div>*@
+                <div class="col-md-4" id="cateContainer">
+                    <div class="form-group">
+                        <select class="selectpicker" id="item-categories" title="Tất cả loại nguyên liệu" multiple>
+                            @foreach (var item in productCategories)
+                            {
+                                <option value="@item.CateID">@item.CateName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-4" id="templateContainer" style="display:none;">
+                    <div class="p-l-0 col-md-10 form-group">
+                        <select class="selectpicker" id="inventory-templates">
+                            <option value="null" selected>Tất cả mẫu</option>
+                            @foreach (var item in inventoryTemplates)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="p-l-0 col-md-2" id="templateBtn" style="display:none;">
+                        <a href="@Url.Action("Index", "InventoryTemplate")" class="btn btn-sm btn-success">Xem mẫu</a>
+                    </div>
+                </div>
+                
+                @if (stores != null)
+            {
+                    @*<div class="row m-t-20">
+                        <div class="col-md-1 text-center p-r-0">
+                            <label class="control-label p-t-5">Cửa hàng:</label>
+                        </div>*@
+
+                    <div class="col-md-4 col-md-offset-1">
+                        <div class="form-group">
+                            <select class="selectpicker" id="selectedStore">
+                                <option value="0" selected>Tất cả cửa hàng</option>
+                                @foreach (var item in stores)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    @*</div>*@
+                }
+                
+                
+            </div>
+
+            <div class="col-md-4 pull-right text-right">
+                <div class="input-group">
+                    <!-- Daterange picker -->
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group-btn FindButtonDateTime">
+                        <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i> Tìm
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <label class="control-label p-t-5">Lọc theo:</label>
+            </div>
+            <div class="group-radio-buttons col-md-3">
+                <div class="medium-radio-button-width col-md-12 m-t-15">
+                    <input type="radio" name="report-filter" value="3" class="nice-check" id="cate-filter" checked />
+                    <label for="cate-filter"><span>Loại nguyên liệu</span></label>
+                </div>
+                <div class="medium-radio-button-width col-md-12 m-t-15">
+                    <input type="radio" name="report-filter" value="3" class="nice-check" id="template-filter" />
+                    <label for="template-filter"><span>Mẫu báo cáo</span></label>
+                </div>
+            </div>
+            @*<div class="col-md-3" id="cateContainer">
+                        <div class="form-group">
+                            <select class="selectpicker" id="item-categories" title="Loại sản phẩm" multiple>
+                                @foreach (var item in productCategories)
+                                {
+                                    <option value="@item.CateID">@item.CateName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3" id="templateContainer" style="display:none;">
+                        <div class="form-group">
+                            <select class="selectpicker" id="inventory-templates" title="Mẫu báo cáo">
+                                @foreach (var item in inventoryTemplates)
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+                @if (stores != null)
+                    {
+                    <div class="row m-t-20">
+                        <div class="col-md-1 text-center p-r-0">
+                            <label class="control-label p-t-5">Cửa hàng:</label>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="form-group">
+                                <select class="selectpicker" id="selectedStore">
+                                    <option value="0" selected>Tất cả cửa hàng</option>
+                                    @foreach (var item in stores)
+                                    {
+                                        <option value="@item.ID">@item.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                }*@
+        </div>
+        <div class="card-padding row m-t-30">
+            <div class="form-horizontal" id="infoIndex"></div>
+            <table class="table table-striped table-condensed table-hover table-bordered myTable" style="width:100%" id="main-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2"><label>STT</label></th>
+                        @*<th rowspan="2"><label>Hình ảnh</label></th>*@
+                        <th rowspan="2"><label>Tên nguyên liệu</label></th>
+                        <th rowspan="2"><label>Đơn vị</label></th>
+                        @*<th rowspan="2"><label>Đơn giá</label></th>
+                            <th rowspan="2"><label>Phân loại</label></th>*@
+                        <th rowspan="2"><label>Tồn kho <span data-date="beforeDate"></span></label></th>
+                        <th colspan="3">
+                            <a id="toggle-import" class="glyphicon glyphicon-plus" style="background: transparent; color: black; float: left;" data-status="0" onclick="toggleButton(this)"></a>
+                            <label class="">Nhập Kho</label>
+                        </th>
+                        <th colspan="5">
+                            <a id="toggle-export" class="glyphicon glyphicon-plus" style="background: transparent; color: black; float: left;" data-status="0" onclick="toggleButton(this)"></a>
+                            <label class="">Xuất Kho</label>
+                        </th>
+                        <th rowspan="2"><label>Lý thuyết</label></th>
+                        <th rowspan="2"><label>Thực tế</label></th>
+                        <th rowspan="2"><label>Chênh lệch</label></th>
+                        <th rowspan="2"><label>Tổng tiền</label></th>
+                        <th rowspan="2"><label>Cos</label></th>
+                    </tr>
+                    <tr>
+                        <th><label>Nhập Kho</label></th>
+                        <th><label>Nhận Chuyển Kho</label></th>
+                        <th><label>Tổng Nhập</label></th>
+                        <th><label>Xuất Bán</label></th>
+                        <th><label>Xuất Trả</label></th>
+                        <th><label>Xuất Hủy</label></th>
+                        <th><label>Chuyển Kho</label></th>
+                        <th><label>Tổng Xuất</label></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+<div id="excel-template" class="modal fade">
+</div>
+<div id="detail-checking-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Chi tiết kiểm kê</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-hover" id="checking-detail-table">
+                    <thead>
+                        <tr>
+                            <th>Thời gian kiểm kê</th>
+                            <th>Người kiểm kê</th>
+                            <th>Số lượng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="checkingQuantityDetailList"></tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div>
+<div class="modal fade" id="detailItem" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content" id="detailItem-content">
+
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var status = "0";
+    var inStockDate = "";
+    var selectedCategories = [];
+    var selectedTemplate = null;
+    var beforeDate = "";
+    var currentDate = "";
+    var selectedStore = parseInt('@storeId');
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker({
+            size: 10,
+        });
+        function cb(date) {
+            var datetime = date.format('DD/MM/YYYY');
+            $('#date-string').val(datetime);
+            currentDate = "";
+            currentDate = date;
+            $('[data-role=small-date]').html(datetime);
+        }
+        cb(moment().add(-1, 'days'));
+        $('#reportrange').daterangepicker({
+            'maxDate': moment().add(-1, 'days'),
+            singleDatePicker: true,
+            showDropdowns: true,
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        }, cb);
+        $('[data-date=beforeDate]').html(moment().subtract(2, 'days').format('DD/MM/YYYY'));
+
+        //$('#startTime').on('apply.daterangepicker', function (ev, picker) {
+        //    //startDate = picker.startDate.format('DD/MM/YYYY');
+        //    //endDate = picker.endDate.format('DD/MM/YYYY');
+        //    beforeDate = picker.startDate.subtract(1, 'days').format('DD/MM/YYYY');
+        //});
+
+        loadInfoIndex($("#date-string").val());
+
+        $('input[name=report-filter]').on('change', function () {
+            if ($('input[name=report-filter]:checked').attr('id') == 'template-filter') {
+                $("#item-categories").selectpicker("deselectAll");
+                selectedCategories = [];
+                $("#cateContainer").hide();
+                $("#templateContainer").show();
+                $("#templateBtn").show();
+
+            } else if ($('input[name=report-filter]:checked').attr('id') == 'cate-filter') {
+                $("#inventory-templates [value=null]").prop('selected', true);
+                $("#inventory-templates").selectpicker("refresh");
+                selectedTemplate = null;
+                $("#cateContainer").show();
+                $("#templateContainer").hide();
+                $("#templateBtn").hide();
+
+            }
+        });
+
+        ProductFilter();
+        //$('#selectedStore').on('change', function () {
+        //    ProductFilter();
+        //});
+
+        
+        //console.log($('#sTime').data('daterangepicker').endDate.toISOString());
+        window.TableHistory = $('#main-table').dataTable({
+            //"bPaginate": false,
+            "bAutoWidth": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("GetInventory","Inventory")",
+            "bProcessing": true,
+            "bSort": false,
+            //"bScrollCollapse": true,
+            "bInfo": false,
+            //"bPaginate": false,
+            "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "cateId", "value": selectedCategories.toString() });
+                aoData.push({ "name": "dateTime", "value": $("#date-string").val() });
+                aoData.push({ "name": "selectedStoreId", "value": $("#selectedStore").val() });
+                aoData.push({ "name": "selectedTemplate", "value": selectedTemplate });
+                //$('#sTime').data('daterangepicker').startDate.toISOString()
+            },
+            "columns": [
+                { "data": "No" },
+                //{ "data": "itemName" },
+                {
+                    "data": function (data) {
+                        var html;
+                        html = '<div style="display: inline-flex"><a data-id=' + data.itemId + ' onclick="checkDetailItem(this)" ><label class="realistics col-md-10" size="5" style="cursor: pointer; cursor: hand;" value="' + data.itemName + '">' + data.itemName + ' </label></a></div>';
+                        //+"<button type='button' class='btn btn-primary btn-xs btnInInventory''><i class='glyphicon glyphicon-eye-open'></i></button>";
+                        return html;
+                    }
+                },
+                { "data": "unit" },
+                //{ "data": "unitPrice" },
+                //{ "data": "categoryName" },
+                { "data": "inStockQuantity" },
+                //, "title": "Tồn kho"
+                { "data": "InQuantity" },
+                { "data": "InChangeQuantity" },
+                { "data": "TotalImport" },
+                { "data": "SoldQuantity" },
+                { "data": "ReturnQuantity" },
+                { "data": "DraftQuantity" },
+                { "data": "OutChangeQuantity" },
+                { "data": "TotalExport" },
+                { "data": "theoryQuantity" },
+                {
+                    "data": function (data) {
+                        var html;
+                        if (!data.isChanged) {
+                            if (data.allowCheck) {
+                                $('#importContainer').show();
+                                html = '<input id=' + data.itemId + ' name=input' + data.No +
+                                    ' class="realistics col-md-10" size="5" value="' +
+                                    data.realQuantity + '" style="border:none;background-color:#6FB3E0" onkeyup="this.value = checkDigit(this.value)" readonly/>' +
+                                    "<button type='button' class='btn btn-primary btnInInventory' id=" + data.No + " onclick='editRealAmount(this)'>Sửa</button>";
+                            } else {
+                                html = '<input id=' + data.itemId + ' name=input' + data.No + ' class="realistics col-md-10" size="5" value="' + data.realQuantity + '" style="border:none;background-color:#6FB3E0" onkeyup="this.value = checkDigit(this.value)" readonly/>';
+                                $('#importContainer').hide();
+                            }
+                            //return '<input id=' + o.aData[7] + ' name=input' + o.aData[0] + ' class="realistics" size="3" value="' + o.aData[5] + '" style="border:none;background-color:cornflowerblue" onkeyup="this.value = checkDigit(this.value)" readonly/>'
+                        } else {
+                            if (data.allowCheck) {
+                                $('#importContainer').show();
+                                html = '<input id=' + data.itemId + ' name=input' + data.No + ' class="realistics col-md-10" size="5" value="' + data.realQuantity + '" style="border:none;color: red;background-color:#6FB3E0" onkeyup="this.value = checkDigit(this.value)" readonly/>' +
+                                    "<button type='button' class='btn btn-primary btnInInventory' id=" + data.No + " onclick='editRealAmount(this)'>Sửa</button>";
+                            } else {
+                                $('#importContainer').hide();
+                                html = '<input id=' + data.itemId + ' name=input' + data.No + ' class="realistics col-md-10" size="5" value="' + data.realQuantity + '" style="border:none;color: red;background-color:#6FB3E0" onkeyup="this.value = checkDigit(this.value)" readonly/>';
+                            }
+                        }
+                        return html;
+                    }
+                },
+                { "data": "checkingQuantity" },
+                { "data": "TotalRealAmount" },
+                { "data": "COS" },
+            ],
+            //"columnDefs": [
+            //    {
+            //        "targets": [0, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+            //        "sClass": "text-center"
+            //    },
+            //    {
+            //        "visible": false, "targets": [1, 7, 8, 10, 11, 12, 13]
+            //    },
+            //],
+            "oLanguage": {
+                "sSearchPlaceholder": "Tên nguyên liệu",
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trong tổng số _TOTAL_",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " ",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [4, 5, 6, 7, 8, 9, 10, 11],
+                    "sClass": "SmallChildHeader text-center"
+                },
+                 {
+                     "aTargets": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+                     "sClass": "text-center"
+                 },
+                  {
+                      "visible": false, "targets": [4, 5, 7, 8, 9, 10]
+                  },
+            ]
+
+        }).fnSetFilteringDelay(800);
+        //.fnSetFilteringDelay(delaySearch);
+        $('#btnSearch').on('click', function () {
+            var date = $("#date-string").val();
+            beforeDate = currentDate;
+            // beforeDate = $('#sTime').data('daterangepicker').startDate.toISOString();
+            //$('#sTime').data('daterangepicker').endDate.toISOString()
+            $('[data-role=small-date]').html($("#date-string").val());
+            loadInfoIndex($("#date-string").val());
+            $('[data-date=beforeDate]').html(beforeDate.subtract(1, 'days').format('DD/MM/YYYY'));
+            cb(currentDate.add(1, 'days'));
+            //console.log(currentDate,beforeDate);
+            ProductFilter();
+            selectedTemplate = $("#inventory-templates").val();
+            selectedStore = $("#selectedStore").val();
+            RefreshTable();
+        });
+    });
+
+    function ProductFilter() {
+        var select = document.getElementById("item-categories");
+        selectedCategories = [];
+        for (var i = 0; i < select.length; i++) {
+            if (select.options[i].selected) selectedCategories.push(select.options[i].value);
+        }
+
+        //RefreshTable();
+    };
+
+    function checkDetailItem(btn) {
+        var idDetail = $(btn).attr("data-id");
+        $.ajax({
+            url: "@Url.Action("CheckDetailItem", "Inventory")",
+            data: {
+                itemId: idDetail,
+                startTime: $("#date-string").val(),
+                endTime: $("#date-string").val()
+            },
+            success: function (result) {
+                $('#detailItem').modal('show');
+                $('#detailItem-content').html(result);
+            }
+        });
+    }
+    function toggleButton(btn) {
+        var id = $(btn).attr("id");
+        var status = $(btn).data("status");
+        //console.log(status);
+        var idColumns;
+        if (id === "toggle-export") idColumns = [7, 8, 9, 10];
+        else idColumns = [4, 5];
+        toggleColumn(idColumns);
+        $(btn).removeClass();
+        if (status == 0) {
+            $(btn).addClass("glyphicon glyphicon-minus");
+            $(btn).data("status", 1);
+        } else {
+            $(btn).addClass("glyphicon glyphicon-plus");
+            $(btn).data("status", 0);
+        }
+    }
+    function toggleColumn(idColumns) {
+        for (var i = 0; i < idColumns.length; i++) {
+            var column = TableHistory.api().column(idColumns[i]);
+            // Toggle the visibility
+            column.visible(!column.visible());
+        }
+    }
+    //function RefreshTable() {
+    //    $("#main-table tbody").empty();
+    //    TableHistory.ajax.reload();
+    //};
+    function reDrawDatatable(id) {
+        $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+            if (oSettings.oFeatures.bServerSide === false) {
+                var before = oSettings._iDisplayStart;
+                oSettings.oApi._fnReDraw(oSettings);
+                //iDisplayStart has been reset to zero - so lets change it back
+                oSettings._iDisplayStart = before;
+                oSettings.oApi._fnCalculateEnd(oSettings);
+            }
+            //draw the 'current' page
+            oSettings.oApi._fnDraw(oSettings);
+        };
+        $(id).dataTable().fnStandingRedraw();
+    }
+    //user datatable
+    function RefreshTable() {
+        reDrawDatatable("#main-table");
+    }
+    function loadInfoIndex(time) {
+        $.ajax({
+            url: "@Url.Action("InfoIndex", "Inventory")",
+            type: "GET",
+            data: { sTime: time, eTime : time },
+            dataType: 'html',
+            success: function (result) {
+                $('#infoIndex').html(result);
+            }
+        });
+    }
+
+    function editRealAmount(btn) {
+        var inputsName = 'input' + btn.id;
+        var input = document.getElementsByName(inputsName)[0];
+        var quantity = input.value;
+        $('div.container').on('click', function (e) {
+            if ((e.target).id != btn.id) {
+                btn.innerText = "Sửa";
+                input.value = quantity;
+                input.readOnly = true;
+            }
+        });
+        if (btn.innerText == "Sửa" || btn.innerText == "SỬA") {
+            input.readOnly = false;
+            input.value = "";
+            input.focus();
+            btn.innerText = "Lưu";
+        } else {
+            if (quantity != "" && quantity != "-") {
+                input.readOnly = true;
+                //var storeId = $('#hiddenStoreId').val();
+                var itemId = input.id;
+                $.ajax({
+                    url: "@Url.Action("EditRealAmount","Inventory")",
+                    type: "GET",
+                    data: {
+                        //storeId: storeId,
+                        itemId: itemId,
+                        quantity: quantity,
+                    },
+                    success: function (rs) {
+                        if (rs.success == true) {
+                            refreshRowData();
+                            ShowMessage('Lưu thành công', 2);
+                        } else {
+                            ShowMessage('Lưu thất bại', 1);
+                        }
+                    },
+                    error: function (rs) {
+                        ShowMessage('Lưu thất bại', 1);
+                    }
+                });
+                input.style.color = "red";
+                btn.innerText = "Sửa";
+            } else {
+                ShowMessage('Số lượng trống. Vui lòng thêm vào!', 1);
+            }
+        }
+    }
+    function refreshRowData() {
+        var table = $('#main-table').dataTable();
+        table._fnAjaxUpdate();
+    }
+
+    $('#btnUploadExcel').on('click', function () {
+        $("#updateByExcel").click();
+    });
+
+    $("#updateByExcel").on('change', function () {
+        if (this.files.length > 0) {
+            var file = this.files[0];
+            // Kiểm tra file extension hợp lệ hay không
+            //var exType = files[0].type;
+            //if (exType != ".cvs" && exType != ".xlsx" && exType != ".xls") {
+            //    ShowMessage("Sai định dạng, xin hãy chọn .cvs, .xlsx hoặc .xls", 1);
+            //    return;
+            //}
+            uploadExcel(file);
+        }
+    });
+
+    function checkDigit(str) {
+        var check = /^-?$|^-?\d+$/.test(str);
+        if (!check) {
+            return "";
+        }
+        return str;
+    };
+
+    function uploadExcel(file) {
+        var formData = new FormData();
+        if (file != null) {
+            formData.append('file', file);
+            formData.append('selectedStore', selectedStore);
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("UpdateDataViaExcel", "Inventory")',
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        refreshRowData();
+                        ShowMessage(result.message, 3);
+                    } else {
+                        ShowMessage(result.message, 1);
+                    }
+                },
+                processData: false,
+                contentType: false,
+                error: function () {
+                    ShowMessage("Có lỗi xảy ra!", 1);
+                }
+            });
+        }
+    }
+    $('#btnExportExcel').on('click', function () {
+        //ProductFilter();
+        $('[name=selectedStore]').val(selectedStore);
+        //$('#hiddenStoreId').val()
+        $('[name=templateId]').val($("#inventory-templates").val());
+        $('[name=cateId]').val(cateId = selectedCategories.toString());
+        $('[name=dateTime]').val(dateTime = $('#date-string').val());
+        $('#formReportExcel').submit();
+    });
+</script>

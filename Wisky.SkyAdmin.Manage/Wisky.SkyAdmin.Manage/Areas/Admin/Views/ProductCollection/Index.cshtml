@@ -1,0 +1,519 @@
+﻿@{
+    var PicURL = "";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách nhóm</h3>
+            </div>
+            <div class="col-md-4 text-right">
+                <button class="btn btn-primary btn-icon-text waves-effect" id="AddCollection">
+                    <i class="zmdi zmdi-plus"></i> Thêm Bộ sưu tập
+                </button>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <table id="listCollectionTable" class="table table-striped table-vmiddle">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Hình Ảnh</th>
+                    <th>Bộ sưu tập</th>
+                    <th>Trạng thái</th>
+                    <th>Tùy Chọn</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+</div>
+
+<div class="modal fade" id="editAtStoreModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="modalUserHeader"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="attribute-panel">
+
+                        <div class="pair-group form-group m-0">
+
+                            <div class="col-sm-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h2 id="title-modal">Thông tin</h2>
+                                    </div>
+                                    <div class="card-body card-padding">
+                                        <input type="hidden" id="currentImageSelected" value="" />
+                                        <div class="row">
+                                            <label class="control-label">Tên BST</label>
+                                        </div>
+                                        <div class="row">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control currency number" id="ProductCollectNameId" value="" required />
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <label class="control-label">SeoName</label>
+                                        </div>
+                                        <div class="row">
+                                            <div class="fg-line">
+                                                <input type="text" class="form-control number percent" id="SEONameId" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h2>Hình ảnh đại diện</h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row sm-margin">
+                                            <div class="col-md-12">
+                                                <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                                                    <li class="col-md-12 photo-item removeable img-vpos">
+                                                        <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                            <div class="ratio-item">
+                                                                <div class="img-container" id="image_link"><img src="" id="imagepreview" /></div>
+                                                                <input type="hidden" name="SelectedImages" value="" id="hiden_link" />
+                                                                <span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="center">
+                                            <input type="hidden" value="" id="PictureURL" />
+                                            <div style="display: none">
+                                                <input type="file" hidden id="uploadImage" accept="image/*" class="btn btn-sm btn-success uploadImageToBlob" />
+                                            </div>
+                                            <button type="button" id="btnUploadImage" class="btn btn-sm btn-success">
+                                                <i class="icon-upload"></i>Browse
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h2>Hình ảnh Banner</h2>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row sm-margin">
+                                            <div class="col-md-12">
+                                                <ul class="row sm-margin images-preview avatar" id="avatar-preview-banner">
+                                                    <li class="col-md-12 photo-item removeable img-vpos">
+                                                        <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                            <div class="ratio-item">
+                                                                <div class="img-container" id="image_link"><img src="" id="imagepreview" /></div>
+                                                                <input type="hidden" name="SelectedImages" value="" id="hiden_link" />
+                                                                <span class="btn-remove" onclick="delBanner()"><i class="glyphicon glyphicon-remove"></i></span>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="center">
+                                            <input type="hidden" value="" id="BannerURL" />
+                                            <div style="display: none">
+                                                <input type="file" hidden id="uploadBanner" accept="image/*" class="btn btn-sm btn-success uploadImageToBlob" />
+                                            </div>
+                                            <button type="button" id="btnUploadBanner" class="btn btn-sm btn-success">
+                                                <i class="icon-upload"></i>Browse
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            @*<div class="pair-group form-group xs-margin">
+                                    <div class="col-sm-4">
+                                        <div class="fg-line">
+                                            <label class="control-label">Hình ảnh đại diện</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <ul class="row sm-margin images-preview avatar" id="avatar-preview">
+                                            @if (PicURL != "")
+                                            {
+                                                <li class="col-md-4 photo-item removeable">
+                                                    <div class="ratio-wrapper ratio-wrapper-1-1">
+                                                        <div class="ratio-item">
+                                                            <div class="img-container">
+                                                                <img src="@(PicURL)" style="width:100%!important;height:100%!important" id="selectedImageUrl" />
+                                                            </div>
+                                                            <input type="hidden" id="picurlId" name="picurlId" value="@PicURL" />
+                                                            <span class="btn-remove"><i class="glyphicon glyphicon-remove"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                        <div>
+                                            <input type="hidden" id="PicUrl" data-name="@PicURL" />
+                                            <div style="display: none">
+                                                <input type="file" hidden id="uploadImage" accept="image/gif, image/jpeg, image/png" class="btn btn-sm btn-success uploadImageToBlob" />
+                                            </div>
+                                            <button type="button" id="btnUploadImage" class="btn btn-sm btn-success">
+                                                <i class="icon-upload"></i>Browse
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>*@
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top: none;">
+                    <button type="button" class="btn btn-primary" id="btnsubmit">Hoàn Tất</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+    <input type="hidden" id="IdUpdate" />
+    @section scripts {
+        @*<link href="/Content/template-material/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">
+            <script src="/Content/template-material/vendors/bootgrid/jquery.bootgrid.min.js"></script>*@
+        <!-- Data Table -->
+        <script type="text/javascript">
+            function delImg() {
+                $("#PictureURL").val("");
+                $("#avatar-preview").html("");
+            };
+            function delBanner() {
+                $("#BannerURL").val("");
+                $("#avatar-preview-banner").html("");
+            }
+
+            $(document).ready(function () {
+            $("#btnUploadImage").on('click', function () {
+                $('#uploadImage').click();
+                });
+            $("#btnUploadBanner").on('click', function () {
+                $('#uploadBanner').click();
+            });
+            $('#ProductCollectNameId').blur(function () {
+                var seoTitle = $('#ProductCollectNameId').val();
+                $('#SEONameId').val(generateSeoTitle(seoTitle));
+            });
+            $("#uploadImage").on('change', function () {
+
+                var file, img;
+                if ((file = this.files[0])) {
+                    img = new Image();
+                    img.onload = function () {
+                        sendFile(file);
+                    };
+                    img.onerror = function () {
+                        ShowMessage("Not a valid file:" + file.type, 1);
+                    };
+                    var _URL = window.URL || window.webkitURL;
+                    img.src = _URL.createObjectURL(file);
+                }
+            });
+            $("#uploadBanner").on('change', function () {
+
+                var file, img;
+                if ((file = this.files[0])) {
+                    img = new Image();
+                    img.onload = function () {
+                        sendBanner(file);
+                    };
+                    img.onerror = function () {
+                        ShowMessage("Not a valid file:" + file.type, 1);
+                    };
+                    var _URL = window.URL || window.webkitURL;
+                    img.src = _URL.createObjectURL(file);
+                }
+            });
+
+            function sendFile(file) {
+                var formData = new FormData();
+                formData.append('file', $('#uploadImage')[0].files[0]);
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UploadImage", "File")',
+                    data: formData,
+                    success: function (result) {
+                        if (result.success) {
+                            var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                                '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                                '<div class="ratio-item"><div class="img-container"><img src="' + result.imageUrl + '" style="width:100%!important;height:100%!important"/></div>' +
+                            '<input type="hidden" name="SelectedImages" value="' + result.imageUrl + '"/>'
+                            + '<span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                '</div></div></li>';
+                            $("#avatar-preview").html(htmlInnerData);
+                            $("#PictureURL").val(result.imageUrl);
+                        }
+                    },
+                    processData: false,
+                    contentType: false,
+                    error: function () {
+                        ShowMessage("Có lỗi xảy ra!", 1);
+                    }
+                });
+            };
+
+                function sendBanner(file) {
+                var formData = new FormData();
+                formData.append('file', $('#uploadBanner')[0].files[0]);
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("UploadImage", "File")',
+                    data: formData,
+                    success: function (result) {
+                        if (result.success) {
+                            var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                                '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                                '<div class="ratio-item"><div class="img-container"><img src="' + result.imageUrl + '" style="width:100%!important;height:100%!important"/></div>' +
+                                '<input type="hidden" name="SelectedImages" value="' + result.imageUrl + '"/>'
+                                + '<span class="btn-remove" onclick="delBanner()"><i class="glyphicon glyphicon-remove"></i></span>' +
+                                '</div></div></li>';
+                            $("#avatar-preview-banner").html(htmlInnerData);
+                            $("#BannerURL").val(result.imageUrl);
+                        }
+                    },
+                    processData: false,
+                    contentType: false,
+                    error: function () {
+                        ShowMessage("Có lỗi xảy ra!", 1);
+                    }
+                });
+            };
+
+
+            InitCollectionDatatable();
+            $("#AddCollection").on("click", function () {
+                $("#IdUpdate").val("");
+                $('#ProductCollectNameId').val("");
+                $('#SEONameId').val("");
+                PicURL = "";
+                var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                    '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                    '<div class="ratio-item"><div class="img-container"><img src=""/></div>' +
+                    '<input type="hidden" name="SelectedImages" value=""/>'
+                    + '<span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>' +
+                    '</div></div></li>';
+                var htmlInnerDataBanner = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                    '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                    '<div class="ratio-item"><div class="img-container"><img src=""/></div>' +
+                    '<input type="hidden" name="SelectedImages" value=""/>'
+                    + '<span class="btn-remove" onclick="delBanner()"><i class="glyphicon glyphicon-remove"></i></span>' +
+                    '</div></div></li>';
+                $("#avatar-preview").html(htmlInnerData);
+                $("#avatar-preview-banner").html(htmlInnerDataBanner);
+                $("#editAtStoreModal").modal("show");
+
+            });
+
+        });
+
+        $(document).on("click", "#btnsubmit", function () {
+            var collectionName = $('#ProductCollectNameId').val();
+            if (collectionName = "") {
+                ShowMessage("vui lòng nhập tên bộ sưu tập", 1);
+                return;
+            }
+            var collectionSEO = $('#SEONameId').val();
+            if (collectionSEO = "") {
+                ShowMessage("vui lòng nhập SEO ", 1);
+                return;
+            }
+            var collectionImage = $('#PictureURL').val();
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("Create", "ProductCollection")',
+                data: { collectionName: $('#ProductCollectNameId').val(), collectionSEO: $('#SEONameId').val(), picUrl: $('#PictureURL').val(), bannerUrl: $("#BannerURL").val(), IdUpdate: $("#IdUpdate").val() },
+                success: function (result) {
+                    if (result.success == true) {
+                        RefreshTable();
+                        $('#editAtStoreModal').modal('hide');
+                        ShowMessage("Thành công", 2);
+                    } else {
+                        ShowMessage("Whoops something went wrong!", 1);
+                    }
+                }
+            });
+        });
+
+
+        function InitCollectionDatatable() {
+
+            $("#listCollectionTable").dataTable({
+                "bSort": false,
+                "bServerSide": true,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "sAjaxSource": "@Url.Action("GetCollections", "ProductCollection")",
+                "bProcessing": true,
+                "aLengthMenu": [10, 25, 50],
+                "bFilter": true,
+                //"fnServerParams": function (aoData) {
+                //    aoData.push({ "name": "productGroup", "value": $('#productGroupList').val() }),
+                //    aoData.push({ "name": "status", "value": $('input[name=filter-status]:checked').val() }),
+                //    aoData.push({ "name": "type", "value": $('input[name=filter-type]:checked').val() });
+                //},
+                "oLanguage": {
+                    "sSearchPlaceholder": "Tên bộ sưu tập",
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3, 4],
+                        "bSortable": false,
+                        "sClass": "text-center mid-v-align"
+                    },
+                    {
+                        "aTargets": [1],
+                        "bSortable": false,
+                        "mRender": function (data, type, row) {
+                            return "<img class='img-responsive myImg-responsive' src='" + ((row[1] != null) ? row[1] : "~/Content/images/default_product.jpg") + "' onerror='this.onerror=null; this.src=\"@Url.Content("~/Content/images/default_product.jpg")\"'/>";
+                        }
+                    },
+                    {
+                        "aTargets": [3],
+                        "mRender": function (data, type, row) {
+                            if (row[4]) {
+                                return '<a class="btn btn-success btn-icon-text waves-effect changeStatus" data-id="' + row[3] + '">Actived </a>';
+                            } else {
+                                return '<a class="btn btn-danger btn-icon-text waves-effect changeStatus" data-id="' + row[3] + '">Deactived </a>';
+                            }
+                        },
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [4],
+                        "mRender": function (data, type, row) {
+                            var productCollectionId = row[0];
+                            var Id = row[0];
+                            var editButton = '<button title="Chỉnh sửa" onclick="onEditCollection(this);" data-id="' + productCollectionId + '" ' +
+                                'class="btn btn-primary btn-lg" data-toggle="tooltip" >' +
+                                '<i class="glyphicon glyphicon-pencil"></i></button>';
+                            var deleteButton = '<button title="Xóa" onclick="onDeleteButtonClick(this);" style="margin-left: -3px;" data-id="' + productCollectionId + '" ' +
+                                'class="btn btn-danger btn-lg" data-toggle="tooltip" >' +
+                                '<i class="glyphicon glyphicon-trash"></i></button>';
+                            return editButton + " " + deleteButton;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    },
+
+                ],
+                "bAutoWidth": false,
+            }).fnSetFilteringDelay(delaySearch);;
+        }
+
+        function reDrawDatatable(id) {
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+        }
+        //user datatable
+        function RefreshTable() {
+            reDrawDatatable("#listCollectionTable");
+        }
+
+        function onDeleteButtonClick(btn) {
+            ShowConfirm("Bạn có chắc là mình muốn xóa sản phẩm này không??", function () {
+                var id = $(btn).attr("data-id");
+                $.ajax({
+                    url: "@this.Url.Action("Delete", "ProductCollection")",
+                    type: 'POST',
+                    data: {
+                        "collectionId": id,
+                    },
+                    error: function () {
+                        ShowMessage(data.message, 1);
+                    },
+                    success: function (data) {
+                        if (data.success) {
+                            ShowAlert(data.message, 2, null)
+                            RefreshTable();
+                        } else {
+                            ShowMessage(data.message, 1);
+                        }
+                    }
+                });
+            });
+        }
+
+        function onEditCollection(btn) {
+            var id = $(btn).attr("data-id");
+            $.ajax({
+                url: "@this.Url.Action("GetCollectionbyId", "ProductCollection")",
+                type: 'POST',
+            data: {
+                "collectionId": id,
+                },
+            error: function () {
+                ShowMessage("Không thể tải được dữ liệu", 1);
+            },
+            success: function (data) {
+                if (data.success) {
+                    $('#ProductCollectNameId').val(data.collection.Name);
+                    $('#SEONameId').val(data.collection.SEO);
+                    PicURL = data.collection.Link;
+                    var htmlInnerData = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                               '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                               '<div class="ratio-item"><div class="img-container"><img src="' + data.collection.Link + '" style="width:100%!important;height:100%!important"/></div>' +
+                           '<input type="hidden" name="SelectedImages" value="' + data.collection.Link + '"/>'
+                           + '<span class="btn-remove" onclick="delImg()"><i class="glyphicon glyphicon-remove"></i></span>' +
+                        '</div></div></li>';
+                    var htmlInnerDataBanner = '<li class="col-md-4 photo-item removeable img-vpos">' +
+                        '<div class="ratio-wrapper ratio-wrapper-1-1">' +
+                        '<div class="ratio-item"><div class="img-container"><img src="' + data.collection.BannerUrl + '" style="width:100%!important;height:100%!important"/></div>' +
+                        '<input type="hidden" name="SelectedImages" value="' + data.collection.BannerUrl + '"/>'
+                        + '<span class="btn-remove" onclick="delBanner()"><i class="glyphicon glyphicon-remove"></i></span>' +
+                        '</div></div></li>';
+                    $("#avatar-preview").html(htmlInnerData);
+                    $("#avatar-preview-banner").html(htmlInnerDataBanner);
+                    $("#PictureURL").val(data.collection.Link);
+                    $("#BannerURL").val(data.collection.BannerUrl);
+                    $("#IdUpdate").val(id);
+                    $("#editAtStoreModal").modal("show");
+                } else {
+                    ShowMessage(data.message, 1);
+                }
+            }
+        });
+        }
+
+
+        </script>
+    }

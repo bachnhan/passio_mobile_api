@@ -1,0 +1,88 @@
+﻿
+@{
+    ViewBag.Title = "ProductGeneralDetail";
+    //    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row" style="margin-top: 5px">
+            <div class="col-md-6">
+                <h3>@ViewBag.productName - Quản lý sản phẩm con</h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <a href="@Url.Action("Edit", new { id = ViewBag.productId })" class="btn btn-success">Quay lại</a>
+                <a id="submitCreateChild" class="btn btn-primary">
+                    Thêm
+                </a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <input type="hidden" value=@ViewBag.productID id="productId" />
+        <div class="row">
+            <div id="divLoadGeneral" class="col-md-4">
+            </div>
+            <br />
+            <br />
+            <div id="divChooseGeneral" class="col-md-8">
+            </div>
+        </div>
+    </div>
+</div>
+@*<input type="hidden" value=@ViewBag.productID id="productId" />*@
+@*<input type="hidden" value=@ViewBag.storeName id="storeName" />*@
+@*<input type="hidden" value=@ViewBag.storeId id="storeId" />*@
+@*<div class="page-content">
+    <div class="page-header">
+        <div class="row" style="margin-left: 0; margin-top: 5px">
+            <h1>@ViewBag.productName - Quản lý sản phẩm con</h1>
+
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div id="divLoadGeneral" class="col-md-4">
+        </div>
+        <br />
+        <br />
+        <div id="divChooseGeneral" class="col-md-8">
+        </div>
+    </div>
+</div>*@
+<script>
+    function loadCurrentChildren(productId) {
+        var storeId = $('#hiddenStoreId').val();
+        var storeName = $('#hiddenStoreName').val();
+        $('#tableChooseGeneral').html("");
+        $.ajax({
+            //            url: '/Products/' + storeId + '/' + storeName + '/Product/ListGeneral',
+            url: '@Url.Action("ListGeneral", "Product")',
+            type: "GET",
+            data: { productId: productId },
+            success: function (result) {
+                $("#divChooseGeneral").fadeOut(200, function () {
+                    $("#divChooseGeneral").html(result);
+                    $("#divChooseGeneral").fadeIn(200);
+                });
+            }
+        });
+    };
+    function loadChildrenCreatingForm(productId) {
+        $.ajax({
+            //            url: '/Products/' + $('#storeId').val() + '/' + $('#storeName').val() + '/Product/CreateChildGeneral',
+            url: '@Url.Action("CreateChildGeneral", "Product")',
+            type: "GET",
+            data: { productId: productId },
+            success: function (result) {
+                $('#divLoadGeneral').html(result);
+            }
+        });
+    };
+    $(document).ready(function () {
+        loadCurrentChildren($('#productId').val());
+        loadChildrenCreatingForm($('#productId').val());
+        window.HMS.ProductGeneral.init();
+        window.HMS.ProductSingle.init();
+    });
+</script>

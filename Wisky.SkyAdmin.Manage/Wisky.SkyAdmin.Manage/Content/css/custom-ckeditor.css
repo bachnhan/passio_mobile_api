@@ -1,0 +1,39 @@
+﻿.cke_chrome {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+}
+
+.cke_top,
+.cke_bottom,
+.cke_toolgroup,
+.cke_combo_button {
+    background-image: none !important;
+    background-color: #fff !important;
+}
+
+.cke_toolgroup,
+.cke_combo_button {
+    border-radius: 0 !important;
+    /*border: 1px solid #ccc !important;*/
+    border: none !important;
+}
+
+a.cke_button_off:hover, a.cke_button_off:focus, a.cke_button_off:active, a.cke_button_disabled:hover, a.cke_button_disabled:focus, a.cke_button_disabled:active {
+    background-image: none !important;
+    background-color: #eee !important;
+    cursor: pointer;
+    -moz-transition: background .3s;
+    -o-transition: background .3s;
+    -webkit-transition: background .3s;
+    transition: background .3s;
+}
+
+.cke_combo_button {
+    box-shadow: none !important;
+}
+.cke_combo_on .cke_combo_button {
+    background-color: #eee !important;
+}
+.cke_combo_button:hover {
+    
+}

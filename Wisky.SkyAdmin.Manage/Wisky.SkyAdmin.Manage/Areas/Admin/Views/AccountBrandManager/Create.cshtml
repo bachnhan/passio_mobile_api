@@ -1,0 +1,186 @@
+﻿@model RegisterViewModel
+@{
+    ViewBag.Title = "Thêm người dùng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+
+
+<div class="card">
+    <form id="createAccountBrandManagerForm" method="post">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>Thêm người dùng mới</h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <a href="@Url.Action("Index")" class="btn btn-success">Quay lại</a>
+                    <button type="button" onclick="confirmSubmit(this)" class="btn btn-primary">Tạo khách hàng</button>
+                </div>
+            </div>
+            <hr />
+        </div>
+        <div class="card-padding">
+            <div class="modal-body">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+                <div class="form-horizontal">
+                    <div class="row group-info" style="margin-left:-2px; margin-right:-2px; margin-top:12px; padding-top:20px; padding-bottom:22px;">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Tên Người Dùng<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Username, new { id = "Username", @class = "form-control" })
+                                        @Html.ValidationMessageFor(q => q.Username, "", new { @style = "color:red;font-size: 125%;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Tên Đầy Đủ<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.FullName, new { id = "Fullname", @class = "form-control" })
+                                        @Html.ValidationMessageFor(q => q.FullName, "", new { @style = "color:red;font-size: 125%;" })
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Email<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.TextBoxFor(q => q.Email, new { id = "Email", type = "email", @class = "form-control" })
+                                        @*@Html.ValidationMessageFor(q => q.Email, "", new { @style = "color:red;font-size: 125%;" })*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Mật Khẩu<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.PasswordFor(q => q.Password, new { id = "Password", @class = "form-control" })
+                                        @Html.ValidationMessageFor(q => q.Password, "", new { @style = "color:red;font-size: 125%;" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-md-4" for="Name">Xác Nhận Mật Khẩu<span style="color:red">*</span></label>
+                                <div class="col-md-6">
+                                    <div class="fg-line">
+                                        @Html.PasswordFor(q => q.ConfirmPassword, new { id = "ConfirmPassword", @class = "form-control" })
+                                        @Html.ValidationMessageFor(q => q.ConfirmPassword, "", new { @style = "color:red;font-size: 125%;" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    //$(document).ready(function () {
+
+    //    $('#createaccountbrandmanagerform').submit(function (e) {
+    //        e.preventdefault();
+    //        var password = $("input[name='Password']").val();
+    //        var confirmPassword = $("input[name='ConfirmPassword']").val();
+    //        if (password == "" || confirmPassword == "") {
+    //            return;
+    //        }
+    //        else if (!password.match(confirmPassword)) {
+    //            ShowMessage('Xác nhận mật khẩu không chính xác',1);
+    //            return;
+    //        }
+    //        else if (password == confirmPassword)
+    //        {
+    //            createAccountBrandManager();
+    //        }
+    //        //if (checkconfirmpassword()) {
+    //        //    createaccountbrandmanager();
+    //        //}
+
+    //    });
+    //})
+
+    function validateEmail(email) {
+        var re = /^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    };
+
+    function confirmSubmit(btn) {
+        if ($("input[name='Username']").val() == "") {
+            ShowMessage("Vui lòng nhập tên người dùng.", 3);
+            return;
+        }
+        else if ($("input[name='FullName']").val() == "") {
+            ShowMessage("Vui lòng nhập họ tên đầy đủ.", 3);
+            return;
+        }
+        else if ($("input[name='Email']").val() == "") {
+            ShowMessage("Vui lòng nhập email.", 3);
+            return;
+        }
+        else if (!validateEmail($("input[name='Email']").val())) {
+            ShowMessage("Email không đúng định dạng, vui lòng thử lại", 3);
+            return;
+        }
+        else if ($("input[name='Password']").val() == "") {
+            ShowMessage("Vui lòng nhập mật khẩu.", 3);
+            return;
+        }
+        else if ($("input[name='ConfirmPassword']").val() == "") {
+            ShowMessage("Vui lòng xác nhận mật khẩu.", 3);
+            return;
+        }
+        else if ($("input[name='Password']").val() != $("input[name='ConfirmPassword']").val()) {
+            ShowMessage("Xác nhận mật khẩu không chính xác.", 3);
+            return;
+        }
+        else {
+            createAccountBrandManager();
+        }
+    }
+    function createAccountBrandManager() {
+        var form = $('#createAccountBrandManagerForm');
+        $.validator.unobtrusive.parse(form);
+        var formData = $('#createAccountBrandManagerForm').serialize();
+        if (form.valid()) {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Create")',
+                dataType: 'JSON',
+                data: formData,
+                success: function (result) {
+                    if (result.success) {
+                        ShowAlert(result.message, 2, '@Url.Action("Index")');
+                    }
+                    else {
+                        ShowAlert(result.message, 1);
+                    }
+                },
+
+                error: function (error) {
+                    ShowAlert(error.message, 1);
+                }
+            });
+        }
+    }
+
+    function checkConfirmPassword() {
+        var password = $('#Password').val();
+        var confirmPassword = $('#ConfirmPassword').val();
+        if (password == "" || confirmPassword == "") {
+            return false;
+        }
+        else if (!password.match(confirmPassword)) {
+            ShowMessage('Xác nhận mật khẩu không chính xác', 1);
+            return false;
+        }
+        return true;
+    }
+</script>

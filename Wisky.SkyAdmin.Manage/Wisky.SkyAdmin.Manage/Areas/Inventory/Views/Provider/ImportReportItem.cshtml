@@ -1,0 +1,221 @@
+﻿
+@{
+    //ViewBag.Title = "ImportReportItem";
+    Layout = null;
+}
+
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            @*<div class="card">
+                <div class="card-header">*@
+            <div class="row">
+                <div class="col-md-8">
+                    <h3 id="provider">Chi tiết nhà cung cấp @*@ViewBag.ProviderName*@</h3>
+                    <h5 class="smallDate" data-role="small-date">@*(@ViewBag.ReviewDate)*@</h5>
+                </div>
+                @*<div class="col-md-4 text-right">
+                        <a class="btn btn-success" href="@Url.Action("ImportReportList","Provider")">Trở lại</a>
+                    </div>*@
+            </div>
+            @*<hr />*@
+            @*<div class="row" style="margin-top: 19px">
+                <div class="col-md-12">
+                    <div class="input-group text-right">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div> /input-group 
+                        <div class="input-group-btn">
+                            <a class="btn btn-primary btn-sm" id="btnSearch">
+                                <i class="left-icon fa fa-search"></i>Tìm
+                            </a>
+                        </div>
+                    </div>
+                    <input type="hidden" id="sTime" />
+                    <input type="hidden" id="eTime" />
+                    <input value="@ViewBag.ProviderId" id="providerId" hidden />
+                </div>
+            </div>*@
+        </div>
+        <div class="modal-body">
+            <div id="inventory">
+                <table id="table-item" class="table table-bordered table-striped table-fixed-header">
+                    <thead>
+                        <tr>
+                            <th><label>STT</label></th>
+                            <th><label>Tên sản phẩm</label></th>
+                            <th><label>Ngày nhập</label></th>
+                            <th><label>Đơn vị</label></th>
+                            <th><label>Số lượng</label></th>
+                            <th><label>Đơn giá</label></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@*<div class="page-content">
+        <div class="page-header">
+            <div class="row small-margin">
+                <div class="col-md-8">
+                    <h2>Chi tiết nhà cung cấp @ViewBag.ProviderName ngày <strong data-role="small-date">@ViewBag.ReviewDate</strong></h2>
+                </div>
+                <div class="col-lg-4 pull-right text-right">
+                    <div class="input-group">
+                        <div class="date-picker">
+                            <input type="text" id="date-string" readonly="">
+                            <a id="reportrange"><i class="fa fa-calendar"></i></a>
+                        </div><!-- /input-group -->
+                        <div class="input-group-btn">
+                            <a class="btn btn-success btn-sm" id="btnSearch">
+                                <i class="left-icon fa fa-search"></i>Tìm
+                            </a>
+                        </div>
+                    </div>
+                    <input type="hidden" id="sTime" />
+                    <input type="hidden" id="eTime" />
+                    <input value="@ViewBag.ProviderId" id="providerId" hidden />
+
+                </div>
+            </div>
+        </div>
+        <div id="inventory">
+            <table id="tablepaging" class="table table-bordered table-striped table-fixed-header">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Ngày nhập</th>
+                        <th>Đơn vị</th>
+                        <th>Số lượng</th>
+                        <th>Đơn giá</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>*@
+<style>
+    .input-group .input-group-btn > a.btn {
+        margin-top: 0px !important;
+    }
+</style>
+
+<script type="text/javascript">
+    //$(document).ready(function () {
+    //    function cb(start, end, label) {
+    //        var startTime = start.format("DD/MM/YYYY"),
+    //            endTime = end.format("DD/MM/YYYY"),
+    //            dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+    //        if (label != "Tùy chọn") {
+    //            $('#date-string').val(label);
+    //        } else {
+    //            $("#date-string").val(dateString);
+    //        }
+
+    //        $("#sTime").val(startTime);
+    //        $("#eTime").val(endTime);
+    //        $("[data-role=small-date]").html(dateString);
+    //    };
+
+    //    $('#reportrange').daterangepicker({
+    //        "opens": "left",
+    //        "maxDate": moment(),
+    //        locale: {
+    //            format: 'DD/MM/YYYY'
+    //        },
+    //        ranges: {
+    //            'Hôm nay': [moment(), moment()],
+    //            'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+    //            'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+    //            'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+    //            'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+    //            'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+    //        }
+    //    }, cb);
+    //    cb(moment(), moment(), "Hôm nay");
+
+        @*$('#btnSearch').on('click', function () {
+            sStartDate = $("#sTime").val();
+            sEndDate = $("#eTime").val();
+            dStartDate = moment(sStartDate, 'DD/MM/YYYY');
+            dEndDate = moment(sEndDate, 'DD/MM/YYYY');
+
+            if (sStartDate.length > 16 || sEndDate.length > 16) {
+                ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                return;
+            }
+
+            if ((sStartDate.length > 0 && sEndDate.length == 0) || (sEndDate.length > 0 && sStartDate.length == 0) || (dStartDate > dEndDate)) {
+                ShowMessage("Thời gian bắt đầu và kết thúc không phù hợp", 3);
+                return;
+            }
+            if ($("#sTime").val() == '' || $("#eTime").val() == '') {
+                $('#dateRange').html('(' + moment().format('DD/MM/YYYY') + ')');
+            } else {
+                $('#dateRange').html('(' + $("#sTime").val() + ($("#sTime").val() === $("#eTime").val() ? '' : (' - ' + $("#eTime").val())) + ')');
+            }
+            //$('#sTime').data('daterangepicker').endDate.toISOString()
+            if (sStartDate == sEndDate) {
+                $('[data-role=small-date]').html(sStartDate);
+            }
+            else {
+                $('[data-role=small-date]').html(sStartDate + " - " + sEndDate);
+            }
+            RefreshTable();
+        });
+        var table = $("#tablepaging").dataTable({
+            "bFilter": true,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("LoadImportReportItem")",
+            "bProcessing": true,
+
+            "fnServerParams": function (aoData) {
+                aoData.push({ "name": "startTime", "value": $('#sTime').val() });
+                aoData.push({ "name": "endTime", "value": $('#eTime').val() });
+                aoData.push({ "name": "providerId", "value": $('#providerId').val() })
+            },
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5],
+                    "bSortable": false,
+                },
+                  {
+                      "aTargets": [0, 2, 3, 4],
+                      "sClass": "text-center",
+                  },
+            ],
+            "bAutoWidth": false,
+        });
+    });*@
+    //function RefreshTable() {
+    //    var oTable = $("#tablepaging").dataTable();
+    //    oTable._fnPageChange(0);
+    //    oTable._fnAjaxUpdate();
+    //};
+</script>
+

@@ -1,0 +1,1216 @@
+﻿
+@{
+    ViewBag.Title = "IndexProductLineReport";
+}
+<style>
+    .tab-nav.tn-justified > li {
+        width: 33% !important;
+        padding: 0px;
+    }
+
+    .dropdown-menu.open {
+        max-height: 200px !important;
+        overflow: visible !important;
+    }
+
+    .dropdown-menu.inner {
+        max-height: 200px !important;
+    }
+
+    .highcharts-container {
+        width: 100% !important;
+    }
+    /* The switch - the box around the slider */
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 30px;
+        height: 17px;
+    }
+
+        /* Hide default HTML checkbox */
+        .switch input {
+            display: none;
+        }
+
+    /* The slider */
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 13px;
+            width: 13px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+    input:checked + .slider {
+        background-color: #2196F3;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(13px);
+        -ms-transform: translateX(13px);
+        transform: translateX(13px);
+    }
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 17px;
+    }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+</style>
+
+<div class="card">
+    <div class="card-header" style="padding-bottom:5px">
+        <div class="row">
+            <div class="col-md-4">
+                <h3>Báo cáo diễn tiến sản phẩm</h3>
+                <h5 data-role="small-date" id="dateRange"></h5>
+            </div>
+            <div class="col-md-8">
+                <div style="text-align: right;">
+                    <!-- ALL STORE -->
+                    <button type="submit" id="exportAllStore" class="btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button><!-- ALL STORE END -->
+                    <!-- ALL STOREGROUP -->
+                    <button type="submit" id="exportStoreGroup" class="btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button><!-- ALL STOREGROUP END -->
+                    <!-- ONE SOTRE -->
+                    <button type="submit" id="exportOneStore" class="btn btn-primary btn-sm">
+                        <i class="fa fa-download"></i>
+                        Xuất ra file Excel
+                    </button><!-- ONE SOTRE END -->
+                </div><!-- EXPORT TO EXCEL END -->
+            </div>
+        </div>
+        <hr />
+        <ul id="TabList" class="tab-nav tn-justified" style="overflow: hidden;width: 100%">
+            <li class="active waves-effect col-lg-6"><a data-toggle="tab" onclick="openCity(event, 'tab1')" href="#storesTab" id="tab01"><i class="fa fa-home"></i> Cửa hàng</a></li>
+            <li class="waves-effect col-lg-6"><a data-toggle="tab" onclick="openCity(event, 'tab3')" href="#all" id="tab03"><i class="fa fa-globe"></i> Hệ Thống</a></li>
+            <li class="waves-effect col-lg-6"><a data-toggle="tab" onclick="openCity(event, 'tab2')" href="#storesGroupTab" id="tab02"><i class="fa fa-users"></i> Nhóm cửa hàng</a></li>
+        </ul>
+        <div class="row">
+            <form id="form-create-session" class="form-inline">
+                <div class="col-md-12 m-t-20">
+                    <div class="col-md-3" id="cbCuaHang">
+                        <label>Chọn Cửa hàng:</label>
+                        <select class="selectpicker" id="StoreIdReport"></select>
+                    </div>
+                    <div class="col-md-3" id="cbnhomcuahang" hidden>
+                        <label>Nhóm Cửa hàng: &nbsp;</label>
+                        <select class="selectpicker" id="StoreGroupIdReport" style="width : auto"></select>
+                    </div>
+                    <div class="col-md-3 col-md-offset-1" id="select-type">
+                        <label>Chọn sản phẩm: &nbsp;</label>
+                        <label hidden>Chọn nhóm sản phẩm: &nbsp;</label>
+                        <select class="selectpicker" id="itemlist" data-live-search="true"></select>
+                    </div>
+                    <div class="input-group pull-right" style="padding-top: 22px">
+                        <div class="dateTime width230 pull-right">
+                            <div class="fg-line m-t-5">
+                                <div id="reportrange">
+                                    <input id="date-string" readonly class="form-control text-center">
+                                    <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="sTime" />
+                    <input type="hidden" id="eTime" />
+                </div>
+                <div class="col-md-12 m-y-15">
+                    <div class="col-md-6">
+                        <label>Chọn loại :</label>
+                        <div id="checkproduct" class="group-radio-buttons">
+                            <div class="toggle-switch col-md-12 m-y-10">
+                                <input name="mapping1" id="activeMapping" type="radio" class="nice-check" onchange="toggleName()" checked value="true"/>
+                                <label for="activeMapping" class="ts-label"><span>Sản Phẩm</span></label>
+                            </div>
+                            <div class="toggle-switch col-md-12 m-y-10">
+                                <input name="mapping1" id="deActiveMapping" type="radio" class="nice-check" onchange="toggleName()" value="false"/>
+                                <label for="deActiveMapping" class="ts-label"><span>Nhóm Sản Phẩm</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Chọn biểu đồ :</label>
+                        <div class="group-radio-buttons">
+                            <div class="toggle-switch col-md-12 m-y-10">
+                                <input name="mapping2" id="activeChart" type="radio" class="nice-check" @*onchange="onChangeActiveChart()"*@ checked value="true" />
+                                <label for="activeChart" class="ts-label"><span>Trước giảm giá</span></label>
+                            </div>
+                            <div class="toggle-switch col-md-12 m-y-10">
+                                <input name="mapping2" id="deActiveChart" type="radio" class="nice-check" @*onchange="onChangeDeActiveChart()"*@ value="false" />
+                                <label for="deActiveChart" class="ts-label"><span>Sau giảm giá</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="col-md-2">
+                        <button type="button" data-status="hide" id="btnChart" class="btn btn-primary btn-sm" style="width: 150px;">
+                            <i class="fa fa-plus"></i>
+                            Hiển thị biểu đồ
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12" id="containerWrapper" style="display:none">
+            <div id="container" style="width:100%; height:300px"></div>
+            <div id="container2" style="width:100%; height:300px"></div>
+            <div id="container3" style="width:100%; height:300px"></div>
+        </div>
+    </div>
+    <div class="card-padding">
+        <div id="groupCategoryReport1">
+            <table id="groupCategoryReportDatatable1" class="table table-striped table-bordered table-hover" style="width: 100% !important">
+                <thead style="white-space: nowrap; text-overflow: ellipsis;">
+                    <tr>
+                        <th>
+                            <label class="">Ngày</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu trước giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="groupCategoryReport2" hidden>
+            <table id="groupCategoryReportDatatable2" class="table table-striped table-bordered table-hover" style="width: 100% !important">
+                <thead style="white-space: nowrap; text-overflow: ellipsis;">
+                    <tr>
+                        <th>
+                            <label class="">Ngày</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu trước giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <div id="groupCategoryReport3" hidden>
+            <table id="groupCategoryReportDatatable3" class="table table-striped table-bordered table-hover" style="width: 100% !important">
+                <thead style="white-space: nowrap; text-overflow: ellipsis;">
+                    <tr>
+                        <th>
+                            <label class="">Ngày</label>
+                        </th>
+                        <th>
+                            <label class="">Số lượng</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu trước giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Giảm giá</label>
+                        </th>
+                        <th>
+                            <label class="">Doanh thu</label>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<form class="hidden" id="formProductCategoryReportAllExcel" action="@Url.Action("ReportProductLineAllStoreExportExcelEPPlus", "ProductReport")">
+    <input id="startTimeAll" name="startTime" />
+    <input id="endTimeAll" name="endTime" />
+    <input name="selecteditem" />
+    <input name="checkvalue" />
+</form>
+
+<form class="hidden" id="ReportProductLineStoreGroupExportExcelEPPlus" action="@Url.Action("ReportProductLineStoreGroupExportExcelEPPlus", "ProductReport")">
+    <input id="startTimeGroup" name="startTime" />
+    <input id="endTimeGroup" name="endTime" />
+    <input name="StoreGroupIdReport" />
+    <input name="selecteditem" />
+    <input name="checkvalue" />
+</form>
+
+<form class="hidden" id="ReportProductLineOneStoreExportExcelEPPlus" action="@Url.Action("ReportProductLineOneStoreExportExcelEPPlus", "ProductReport")">
+    <input id="startTimeOne" name="startTime" />
+    <input id="endTimeOne" name="endTime" />
+    <input name="storeIdReport" />
+    <input name="selecteditem" />
+    <input name="checkvalue" />
+</form>
+
+<script>
+    var check = 0;
+    var start = 0;
+    function openCity(evt, cityName) {
+        // Declare all variables
+        var i, tabcontent, tablinks;
+        // Get all elements with class="tablinks" and remove the class "active"
+        tablinks = document.getElementsByClassName("waves-effect col-lg-6");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        // Show the current tab, and add an "active" class to the link that opened the tab
+        evt.currentTarget.className += " active";
+        if (cityName == 'tab1') {
+            $('#cbCuaHang').show();
+            $('#cbnhomcuahang').hide();
+            $('#container').show();
+            $('#container2').hide();
+            $('#container3').hide();
+            $('#groupCategoryReport1').show();
+            $('#groupCategoryReport2').hide();
+            $('#groupCategoryReport3').hide();
+            check = 1;
+        } else if (cityName == 'tab2') {
+            $('#cbCuaHang').hide();
+            $('#cbnhomcuahang').show();
+            $('#container2').show();
+            $('#container').hide();
+            $('#container3').hide();
+            $('#groupCategoryReport2').show();
+            $('#groupCategoryReport1').hide();
+            $('#groupCategoryReport3').hide();
+            check = 2;
+        }
+        else {
+            $('#cbCuaHang').hide();
+            $('#cbnhomcuahang').hide();
+            $('#container3').show();
+            $('#container2').hide();
+            $('#container').hide();
+            $('#groupCategoryReport3').show();
+            $('#groupCategoryReport2').hide();
+            $('#groupCategoryReport1').hide();
+            check = 3;
+        }
+    }
+    function GetStoreList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStoreList", "ProductReport")',
+            jsonp: "$callback",
+            success: function (result) {
+                for (var i = 0; i < result.store.length; i++) {
+                    $('#StoreIdReport').append('<option value="' + result.store[i].ID + '">' + result.store[i].Name + '</option>')
+                }
+                $('#StoreIdReport').selectpicker('refresh');
+            }
+        }).done(function () {
+            GetProductList();
+        });
+
+    }
+    function GetStoreGroupList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadStoreGroupList", "ProductReport")',
+            success: function (result) {
+                for (var i = 0; i < result.storeGroup.length; i++) {
+                    $('#StoreGroupIdReport').append('<option value="' + result.storeGroup[i].GroupID + '">' + result.storeGroup[i].GroupName + '</option>')
+                }
+                $('#StoreGroupIdReport').selectpicker('refresh');
+                if ($('#StoreGroupIdReport').val() != null) {
+                    $('#tab02').show();
+                }
+            }
+        });
+    }
+    function GetProductList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadProductList","ProductReport")',
+            jsonp: "$callback",
+            success: function (result) {
+                for (var i = 0; i < result.listPro.length; i++) {
+                    $('#itemlist').append('<option value="' + result.listPro[i].ProductId + '"checked>' + result.listPro[i].ProductName + '</option>')
+                }
+                $('#itemlist').val(result.listPro[0].ProductId);
+                $('#itemlist').selectpicker('refresh');
+                //Reload when check radio button
+                if (check == 1) {
+                    productReportOneStore();
+                }
+                if (check == 2) {
+                    productReportStoreGroup();
+                }
+                if (check == 3) {
+                    productReportAllStore();
+                }
+            }
+        });
+    }
+    function GetProductCateList() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("LoadProductCateList", "ProductReport")',
+            success: function (result) {
+                for (var i = 0; i < result.listCate.length; i++) {
+                    $('#itemlist').append('<option value="' + result.listCate[i][0] + '">' + result.listCate[i][1] + '</option>')
+                }
+                $('#itemlist').selectpicker('refresh');
+                //Reload when check radio button
+                if (check == 1) {
+                    productCategoryReportOneStore();
+                }
+                if (check == 2) {
+                    CategoryReportStoreGroup();
+                }
+                if (check == 3) {
+                    CategoryReportAllStore();
+                }
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        var CheckListProduct = [];
+        check = 1;
+        start = 0;
+        GetStoreList();
+        GetStoreGroupList();
+        $('#tab02').hide();
+        //Show tab OneStore
+        $('#exportAllStore').hide();
+        $('#exportStoreGroup').hide();
+        $('#container').show();
+        $('#container2').hide();
+        $('#container3').hide();
+        $('#groupCategoryReport1').show();
+        $('#groupCategoryReport2').hide();
+        $('#groupCategoryReport3').hide();
+        //RadioButton ProductType Change
+        $('#activeMapping').on('change', function () {
+            if (!$("#activeMapping").is(':checked')) {
+                $("#itemlist").html("");
+                GetProductCateList();
+            } else {
+                $("#itemlist").html("");
+                GetProductList();
+            }
+        });
+        $('#deActiveMapping').on('change', function () {
+            if ($("#deActiveMapping").is(':checked')) {
+                $("#itemlist").html("");
+                GetProductCateList();
+            } else {
+                $("#itemlist").html("");
+                GetProductList();
+            }
+        });
+        //RadioButton Chart Change
+        $('#activeChart').on('change', function () {
+            if (!$("#activeMapping").is(':checked')) {
+                if (check == 1) {
+                    productCategoryReportOneStore();
+                }
+                if (check == 2) {
+                    CategoryReportStoreGroup();
+                }
+                if (check == 3) {
+                    CategoryReportAllStore();
+                }
+            } else {
+                if (check == 1) {
+                    productReportOneStore();
+                }
+                if (check == 2) {
+                    productReportStoreGroup();
+                }
+                if (check == 3) {
+                    productReportAllStore();
+                }
+            }
+        });
+        $('#deActiveChart').on('change', function () {
+            if (!$("#activeMapping").is(':checked')) {
+                if (check == 1) {
+                    productCategoryReportOneStore();
+                }
+                if (check == 2) {
+                    CategoryReportStoreGroup();
+                }
+                if (check == 3) {
+                    CategoryReportAllStore();
+                }
+            } else {
+                if (check == 1) {
+                    productReportOneStore();
+                }
+                if (check == 2) {
+                    productReportStoreGroup();
+                }
+                if (check == 3) {
+                    productReportAllStore();
+                }
+            }
+        });
+
+        cb(moment(), moment(), "Hôm nay");
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+
+
+            $("#sTime").val(startTime);
+            $("#eTime").val(endTime);
+            $("#dateRange").html(dateString);
+            if (!$("#activeMapping").is(':checked')) {
+                if (check == 1) {
+                    productCategoryReportOneStore();
+                } else if (check == 2) {
+                    CategoryReportStoreGroup();
+                } else if (check == 3) {
+                    CategoryReportAllStore();
+                }
+            } else {
+                if (check == 1) {
+                    if ($('#StoreIdReport').val() == null && $('#itemlist').val() == null) {
+                        return;
+                    }
+                    productReportOneStore();
+                } else if (check == 2) {
+                    productReportStoreGroup();
+                } else if (check == 3) {
+                    productReportAllStore();
+                }
+            }
+        }
+        $('#reportrange').daterangepicker({
+            "opens": "left",
+            "maxDate": moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            },
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);  
+    });
+    $('#tab01').on('click', function () {
+        if (!$('#select-type').hasClass('col-md-offset-1')) {
+            $('#select-type').addClass('col-md-offset-1');
+        }
+
+        if ($("#itemlist").val() == null) {
+            ShowMessage('Vui lòng chọn sản phẩm hoặc nhóm sản phẩm', 3);
+            return;
+        }
+        if (!$("#activeMapping").is(':checked')) {
+            productCategoryReportOneStore();
+
+        } else {
+            productReportOneStore();
+        }
+    });
+    $('#tab02').on('click', function () {
+        if (!$('#select-type').hasClass('col-md-offset-1')) {
+            $('#select-type').addClass('col-md-offset-1');
+        }
+
+        if ($("#itemlist").val() == null) {
+            ShowMessage('Vui lòng chọn sản phẩm hoặc nhóm sản phẩm', 3);
+            return;
+        }
+        if (!$("#activeMapping").is(':checked')) {
+            CategoryReportStoreGroup();
+
+        } else {
+            productReportStoreGroup();
+        }
+    });
+    $('#tab03').on('click', function () {
+        if ($('#select-type').hasClass('col-md-offset-1')) {
+            $('#select-type').removeClass('col-md-offset-1');
+        }
+
+        if ($("#itemlist").val() == null) {
+            ShowMessage('Vui lòng chọn sản phẩm hoặc nhóm sản phẩm', 3);
+            return;
+        }
+        if (!$("#activeMapping").is(':checked')) {
+            CategoryReportAllStore();
+
+        } else {
+            productReportAllStore();
+        }
+    });
+    function productCategoryReportOneStore() {
+        $('#exportAllStore').hide();
+        $('#exportStoreGroup').hide();
+        $('#exportOneStore').show();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CategoryProductLineReportOneStore")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'storeIdReport': $('#StoreIdReport').val(), 'selecteditem': $('#itemlist').val() },
+            success: function (result) {
+                initProductReportDatatable(result.datatable, false);
+                // Set up chart
+                DoanhThuChart(result.dataChart)
+            }
+        });
+    };
+    function productReportOneStore() {
+        $('#exportAllStore').hide();
+        $('#exportStoreGroup').hide();
+        $('#exportOneStore').show();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ProductLineReportOneStore")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'storeIdReport': $('#StoreIdReport').val(), 'selecteditem': $('#itemlist').val() },
+            success: function (result) {
+                initProductReportDatatable(result.datatable, false);
+                // Set up chart
+                DoanhThuChart(result.dataChart)
+            }
+        });
+    };
+    function CategoryReportStoreGroup() {
+        console.log($('#StoreIdReport').val());
+        $('#exportAllStore').hide();
+        $('#exportStoreGroup').show();
+        $('#exportOneStore').hide();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CategoryProductLineReportStoreGroup")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'StoreGroupIdReport': $('#StoreGroupIdReport').val(), 'selecteditem': $('#itemlist').val() },
+            success: function (result) {
+                initProductReportDatatable2(result.datatable, false);
+                // Set up chart
+                DoanhThuChart2(result.dataChart)
+            }
+        });
+    };
+    function productReportStoreGroup() {
+        console.log($('#StoreIdReport').val());
+        $('#exportAllStore').hide();
+        $('#exportStoreGroup').show();
+        $('#exportOneStore').hide();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ProductLineReportStoreGroup")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'StoreGroupIdReport': $('#StoreGroupIdReport').val(), 'selecteditem': $('#itemlist').val() },
+            success: function (result) {
+                initProductReportDatatable2(result.datatable, false);
+                // Set up chart
+                DoanhThuChart2(result.dataChart)
+            }
+        });
+    };
+    //Chart of tab OneStore
+    function DoanhThuChart(dataChart) {
+        var seriesOptions = [],
+        seriesCounter = 0
+        if ($("#deActiveChart").is(':checked')) {
+            $.each(dataChart.listTotalPrice, function (i, name) {
+                seriesOptions[i] = {
+                    type: 'area',
+                    name: dataChart._ProductName,
+                    data: dataChart.listTotalPrice[i],
+                };
+            });
+        } else {
+            $.each(dataChart.listTotalOrder, function (i, name) {
+                seriesOptions[i] = {
+                    type: 'area',
+                    name: dataChart._ProductName,
+                    data: dataChart.listTotalOrder[i],
+                };
+            });
+        }
+        $('#container').highcharts({
+            chart: {
+                zoomType: 'x'
+            },
+            title: {
+                text: 'BIỂU ĐỒ DOANH THU',
+                x: -20 //center
+            },
+            subtitle: {
+                text: document.ontouchstart === undefined ?
+                        'Nhấp và kéo để phóng to' : 'Pinch the chart to zoom in',
+                style: {
+                    fontFamily: 'Arial',
+                    fontStyle: 'Bold'
+                }
+            },
+            xAxis: {
+                categories: dataChart._Day
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh Thu'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ' VNĐ'
+            },
+            legend: {
+                area: {
+                    fillColor: {
+                        linearGradient: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 0,
+                            y2: 1
+                        },
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    lineWidth: 1,
+                    states: {
+                        hover: {
+                            lineWidth: 1
+                        }
+                    },
+                    threshold: null
+                }
+            },
+            series: seriesOptions
+        });
+    };
+    //Chart of tab StoreGroup
+    function DoanhThuChart2(dataChart) {
+        var seriesOptions = [],
+        seriesCounter = 0
+        if ($("#deActiveChart").is(':checked')) {
+            $.each(dataChart.listTotalPrice, function (i, name) {
+                seriesOptions[i] = {
+                    type: 'area',
+                    name: dataChart._ProductName,
+                    data: dataChart.listTotalPrice[i],
+                };
+            });
+        } else {
+            $.each(dataChart.listTotalOrder, function (i, name) {
+                seriesOptions[i] = {
+                    type: 'area',
+                    name: dataChart._ProductName,
+                    data: dataChart.listTotalOrder[i],
+                };
+            });
+        }
+        $('#container2').highcharts({
+            chart: {
+                zoomType: 'x'
+            },
+            title: {
+                text: 'BIỂU ĐỒ DOANH THU',
+                x: -20 //center
+            },
+            subtitle: {
+                text: document.ontouchstart === undefined ?
+                        'Nhấp và kéo để phóng to' : 'Pinch the chart to zoom in',
+                style: {
+                    fontFamily: 'Arial',
+                    fontStyle: 'Bold'
+                }
+            },
+            xAxis: {
+                categories: dataChart._Day
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh Thu'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ' VNĐ'
+            },
+            legend: {
+                area: {
+                    fillColor: {
+                        linearGradient: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 0,
+                            y2: 1
+                        },
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    lineWidth: 1,
+                    states: {
+                        hover: {
+                            lineWidth: 1
+                        }
+                    },
+                    threshold: null
+                }
+            },
+            series: seriesOptions
+        });
+    };
+    //Chart of tab Allstore
+    function DoanhThuChart3(dataChart) {
+        var seriesOptions = [],
+        seriesCounter = 0
+        if ($("#deActiveChart").is(':checked')) {
+            $.each(dataChart.listTotalPrice, function (i, name) {
+                seriesOptions[i] = {
+                    type: 'area',
+                    name: dataChart._ProductName,
+                    data: dataChart.listTotalPrice[i],
+                };
+            });
+        } else {
+            $.each(dataChart.listTotalOrder, function (i, name) {
+                seriesOptions[i] = {
+                    type: 'area',
+                    name: dataChart._ProductName,
+                    data: dataChart.listTotalOrder[i],
+                };
+            });
+        }
+        $('#container3').highcharts({
+            chart: {
+                zoomType: 'x'
+            },
+            title: {
+                text: 'BIỂU ĐỒ DOANH THU',
+                x: -20 //center
+            },
+            subtitle: {
+                text: document.ontouchstart === undefined ?
+                        'Nhấp và kéo để phóng to' : 'Pinch the chart to zoom in',
+                style: {
+                    fontFamily: 'Arial',
+                    fontStyle: 'Bold'
+                }
+            },
+            xAxis: {
+                categories: dataChart._Day
+            },
+            yAxis: {
+                title: {
+                    text: 'Doanh Thu'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                valueSuffix: ' VNĐ'
+            },
+            legend: {
+                area: {
+                    fillColor: {
+                        linearGradient: {
+                            x1: 0,
+                            y1: 0,
+                            x2: 0,
+                            y2: 1
+                        },
+                        stops: [
+                            [0, Highcharts.getOptions().colors[0]],
+                            [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                        ]
+                    },
+                    marker: {
+                        radius: 2
+                    },
+                    lineWidth: 1,
+                    states: {
+                        hover: {
+                            lineWidth: 1
+                        }
+                    },
+                    threshold: null
+                }
+            },
+            series: seriesOptions
+        });
+    };
+    function CategoryReportAllStore() {
+        console.log($('#StoreIdReport').val());
+        $('#exportAllStore').show();
+        $('#exportStoreGroup').hide();
+        $('#exportOneStore').hide();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CategoryProductLineReportAllStore")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'selecteditem': $('#itemlist').val() },
+            //dataType: 'html',
+            success: function (result) {
+                initProductReportDatatable3(result.datatable, false);
+                DoanhThuChart3(result.dataChart)
+            }
+        });
+    };
+    function productReportAllStore() {
+        console.log($('#StoreIdReport').val());
+        $('#exportAllStore').show();
+        $('#exportStoreGroup').hide();
+        $('#exportOneStore').hide();
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("ProductLineReportAllStore")',
+            data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'selecteditem': $('#itemlist').val() },
+            success: function (result) {
+                initProductReportDatatable3(result.datatable, false);
+                DoanhThuChart3(result.dataChart)
+            }
+        });
+    };
+    var initProductReportDatatable = function (data, visible) {
+        $('#groupCategoryReport1').html('<table id="groupCategoryReportDatatable1" class="table table-striped table-bordered table-hover" style="width: 100% !important">'
+                    + '<thead style="white-space: nowrap; text-overflow: ellipsis;"><tr><th><label class="">Ngày</label></th>'
+                    + '<th> <label class="">Ngành hàng</label></th><th><label class="">Số lượng</label></th>'
+                    + '<th><label class="">Doanh thu trước giảm giá</label></th>'
+                    + '<th><label class="">Giảm giá</label></th>'
+                    + '<th><label class="">Doanh thu</label></th>'
+                    + '<th><label class="">So sánh</label></th>'
+                    + '</tr></thead><tbody></tbody></table>');
+
+        $("#groupCategoryReportDatatable1").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 150],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+
+            "aoColumnDefs": [
+                {
+                    "visible": false, "targets": [1]
+                },
+                {
+                    "aTargets": [2, 3, 4, 5],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, o) {
+                        return '<a data-catname="' + o[0] + '" data-storeid="' + o[4] + '" class="btn btn-sm btn-info btnComparison"><span class="fa fa-tasks"></span></a>';
+                    },
+                    'visible': visible,
+                }
+            ],
+            "bAutoWidth": true,
+            "order": [[1, 'asc']],
+
+        });
+    };
+    var initProductReportDatatable2 = function (data, visible) {
+        $('#groupCategoryReport2').html('<table id="groupCategoryReportDatatable2" class="table table-striped table-bordered table-hover" style="width: 100% !important">'
+                    + '<thead style="white-space: nowrap; text-overflow: ellipsis;"><tr><th><label class="">Ngày</label></th>'
+                    + '<th> <label class="">Ngành hàng</label></th><th><label class="">Số lượng</label></th>'
+                    + '<th><label class="">Doanh thu trước giảm giá</label></th>'
+                    + '<th><label class="">Giảm giá</label></th>'
+                    + '<th><label class="">Doanh thu</label></th>'
+                    + '<th><label class="">So sánh</label></th>'
+                    + '</tr></thead><tbody></tbody></table>');
+
+        $("#groupCategoryReportDatatable2").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 150],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+
+            "aoColumnDefs": [
+                {
+                    "visible": false, "targets": [1]
+                },
+                {
+                    "aTargets": [2, 3, 4, 5],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, o) {
+                        return '<a data-catname="' + o[0] + '" data-storeid="' + o[4] + '" class="btn btn-sm btn-info btnComparison"><span class="fa fa-tasks"></span></a>';
+                    },
+                    'visible': visible,
+                }
+            ],
+            "bAutoWidth": true,
+            "order": [[1, 'asc']],
+
+        });
+    };
+    var initProductReportDatatable3 = function (data, visible) {
+        $('#groupCategoryReport3').html('<table id="groupCategoryReportDatatable3" class="table table-striped table-bordered table-hover" style="width: 100% !important">'
+                    + '<thead style="white-space: nowrap; text-overflow: ellipsis;"><tr><th><label class="">Ngày</label></th>'
+                    + '<th> <label class="">Ngành hàng</label></th><th><label class="">Số lượng</label></th>'
+                    + '<th><label class="">Doanh thu trước giảm giá</label></th>'
+                    + '<th><label class="">Giảm giá</label></th>'
+                    + '<th><label class="">Doanh thu</label></th>'
+                    + '<th><label class="">So sánh</label></th>'
+                    + '</tr></thead><tbody></tbody></table>');
+
+        $("#groupCategoryReportDatatable3").dataTable({
+            "bFilter": false,
+            "bSort": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 150],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+
+            "aoColumnDefs": [
+                {
+                    "visible": false, "targets": [1]
+                },
+                {
+                    "aTargets": [2, 3, 4, 5],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, o) {
+                        return '<a data-catname="' + o[0] + '" data-storeid="' + o[4] + '" class="btn btn-sm btn-info btnComparison"><span class="fa fa-tasks"></span></a>';
+                    },
+                    'visible': visible,
+                }
+            ],
+            "bAutoWidth": true,
+            "order": [[1, 'asc']],
+
+        });
+    };
+
+    // Export to excel. All store.
+    $(document).on('click', '#exportAllStore', function () {
+        var selecteditem;
+        if (!$("#activeMapping").is(':checked')) {
+            selecteditem = "category";
+        }
+        else {
+            selecteditem = "product";
+        }
+        $('#startTimeAll').val($('#sTime').val());
+        $('#endTimeAll').val($('#eTime').val());
+        $('input[name=selecteditem]').val($('#itemlist').val());
+        $('input[name=checkvalue]').val(selecteditem);
+        $('#formProductCategoryReportAllExcel').submit();
+    });
+    // Export to excel. One storeGruop.
+    $(document).on('click', '#exportStoreGroup', function () {
+        var selecteditem;
+        if (!$("#activeMapping").is(':checked')) {
+            selecteditem = "category";
+        }
+        else {
+            selecteditem = "product";
+        }
+        $('#startTimeGroup').val($('#sTime').val());
+        $('#endTimeGroup').val($('#eTime').val());
+        $('input[name=StoreGroupIdReport]').val($('#StoreGroupIdReport').val());
+        $('input[name=selecteditem]').val($('#itemlist').val());
+        $('input[name=checkvalue]').val(selecteditem);
+        $('#ReportProductLineStoreGroupExportExcelEPPlus').submit();
+    });
+    // Export to excel. One store.
+    $(document).on('click', '#exportOneStore', function () {
+        var selecteditem;
+        if (!$("#activeMapping").is(':checked')) {
+            selecteditem = "category";
+        }
+        else {
+            selecteditem = "product";
+        }
+        $('#startTimeOne').val($('#sTime').val());
+        $('#endTimeOne').val($('#eTime').val());
+        $('input[name=storeIdReport]').val($('#StoreIdReport').val());
+        $('input[name=selecteditem]').val($('#itemlist').val());
+        $('input[name=checkvalue]').val(selecteditem);
+        $('#ReportProductLineOneStoreExportExcelEPPlus').submit();
+    });
+    // Show/Hide Chart
+    $('#btnChart').click(function () {
+        var status = $(this).data('status');
+        if ($.trim($('#container').html()).length > 0 || $.trim($('#container3').html()).length > 0 || $.trim($('#container2').html()).length > 0) {
+            if (status == 'show') {
+                $(this).html('<i class="fa fa-plus"></i> Hiển thị biểu đồ');
+                $(this).data('status', 'hide');
+            } else {
+                $(this).html('<i class="fa fa-minus"></i> Ẩn biểu đồ');
+                $(this).data('status', 'show');
+            }
+            $('#containerWrapper').toggle('show');
+        } else {
+            ShowMessage("Xin chọn nhấn Tìm trước khi xem biểu đồ", 3);
+        }
+    });
+    // Load data change
+    function LoadDataOnChange() {
+        var selectedItem = $("#itemlist").val();
+        if (selectedItem != null) {
+            if (selectedItem.length > 0) {
+                if (!$("#activeMapping").is(':checked')) {
+                    if (check == 1) {
+                        productCategoryReportOneStore();
+                    }
+                    if (check == 2) {
+                        CategoryReportStoreGroup();
+                    }
+                    if (check == 3) {
+                        CategoryReportAllStore();
+                    }
+                } else {
+                    if (check == 1) {
+                        productReportOneStore();
+                    }
+                    if (check == 2) {
+                        productReportStoreGroup();
+                    }
+                    if (check == 3) {
+                        productReportAllStore();
+                    }
+                }
+            } else {
+                ShowMessage("Error!", 3);
+            }
+        }
+    }
+    // item is product or categoryproduct
+    $("#itemlist").on("change", function () {
+        LoadDataOnChange();
+    }); 
+    $("#StoreIdReport").on("change", function () {
+        if (!$("#activeMapping").is(':checked')) {
+            productCategoryReportOneStore();
+        } else {
+            productReportOneStore();
+        }
+    });
+    $("#StoreGroupIdReport").on("change", function () {
+        if (!$("#activeMapping").is(':checked')) {
+            CategoryReportStoreGroup();
+        } else {
+            productReportStoreGroup();
+        }
+    });
+    function toggleName() {
+        $('#select-type label').each(function () {
+            $(this).toggle();
+        });
+    }
+</script>

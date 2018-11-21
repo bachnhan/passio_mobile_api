@@ -1,0 +1,289 @@
+﻿@model IEnumerable<HmsService.ViewModels.ProductViewModel>
+@{
+    ViewBag.Title = "Index";
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var storeId = 0;
+    if (ViewContext.RouteData.Values["storeId"] != null)
+    {
+        storeId = int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString());
+    }
+    var store = Utils.GetStore(storeId);
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Danh sách danh mục sản phẩm</h3>
+            </div>
+            @if (store.Brand == null || store.Type == (int)StoreTypeEnum.Website)
+            {
+                <div class="col-md-4 text-right">
+                    <a href="@this.Url.Action("Create", new { parameters = currentStoreDomain.Directory })" class="btn btn-primary btn-icon-text waves-effect">
+                        <i class="zmdi zmdi-plus"></i> Thêm danh mục
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="col-md-4 text-right"></div>
+            }
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="allcust">
+                <!-- Datatable -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <table id="lst-products" class="table table-striped table-bordered table-hover">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <label class="">STT</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tên danh mục</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Phân loại</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Vị trí xuất hiện</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Kích hoạt</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Loại sản phẩm kèm</label>
+                                    </th>
+                                    <th>
+                                        <label class="">Tùy chọn</label>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@*<template id="command-template" class="hidden">
+        <div>
+            <a class="btn btn-primary btn-sm"
+               data-toggle="tooltip" title="Edit">
+                <i class="glyphicon glyphicon-pencil"></i>
+            </a>
+            <button onclick="onDeleteButtonClick(this);" class="btn btn-danger btn-sm" data-toggle="tooltip" title="Delete">
+                <i class="glyphicon glyphicon-trash"></i>
+            </button>
+        </div>
+    </template>*@
+
+@section scripts {
+    <script>
+        @*$(function () {
+            var commandTemplate = $("#command-template").html();
+
+            $("#lst-products").bootgrid({
+                rowCount: [10, 20, 50, ],
+                ajax: true,
+
+                url: "@this.Url.Action("IndexList", new { parameters = currentStoreDomain.Directory })",
+                labels: {
+                    noResults: "Không có dữ liệu",
+                    refresh: "Làm mới",
+                    search: "Tìm kiếm",
+                    infos: "Hiển thị {{ctx.start}} tới {{ctx.end}} của {{ctx.total}} dòng",
+                    loading: "Đang tải"
+                },
+                formatters: {
+                    "Commands": function (column, row) {
+                        var template = $(commandTemplate);
+
+                        template.find("[title=Edit]").attr("href", "@(this.Url.Action("Edit", new { parameters = currentStoreDomain.Directory }))/" + row.CateID);
+                        template.find("[title=Delete]").attr("data-id", row.CateID);
+
+                        return template[0].outerHTML;
+                    },
+                },
+            });
+        });*@
+
+        $(document).ready(function () {
+            InitUserDatatable();
+
+            
+
+        });
+
+
+        function ProductCategoryDataProcess() {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("IndexList", "ProductCategory")',
+                success: function (result) {
+
+                    //console.log(result.aaData);
+                    InitUserDatatable(result.aaData);
+                }
+            });
+        };
+        function InitUserDatatable() {
+            $("#lst-products").dataTable({
+                "sAjaxSource": "@Url.Action("IndexList", "ProductCategory")",
+                //"fnServerParams": function (aoData) {
+                //    aoData.push(
+                //        { "name": "filterId", "value": $('#filterId').val() }
+                //    );
+                //},
+                "bSort": false,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                //"data": data,
+                "bProcessing": true,
+                "iDisplayLength": 10,
+                "aLengthMenu": [10, 25, 50],
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                    "sSearchPlaceholder": "Tên danh mục"
+                },
+
+                "aoColumnDefs": [
+
+                    {
+                        "aTargets": [0, 2, 3],
+                        "bSortable": false,
+                        "sClass": "text-center",
+                        "bSearchable": false
+                    },
+                    //search only in column index  = 1
+                    {
+                        "aTargets": [1],
+                        "bSortable": false,
+                        "sClass": "text-center",
+                        "bSearchable": true
+                    
+                    },
+                    {
+                        "aTargets": [4],
+                        "mRender": function (data, type, row) {
+                            var icon = row[4] ? "glyphicon-ok" : "glyphicon-remove";
+                            return "<i class='glyphicon " + icon + "'></i>";
+                        },
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [5],
+                        "mRender": function (data, type, row) {
+                            var icon = row[5] ? "glyphicon-ok" : "glyphicon-remove";
+                            return "<i class='glyphicon " + icon + "'></i>";
+                        },
+                        "sClass": "text-center"
+                    },
+                    {
+                        "aTargets": [6],
+                        "mRender": function (data, type, row) {
+                            var productCategoryId = row[6];
+
+                            var editButton = '<a class="btn btn-primary btn-sm" ' +
+                                'href="@(this.Url.Action("Edit", new {parameters = currentStoreDomain.Directory}))/' + productCategoryId + '" ' +
+                                'data-toggle="tooltip" title="Chỉnh sửa"><i class="glyphicon glyphicon-pencil"></i></a>';
+                            var deleteButton = '<button onclick="onDeleteButtonClick(this);" data-id="' + productCategoryId + '" ' +
+                                'class="btn btn-danger btn-sm" data-toggle="tooltip" title="Xóa">' +
+                                '<i class="glyphicon glyphicon-trash"></i></button>';
+
+                            return editButton + " " + deleteButton;
+                        },
+                        "bSortable": false,
+                        "sClass": "text-center"
+                    }
+                ],
+                "bAutoWidth": false,
+            });
+        }
+
+        //$('.dataTables_filter input').on('keyup change', function () {
+        //    //$("#lst-products").dataTable()
+        //    //    .columns(2)
+        //    //    .search(this.val())
+        //    //    .draw();
+        //    $("#lst-products").dataTable().fnFilter($(this).val(), 0);
+        //});
+
+
+       
+        //redraw datatable without reload
+        function reDrawDatatable(id) {
+            $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+                if (oSettings.oFeatures.bServerSide === false) {
+                    var before = oSettings._iDisplayStart;
+                    oSettings.oApi._fnReDraw(oSettings);
+                    //iDisplayStart has been reset to zero - so lets change it back
+                    oSettings._iDisplayStart = before;
+                    oSettings.oApi._fnCalculateEnd(oSettings);
+                }
+
+                //draw the 'current' page
+                oSettings.oApi._fnDraw(oSettings);
+            };
+            $(id).dataTable().fnStandingRedraw();
+        }
+
+        //user datatable
+        //function RefreshTable() {
+        //    reDrawDatatable("#lst-products");
+        //}
+
+        function RefreshTable() {
+            var oTable = $("#lst-products").dataTable();
+            oTable._fnPageChange(0);
+            oTable._fnAjaxUpdate();
+        }
+
+        function onDeleteButtonClick(btn) {
+            ShowConfirm("Bạn có chắc là mình muốn xóa loại sản phẩm này không??", function () {
+                var id = $(btn).attr("data-id");
+
+                $.ajax({
+                    url: '@Url.Action("Delete")',
+                    data: {
+                        id: id
+                    },
+                    type: 'POST',
+                    success: function (result) {
+                        if (result.success) {
+                            ShowAlert(result.message, 2);
+                            RefreshTable();
+                        }
+                        else {
+                            ShowAlert(result.message, 1);
+                        }
+                        //Refresh table bị lỗi
+                        //RefreshTable();
+                        //location.reload();
+                    },
+                    error: function (error) {
+                        ShowAlert(error.message, 1);
+                    }
+                });
+            });
+        }
+
+    </script>
+}

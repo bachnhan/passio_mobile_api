@@ -1,0 +1,90 @@
+﻿@using HmsService.ViewModels;
+@model IEnumerable<MenuViewModel>
+
+@ShowAllMenuItem(Model, 0)
+
+@helper CheckLastItem(int menuIndex, IEnumerable<MenuViewModel> listItem, MenuViewModel lastItem)
+    {
+        if (menuIndex == listItem.Count() - 2)
+        {
+            string lastItemLink = Url.Action(lastItem.Action.Trim(), lastItem.Controller.Trim(), new { area = lastItem.Area.Trim() });
+            <li>
+                <a href="@lastItemLink"><i class="@lastItem.IconCss"></i> @lastItem.MenuText</a>
+            </li>
+        }
+}
+@helper ShowAllMenuItem(IEnumerable<MenuViewModel> menus, int currentIndex)
+    {
+        for (var i = currentIndex; i < menus.Count() - 1; i++)
+        {
+            var item = menus.ElementAt(i);
+            var nextItem = menus.ElementAt(i + 1);
+            var parentItem = menus.Where(q => q.Id == item.ParentMenuId).FirstOrDefault();
+            var sMenuClass = item.Id == nextItem.ParentMenuId ? "sub-menu" : "";
+            string itemLink = item.Id == nextItem.ParentMenuId ? "#" : Url.Action(item.Action.Trim(), item.Controller.Trim(), new { area = item.Area.Trim() });
+            currentIndex++;
+            if (nextItem.MenuLevel == item.MenuLevel)
+            {
+                <li>
+                    <a href="@itemLink"><i class="@item.IconCss"></i> @item.MenuText</a>
+                </li>
+            }
+            else
+            {
+                if (nextItem.MenuLevel > item.MenuLevel)
+                {
+                    @Html.Raw("<li class='" + sMenuClass + "'>");
+                    <a href="@itemLink"><i class="@item.IconCss"></i> @item.MenuText</a>
+                    @Html.Raw("<ul>");
+                }
+                else
+                {
+                    <li>
+                        <a href="@itemLink"><i class="@item.IconCss"></i> @item.MenuText</a>
+                    </li>
+                    var k = item.MenuLevel - nextItem.MenuLevel;
+                    for (var j = 0; j < k; j++)
+                    {
+                        @Html.Raw("</ul></li>");
+                    }                    
+                }
+            }
+            @CheckLastItem(i, menus, nextItem);
+        }
+
+        //if (currentIndex == (menus.Count() - 1))
+        //{
+        //    return;
+        //}
+        @*var item = menus.ElementAt(currentIndex);
+            var nextItem = menus.ElementAt(currentIndex + 1);
+            var sMenuClass = item.ParentMenuId == null ? "sub-menu" : "";
+            string itemLink = item.Id == nextItem.ParentMenuId ? "#" : Url.Action(item.Action.Trim(), item.Controller.Trim(), new { area = item.Area.Trim() });
+            currentIndex++;
+
+            if (nextItem.MenuLevel == item.MenuLevel)
+            {
+                <li>
+                    <a href="@itemLink"><i class="@item.IconCss"></i> @item.MenuText</a>
+                </li>
+                @ShowAllMenuItem(menus, currentIndex);
+            }
+            else
+            {
+                if (nextItem.ParentMenuId == null)
+                {
+                    <li>
+                        <a href="@itemLink"><i class="@item.IconCss"></i> @item.MenuText</a>
+                    </li>
+                    @Html.Raw("</ul></li>");
+                    @ShowAllMenuItem(menus, currentIndex);
+                }
+                else
+                {
+                    @Html.Raw("<li class='" + sMenuClass + "'>");
+                    <a href="@itemLink"><i class="@item.IconCss"></i> @item.MenuText</a>
+                    @Html.Raw("<ul>");
+                    @ShowAllMenuItem(menus, currentIndex);
+                }
+            }*@
+}

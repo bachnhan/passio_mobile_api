@@ -1,0 +1,332 @@
+﻿@using HmsService.Sdk
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="box-header p-b-0">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h3>Lịch sử quét vân tay</h3>
+                </div>
+
+                <div class="input-group col-sm-6">
+                    <!-- Daterange picker -->
+                    <div class="dateTime width230 pull-right">
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange2" class="height-fix">
+                                <input id="startYear2" size="23" readonly class="form-control text-center pull-right">
+                                <a class="myCelenderA" id=""> <i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group-btn FindButtonDateTime">
+                        <a class="btn btn-primary FindDateTime" id="btnSearch2" style="height: 35px;">
+                            <i class="left-icon fa fa-search"></i> Tìm
+                        </a>
+                    </div>
+                    <form id="form-create-session" class="form-inline" style="display: none">
+                        <input type="text" id="sTime2" name="startTime2" placeholder="Chọn giờ bắt đầu" />
+                        <input type="text" id="eTime2" name="endTime2" placeholder="Chọn giờ kết thúc" />
+                    </form>
+
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+
+    <div class="row">
+        <div class="col-md-12" style="margin-top: 15px;">
+            <div class="form-group col-md-4">
+                <span class="col-md-4 control-label p-t-10">Nhân viên</span>
+                <div class="col-md-8">
+                    <select class="form-control selectpicker" data-live-search="true" name="EmployeeId" id="EmployeeId">
+                        <option value="-1">Chọn nhân viên</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group col-md-6">
+                <span class="col-sm-4 control-label p-r-0 p-t-10">Lọc theo khung giờ</span>
+                <div class="col-sm-8">
+
+                    @{
+                        var timeFrameApi = new TimeFrameApi();
+                        var list = timeFrameApi.GetActive().ToList();
+                    }
+                    <select class="form-control selectpicker" data-live-search="true" id="TimeFrameId" name="TimeFrameId">
+                        <option value="-1">Chọn khung giờ</option>
+
+                        @foreach (var item in list)
+                        {
+                            <option value="@item.Id">@item.Name : { @item.StartTime - @item.StartTime.Add(item.Duration) }</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12" style="margin-top: 15px;">
+            <div class="pull-right text-right" style="margin-right:25px">
+                <button id="exportOneShift" class="width230 btn btn-primary btn-sm" onclick="exportExcellCheckFinger()">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-padding">
+        <div class="row">
+            <div class="tab-content">
+                <div role="tabpanel" class="tab-pane active" id="allcust">
+                    <!-- Datatable -->
+                    <div class="col-md-12">
+
+                        <table id="detail-table" class="table table-hover dataTable table-bordered dt-responsive nowrap" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th><label>STT</label></th>
+                                    <th><label>Nhân viên</label></th>
+                                    @*<th><label>Ca làm việc</label></th>*@
+                                    <th><label>Ngày giờ check</label></th>
+                                    <th><label>Máy scan</label></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section scripts {
+
+    <script>
+        $(document).ready(function () {
+            setupDaterangerpicker2();
+            //loadCheckFinger();
+            getEmployee();
+            $('#EmployeeId').val(-1);
+            $('#TimeFrameId').val(-1);
+            InitOrderDatatable();
+            RefreshOrderTable();
+        });
+
+        $('#btnSearch2').on('click', function () {
+            if ($("#eTime2").val().length > 16 || $("#sTime2").val().length > 16) {
+                ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+                return;
+            }
+            else {
+                //loadCheckFinger();
+                RefreshOrderTable();
+            }
+        });
+
+        function loadCheckFinger() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetAllCheckFinger")',
+                data: {
+                    'startTime': $('#sTime2').val(),
+                    'endTime': $('#eTime2').val(),
+                    'empId': $('#EmployeeId').val(),
+                    'timeFrameId': $('#TimeFrameId').val(),
+        },
+
+                success: function (result) {
+                    initFingerCheckDatatable(result);
+                }
+            });
+        }
+
+        function initFingerCheckDatatable(data) {
+            $("#detail-table").dataTable().fnDestroy();
+            $("#detail-table").dataTable({
+                stateSave: true,
+                "bFilter": true,
+                "bSort": false,
+                "data": data,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "bProcessing": true,
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sSearchPlaceholder": "Thành phần",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3],
+                        "sClass": "text-center",
+                        "bSortable": false,
+                    },
+
+                ],
+                "bAutoWidth": false,
+            });
+        }
+        function setupDaterangerpicker2() {
+            function cb(start, end, label) {
+                //console.log(start.toISOString(), end.toISOString(), label);
+
+                //Prepare start time and end time format
+                var startTime = start.format("DD/MM/YYYY"),
+                    endTime = end.format("DD/MM/YYYY"),
+                    dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+                if (label != "Tùy chọn") {
+                    $('#startYear2').val(label);
+                } else {
+                    $('#startYear2').val(dateString);
+                }
+
+                $('#sTime2').val(startTime);
+                $('#eTime2').val(endTime);
+
+                //Chage date at page header
+                $('[data-role=small-date]').html(dateString);
+
+                $('#reportrange2 span').html(start.format('MMM D, YYYY') + ' - ' + end.format('MMM D, YYYY'));
+            };
+            cb(moment(), moment(), 'Hôm nay');
+            $('#reportrange2').daterangepicker({
+                format: 'DD/MM/YYYY',
+                startDate: moment(),
+                endDate: moment(),
+                minDate: '01/01/2012',
+                maxDate: '31/12/2100',
+                dateLimit: { days: 365 },
+                showDropdowns: true,
+                showWeekNumbers: true,
+                timePicker: false,
+                timePickerIncrement: 1,
+                timePicker12Hour: true,
+                //parentEl: '.modal-body',
+                ranges: {
+                    'Hôm nay': [moment(), moment()],
+                    'Tuần này': [moment().add(0, 'week').startOf('isoweek'), moment().add(0, 'week').endOf('isoweek')],
+                    'Tuần trước': [moment().add(-1, 'week').startOf('isoweek'), moment().add(-1, 'week').endOf('isoweek')],
+                    'Tháng này': [moment().add(0, 'month').startOf('month'), moment().add(0, 'month').endOf('month')],
+                    'Tháng trước': [moment().add(-1, 'month').startOf('month'), moment().add(-1, 'month').endOf('month')]
+                },
+                opens: 'left',
+                drops: 'down',
+                buttonClasses: ['btn', 'btn-sm'],
+                applyClass: 'btn-primary',
+                cancelClass: 'btn-success',
+                separator: ' to ',
+                locale: {
+                    format: 'DD/MM/YYYY',
+                    applyLabel: 'Chọn',
+                    cancelLabel: 'Hủy',
+                    fromLabel: 'Từ',
+                    toLabel: 'Đến',
+                    customRangeLabel: 'Tùy chọn',
+                    daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
+                    monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
+                    firstDay: 1
+                }
+            }, cb);
+        }
+
+        function getEmployee() {
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetEmployeeInStore")',
+
+                success: function (result) {
+                    loadListEmployeeInDrodownList(result);
+                },
+                error: function (error) {
+                    showMessage("Có lỗi xảy ra. Vui lòng thử lại sau.", "error", "OK");
+                }
+            });
+        }
+
+        function loadListEmployeeInDrodownList(listData) {
+            for (i = 0; i < listData.length; i++) {
+                $("#EmployeeId").append('<option value="' + listData[i].Id + '">' + listData[i].Name + '</option>');
+            }
+            $("#EmployeeId").selectpicker('refresh');
+        }
+
+        function RefreshOrderTable() {
+            var oTable = $("#detail-table").dataTable();
+            //oTable._fnPageChange(0);
+            oTable._fnAjaxUpdate();
+        }
+        function InitOrderDatatable() {
+            var oTable = $("#detail-table").dataTable({
+                "bSort": false,
+                "bRetrieve": true,
+                "bServerSide": true,
+                "bScrollCollapse": true,
+                "iDeferLoading": true,
+                "bDeferRender": true,
+                "sAjaxSource": "@Url.Action("GetAllCheckFingerServerSide","CheckFinger")",
+                "bProcessing": true,
+                "iDisplayLength": 10,
+                "aLengthMenu": [10, 50, 100],
+                "bFilter": true,
+                "fnServerParams": function (aoData) {
+                    aoData.push({
+                        "name": "startTime",
+                        "value": $('#sTime2').val()
+                    }),
+                        aoData.push({
+                            "name": "endTime",
+                            "value": $('#eTime2').val()
+                        }),
+                        aoData.push({
+                            "name": "empId",
+                            "value": $('#EmployeeId').val()
+                        }),
+                        aoData.push({
+                            "name": "timeFrameId",
+                            "value": $('#TimeFrameId').val()
+                        });
+                },
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    },
+                    "sSearchPlaceholder": "..."
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 2, 3],
+                        "sClass": "text-center",
+                        "bSortable": false,
+                    },
+
+                ],
+                "bAutoWidth": false
+            });
+        }
+        function exportExcellCheckFinger() {
+            window.location.replace("@Url.Action("ExportToExcelReport", "CheckFinger")" + "?startTime=" + $('#sTime2').val() + "&endTime=" + $('#eTime2').val() + "&empId=" + $('#EmployeeId').val() + "&timeFrameId=" + $('#TimeFrameId').val());
+        }
+    </script>
+}

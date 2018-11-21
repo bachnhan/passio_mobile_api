@@ -1,0 +1,264 @@
+﻿@model IEnumerable<HmsService.ViewModels.StoreViewModel>
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>Báo cáo doanh thu theo ngày</h3>
+                <h5 data-role="small-date" id="dateRange"></h5>
+            </div>
+        </div>
+        <hr />          
+            @*cửa hàng*@
+
+                @*dropdownlist và date range picker*@
+                <div class="col-md-12">
+                    <form id="form-create-session" class="form-inline">
+                        @*date range picker*@
+                        <div class="input-group pull-right">
+                            <div class="dateTime width230 pull-right">
+                                <div class="fg-line">
+                                    <div id="reportrange">
+                                        <input id="date-string" readonly class="form-control text-center">
+                                        <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="input-group-btn FindButtonDateTime">
+                                <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                                    <i class="left-icon fa fa-search"></i> Tìm
+                                </a>
+                            </div>
+                        </div>
+                        <input type="text" id="sTime" name="startTime" placeholder="Chọn giờ bắt đầu" hidden="hidden" />
+                        <input type="text" id="eTime" name="endTime" placeholder="Chọn giờ kết thúc" hidden="hidden" />
+                    </form>
+                </div>
+
+                @*table và chart*@
+                <div class="style=" padding:25px;"">
+                    <div>
+                        <button type="submit" id="export" class="btn btn-primary btn-sm pull-right">
+                            <i class="fa fa-download"></i>
+                            Xuất ra file Excel
+                        </button>
+                        <button type="button" data-show="show" id="buttonChart" class="btn btn-primary btn-sm" style="width:180px" onclick="ShowChart1()">
+                            <i class="fa fa-plus">
+                            </i> Hiển thị biểu đồ
+                        </button>
+                    </div>
+
+                    <form class="hidden" id="formDateReportExcel" action="@Url.Action("ExportDateStoreReportToExcel","TimeReport")">
+                        <input id="startTime" name="startTime" />
+                        <input id="endTime" name="endTime" />
+                        <input id="selectedStoreId" name="selectedStoreId" />
+                    </form>
+
+                    <div id="chartCuaHang" style="min-width: 300px; height: 290px;" hidden="hidden"></div>
+                    <div id="datatableCuaHang">
+                    </div>
+                </div>
+      
+    </div>
+</div>
+
+<script>
+        $(document).ready(function () {
+            $("#buttonChart").click(function () {
+                $("#chartCuaHang").toggle();
+            });
+            cb(moment().startOf('month'), moment(), "Tháng này");
+            setupDaterangepicker();
+            ReportStores();
+        });
+
+
+        //day la load date range picker
+        function cb(start, end, label) {
+            var startTime = start.format("DD/MM/YYYY"),
+                endTime = end.format("DD/MM/YYYY"),
+                dateString = "(" + startTime + (startTime == endTime ? "" : " - " + endTime) + ")";
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $("#date-string").val(dateString);
+            }
+
+            $("#sTime").val(startTime);
+            $("#eTime").val(endTime);
+            $("#dateRange").html(dateString);
+        }
+        function setupDaterangepicker() {
+            $('#reportrange span').html(moment().add(-30, 'days').format('MMM D, YYYY') + ' - ' + moment().add(0, 'days').format('MMM D, YYYY'));
+            $('#reportrange').daterangepicker({
+                "opens": "left",
+                "maxDate": moment(),
+                locale: {
+                    format: 'DD/MM/YYYY'
+                },
+                ranges: {
+                    'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                    'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                }
+            }, cb);
+        }
+        //chart
+        function ChartStore(dataChart) {
+            $('#chartCuaHang').highcharts({
+                title: {
+                    text: 'BIỂU ĐỒ HÓA ĐƠN',
+                    x: -20 //center
+                },
+                subtitle: {
+                    text: '',
+                    x: -20
+                },
+                xAxis: {
+                    categories: dataChart.DateName
+                },
+                yAxis: {
+                    title: {
+                        text: 'Hóa đơn'
+                    },
+                    plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+                },
+                tooltip: {
+                    valueSuffix: ' Hóa đơn'
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'right',
+                    verticalAlign: 'middle',
+                    borderWidth: 0
+                },
+                series: [
+                    {
+                        name: 'TakeAway',
+                        data: dataChart.TakeAway,
+                    },
+                    {
+                        name: 'AtStore',
+                        data: dataChart.AtStore,
+                    },
+                    {
+                        name: 'Delivery',
+                        data: dataChart.Delivery,
+                    }
+                ]
+            });
+        }
+        //datatable
+        var InitProDatatableStore = function (data) {
+
+            $('#datatableCuaHang').html('<table id="storeReportDatatable" class="table table-condensed table-striped table-bordered table-hover">'
+                        + "<thead style=\"white-space: nowrap; text-overflow: ellipsis;\">"
+                            + "<tr>"
+                                + "<th>"
+                                    + "<label class=\"\">Ngày</label>"
+                                + "</th>"
+                                + "<th>"
+                                    + "<label class=\"\">Tổng danh thu</label>"
+                                + "</th>"
+                                + "<th>"
+                                    + "<label class=\"\">Giảm giá</label>"
+                                + "</th>"
+                                + "<th>"
+                                    + "<label class=\"\">Doanh thu sau giảm giá</label>"
+                                + "</th>"
+                            + "</tr>"
+                        + "</thead>"
+                        + "<tbody></tbody>"
+                    + "</table>");
+
+            $("#storeReportDatatable").dataTable({
+                "bFilter": false,
+                "bSort": false,
+                "bRetrieve": true,
+                "bScrollCollapse": true,
+                "data": data,
+                "iDisplayLength": 50,
+                "aLengthMenu": [50, 100],
+                "oLanguage": {
+                    "sSearch": "Tìm kiếm:",
+                    "sZeroRecords": "Không có dữ liệu phù hợp",
+                    "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                    "sEmptyTable": "Không có dữ liệu",
+                    "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                    "sLengthMenu": "Hiển thị _MENU_ dòng",
+                    "sProcessing": "Đang xử lý...",
+                    "oPaginate": {
+                        "sNext": "<i class='fa fa-chevron-right'></i>",
+                        "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                    }
+                },
+                "aoColumnDefs": [
+                    {
+                        "aTargets": [0, 1, 2, 3],
+                        "sClass": "text-center"
+                    },
+                    {
+                        'aTargets': [1, 2, 3],
+                        "mRender": function (data, type, row) {
+                            return toMoney(data, ',', 'đ');
+                        }
+                    }
+                ],
+                "bAutoWidth": false
+            }).fnSetFilteringDelay(delaySearch);
+            $('table').wrap('<div class="tableDiv-responsive" />');
+        }
+        var ReportStores = function () {
+            $.ajax({
+                type: 'GET',
+                url: '@Url.Action("DateReportTable", "TimeReport")',
+                data: { 'startTime': $('#sTime').val(), 'endTime': $('#eTime').val(), 'storeIdd': $('#storeIdReport').val() },
+                success: function (result) {
+                    InitProDatatableStore(result.dataList);
+                    ChartStore(result.dataChart);
+                }
+            });
+        };
+        //search button
+        $('#btnSearch').on('click', function () {
+            ReportStores();
+        });
+        //combobox change
+        function ShowChart1() {
+            var display = $('#buttonChart').data('show');
+            if (display == "hide") {
+                $('#buttonChart').data('show', 'show');
+                $('#buttonChart').html(' <i class="fa fa-plus"></i> Hiển thị biểu đồ');
+            }
+            else {
+                $('#buttonChart').html(' <i class="fa fa-minus"></i> Ẩn biểu đồ');
+                $('#buttonChart').data('show', 'hide');
+            }
+        }
+
+        //export to exel
+        $(document).on('click', '#export', function () {
+            $('#startTime').val($('#sTime').val());
+            $('#endTime').val($('#eTime').val());
+            $("#selectedStoreId").val($('#storeIdReport').val());
+            $('#formDateReportExcel').submit();
+        });
+</script>
+
+<style>
+    .tab-pane > .col-md-12 {
+        margin-top: 19px;
+        padding-right: 0px;
+    }
+
+        .tab-pane > .col-md-12 form {
+            min-height: 33px;
+        }
+</style>

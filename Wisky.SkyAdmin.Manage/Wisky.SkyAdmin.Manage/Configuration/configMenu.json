@@ -1,0 +1,435 @@
+﻿{
+  "menuItemStore": [
+    {
+      "name": "menuTongQuan",
+      "enable": "true"
+    },
+    {
+      "name": "menuHoaDon",
+      "enable": "true"
+    },
+    {
+      "name": "menuBaoCao",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoKinhDoanh",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoTheoKhuyenMai",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuBaoCaoDienTienSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuBaoCaoDoanhThuSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoDoiSanh",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuDoiSanhSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoThanhToan",
+      "enable": "true"
+    },
+    {
+      "name": "menuKho",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTinhTrangKho",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuTonKhoCuoiNgay",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuTonKhoCuoiThang",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuTonKhoHienTai",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuTonKhoTheoThoiGian",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuThaoTacKho",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuNhapKho",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuXuatKho",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuChuyenKhoDi",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuChuyenKhoDen",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuDanhSachPhieuKho",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoNhapHang",
+      "enable": "true"
+    },
+    {
+      "name": "menuSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "menuThemTheThanhVien",
+      "enable": "true"
+    },
+    {
+      "name": "menuQuanlyGiaoDich",
+      "enable": "true"
+    },
+    {
+      "name": "menuTinhTrangKho",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTonKhoCuoiNgay",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTonKhoCuoiThang",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTonKhoHienTai",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTonKhoTheoThoiGian",
+      "enable": "true"
+    },
+    {
+      "name": "menuQuanLyThuChi",
+      "enable": "true"
+    },
+    {
+      "name": "menuQuanLyNhanVienCuaHang",
+      "enable": "true"
+    },
+    {
+      "name": "menuChamCong",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuQuanLyNhanVien",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuQuanLyMayVanTay",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuLichSuQuetVanTay",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuLichSuChamCong",
+      "enable": "true"
+    }
+  ],
+  "menuItemBrand": [
+    {
+      "name": "menuTongQuan",
+      "enable": "true"
+    },
+    {
+      "name": "menuHoatDongKinhDoanh",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuDanhSachHoaDon",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuDanhSachThuChi",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuReportPayment",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuDanhSachGiaoDich",
+      "enable": "true"
+    },
+    {
+      "name": "menuBaoCao",
+      "enable": "true"
+    },
+    {
+      "name": "menuTheThanhVien",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoKinhDoanh",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoTheoKhuyenMai",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuBaoCaoDienTienSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuBaoCaoDoanhThuSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoDoiSanh",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuDoiSanhDoanhThu",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuDoiSanhSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaoCaoThanhToan",
+      "enable": "true"
+    },
+    {
+      "name": "menuSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuDanhSachSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuDanhSachDongSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "menuQuanLyKho",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuQuanLyNguyenLieu",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuDinhMucNguyenLieu",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTonKhoCuoiNgay",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTonKhoCuoiThang",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTonKhoHienTai",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTonKhoTheoThoiGian",
+      "enable": "true"
+    },
+    {
+      "name": "menuKeToan",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuVAT",
+      "enable": "true"
+    },
+    {
+      "name": "menuCRM",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuDanhSachKhachHang",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBoLocKhachHang",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuCoupon",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuKhuyenMai",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTheThanhVien",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTheMau",
+      "enable": "true"
+    },
+    {
+      "name": "menuDoiTac",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuQuanLyNhaCungCap",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuNhaCungCapCoupon",
+      "enable": "true"
+    },
+    {
+      "name": "menuDanhMuc",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuNhomSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuNhomNguyenLieu",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuNhomKhachHang",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuNhomThuChi",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuNhomKhuyenMai",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuNhomCuaHang",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuLoaiTheTHanhVIen",
+      "enable": "true"
+    },
+    {
+      "name": "menuNguoiDung",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuPhanCongNguoiDung",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuPhanQuyenNguoiDung",
+      "enable": "true"
+    },
+    {
+      "name": "menuThanhPhan",
+      "enable": "true"
+    },
+    {
+      "name": "menuWorkingshifts",
+      "enable": "true"
+    }
+  ],
+  "menuItemWebsite": [
+    {
+      "name": "menuWebsite",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuXemTrangChinh",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuQuanLyLoaiSanPham",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuQuanLyNhom",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuQuanLyDonHang",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuBaiViet",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuQuanLyBaiViet",
+      "enable": "true"
+    },
+    {
+      "name": "subsubMenuQuanLyChuyenMuc",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuTinNhanKhachHang",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuThuVienAnh",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuQuanLyTrang",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuQuanLyTheme",
+      "enable": "true"
+    },
+    {
+      "name": "subMenuQuanLyWebsite",
+      "enable": "true"
+    }
+  ],
+  "menuItemFacebook": [
+
+  ]
+}

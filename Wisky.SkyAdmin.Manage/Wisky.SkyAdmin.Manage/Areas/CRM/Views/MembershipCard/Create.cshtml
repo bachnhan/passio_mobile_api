@@ -1,0 +1,349 @@
+﻿@using System.Globalization;
+
+@model Wisky.SkyAdmin.Manage.Areas.CRM.Models.MembershipCardEditViewModels
+
+@{
+    ViewBag.Title = "Create Membership Card";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .validate {
+        display: none;
+    }
+</style>
+
+<div class="form-horizontal">
+    <form id="formCreate">
+
+        @Html.HiddenFor(q => q.CustomerId)
+
+        <div class="card">
+            <div class="card-header">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h3>Tạo thẻ thành viên</h3>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <ul class="actions">
+                            <li>
+                                <a id="backButton" href="@Url.Action("CustomerDetail", "Customer", new { id = Model.CustomerId })" style="height: 32px;" class="btn btn-danger">Quay về</a>
+                            </li>
+                            <li>
+                                <button id="submitButton" type="button" class="btn btn-success" onclick="createCard()">Tạo Thẻ</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <hr />
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 p-l-45 p-r-45">
+                    <div class="card">
+                        <div class="card-body card-padding row">
+                           
+                            <div class="col-md-6">
+                                <h3><strong>Thông tin thẻ</strong></h3>
+                                <div class="form-group row">
+                                    <label class="control-label col-md-3" for="Name">Mã số thẻ: </label>
+                                    <div class="col-md-5">
+                                        <div>
+                                            @Html.TextAreaFor(q => q.MembershipCardCode, new { id = "code", @class = "form-control fg-line", placeholder = "Nhập mã số thẻ để kiểm tra" })
+                                        </div>
+                                        <div>
+                                            <label id="warning" style="display:none"><font color="red"><b><i>Thẻ này đã có người khác sử dụng</i></b></font></label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button type="button" class="btn btn-warning" onclick="validateCard()">Kiểm tra</button>
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="control-label col-md-3" for="Name">CSV</label>
+                                    <div class="col-md-5">
+                                        @Html.TextAreaFor(q => q.CSV, new { id = "csv", @class = "form-control fg-line", placeholder = "Nhập CSV" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h3><strong>Loại thẻ</strong></h3>
+                                <div class="form-group row">
+                                    <label class="control-label col-md-3">Chọn loại thẻ</label>
+                                    <div class="col-md-7">
+                                        <select id="type" class="selectpicker">
+                                            @foreach (var item in Model.listType)
+                                            {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                            @Html.HiddenFor(a => a.MembershipTypeId, new { id = "typeId" })
+                                        </select>
+                                    </div>
+
+                                </div>
+                                <div class="form-group row">
+                                    <label class="control-label col-md-3">Level</label>
+                                    <div class="col-md-7">
+                                        <select id="level" class="selectpicker">
+                                            @{
+                                                MembershipCardLevel[] array = (MembershipCardLevel[])Enum.GetValues(typeof(MembershipCardLevel));
+                                            }
+                                            @foreach (var item in array)
+                                            {
+                                                <option value="@((int)item)">@item.DisplayName()</option>
+                                            }
+                                            @Html.HiddenFor(a => a.C_Level, new { id = "levelCard" })
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row validate">
+                <div class="col-md-12 p-l-45 p-r-45">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>
+                                <span>Tạo tài khoản</span>
+                                <button type="button" class="btn btn-primary pull-right" onclick="showModal()">Thêm tài khoản</button>
+                            </h2>
+                        </div>
+                        <div class="card-body card-padding row">
+                            <table class="table table-bordered table-hover" id="account" style="width: 100%"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!--Modal-->
+<div class="modal fade in" id="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div id="modalContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var array = [];
+    var table = null;
+    var count = 0;
+    var newAccounts = [];
+
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker({
+            size: 10,
+            liveSearch: true,
+        });
+
+        $('input[name=type]').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+            increaseArea: '20%'
+        });
+
+        $('input[name=type]').on('ifChecked', function (event) {
+            $('#typeId').val($(this).val());
+        });
+
+        $('input[name=type]:first').iCheck('check');
+    });
+
+    function createCard() {
+        if ($('#code').val() == '' || $('#code').val().length > 30) {
+            ShowAlert("Mã thẻ không được rỗng hoặc vượt quá 30 ký tự", 1);
+            return;
+        } else if ($('#csv').val() != '' && $('#csv').val().length > 30) {
+            ShowAlert("Mã CSV không được vượt quá 30 ký tự", 1);
+            return;
+        }
+
+        newAccounts = [];
+        var data = table.rows().data();
+        data.each(function (value, index) {
+            if (!value[9]) {
+                var account = {
+                    AccountCode: value[1],
+                    AccountName: value[2],
+                    Balance: value[3],
+                    StartDate: value[4],
+                    FinishDate: value[5],
+                    Type: value[6],
+                    ProductCode: value[7],
+                };
+                newAccounts.push(account);
+            }
+        });
+
+        $('#levelCard').val($('#level').val());
+        $('#typeId').val($('#type').val());
+        var dataForm = $('#formCreate').serializeArray();
+        var value = JSON.stringify(newAccounts);
+        dataForm.push({ name: 'newAccounts', value: value });
+
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("Create", "MembershipCard")',
+            data: dataForm,
+            success: function (result) {
+                if (result.success) {
+                    swal({
+                        title: "Thành công",
+                        text: "Bạn đã tạo thẻ thành công",
+                        type: "success",
+                        showCancelButton: false,
+                        closeOnConfirm: true,
+                    }, function () {
+                        window.location.href = '@Url.Action("CustomerDetail", "Customer", new { id = Model.CustomerId })';
+                    });
+                } else {
+                    ShowAlert(result.mess, 1);
+                }
+            },
+            error: function () {
+                ShowMessage("Dynamic content load failed.", 1);
+            }
+        });
+    }
+
+    function InitAccountTables() {
+        if (table != null) table.destroy();
+        table = $("#account").DataTable({
+            "data": array,
+            "language": {
+                "sSearchPlaceholder": "Tài khoản",
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "columns": [
+                { title: "STT" },
+                { title: "Mã tài khoản" },
+                { title: "Tên tài khoản" },
+                { title: "Số điểm" },
+                { title: "Ngày khởi tạo" },
+                { title: "Ngày kết thúc" },
+                { title: "Loại thẻ" },
+                { title: "Mã sản phẩm" },
+                { title: "Action" },
+                { title: "Hidden1" },
+            ],
+            "columnDefs": [
+                 {
+                     "render": function (data, type, row) {
+                         if (row[9]) {
+                             return "<button type='button' class='btn btn-warning' onclick='Deactivate(" + data + ",this)'>Khóa</button>";
+                         } else {
+                             return "<button type='button' class='btn btn-default' onclick='Deactivate(null,this)'><b><i class='glyphicon glyphicon-trash'></i></b></button>";
+                         }
+                     },
+                     "class": "dt-center text-nowrap",
+                     "targets": 8
+                 },
+                 {
+                     "visible": false,
+                     "searchable": false,
+                     "targets": 9
+                 },
+            ]
+        });
+    }
+
+    function showModal() {
+        $.ajax({
+            type: 'GET',
+            url: '@Url.Action("CreateAccount", "MembershipCard")',
+            success: function (result) {
+                $('#modalContent').html(result);
+                $('#modal').modal('show');
+            },
+            error: function () {
+                ShowMessage("Dynamic content load failed.", 1);
+            }
+        });
+    }
+
+    function resetForm() {
+        $('.validate').css('display', 'none');
+        $('#warning').css('display', 'none');
+        $('input[name=type]:first').iCheck('check');
+        $('#csv').val('');
+    }
+
+    function Deactivate(id, tr) {
+        var row = $(tr).parents('tr');
+        if (id != null) {
+            swal({
+                title: "Khóa tài khoản",
+                text: "Bạn có chắc muốn khóa tài khoản không?",
+                type: "warning",
+                showCancelButton: true,
+                closeOnConfirm: false,
+                showLoaderOnConfirm: true,
+            }, function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("DeactivateAccount", "MembershipCard")',
+                    data: { id: id },
+                    success: function (result) {
+                        if (result.success) {
+                            swal("Thành công", "Khóa thẻ thành công", "success");
+                            table.row(row).remove().draw(false);
+                        } else {
+                            ShowAlert(result.error, 1);
+                        }
+                    }
+                });
+            });
+        } else {
+            table.row(row).remove().draw(false);
+        }
+    }
+
+    function validateCard() {
+        var code = $('#code').val();
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("ValidateCard", "MembershipCard")',
+            data: { cardCode: code },
+            success: function (result) {
+                if (result.success) {
+                    resetForm();
+
+                    $('.validate').css('display', 'block');
+                    array = result.data;
+                    count = array.length;
+                    InitAccountTables();
+
+                    var model = result.model;
+                    if (model.CSV != null) $('#csv').val(model.CSV);
+                    if (model.MembershipTypeId != null) $("input[name=type][value=" + model.MembershipTypeId + "]").iCheck('check');
+                    if (model.CustomerId != null && model.CustomerId != '@Model.CustomerId') $('#warning').css('display', 'block');
+                    else $('#warning').css('display', 'none');
+                    if (model.C_Level != null) $('#level').val(model.C_Level);
+                    else $('#level').val(0);
+                    $('.selectpicker').selectpicker('refresh');
+                } else {
+                    ShowAlert(result.error, 1);
+                }
+            }
+        });
+    }
+</script>

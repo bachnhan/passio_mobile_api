@@ -1,0 +1,357 @@
+﻿@model HmsService.ViewModels.BrandViewModel
+
+@{
+    ViewBag.Title = "Detail";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-6">
+                <h3>@this.Model.BrandName</h3>
+            </div>
+            <div class="col-md-6 text-right">
+                <a class="btn btn-success" href="@Url.Action("Index","Brand")">Quay lại</a>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="card-padding">
+        <div class="row">
+            <div class="col-md-3">
+                <div id="profile-main">
+                    @*<div class="pm-overview c-overflow mCustomScrollbar _mCS_3 mCS-autoHide" style="overflow: visible;">
+                        <div id="mCSB_3" class="mCustomScrollBox mCS-minimal-dark mCSB_vertical_horizontal mCSB_outside" tabindex="0">
+                            <div id="mCSB_3_container" class="mCSB_container mCS_x_hidden mCS_no_scrollbar_x" style="position: relative; top: 0px; left: 0px; width: 100%;" dir="ltr">*@
+
+                                <div class="pmo-block pmo-contact hidden-xs">
+                                    <ul>
+                                        @if (this.Model.Website != null)
+                                        {
+                                            <li><i class="zmdi zmdi-view-web"></i> <a href="http://@(this.Model.Website)">Trang chủ</a></li>
+                                        }
+                                        @if (this.Model.ContactPerson != null)
+                                        {
+                                            <li><i class="zmdi zmdi-account"></i> @this.Model.ContactPerson</li>
+                                        }
+                                        @if (this.Model.PhoneNumber != null)
+                                        {
+                                            <li><i class="zmdi zmdi-phone"></i> @this.Model.PhoneNumber</li>
+                                        }
+                                        @if (this.Model.Fax != null)
+                                        {
+                                            <li><i class="zmdi zmdi-print"></i> @this.Model.Fax</li>
+                                        }
+                                    </ul>
+                                </div>
+
+                            @*</div>
+                        </div>
+                        <div id="mCSB_3_scrollbar_vertical" class="mCSB_scrollTools mCSB_3_scrollbar mCS-minimal-dark mCSB_scrollTools_vertical" style="display: block;"><div class="mCSB_draggerContainer"><div id="mCSB_3_dragger_vertical" class="mCSB_dragger" style="position: absolute; min-height: 50px; height: 587px; top: 0px; display: block; max-height: 695px;" oncontextmenu="return false;"><div class="mCSB_dragger_bar" style="line-height: 50px;"></div></div><div class="mCSB_draggerRail"></div></div></div>
+                        <div id="mCSB_3_scrollbar_horizontal" class="mCSB_scrollTools mCSB_3_scrollbar mCS-minimal-dark mCSB_scrollTools_horizontal" style="display: none;"><div class="mCSB_draggerContainer"><div id="mCSB_3_dragger_horizontal" class="mCSB_dragger" style="position: absolute; min-width: 50px; width: 0px; left: 0px;" oncontextmenu="return false;"><div class="mCSB_dragger_bar"></div></div><div class="mCSB_draggerRail"></div></div></div>
+                    </div>*@
+
+
+                </div>
+            </div>
+            <div class="col-md-9 myPmbody">
+                <div class="pm-body clearfix">
+                    <ul class="tab-nav tn-justified">
+                        <li class="active waves-effect"><a data-toggle="tab" href="#store">Danh sách cửa hàng</a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div id="store" class="tab-pane fade in active">
+                            <div class="col-md-12 m-b-5">
+                                <a href="@Url.Action("Create2", "Store", new { brandId = this.Model.Id})" class="btn btn-primary btn-icon-text waves-effect pull-right"><i class="zmdi zmdi-plus"></i> Thêm cửa hàng</a>
+                            </div>
+                            <div class="col-md-12">
+                                @*<div class="card">
+                                    <div class="card-body">*@
+                                        <table id="StoreDatatable" class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <label class="">STT</label>
+                                                    </th>
+                                                    <th>
+                                                        <label class="">Tên cửa hàng</label>
+                                                    </th>
+                                                    <th>
+                                                        <label class="">Số điện thoại</label>
+                                                    </th>
+                                                    <th>
+                                                        <label class="">Giờ mở cửa</label>
+                                                    </th>
+                                                    <th>
+                                                        <label class="">Giờ đóng cửa</label>
+                                                    </th>
+                                                    <th>
+                                                        <label class="">Trạng thái</label>
+                                                    </th>
+                                                    <th><label class="">Tùy chọn</label></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                @*</div>
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
+                <div id="createStorePanel" class="modal fade" data-backdrop="static" data-keyboard="true"></div>
+                <div id="editStorePanel" class="modal fade" data-backdrop="static" data-keyboard="true"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        InitStoreDatatable();
+    });
+
+    function InitStoreDatatable() {
+        $("#StoreDatatable").dataTable({
+            "bFilter": true,
+            "bRetrieve": true,
+            "bServerSide": true,
+            "bScrollCollapse": true,
+            "sAjaxSource": "@Url.Action("GetListStoresByBrandId", "Store")",
+            "bProcessing": true,
+            "bFilter": true,
+            "oLanguage": {
+                "sSearch": "Tìm kiếm",
+                "sSearchPlaceholder": "Tên cửa hàng",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "sInfoEmpty": "Không có dữ liệu",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "fnServerParams": function (aoData) {
+                aoData.push(
+                    { "name": "id", "value": "@this.Model.Id" }
+                );
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 3, 4, 5],
+                    "bSortable": false,
+                    "sClass": "text-center",
+                },
+                {
+                    "aTargets": [2],
+                    "bSortable": false,
+                },
+                {
+                    "aTargets": [1],
+                    "mRender": function (data, type, row) {
+                        var storeID = row[6];
+                        return data;
+                    }
+                },
+                {
+                    "aTargets": [6],
+                    "mRender": function (data, type, row) {
+                        var data = row[6];
+                        //var detail = "<a class='btn btn-sm btn-primary waves-effect waves-light' href='@Url.Action("Detail","Store")\/" + data + "\'><i class='glyphicon glyphicon-info-sign'></i></a>";
+                        var edit = "<a href='@Url.Action("Edit2", "Store")\/" + data + "\' class='btn btn-sm btn-primary waves-effect waves-light'><i class='glyphicon glyphicon-pencil'></i></a>";
+                        var deActive = "<a class='btn btn-sm btn-danger waves-effect waves-light' onclick='deactive(" + data + ")'><i class='glyphicon glyphicon-trash'></i></a>";
+                        return edit + " " + deActive;
+                    },
+                    "bSortable": false,
+                    "sClass": "text-center",
+                }
+
+            ],
+            "bAutoWidth": false,
+        }).fnSetFilteringDelay(delaySearch);
+    }
+
+    //redraw datatable without reload
+    function reDrawDatatable(id) {
+        $.fn.dataTableExt.oApi.fnStandingRedraw = function (oSettings) {
+            if (oSettings.oFeatures.bServerSide === false) {
+                var before = oSettings._iDisplayStart;
+                oSettings.oApi._fnReDraw(oSettings);
+                //iDisplayStart has been reset to zero - so lets change it back
+                oSettings._iDisplayStart = before;
+                oSettings.oApi._fnCalculateEnd(oSettings);
+            }
+
+            //draw the 'current' page
+            oSettings.oApi._fnDraw(oSettings);
+        };
+        $(id).dataTable().fnStandingRedraw();
+    }
+
+    //user datatable
+    function RefreshTable() {
+        reDrawDatatable("#StoreDatatable");
+    }
+
+    function deactive(storeId) {
+        ShowConfirm("Bạn có muốn ngưng hoạt động cửa hàng này?", function () {
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("Delete", "Store")',
+                data: { id: storeId },
+                success: function (result) {
+                    if (result.success) {
+                        ShowAlert(result.message, 2);
+                        RefreshTable();
+                    } else {
+                        ShowAlert(result.message, 1);
+                    }
+                },
+                error: function (error) {
+                    ShowAlert(result.message, 1);
+                }
+            });
+        });
+    }
+
+    function showCreateStore(brandId) {
+        $.ajax({
+            type: "GET",
+            url: '#createStore',
+            url: '@Url.Action("Create","Store")',
+            data: {
+                "Id": brandId
+            },
+            success: function (result) {
+                //$('#myModal').modal('show');
+                $('#createStorePanel').html(result);
+                $('#createStorePanel').modal('show');
+                initializeTimePicker();
+            },
+            error: function (error) {
+                ShowMessage("Error Occured", 1)
+            }
+        });
+    }
+
+    function showEditStore(storeId) {
+        $.ajax({
+            type: "GET",
+            url: '#editStore',
+            url: '@Url.Action("Edit","Store")',
+            data: {
+                "Id": storeId
+            },
+            success: function (result) {
+                $('#editStorePanel').html(result);
+                $('#editStorePanel').modal('show');
+                initializeTimePicker();
+            }
+        });
+    }
+
+    function initializeTimePicker() {
+        $('#OpenTime').datetimepicker({
+            format: 'LT',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+        $('#CloseTime').datetimepicker({
+            format: 'LT',
+            ignoreReadonly: true,
+            toolbarPlacement: 'bottom'
+        });
+    };
+
+    //$(document).on('click', '#btnSubmit', function () {
+    //    // clear error
+    //    $(".error-message").html("");
+    //    $("#FormError").hide();
+    //    $("#FormError").html("");
+    //    $("#FormSuccess").hide();
+    //    $("#FormSuccess").html("");
+
+    //    var hasError = false;
+
+    //    // validating
+    //    if ($("input[name='Name']").val() == "") {
+    //        $("span[data-valmsg-for='Name']").html("Tên đối tác không được bỏ trống");
+    //        hasError = true;
+    //    }
+
+    //    if ($("textarea[name='Address']").val() == "") {
+    //        $("span[data-valmsg-for='Address']").html("Địa chỉ đối tác không được bỏ trống");
+    //        hasError = true;
+    //    }
+    //    //if ($("input[name='Lat']").val() == "") {
+    //    //    $("span[data-valmsg-for='Lat']").html("Kinh độ không được bỏ trống");
+    //    //    hasError = true;
+    //    //}
+    //    if (!$("input[name='Lat']").val() == "") {
+    //        if (!isNumerString($("input[name='lat']").val())) {
+    //            $("span[data-valmsg-for='lat']").html("kinh độ không được nhập chữ");
+    //            haserror = true;
+    //        }
+    //    }
+    //    //if ($("input[name='Lon']").val() == "") {
+    //    //    $("span[data-valmsg-for='Lon']").html("Vĩ độ không được bỏ trống");
+    //    //    hasError = true;
+    //    //}
+    //    if (!$("input[name='Lon']").val() == "") {
+    //        if (!isNumerString($("input[name='Lon']").val())) {
+    //            $("span[data-valmsg-for='Lon']").html("Vĩ độ không được nhập chữ");
+    //            hasError = true;
+    //        }
+    //    }
+
+    //    if (!validateEmail(($("input[name='Email']").val()))) {
+    //        $("span[data-valmsg-for='Email']").html("Email không hợp lệ");
+    //        hasError = true;
+    //    }
+    //    if ($("input[name='Phone']").val() == "") {
+    //        $("span[data-valmsg-for='Phone']").html("Số điện thoại không được bỏ trống");
+    //        hasError = true;
+    //    }
+    //    if (!isNumerString($("input[name='Phone']").val())) {
+    //        $("span[data-valmsg-for='Phone']").html("Số điện thoại không được nhập chữ");
+    //        hasError = true;
+    //    }
+    //    //if ($("input[name='Fax']").val() == "") {
+    //    //    $("span[data-valmsg-for='Fax']").html("Số Fax không được bỏ trống");
+    //    //    hasError = true;
+    //    //}
+    //    if (!$("input[name='Fax']").val() == "") {
+    //        if (!isNumerString($("input[name='Fax']").val())) {
+    //            $("span[data-valmsg-for='Fax']").html("Số Fax không được nhập chữ");
+    //            hasError = true;
+    //        }
+    //    }
+    //    // submit
+    //    if (!hasError) {
+    //        $("#CreateEditForm").submit();
+    //    }
+    //});
+    //validate number
+
+    function isNumerString(str) {
+        var matchingString = str.match(/\d+/);
+
+        return !(matchingString == null || matchingString[0].length != str.length);
+    }
+
+    //valid email
+
+    function validateEmail(sEmail) {
+        var filter = /^[\w-.+]+@@[a-zA-Z0-9.-]+.[a-zA-z0-9]{2,4}$/;
+        if (filter.test(sEmail)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+</script>

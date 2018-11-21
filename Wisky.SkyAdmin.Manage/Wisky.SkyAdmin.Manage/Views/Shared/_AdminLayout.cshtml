@@ -1,0 +1,676 @@
+﻿@using HmsService.ViewModels;
+@{
+    var _storeId = this.ViewContext.RouteData.Values["storeId"] == null ? null : this.ViewContext.RouteData.Values["storeId"].ToString();
+    var currentStore = Utils.GetStore(int.Parse(_storeId ?? "0"));
+    //var currentStore = ViewBag.CurrentStore;
+    var storeId = currentStore?.ID;
+    var storeName = _storeId == "0" ? "" : "- " + currentStore?.Name;
+    var brandId = Utils.GetBrandId();
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+    var user = HttpContext.Current.User;
+    var brandName = user.IsInRole("Administrator") ? "SYSTEM" : Utils.getBrandName(brandId);
+    if (brandName == null)
+    {
+        brandName = "";
+    }
+}
+
+<input type="hidden" id="hiddenStoreId" value="@ViewBag.storeId" />
+<input type="hidden" id="hiddenBrandId" value="@(brandId)" />
+<!DOCTYPE html>
+<!--[if IE 9 ]><html class="ie9"><![endif]-->
+<html>
+<head>
+    <link rel='shortcut icon' type="image/png" href='~/Content/images/favicon.png' />
+
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,minimum-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Trang quản trị SkyAdmin</title>
+    <script src="~/Content/js/jquery-2.1.4.min.js"></script>
+
+    <!-- DataTable CSS -->
+    @Styles.Render("~/Content/DataTableCSS")
+    @*<link rel="stylesheet" type="text/css" href="~/Content/plugins/DataTables/datatables.css" />
+        <link rel="stylesheet" type="text/css" href="~/Content/plugins/DataTables/datatables.min.css" />*@
+
+    <script type="text/javascript" src="~/Content/plugins/DataTables/datatables.min.js"></script>
+    <!-- Select2 4-->
+    <link href="~/Content/plugins/select2-4.0.3/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="~/Content/plugins/select2-4.0.3/dist/js/select2.full.js"></script>
+
+    <script>
+        var myOwnSelect2 = $.fn.select2;
+        delete $.fn.select2;
+    </script>
+
+    <!-- Vendor CSS -->
+    @Styles.Render("~/Content/VendorsCSS")
+    @*<link href="~/Content/template/template-material/vendors/bower_components/fullcalendar/dist/fullcalendar.min.css" rel="stylesheet">
+        <link href="~/Content/template/template-material/vendors/bower_components/animate.css/animate.min.css" rel="stylesheet">
+        <link href="~/Content/plugins/swal/sweetalert.css" rel="stylesheet" />*@
+    @*<link href="/Content/template/template-material/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.css" rel="stylesheet" />*@
+    @*<link href="~/Content/template/template-material/vendors/bower_components/material-design-iconic-font/css/material-design-iconic-font.min.css" rel="stylesheet">
+
+        <link href="~/Content/template/template-material/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
+        <link href="~/Content/template/template-material/vendors/bower_components/bootstrap-select/dist/css/bootstrap-select.css" rel="stylesheet">
+        <link href="~/Content/template/template-material/vendors/bootgrid/jquery.bootgrid.min.css" rel="stylesheet">*@
+
+    <!-- CSS -->
+    @Styles.Render("~/Content/CSS")
+    @*<link href="~/Content/template/template-material/css/app.min.1.css" rel="stylesheet">
+        <link href="~/Content/template/template-material/css/app.min.2.css" rel="stylesheet">*@
+    @*<link href="~/Content/css/material-design-iconic-font.min.css" rel="stylesheet" />*@
+    @*<link href="~/Content/css/sweetalert.css" rel="stylesheet" />*@
+
+    <!-- Plugins -->
+    @Styles.Render("~/Content/Plugins")
+    @*<link href="/Content/plugins/select2/css/select2.min.css" rel="stylesheet" />*@
+    @*<link href="~/Content/plugins/bootstrap-tagsinput/bootstrap-tagsinput.css" rel="stylesheet" />*@
+    @*<link href="~/Content/plugins/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />*@
+    @*<link href="~/Content/font-awesome-4.6.3/css/font-awesome.css" rel="stylesheet" />
+        <link href="~/Content/plugins/Gritter-master/css/jquery.gritter.css" rel="stylesheet" />
+        <link href="~/Content/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css" rel="stylesheet" />*@
+    @*<link href="~/Content/plugins/select2-3.5.0/select2-bootstrap.css" rel="stylesheet" />*@
+    @*<link href="~/Content/plugins/select2/css/select2-bootstrap.css" rel="stylesheet"/>*@
+    @*<link href="~/Content/plugins/select2-3.5.0/select2.css" rel="stylesheet" />*@
+    @*<link href="~/Content/plugins/select2-4.0.3/dist/css/select2.min.css" rel="stylesheet"/>*@
+
+    <!-- Custom -->
+    @Styles.Render("~/Content/Custom")
+    @*<link href="~/Content/css/custom-ckeditor.css" rel="stylesheet" />*@
+    @*<link href="~/Content/css/theme.css" rel="stylesheet" />
+        <link href="~/Content/css/admin.css" rel="stylesheet" />
+        <link href="~/Content/css/style.css" rel="stylesheet" />*@
+    @*<link href="https://dl.dropbox.com/s/rqrn5datcvcrka6/style.css" rel="stylesheet" />*@
+    @*<link href="~/Content/frontend/css/dual-screen.css" rel="stylesheet" />
+        <link href="~/Content/ace/assets/css/NewSkin.css" rel="stylesheet" />
+        <link href="~/Content/frontend/css/theme.css" rel="stylesheet" />
+        <link href="~/Content/css/skyplus-skin.css" rel="stylesheet" />
+        <link href="~/Content/ace/assets/css/ace.min.css" rel="stylesheet" />*@
+
+    <!--DateTimePicker-->
+    @Styles.Render("~/Content/DateTimePicker")
+    @*<link href="~/Content/css/daterangepicker.css" rel="stylesheet" />
+        <link href="~/Content/css/datepicker.css" rel="stylesheet" />*@
+
+    <!-- ZMDI -->
+    @*<link href="~/Content/css/material-design-iconic-font.css" rel="stylesheet" />
+        <link href="~/Content/css/material-design-iconic-font.css" rel="stylesheet" />*@
+    @*<link href="~/Content/frontend/zmdi/css/material-design-iconic-font.min.css" rel="stylesheet"/>*@
+    <link href="~/Content/frontend/zmdi/css/material-design-iconic-font.css" rel="stylesheet" />
+    <!--theme-->
+    @*<link href="~/Content/css/greenTheme.css" rel="stylesheet" />*@
+
+    <!-- include summernote css/js-->
+    <link href="~/Content/plugins/summernote/css/summernote.css" rel="stylesheet">
+    <script src="~/Content/plugins/summernote/js/summernote.js"></script>
+    @*<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.css" rel="stylesheet">
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.2/summernote.js"></script>*@
+
+    <!--Auto resize text area-->
+    <script src="~/Content/plugins/autosize/autosize.js"></script>
+    <!-- Chart.js Version 2.3.0 Release 23 Sep 2016-->
+    <script src="~/Content/plugins/chartjs/Chart.js"></script>
+</head>
+<body class="toggled sw-toggled">
+    <div class="loading-gif" id="loading-gif">
+        <img src="~/Content/images/loading_bar_animated.gif" />
+    </div>
+    <header id="header" class="clearfix" data-current-skin="green">
+        <ul class="header-inner">
+            <li id="menu-trigger" data-trigger="#sidebar">
+                <div class="line-wrap">
+                    <div class="line top"></div>
+                    <div class="line center"></div>
+                    <div class="line bottom"></div>
+                </div>
+            </li>
+
+            @*<li class="logo hidden-xs">
+                    <a href="@Url.Action("Index","Default", new { area = "Admin", parameters = currentStoreDomain.Directory } )">@(currentStore.Name) - Chào mừng đến với trang quản trị SkyWeb Admin</a>
+                </li>*@
+            <li class="logo hidden-xs">
+                <a href="#" id="store-name-id">@(brandName.ToUpper()) ADMIN @(storeName)</a>
+                @*Admin thì không cần thiết gắn link vì có tab Tổng quan rồi*@
+                @*<a href="/@brandId/DashBoard/@_storeId/DateDashBoard/Index">@(storeName) - Chào mừng đến với trang quản trị SkyWeb Admin</a>*@
+            </li>
+
+            <li class="pull-right">
+                <ul class="top-menu">
+                    <!-- Dieu Huong -->
+                    <li>
+                        <!-- Trigger button -->
+                        <button class="btn btn-default btn-dieu-huong waves-effect" onclick="StoreNavigation(this)">
+                            <i class="fa fa-th"></i>
+                            Điều hướng
+                        </button>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </header>
+
+    <section id="main" data-layout="layout-1">
+        <aside id="sidebar" class="sidebar c-overflow" style="background-color:#3a3738">
+            <div class="profile-menu">
+                <a href="#">
+                    <div class="profile-pic">
+                        <img src="/Content/template/template-material/img/profile-pics/1.jpg" alt="">
+                    </div>
+
+                    <div class="profile-info">
+                        Xin chào, @(this.User.Identity.Name)
+
+                        <i class="zmdi zmdi-caret-down"></i>
+                    </div>
+                </a>
+
+                <ul class="main-menu">
+                    <li>
+                        <a onclick="changePass()" href="#"><i class="fa fa-users"></i>Đổi mật khẩu</a>
+                        @*href="@this.Url.Action("ChangePassword", "Account", new { area = "" })"*@
+                    </li>
+                    <li>
+                        <a href="@this.Url.Action("LogOff", "Account", new { area=""})"><i class="zmdi zmdi-time-restore"></i>Đăng xuất</a>
+                    </li>
+                </ul>
+            </div>
+            <ul class="main-menu">
+                @{
+                    Html.RenderAction("LeftMenu", "Home", new { area = "" });
+                }
+            </ul>
+        </aside>
+
+        <section id="content">
+            <div class="container">
+                @RenderBody()
+                @*<div class="modal-backdrop" id="loading-image" style="display:none; opacity: 0.7; z-index:99999999">
+                        <i class="fa fa-spinner fa-pulse" style="position: absolute; top: 50%; left: 50%; font-size:50px;"></i>
+                    </div>*@
+            </div>
+
+        </section>
+    </section>
+    <div id="changePassModal" class="modal fade" data-backdrop="static" data-keyboard="true"></div>
+
+    <footer id="footer">
+        @*Copyright &copy; 2015 Material Admin*@
+
+        @*<ul class="f-menu">
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Dashboard</a></li>
+            <li><a href="#">Reports</a></li>
+            <li><a href="#">Support</a></li>
+            <li><a href="#">Contact</a></li>
+        </ul>*@
+    </footer>
+
+    <!-- Modal Dieu Huong -->
+    <div id="modalDieuHuong" class="modal fade" role="dialog" data-backdrop="true">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content" id="modalDieuHuong-content">
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Page Loader -->
+    @*<div class="page-loader">
+            <div class="preloader pls-blue">
+                <svg class="pl-circular" viewBox="25 25 50 50">
+                    <circle class="plc-path" cx="50" cy="50" r="20" />
+                </svg>
+
+                <p>Please wait...</p>
+            </div>
+        </div>*@
+
+    <!-- Older IE warning message -->
+    <!--[if lt IE 9]>
+        <div class="ie-warning">
+            <h1 class="c-white">Warning!!</h1>
+            <p>You are using an outdated version of Internet Explorer, please upgrade <br/>to any of the following web browsers to access this website.</p>
+            <div class="iew-container">
+                <ul class="iew-download">
+                    <li>
+                        <a href="http://www.google.com/chrome/">
+                            <img src="/Content/template/template-material/img/browsers/chrome.png" alt="">
+                            <div>Chrome</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.mozilla.org/en-US/firefox/new/">
+                            <img src="/Content/template/template-material/img/browsers/firefox.png" alt="">
+                            <div>Firefox</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://www.opera.com">
+                            <img src="/Content/template/template-material/img/browsers/opera.png" alt="">
+                            <div>Opera</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://www.apple.com/safari/">
+                            <img src="/Content/template/template-material/img/browsers/safari.png" alt="">
+                            <div>Safari</div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="http://windows.microsoft.com/en-us/internet-explorer/download-ie">
+                            <img src="/Content/template/template-material/img/browsers/ie.png" alt="">
+                            <div>IE (New)</div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <p>Sorry for the inconvenience!</p>
+        </div>
+    <![endif]-->
+    <!-- Javascript Libraries -->
+    @Html.Partial("_Constant")
+    <!-- General scripts -->
+    @Scripts.Render("~/bundles/General")
+    @*<script src="~/Content/template/template-material/vendors/bower_components/jquery/dist/jquery.min.js"></script>*@
+    @*<script src="~/Content/template/template-material/vendors/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/Content/template/template-material/vendors/bower_components/flot/jquery.flot.js"></script>
+    <script src="~/Content/template/template-material/vendors/bower_components/flot/jquery.flot.resize.js"></script>
+    <script src="~/Content/template/template-material/vendors/bower_components/flot.curvedlines/curvedLines.js"></script>
+    <script src="~/Content/template/template-material/vendors/sparklines/jquery.sparkline.min.js"></script>
+    <script src="~/Content/template/template-material/vendors/bower_components/jquery.easy-pie-chart/dist/jquery.easypiechart.min.js"></script>
+    <script src="~/Content/template/template-material/vendors/bower_components/moment/min/moment.min.js"></script>
+    <script src="~/Content/template/template-material/vendors/bower_components/fullcalendar/dist/fullcalendar.min.js"></script>
+    <script src="~/Content/template/template-material/vendors/bower_components/Waves/dist/waves.min.js"></script>
+    <script src="~/Content/template/template-material/vendors/bootstrap-growl/bootstrap-growl.min.js"></script>*@
+    @*<script src="/Content/template/template-material/vendors/bower_components/bootstrap-sweetalert/lib/sweet-alert.min.js"></script>*@
+    @*<script src="~/Content/plugins/swal/sweetalert-dev.js"></script>
+    <script src="~/Content/template/template-material/vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script src="~/Content/template/template-material/vendors/bower_components/bootstrap-select/dist/js/bootstrap-select.js"></script>*@
+
+
+    <!-- Placeholder for IE9 -->
+    <!--[if IE 9 ]>
+        <script src="/Content/template/template-material/vendors/bower_components/jquery-placeholder/jquery.placeholder.min.js"></script>
+    <![endif]-->
+    <!-- Template Material -->
+    @Scripts.Render("~/bundles/Template")
+    @*<script src="~/Content/plugins/bootbox-4.4.0/bootbox.js"></script>*@
+    @*<script src="~/Content/plugins/ckeditor/ckeditor.js"></script>
+        <script src="~/Content/plugins/ckeditor/adapters/jquery.js"></script>*@
+    @*<script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script src="~/Content/template/template-material/vendors/bootgrid/jquery.bootgrid.updated.min.js"></script>
+    <script src="~/Content/template/template-material/js/flot-charts/curved-line-chart.js"></script>
+    <script src="~/Content/template/template-material/js/flot-charts/line-chart.js"></script>
+    <script src="~/Content/template/template-material/js/charts.js"></script>
+    <script src="~/Content/template/template-material/js/charts.js"></script>
+    <script src="~/Content/template/template-material/js/functions.js"></script>*@
+
+    <!-- Plugins -->
+    @Scripts.Render("~/bundles/Plugins")
+    @*<script src="/Content/plugins/select2/js/select2.full.min.js"></script>*@
+    @*<script src="~/Content/plugins/bootstrap-tagsinput/bootstrap-tagsinput.js"></script>*@
+    @*<script src="/Content/plugins/DataTables/DataTables-1.10.10/js/jquery.dataTables.js"></script>*@
+    @*<script src="~/Content/plugins/DataTables/DataTables-1.10.12/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/plugins/dragsort/jquery.dragsort-0.5.2.min.js"></script>
+    <script src="~/Content/plugins/Gritter-master/js/jquery.gritter.min.js"></script>
+    <script src="~/Content/js/bootbox.min.js"></script>
+    <script src="~/Content/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js"></script>
+    <script src="~/Content/js/jquery.nicescroll.js"></script>
+    <script src="~/Content/ace/assets/js/jquery.colorbox-min.js"></script>
+    <script src="~/Content/ace/assets/js/fuelux/fuelux.spinner.min.js"></script>
+    <script src="~/Content/ace/assets/js/jquery.gritter.min.js"></script>*@
+    @*<script src="~/Content/plugins/select2-4.0.3/dist/js/select2.full.min.js"></script>*@
+    @*<script src="~/Content/plugins/select2-3.5.0/select2.min.js"></script>
+    <script src="~/Content/plugins/DataTables/fnSetFilteringDelay.js"></script>*@
+
+    <!--Accounting-->
+    @Scripts.Render("~/bundles/Accounting")
+    @*<script src="~/Scripts/accounting.min.js"></script>*@
+
+    <!-- Custom -->
+    <script src="~/Content/js/script.js"></script>
+    @Scripts.Render("~/bundles/Custom")
+    @*<script src="~/Content/frontend/js/common.js"></script>
+    <script src="~/Content/frontend/js/skyplus-products.js"></script>
+    <script src="~/Content/frontend/js/skyplus-skin.js"></script>
+    <script src="~/Content/frontend/js/skyplus-dualscreen.js"></script>
+    <script src="~/Content/frontend/js/skyplus-inventory.js"></script>
+    <script src="~/Content/frontend/js/skyplus-room.js"></script>
+    <script src="~/Content/frontend/js/skyplus-dashboard.js"></script>
+    <script src="~/Content/frontend/js/skyplus-cost.js"></script>*@
+    @*<script src="~/Content/frontend/js/skyplus-delivery.js"></script>*@
+    @*<script src="~/Content/frontend/js/skyplus-dualscreen.js"></script>*@
+
+    <!--DateTimePicker-->
+    @Scripts.Render("~/bundles/DateTimePicker")
+    @*<script src="~/Content/js/daterangepicker.js"></script>
+    <script src="~/Content/js/bootstrap-datepicker.min.js"></script>
+    <script src="~/Content/js/bootstrap-datetimepicker.min.js"></script>*@
+
+    <!--HightChart-->
+    @Scripts.Render("~/bundles/HighChart")
+    @*<script src="~/Content/js/highcharts.js"></script>
+    <script src="~/Content/js/exporting.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>*@
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300" rel="stylesheet">
+    @RenderSection("scripts", false)
+    @RenderSection("InventoryReceipt", false)
+    @RenderSection("AddInventory", false)
+    @RenderSection("CouponCampaign", false)
+    @RenderSection("CouponProvider", false)
+
+    <!-- ICHECK -->
+    <link href="~/Content/plugins/icheck-1.0.2/skins/square/green.css" rel="stylesheet" />
+    <script src="~/Content/plugins/icheck-1.0.2/icheck.js"></script>
+
+    @section Scripts {
+        @Scripts.Render("~/bundles/jqueryval")
+    }
+    <script>
+
+        function changePass() {
+            //id
+            $.ajax({
+                //url: '#assignUser',
+                url: '@Url.Action("ChangePassword", "Account", new { area = "" })',
+                type: "GET",
+                dataType: 'html',
+                data: {
+                    //id: id
+                },
+                success: function (result) {
+                    $('#changePassModal').html(result);
+                    $('#changePassModal').modal('show');
+                }
+            });
+        };
+
+        $(function () {
+            SKYWEB.Admin.General.init();
+        });
+
+        $(document)
+        //.ajaxStart(function () {
+        //    $('#loading-image').fadeIn(400);
+        //})
+        //.ajaxStop(function () {
+        //    $('#loading-image').fadeOut(400, function () {
+        //        $(this).trigger('onFadeOutComplete');
+        //    });
+        //});
+
+        function notifyBottomRight(message) {
+            $.growl({
+                //                icon: icon,
+                //                title: title,
+                message: message,
+                url: ''
+            }, {
+                element: 'body',
+                //                type: type,
+                allow_dismiss: true,
+                placement: {
+                    from: 'bottom',
+                    //                    align: align
+                },
+                offset: {
+                    x: 20,
+                    y: 85
+                },
+                spacing: 10,
+                z_index: 1031,
+                delay: 2500,
+                timer: 1000,
+                url_target: '_blank',
+                mouse_over: false,
+                //                animate: {
+                //                    enter: animIn,
+                //                    exit: animOut
+                //                },
+                icon_type: 'class',
+                template: '<div data-growl="container" class="alert" role="alert">' +
+                                '<button type="button" class="close" data-growl="dismiss">' +
+                                    '<span aria-hidden="true">&times;</span>' +
+                                    '<span class="sr-only">Close</span>' +
+                                '</button>' +
+                                '<span data-growl="icon"></span>' +
+                                '<span data-growl="title"></span>' +
+                                '<span data-growl="message"></span>' +
+                                '<a href="#" data-growl="url"></a>' +
+                            '</div>'
+            });
+        }
+
+        function notify(from, align, title, message, icon, type, animIn, animOut) {
+            $.growl({
+                icon: icon,
+                title: title,
+                message: message,
+                url: ''
+            }, {
+                element: 'body',
+                type: type,
+                allow_dismiss: true,
+                placement: {
+                    from: from,
+                    align: align
+                },
+                offset: {
+                    x: 20,
+                    y: 85
+                },
+                spacing: 10,
+                z_index: 1031,
+                delay: 2500,
+                timer: 1000,
+                url_target: '_blank',
+                mouse_over: false,
+                animate: {
+                    enter: animIn,
+                    exit: animOut
+                },
+                icon_type: 'class',
+                template: '<div data-growl="container" class="alert" role="alert">' +
+                                '<button type="button" class="close" data-growl="dismiss">' +
+                                    '<span aria-hidden="true">&times;</span>' +
+                                    '<span class="sr-only">Close</span>' +
+                                '</button>' +
+                                '<span data-growl="icon"></span>' +
+                                '<span data-growl="title"></span>' +
+                                '<span data-growl="message"></span>' +
+                                '<a href="#" data-growl="url"></a>' +
+                            '</div>'
+            });
+        };
+        /*
+           set equal heights for eh-item tags
+           eh: equal heights
+           Author: DucBM
+       */
+        function setEqualHeights() {
+            // voi moi .eh-wrapper, set equal h     eight cho tat ca cac hau due cua no
+            $('.eh-wrapper').each(function () {
+                var maxHeight = -1;
+                // calc maxHeight
+                $(this).find('.eh-item').each(function () {
+                    maxHeight = (maxHeight > $(this).height()) ? maxHeight : $(this).height();
+                });
+                // set all elements
+                $(this).find('.eh-item').each(function () {
+                    $(this).height(maxHeight);
+                });
+            });
+        }
+        $(document).ready(function () {
+            setEqualHeights();
+            @if (!user.IsInRole("Administrator")) {
+                <text>Validate();</text>
+            }
+            $('#modalDieuHuong').on('shown.bs.modal', function () {
+                setEqualHeights();
+            });
+        });
+        function StoreNavigation(btn) {
+            var id = $("#hiddenBrandId").val()
+            //var idDetail = $(btn).attr("data-id");
+            $.ajax({
+                url: "@Url.Action("RenderStoreNavigation", "Home", new { area="", brandId = brandId})",
+                success: function (result) {
+                    $('#modalDieuHuong').modal('show');
+                    $('#modalDieuHuong-content').html(result);
+                }
+            });
+        }
+
+        @if (!user.IsInRole("Administrator"))
+            {
+        <text>
+        function Validate() {
+            var id = @ViewContext.RouteData.Values["storeId"]+"";
+            @*var id = @(int.Parse(ViewContext.RouteData.Values["storeId"]?.ToString()));*@
+
+            var brand =@(int.Parse(ViewContext.RouteData.Values["brandId"]?.ToString()));
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("Validate", "Account", new { area = "" })",
+                data: {
+                    "storeId": id,
+                    "brandId": brand
+                },
+                success: function(data){
+                    if(data.result){
+                        window.location.href= data.url;
+                    }
+                },
+            })
+        }
+        </text>
+            }
+
+
+
+
+    </script>
+
+    @if (this.TempData["message"] != null)
+            {
+        <script>
+            $(function () {
+                notify("top", "right", "", "@(this.TempData["message"])");
+            });
+        </script>
+    }
+
+    <script>
+
+        $(document).ready(function(){
+            //insert favicon
+            $("head").append("<link rel='shortcut icon' href='/Content/images/favicon.ico'>");
+
+            //insert header for calendar
+            $("<dt class=''>Ngày bắt đầu</dt>").insertBefore(".calendar.left .daterangepicker_input");
+            $("<dt class=''>Ngày kết thúc</dt>").insertBefore(".calendar.right > .daterangepicker_input");
+
+
+            //insert footer for calendar
+            //$(".calendar.left, .calendar.right").wrapAll("<div style='float:left;'/>");
+
+            //if($(".calendar.right").css("display")!="none"){
+            //$("<div class='calendar calendar-footer'>"+
+            //    "&bull; Xin hãy chọn ngày bắt đầu trước khi chọn ngày kết thúc. <br/>"+
+            //    "&bull; Nhấp chọn và tìm kiếm để hoàn thành tra cứu <br/>"+
+            //    "</div>").insertAfter(".calendar.right");
+            //}
+            //$(".hover-title[data-title]:hover:after").css("background-color", "red !important");
+
+        });
+
+        $(document).ajaxComplete(function() {
+
+            if($('body').find(".tableDiv-responsive").length<=0){
+                $('body').find(".table").wrap('<div class="tableDiv-responsive" />');
+            }
+        });
+
+
+
+    </script>
+
+    <style>
+        .hover-title {
+            color: blue;
+            text-decoration: none;
+        }
+
+            .hover-title:hover {
+                color: red;
+                position: relative;
+                cursor: default;
+            }
+
+            .hover-title[data-title]:hover:after {
+                content: attr(data-title);
+                padding: 4px 8px;
+                color: #333;
+                position: absolute;
+                left: 50%;
+                top: 100%;
+                white-space: nowrap;
+                z-index: 20;
+                -moz-border-radius: 2px;
+                -webkit-border-radius: 2px;
+                border-radius: 2px;
+                -moz-box-shadow: 0px 0px 4px #222;
+                -webkit-box-shadow: 0px 0px 4px #222;
+                box-shadow: 0px 0px 4px #222;
+                /*background-color:lightcyan;*/
+                background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+                background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eeeeee),color-stop(1, #cccccc));
+                background-image: -webkit-linear-gradient(top, #eeeeee, #cccccc);
+                background-image: -moz-linear-gradient(top, #eeeeee, #cccccc);
+                background-image: -ms-linear-gradient(top, #eeeeee, #cccccc);
+                background-image: -o-linear-gradient(top, #eeeeee, #cccccc);
+            }
+
+            .hover-title[data-title].changed:hover:after {
+                margin-left: 50px !important;
+            }
+    </style>
+
+    <script>
+        //body.append('<style>.hover-title[data-title]:hover:after{margin-left: ' + 100 + 'px;}</style>');
+        //var position =$(".text-title").position().left;
+        //$(".hover-title[data-title]:hover:after").toggleClass('changed');
+
+        //$(window).scroll(function () {
+        //    if ($(this).scrollTop() > 70) {
+        //        $("#btn-submit-product").css("top", $(this).scrollTop() - 70);
+        //        $(".myComeback").css("top", $(this).scrollTop() - 70);
+        //    } else {
+        //        $("#btn-submit-product").css("top", 'initial');
+        //        $(".myComeback").css("top", 'initial');
+        //    }
+        //});
+        $(document).ready(function (){
+            $(".dropdown-toggle").each(function() {
+                var menu = $(this).parent().find('.dropdown-menu');
+                menu.css('left', $(this).position().left);
+            });
+        });
+
+        $(document).ready(function() {
+            $("#btn-submit-product").absoluteScroll(70);
+            $(".myComeback").absoluteScroll(70);
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,152 @@
+﻿@model List<Wisky.SkyAdmin.Manage.Controllers.HomeController.menuItem>
+@using HmsService.ViewModels;
+@{
+    var user = HttpContext.Current.User;
+    var currentStore = HmsService.Models.Utils.GetStore();
+    var storeId = ViewBag.storeId as string;
+    var storeName = ViewBag.storeName as string;
+    var brandId = HmsService.Models.Utils.GetBrandId();
+    var currentStoreDomain = this.ViewBag.CurrentDomain as StoreDomainViewModel;
+}
+@if (user.IsInRole("ProductManager") && !user.IsInRole("BrandManager"))
+{
+    <li class="sub-menu" id="menuSanPham">
+        <a href="#"><i class="zmdi zmdi-cloud-box"></i> Sản phẩm</a>
+        <ul>
+            <li class="submenu-style" id="subMenuDanhSachSanPham"><a href="@Url.Action("Index", "Product", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="zmdi zmdi-view-module"></i> Danh sách sản phẩm</a></li>
+            <li class="submenu-style" id="subMenuDanhSachDongSanPham"><a href="@Url.Action("Index", "ProductGeneral", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="zmdi zmdi-view-module"></i> Danh sách dòng sản phẩm</a></li>
+        </ul>
+    </li>
+}
+@if (user.IsInRole("BrandManager"))
+{
+    <li id="menuTongQuan"><a href="@Url.Action("Index", "DateDashBoard", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "DashBoard" })"><i class="fa fa-tachometer"></i> Tổng quan</a></li>
+
+    <li class="sub-menu" id="menuHoatDongKinhDoanh">
+        <a href="#"><i class="fa fa-line-chart"></i> Hoạt động kinh doanh</a>
+        <ul>
+            <li class="submenu-style" id="subMenuDanhSachHoaDon"><a href="@Url.Action("Index", "Order", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Orders" })"><i class="zmdi zmdi-assignment"></i> Danh sách hóa đơn</a></li>
+            <li class="submenu-style" id="subMenuBaoCaoKinhDoanh"><a href="@Url.Action("Index", "TimeReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "SystemReport" })"><i class="fa fa-pie-chart"></i> Báo cáo kinh doanh</a></li>
+            <li class="submenu-style" id="subsubMenuDoiSanhDoanhThu"><a href="@Url.Action("Index", "ComparisonReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "SystemReport" })"><i class="zmdi zmdi-compare"></i> Đối sánh doanh thu</a></li>
+        </ul>
+    </li>
+    <li class="sub-menu" id="menuBaoCao">
+        <a href="#"><i class="fa fa-cubes"></i> Báo cáo sản phẩm</a>
+        <ul>
+            <li class="submenu-style" id="subsubMenuBaoCaoDoanhThuSanPham"><a href="@Url.Action("IndexProductCategoryReport", "ProductReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "SystemReport" })"><i class="fa fa-bar-chart"></i> Doanh thu sản phẩm</a></li>
+            <li class="submenu-style" id="subsubMenuBaoCaoDienTienSanPham"><a href="@Url.Action("IndexProductLineReport", "ProductReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "SystemReport" })"><i class="fa fa-line-chart"></i> Diễn tiến sản phẩm</a></li>
+            <li class="submenu-style" id="subsubMenuDoiSanhSanPham"><a href="@Url.Action("IndexProduct", "ComparisonReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "SystemReport" })"><i class="fa fa-balance-scale"></i> Đối sánh sản phẩm</a></li>
+        </ul>
+    </li>
+    <li class="sub-menu" id="menuKeToan">
+        <a href="#"><i class="fa fa-calculator"></i> Kế toán</a>
+        <ul>
+            <li class="submenu-style" id="subMenuReportPayment"><a href="@Url.Action("Index", "Revenue", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "SystemReport" })"><i class="fa fa-bar-chart"></i> Báo cáo kế toán</a></li>
+            <li class="submenu-style" id="subMenuReportPayment"><a href="@Url.Action("ListCashPayment", "PaymentReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "SystemReport" })"><i class="fa fa-bar-chart"></i> Báo cáo tiền mặt</a></li>
+            <li class="submenu-style" id="subMenuDanhSachThuChi"><a href="@Url.Action("CostManagement", "CostManage", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "CostManager" })"><i class="fa fa-usd"></i> Danh sách thu/chi</a></li>
+            <li class="submenu-style" id="subMenuBaoCaoThanhToan"><a href="@Url.Action("Index", "PaymentReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "SystemReport" })"><i class="zmdi zmdi-receipt"></i> Báo cáo thanh toán</a></li>
+            <li class="submenu-style" id="subMenuDanhSachGiaoDich"><a href="@Url.Action("Index", "Transaction", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "CRM" })"><i class="fa fa-exchange"></i> Giao dịch thẻ thành viên</a></li>
+        </ul>
+    </li>
+    <li class="sub-menu" id="menuTheThanhVien">
+        <a href="#"><i class="fa fa-users"></i> Quản lý khách hàng</a>
+        <ul>
+            <li class="submenu-style" id="subMenuTheThanhVien"><a href="@Url.Action("Index", "MembershipCard", new { brandId = brandId, storeId = storeId, area = "MembershipCard" })"><i class="fa fa-id-card-o"></i> Thẻ thành viên</a></li>
+            <li class="submenu-style" id="subMenuTheMau"><a href="@Url.Action("Index", "MembershipCardSample", new { brandId = brandId, storeId = storeId, area = "MembershipCard" })"><i class="fa fa-id-card-o"></i> Thẻ mẫu</a></li>
+            <li class="submenu-style" id="subMenuEditTheMau"><a href="@Url.Action("EditMembershipCardCode", "MembershipCard", new { brandId = brandId, storeId = storeId, area = "MembershipCard" })"><i class="fa fa-id-card-o"></i> Thay đổi mã thẻ</a></li>
+            <li class="submenu-style" id="subMenuDanhSachKhachHang"><a href="@Url.Action("Index", "Customer", new { brandId = brandId, storeId = storeId, area = "CRM" })"><i class="zmdi zmdi-accounts-alt"></i> Danh sách khách hàng</a></li>
+            <li class="submenu-style" id="subMenuBoLocKhachHang"><a href="@Url.Action("CustomerFilter", "Customer", new { brandId = brandId, storeId = storeId, area = "CRM" })"><i class="zmdi zmdi-filter-tilt-shift"></i> Bộ lọc khách hàng</a></li>
+        </ul>
+    </li>
+    <li class="sub-menu" id="menuCRM">
+        <a href="#"><i class="fa fa-gift"></i> Khuyến mãi</a>
+        <ul>
+            <li class="submenu-style" id="subMenuKhuyenMai"><a href="@Url.Action("IndexPromotion", "Promotion", new { brandId = brandId, storeId = storeId, area = "Promotion" })"><i class="fa fa-gift"></i> Khuyến mãi</a></li>
+            <li class="submenu-style" id="subMenuCoupon"><a href="@Url.Action("CouponCampaign", "Coupon", new { brandId = brandId, storeId = storeId, area = "Coupon" })"><i class="fa fa-ticket"></i> Coupon</a></li>
+            <li class="submenu-style" id="subMenuBaoCaoTheoKhuyenMai"><a href="@Url.Action("Index", "PromotionReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "SystemReport" })"><i class="fa fa-area-chart"></i> Báo cáo khuyến mãi</a></li>
+        </ul>
+    </li>
+    <li class="sub-menu" id="menuQuanLyKho">
+        <a href="#"><i class="fa fa-building"></i> Quản lý kho</a>
+        <ul>
+            <li class="submenu-style" id="subMenuTonKhoCuoiNgay"><a href="@Url.Action("Index", "Inventory", new { brandId = brandId, storeId = storeId, area = "Inventory" })"><i class="fa fa-cube"></i> Tồn kho cuối ngày</a></li>
+            <li class="submenu-style" id="subMenuTonKhoCuoiThang"><a href="@Url.Action("IndexMonth", "Inventory", new { brandId = brandId, storeId = storeId, area = "Inventory" })"><i class="fa fa-cube"></i> Tồn kho cuối tháng</a></li>
+            <li class="submenu-style" id="subMenuTonKhoHienTai"><a href="@Url.Action("IndexInDate", "Inventory", new { brandId = brandId, storeId = storeId, area = "Inventory" })"><i class="fa fa-cube"></i> Tồn kho hiện tại</a></li>
+            <li class="submenu-style" id="subMenuTonKhoTheoThoiGian"><a href="@Url.Action("IndexTimeRange", "Inventory", new { brandId = brandId, storeId = storeId, area = "Inventory" })"><i class="fa fa-cube"></i> Tồn kho theo thời gian</a></li>
+            <li class="submenu-style" id="subMenuQuanLyNguyenLieu"><a href="@Url.Action("Index", "ProductItem", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="fa fa-puzzle-piece"></i> Quản lý nguyên liệu</a></li>
+            <li class="submenu-style" id="subMenuDinhMucNguyenLieu"><a href="@Url.Action("Index", "Products", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Products" })"><i class="fa fa-cogs"></i> Định mức nguyên liệu</a></li>
+        </ul>
+    </li>
+    @*<li class="sub-menu" id="menuKeToan">
+            <a href="#"><i class="zmdi zmdi-receipt"></i> Kế toán</a>
+            <ul>
+                <li class="submenu-style" id="subMenuVAT"><a href="@Url.Action("Index", "VATOrder", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "VATOrders" })"><i class="zmdi zmdi-money"></i> VAT (Testing)</a></li>
+            </ul>
+        </li>*@
+    <li class="sub-menu" id="menuSanPham">
+        <a href="#"><i class="fa fa-product-hunt"></i> Sản phẩm</a>
+        <ul>
+            <li class="submenu-style" id="subMenuDanhSachSanPham"><a href="@Url.Action("Index", "Product", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="fa fa-th-list"></i> Danh sách sản phẩm</a></li>
+            <li class="submenu-style" id="subMenuDanhSachDongSanPham"><a href="@Url.Action("Index", "ProductGeneral", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="fa fa-list-ol"></i> Danh sách dòng sản phẩm</a></li>
+        </ul>
+    </li>
+    <li class="sub-menu" id="menuDoiTac">
+        <a href="#"><i class="fa fa-handshake-o"></i> Đối tác</a>
+        <ul>
+            <li class="submenu-style" id="subMenuQuanLyNhaCungCap"><a href="@Url.Action("IndexProvider", "ProviderManage", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "ProviderManager" })"><i class="fa fa-user-secret"></i> Quản lý nhà cung cấp</a></li>
+            <li class="submenu-style" id="subMenuNhaCungCapCoupon"><a href="@Url.Action("CouponProvider", "Coupon", new { brandId = brandId, storeId = storeId, area = "Coupon" })"><i class="fa fa-user-plus"></i> Nhà cung cấp Coupon</a></li>
+        </ul>
+    </li>
+    <li class="sub-menu" id="menuDanhMuc">
+        <a href="#"><i class="fa fa-sitemap"></i> Danh mục</a>
+        <ul>
+            <li class="submenu-style" id="subMenuNhomSanPham"><a href="@Url.Action("Index", "ProductCategory", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="fa fa-bars"></i> Nhóm sản phẩm</a></li>
+            <li class="submenu-style" id="subMenuNhomNguyenLieu"><a href="@Url.Action("Index", "ProductItemCategory", new { brandId = brandId, storeId = storeId, area = "Admin" })"><i class="fa fa-bars"></i> Nhóm nguyên liệu</a></li>
+            <li class="submenu-style" id="subMenuNhomKhachHang"><a href="@Url.Action("Index", "CustomerType", new { brandId = brandId, storeId = storeId, area = "CRM" })"><i class="fa fa-users"></i> Nhóm khách hàng</a></li>
+            <li class="submenu-style" id="subMenuNhomThuChi"><a href="@Url.Action("IndexCostManage", "CostManage", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "CostManager" })"><i class="fa fa-usd"></i> Nhóm thu chi</a></li>
+            <li class="submenu-style" id="subMenuNhomKhuyenMai"><a href="@Url.Action("Index", "Group", new { brandId = brandId, storeId = storeId, area = "Promotion" })"><i class="fa fa-gift"></i> Nhóm khuyến mãi</a></li>
+            <li class="submenu-style" id="subMenuNhomCuaHang"><a href="@Url.Action("Index", "StoreGroup", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="fa fa-home"></i> Nhóm cửa hàng</a></li>
+            @*<li class="submenu-style"><a href="@Url.Action("Index", "GroupMembershipCard", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="zmdi zmdi-card-membership"></i> Nhóm thẻ thành viên</a></li>*@
+            <li class="submenu-style" id="subMenuLoaiTheTHanhVIen"><a href="@Url.Action("Index", "MembershipCardType", new { brandId = brandId, storeId = storeId, area = "MembershipCard" })"><i class="fa fa-id-card"></i> Loại thẻ thành viên</a></li>
+        </ul>
+    </li>
+    <li class="sub-menu" id="menuNguoiDung">
+        <a href="#"><i class="fa fa-user-circle"></i> Người dùng</a>
+        <ul>
+            <li class="submenu-style" id="subMenuPhanCongNguoiDung"><a href="@Url.Action("Index", "Store", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="fa fa-home"></i> Danh sách cửa hàng</a></li>
+            <li class="submenu-style" id="subMenuPhanQuyenNguoiDung"><a href="@Url.Action("Index", "AccountBrandManager", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="fa fa-address-book-o"></i> Phân quyền người dùng</a></li>
+        </ul>
+    </li>
+    <li id="menuThanhPhan"><a href="@Url.Action("Index", "WebElementType", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "WebElement" })"><i class="zmdi zmdi-present-to-all"></i> Thành phần</a></li>
+    <li id="menuWorkingshifts"><a href="@Url.Action("Index", "TimeFrame", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "FingerScan" })"><i class="zmdi zmdi-present-to-all"></i> Quản lý ca làm việc</a></li>
+    <li>
+        <a href="@Url.Action("Index","ReRunDateReport", new { brandId = brandId, storeId = storeId, storeName = storeName, area = "Admin" })"><i class="zmdi zmdi-account"></i> Quản lý Báo cáo</a>
+    </li>
+}
+<style>
+    .sub-menu ul > li ul {
+        margin: 0px !important;
+    }
+
+    .sub-menu .sub-menu:first-child > a:before, .sub-menu:first-child .sub-menu > a:after {
+        top: 11px;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        @if (Model != null)
+        {
+            for(int i = 0; i < Model.Count(); i++)
+            {
+                if (Model[i].enable == false)
+                {
+                    <text>
+        document.getElementById("@Model[i].name").setAttribute("hidden", "true");
+        </text>
+                }
+            }
+        }
+    });
+
+
+</script>

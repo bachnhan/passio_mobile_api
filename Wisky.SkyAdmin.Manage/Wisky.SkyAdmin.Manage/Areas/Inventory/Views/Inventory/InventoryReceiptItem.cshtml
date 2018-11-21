@@ -1,0 +1,241 @@
+﻿@model HmsService.ViewModels.InventoryReceiptEditViewModel
+@{
+    //ViewBag.Title = "InventoryReceiptItem";
+    Layout = null;
+}
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            @*<div class="card">
+                <div class="card-header">*@
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>
+                        Chi tiết đơn hàng
+                        @if (Model.ReceiptType == 0)
+                        {
+                            <span class="info">(Nhập kho)</span>
+                        }
+                        else if (Model.ReceiptType == 3 || Model.ReceiptType == 5)
+                        {
+                            <span class="info">(Xuất kho)</span>
+                        }
+                        else if (Model.ReceiptType == 2)
+                        {
+                            <span class="info">(Chuyển kho đi)</span>
+                        }
+                        else if (Model.ReceiptType == 1)
+                        {
+                            <span class="info">(Chuyển kho đến)</span>
+                        }
+                        else
+                        {
+                            <span class="info">(Duyệt kho)</span>
+                        }
+                    </h3>
+                </div>
+                <div class="col-md-6 text-right">
+                    <button data-dismiss="modal" class="close">x</button>
+                    @if (Model.Status == 0 && Model.ReceiptType != 4 && Model.ReceiptType != 2 && Model.CreateDate?.ToString("dd/MM/yyyy") == Utils.GetCurrentDateTime().ToString("dd/MM/yyyy"))
+                    {
+                        <a class="btn btn-danger btn-sm pull-right InventoryStatusBtn" onclick="CancelReceipt(@Model.ReceiptID)">
+                            Hủy
+                        </a>
+                        <a class="btn btn-success btn-sm pull-right InventoryStatusBtn" onclick="AcceptReceipt(@Model.ReceiptID)">
+                            Duyệt
+                        </a>
+                    }
+                    else if (Model.Status == 0 && Model.ReceiptType == 2 && Model.CreateDate?.ToString("dd/MM/yyyy") == Utils.GetCurrentDateTime().ToString("dd/MM/yyyy"))
+                    {
+                        <a class="btn btn-danger btn-sm pull-right InventoryStatusBtn" onclick="CancelReceipt(@Model.ReceiptID)">
+                            Hủy
+                        </a>
+                    }
+                    else if (Model.Status == 1 && Model.CreateDate?.ToString("dd/MM/yyyy") == Utils.GetCurrentDateTime().ToString("dd/MM/yyyy"))
+                    {
+                        <a class="btn btn-danger btn-sm pull-right InventoryStatusBtn" onclick="CancelReceipt(@Model.ReceiptID)">
+                            Hủy
+                        </a>
+                    }
+                    else if (Model.Status == 1 && Model.ReceiptType == 2 && Model.CreateDate?.ToString("dd/MM/yyyy") == Utils.GetCurrentDateTime().ToString("dd/MM/yyyy"))
+                    {
+                        <a class="btn btn-danger btn-sm pull-right InventoryStatusBtn" onclick="RequestCancel(@Model.ReceiptID)">
+                            Yêu cầu hủy
+                        </a>
+                    }
+                    else if (Model.Status == 6 && Model.ReceiptType == 2 && Model.CreateDate?.ToString("dd/MM/yyyy") == Utils.GetCurrentDateTime().ToString("dd/MM/yyyy"))
+                    {
+                        <a class="btn btn-danger btn-sm pull-right InventoryStatusBtn" onclick="CancelReceipt(@Model.ReceiptID)">
+                            Đồng ý hủy
+                        </a>
+                    }
+                </div>
+
+            </div>
+        </div>
+        <div class="modal-body">
+
+            @*<div class="card-padding">*@
+            <div class="row">
+                <div class="col-md-6 text-right">
+                    <div class="form-group" style="padding-left: 20px">
+                        <label> Tên đơn hàng: @Model.Name</label>
+                    </div>
+                    <div class="form-group" style="padding-left: 20px">
+                        <label>  Mã đơn hàng: @Model.InvoiceNumber</label>
+                    </div>
+                    <div class="form-group" style="padding-left: 20px">
+                        <label>  Người phụ trách: @Model.Creator</label>
+                    </div>
+                    <div class="form-group" style="padding-left: 20px">
+                        <label> Trạng thái:</label>
+                        @if (Model.Status == 0)
+                    {
+                            <span class='label myInventoryReceiptItem not-approved meStatus'>chờ duyệt</span>
+                    }
+                    else if (Model.Status == 1)
+                    {
+                            <span class='label myInventoryReceiptItem approved meStatus'>Đã duyệt</span>
+                    }
+                    else if (Model.Status == 2)
+                    {
+                            <span class='label myInventoryReceiptItem canceled meStatus'>Đã hủy</span>
+                    }
+                    else if (Model.Status == 3)
+                    {
+                            <span class='label myInventoryReceiptItem rejected meStatus'>Đã từ chối</span>
+                    }
+                    else if (Model.Status == 4)
+                    {
+                            <span class='label myInventoryReceiptItem closed meStatus'>Đã đóng</span>
+                    }
+                    else if (Model.Status == 5)
+                    {
+                            <span class='label myInventoryReceiptItem WaitRequestCancel meStatus'>Chờ xác nhận yêu cầu hủy</span>
+                    }
+                    else if (Model.Status == 6)
+                    {
+                            <span class='label myInventoryReceiptItem requestCancel meStatus'>@(Model.InStoreName) yêu cầu hủy </span>
+                    }
+                    </div>
+
+                </div>
+                <div class="col-md-6">
+                    @if (Model.ReceiptType == 2)
+                {
+                        <div class="form-group">
+                            <label> Cửa hàng chuyển: @Model.OutStoreName</label>
+                        </div>
+                }
+                    @if (Model.ReceiptType == 2)
+                {
+                        <div class="form-group">
+                            <label> Cửa hàng nhận: @Model.InStoreName</label>
+                        </div>
+                }
+                    @if (Model.ReceiptType == 0)
+                {
+                        <div class="form-group">
+                            <label>  Nhà cung cấp: @Model.Provider.ProviderName</label>
+                        </div>
+                }
+                    <div class="form-group">
+                        <label> Ngày tạo: @Model.CreateDate</label>
+                    </div>
+                    <div class="form-group">
+                        <label> Ngày chuyển hàng: @Model.ChangeDate</label>
+                    </div>
+
+                </div>
+            </div>
+
+            <table id="inventoryReceiptItemTable" class="table table-striped table-bordered table-hover">
+                <thead>
+                    <tr class="gray">
+                        <th class="">Tên hàng</th>
+                        <th class="">Đơn vị</th>
+                        <th class="">Số lượng</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.InventoryReceiptItem)
+                {
+                        <tr>
+                            <td>@item.ProductItem.ItemName</td>
+                            <td class="text-center">@item.ProductItem.Unit</td>
+                            <td>@item.Quantity</td>
+                        </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<script>
+        //$('#inventoryReceiptItemTable').dataTable({
+        //    "oLanguage": {
+        //        "sSearch": "Tìm kiếm:",
+        //        "sZeroRecords": "Không có dữ liệu phù hợp",
+        //        "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+        //        "sEmptyTable": "Không có dữ liệu",
+        //        "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+        //        "sLengthMenu": "Hiển thị _MENU_ dòng",
+        //        "sProcessing": "Đang xử lý...",
+        //        "sInfoEmpty": "Không có dữ liệu",
+        //        "oPaginate": {
+        //            "sNext": "<i class='fa fa-chevron-right'></i>",
+        //            "sPrevious": "<i class='fa fa-chevron-left'></i>"
+        //        }
+        //    },
+        //});
+    function RequestCancel(id) {
+        var rs = confirm("Yêu cầu hủy đơn hàng này?");
+        if (rs) {
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("InStoreCancelRequest", "ProductInventory"))",
+                "data": {
+                    id: parseInt(id)
+                },
+                success: function (result) {
+                    ShowMessage("Yêu cầu hủy thành công!", 2);
+                    location.href = "@(Url.Action("InventoryReceiptItem", "Inventory"))";
+                }
+            });
+        }
+    }
+    function AcceptReceipt(id) {
+        var rs = confirm("Xác nhận duyệt đơn hàng này?");
+        if (rs) {
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("AcceptReceipt","ProductInventory"))",
+                "data": {
+                    id: parseInt(id)
+                },
+                success: function (result) {
+                    ShowMessage("Duyệt đơn hàng thành công!", 2);
+                    location.href = "@(Url.Action("InventoryReceiptItem", "Inventory"))";
+                }
+            });
+        }
+    }
+    function CancelReceipt(id) {
+        var rs = confirm("Xác nhận hủy đơn hàng này?");
+        if (rs) {
+            $.ajax({
+                "type": "post",
+                "url": "@(Url.Action("CancelReceipt","ProductInventory"))",
+                "data": {
+                    id: parseInt(id)
+                },
+                success: function (result) {
+                    ShowMessage("Hủy đơn hàng thành công!", 2);
+                    location.href = "@(Url.Action("InventoryReceiptItem", "Inventory"))";
+                }
+            });
+        }
+    }
+</script>

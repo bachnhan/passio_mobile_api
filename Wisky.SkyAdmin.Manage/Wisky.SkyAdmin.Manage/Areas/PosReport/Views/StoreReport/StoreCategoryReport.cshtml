@@ -1,0 +1,352 @@
+﻿@model IEnumerable<HmsService.Models.Entities.ProductCategory>
+@{
+    ViewBag.Title = "Báo cáo doanh thu theo ngành hàng";
+    //   Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<div class="card">
+    <!-- PAGE HEADER -->
+    <div class="card-header">
+        <div class="row small-margin">
+            <!-- HEADER NAME -->
+            <div class="col-md-6">
+                <h3>Báo cáo theo ngành hàng</h3>
+                <h5 class="smallDate" data-role="small-date"></h5>
+            </div>
+
+            <div class="col-md-6">
+                <!-- EXPORT TO EXCEL -->
+                <button type="button" id="export" class="btn btn-primary btn-sm pull-right">
+                    <i class="fa fa-download"></i>
+                    Xuất ra file Excel
+                </button>
+            </div>
+
+        </div>
+        <hr />
+
+        <div class="row" style="margin-top: 19px;">
+            <div class="col-md-6">
+                <div class="form-inline form-absolute">
+                    <div class="form-group">
+                        <label>Phân loại</label>
+                        <select class="form-control" id="categoryId">
+                            <option value="0">Tất cả ngành hàng</option>
+                            @foreach (var item in Model)
+                            {
+                                <option value="@item.CateID">@item.CateName</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="input-group">
+                    <!-- Daterange picker -->
+                    @*<div class="date-picker text-right">
+                        <input id="datestring" hidden />
+                        <div id="reportrange">
+                            <input class="p-7 width230" type="text" id="date-string" readonly />
+                            <a id="" class="CelenderA"><i class="fa fa-calendar"></i></a>
+                        </div>
+                    </div>
+                    <div class="input-group-btn">
+                        <a class="btn btn-primary btn-sm" id="btnSearch">
+                            <i class="left-icon fa fa-search"></i>  Tìm
+                        </a>
+                    </div>*@
+                    <div class="dateTime width230 pull-right">
+                        <input id="datestring" hidden />
+                        <div class="fg-line m-t-5">
+                            <div id="reportrange">
+                                <input id="date-string" readonly class="form-control text-center">
+                                <a class="myCelenderA" id=""><i class="fa fa-calendar"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group-btn FindButtonDateTime">
+                        <a class="btn btn-primary btn-sm FindDateTime" id="btnSearch" style="margin-top: -5px;">
+                            <i class="left-icon fa fa-search"></i> Tìm
+                        </a>
+                    </div>
+                </div>
+                <input type="hidden" id="sTime" />
+                <input type="hidden" id="eTime" />
+               
+            </div>
+        </div>
+    </div><!-- PAGE HEADER END -->
+
+
+
+    <div class="card-padding">
+        <!-- CATEGORIES CHART -->
+        <div id="container" style="width:100%; height:auto"></div><!-- CATEGORIES CHART END -->
+        <!-- CATEGORIES TABLE -->
+        <div id="datatable" class="table-relative">
+
+            <!-- TABLE -->
+            <div id="categoryReportArea">
+                <table id="categoryReport" class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>
+                                <label class="">STT</label>
+                            </th>
+                            <th>
+                                <label class="">Tên danh mục</label>
+                            </th>
+                            <th>
+                                <label class="">Số lượng sản phẩm</label>
+                            </th>
+                            <th>
+                                <label class="">Tổng doanh thu</label>
+                            </th>
+                            <th>
+                                <label class="">Giảm giá</label>
+                            </th>
+                            <th>
+                                <label class="">Tỉ lệ xuất hiện trên hóa đơn/Tổng hóa đơn</label>
+                            </th>
+                            <th>
+                                <label class="">Tỉ lệ đóng góp doanh số</label>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table><!-- TABLE END -->
+            </div>
+        </div><!-- CATEGORIES TABLE END -->
+    </div><!-- /.card-padding -->
+
+</div>
+<form class="hidden" id="formReportExcel" action="@Url.Action("ReportCategoryExportExcelEPPlus","StoreReport")">
+    <input name="storeId" />
+    <input name="startTime" />
+    <input name="endTime" />
+    <input name="categoryId" />
+</form>
+
+<form class="hidden" id="formReportExcel" action="@Url.Action("ExportExcelEPPlus", "StoreReport")">
+    <input name="startTime" />
+    <input name="endTime" />
+    <input name="catetoryId" />
+</form>
+
+<script>
+    $(document).ready(function () {
+        $('#export').on('click', null, function () {
+            $('[name=storeId]').val(@ViewBag.storeId);
+            $('[name=startTime]').val($('#sTime').val());
+            $('[name=endTime]').val($('#eTime').val());
+            $('[name=categoryId]').val($('#categoryId').val());
+            $('#formReportExcel').submit();
+        });
+        function cb(start, end, label) {
+            var startTime = start.format('DD/MM/YYYY'),
+                endTime = end.format('DD/MM/YYYY');
+            var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+
+            if (label != "Tùy chọn") {
+                $('#date-string').val(label);
+            } else {
+                $('#date-string').val(dateRange);
+            }
+            $('#sTime').val(startTime);
+            $('#eTime').val(endTime);
+            $('[data-role=small-date]').html(dateRange);
+        }
+        cb(moment(), moment(), 'Hôm nay');
+
+        $('#reportrange').daterangepicker({
+            startDate: moment(),
+            endDate: moment(),
+            'maxDate': moment(),
+            
+            ranges: {
+                'Hôm nay': [moment(), moment()],
+                'Hôm qua': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Tuần này': [moment().startOf('isoweek'), moment().endOf('isoweek')],
+                'Tuần trước': [moment().subtract(1, 'week').startOf('isoweek'), moment().subtract(1, 'week').endOf('isoweek')],
+                'Tháng này': [moment().startOf('month'), moment().endOf('month')],
+                'Tháng trước': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        }, cb);
+
+        //InitCateDatatable();
+        getData();
+        
+    });
+
+    function getData() {
+        var startTime = $('#sTime').val();
+        var endTime = $('#eTime').val();
+
+        $.ajax({
+            url: '@Url.Action("LoadCategoryReport", "StoreReport")',
+            //            url: '/Report/@ViewBag.storeId/@ViewBag.storeName/StoreReport/LoadCategoryReport',
+            type: 'GET',
+            data: {
+                'startTime': startTime,
+                'endTime': endTime,
+                'catetoryId': $('#categoryId').val()
+            },
+            success: function (rs) {
+                var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+
+                $('[data-role=small-date]').html(dateRange);// Change date range in header.
+                InitCateDatatable(rs.dataTable);
+                setUpCategoriesChart(rs.dataChart);
+            }
+        });
+    };
+
+    function InitCateDatatable(data) {
+        $('#categoryReportArea').html('<table id="categoryReport" class="table table-striped table-bordered table-hover">'
+                + '<thead>'
+                    + '<tr>'
+                        + '<th>'
+                            + '<label class="">STT</label>'
+                        + '</th>'
+                        + '<th>'
+                            + '<label class="">Tên danh mục</label>'
+                        + '</th>'
+                        + '<th>'
+                            + '<label class="">Số lượng sản phẩm</label>'
+                        + '</th>'
+                        + '<th>'
+                            + '<label class="">Tổng doanh thu</label>'
+                        + '</th>'
+                        + '<th>'
+                            + '<label class="">Giảm giá</label>'
+                        + '</th>'
+                        + '<th>'
+                            + '<label class="">Tỉ lệ xuất hiện trên hóa đơn/Tổng hóa đơn</label>'
+                        + '</th>'
+                        + '<th>'
+                            + '<label class="">Tỉ lệ đóng góp doanh số</label>'
+                        + '</th>'
+                    + '</tr>'
+                + '</thead>'
+                + '<tbody></tbody>'
+            + '</table>');
+
+        $("#categoryReport").dataTable({
+            "bSort": false,
+            "bInfo": false,
+            "bRetrieve": true,
+            "bScrollCollapse": true,
+            "data": data,
+            "bProcessing": true,
+            "iDisplayLength": 50,
+            "aLengthMenu": [50, 100],
+            "oLanguage": {
+                "sSearch": "Tìm kiếm:",
+                "sZeroRecords": "Không có dữ liệu phù hợp",
+                "sInfo": "Hiển thị từ _START_ đến _END_ trên tổng số _TOTAL_ dòng",
+                "sEmptyTable": "Không có dữ liệu",
+                "sInfoFiltered": " - lọc ra từ _MAX_ dòng",
+                "sLengthMenu": "Hiển thị _MENU_ dòng",
+                "sProcessing": "Đang xử lý...",
+                "oPaginate": {
+                    "sNext": "<i class='fa fa-chevron-right'></i>",
+                    "sPrevious": "<i class='fa fa-chevron-left'></i>"
+                }
+            },
+            "aoColumnDefs": [
+                {
+                    "aTargets": [0, 2, 3, 4, 5],
+                    "sClass": "text-center"
+                },
+                {
+                    "aTargets": [0, 1, 2, 3, 4, 5, 6],
+                    "bSortable": false
+                },
+                {
+                    "aTargets": [5],
+                    "visible": false,
+                }
+            ],
+            "bAutoWidth": false
+        }).fnSetFilteringDelay(delaySearch);
+        //$('#categoryReportArea').find("table").wrap('<div class="tableDiv-responsive" />');
+        
+        // Change date range in header
+        var startTime = $('#sTime').val();
+        var endTime = $('#eTime').val();
+        var dateRange = startTime + (startTime == endTime ? '' : ' - ' + endTime);
+
+        $('[data-role=small-date]').html('(' + dateRange + ')'); // Chage date at page header
+    };
+
+    $('#btnSearch').on('click', function () {
+        if ($("#eTime").val().length > 16 || $("#sTime").val().length > 16) {
+            ShowMessage("Vui lòng nhập thời gian đúng định dạng", 3);
+            return;
+        }
+        else {
+            getData();
+        }
+    });
+
+    function setUpCategoriesChart(data) {
+        var categoryTemp = data.listCategories;
+        var totalProduct = data.totalProduct;
+        var categoryChart = [];
+        for (var i = 0; i < categoryTemp.length; i++) {
+            var array = { "name": categoryTemp[i].Item1, "y": (categoryTemp[i].Item2 / totalProduct) * 100, "drilldown": categoryTemp[i].Item1 };
+            categoryChart.push(array);
+        }
+
+        $('#container').highcharts({
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Biểu đồ ngành hàng'
+            },
+            subtitle: {
+                text: $("#date").html()
+            },
+            xAxis: {
+                type: 'category'
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                }
+
+            },
+            legend: {
+                enabled: false
+            },
+            plotOptions: {
+                series: {
+                    borderWidth: 0,
+                    dataLabels: {
+                        enabled: true,
+                        format: '{point.y:.1f}%'
+                    }
+                }
+            },
+            tooltip: {
+                valueDecimals: 1,
+                valueSuffix: '%'
+            },
+            series: [{
+                name: "Tỷ lệ",
+                colorByPoint: true,
+                data: categoryChart
+            }],
+        });
+    };
+
+    $(document).ready(function () {
+       
+        //       alert("haha");
+    });
+
+    
+
+</script>
