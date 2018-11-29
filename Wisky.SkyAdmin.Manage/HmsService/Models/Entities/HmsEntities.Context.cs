@@ -40,7 +40,6 @@ namespace HmsService.Models.Entities
         public virtual DbSet<Attendance> Attendances { get; set; }
         public virtual DbSet<AttendanceDate> AttendanceDates { get; set; }
         public virtual DbSet<BlogCategory> BlogCategories { get; set; }
-        public virtual DbSet<BlogPost> BlogPosts { get; set; }
         public virtual DbSet<BlogPostCollectionItem> BlogPostCollectionItems { get; set; }
         public virtual DbSet<BlogPostCollectionItemMapping> BlogPostCollectionItemMappings { get; set; }
         public virtual DbSet<BlogPostImage> BlogPostImages { get; set; }
@@ -62,8 +61,6 @@ namespace HmsService.Models.Entities
         public virtual DbSet<DateHotelReport> DateHotelReports { get; set; }
         public virtual DbSet<DateProduct> DateProducts { get; set; }
         public virtual DbSet<DateProductItem> DateProductItems { get; set; }
-        public virtual DbSet<DeliveryInfo> DeliveryInfoes { get; set; }
-        public virtual DbSet<DeliveryInformation> DeliveryInformations { get; set; }
         public virtual DbSet<District> Districts { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
         public virtual DbSet<EmployeeGroup> EmployeeGroups { get; set; }
@@ -113,8 +110,6 @@ namespace HmsService.Models.Entities
         public virtual DbSet<ProductItemCompositionMapping> ProductItemCompositionMappings { get; set; }
         public virtual DbSet<ProductSpecification> ProductSpecifications { get; set; }
         public virtual DbSet<Profile> Profiles { get; set; }
-        public virtual DbSet<PromotionPartner> PromotionPartners { get; set; }
-        public virtual DbSet<PromotionStoreMapping> PromotionStoreMappings { get; set; }
         public virtual DbSet<Provider> Providers { get; set; }
         public virtual DbSet<ProviderProductItemMapping> ProviderProductItemMappings { get; set; }
         public virtual DbSet<Province> Provinces { get; set; }
@@ -164,11 +159,14 @@ namespace HmsService.Models.Entities
         public virtual DbSet<Order> Orders { get; set; }
         public virtual DbSet<Pos> Pos { get; set; }
         public virtual DbSet<Store> Stores { get; set; }
-        public virtual DbSet<Voucher> Vouchers { get; set; }
         public virtual DbSet<MembershipCard> MembershipCards { get; set; }
         public virtual DbSet<Promotion> Promotions { get; set; }
         public virtual DbSet<BlogPostCollection> BlogPostCollections { get; set; }
+        public virtual DbSet<DeliveryInfo> DeliveryInfoes { get; set; }
+        public virtual DbSet<BlogPost> BlogPosts { get; set; }
         public virtual DbSet<PromotionDetail> PromotionDetails { get; set; }
+        public virtual DbSet<PromotionStoreMapping> PromotionStoreMappings { get; set; }
+        public virtual DbSet<Voucher> Vouchers { get; set; }
     
         public virtual int sp_alterdiagram(string diagramname, Nullable<int> owner_id, Nullable<int> version, byte[] definition)
         {

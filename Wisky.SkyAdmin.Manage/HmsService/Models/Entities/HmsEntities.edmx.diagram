@@ -16,20 +16,27 @@
         <EntityTypeShape EntityType="HmsEntities.Order" Width="1.5" PointX="5.25" PointY="5.25" />
         <EntityTypeShape EntityType="HmsEntities.Pos" Width="1.5" PointX="0.75" PointY="11.875" />
         <EntityTypeShape EntityType="HmsEntities.Store" Width="1.5" PointX="3" PointY="4.875" />
-        <EntityTypeShape EntityType="HmsEntities.Voucher" Width="1.5" PointX="10" PointY="1.5" />
         <AssociationConnector Association="HmsEntities.FK_Order_Customer" />
         <AssociationConnector Association="HmsEntities.FK_DateReport_Store" />
         <AssociationConnector Association="HmsEntities.FK_Order_Store" />
         <AssociationConnector Association="HmsEntities.FK_Store_POS" />
         <EntityTypeShape EntityType="HmsEntities.MembershipCard" Width="1.5" PointX="5.25" PointY="37.25" />
         <AssociationConnector Association="HmsEntities.FK_MembershipCard_Customer" />
-        <AssociationConnector Association="HmsEntities.FK_Voucher_MembershipCard" />
         <EntityTypeShape EntityType="HmsEntities.Promotion" Width="1.5" PointX="7.75" PointY="12.125" />
-        <AssociationConnector Association="HmsEntities.FK_Voucher_Promotion" />
         <EntityTypeShape EntityType="HmsEntities.BlogPostCollection" Width="1.5" PointX="5.25" PointY="0.75" />
         <AssociationConnector Association="HmsEntities.FK_BlogPostCollection_BlogPostCollection" />
         <AssociationConnector Association="HmsEntities.FK_BlogPostCollection_Store" />
-        <EntityTypeShape EntityType="HmsEntities.PromotionDetail" Width="1.5" PointX="10.375" PointY="11" />
+        <EntityTypeShape EntityType="HmsEntities.DeliveryInfo" Width="1.5" PointX="5.25" PointY="33.125" />
+        <AssociationConnector Association="HmsEntities.FK_DeliveryInfo_Customer" />
+        <EntityTypeShape EntityType="HmsEntities.BlogPost" Width="1.5" PointX="5.25" PointY="43.75" />
+        <EntityTypeShape EntityType="HmsEntities.PromotionDetail" Width="1.5" PointX="7.75" PointY="0.75" />
+        <EntityTypeShape EntityType="HmsEntities.PromotionStoreMapping" Width="1.5" PointX="10" PointY="12.625" />
+        <AssociationConnector Association="HmsEntities.FK_BlogPost_Store" />
+        <AssociationConnector Association="HmsEntities.FK_PromotionStoreMapping_Promotion" />
+        <AssociationConnector Association="HmsEntities.FK_PromotionStoreMapping_Store" />
+        <EntityTypeShape EntityType="HmsEntities.Voucher" Width="1.5" PointX="10" PointY="19.625" />
+        <AssociationConnector Association="HmsEntities.FK_Voucher_MembershipCard" />
+        <AssociationConnector Association="HmsEntities.FK_Voucher_Promotion" />
         <AssociationConnector Association="HmsEntities.FK_Voucher_PromotionDetail" />
         </Diagram>
     </edmx:Diagrams>

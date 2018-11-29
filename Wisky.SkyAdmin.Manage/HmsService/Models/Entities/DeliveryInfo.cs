@@ -24,7 +24,7 @@ namespace HmsService.Models.Entities
         public Nullable<bool> isDefaultDeliveryInfo { get; set; }
         public string Lat { get; set; }
         public string Lon { get; set; }
-
+    
         public virtual Customer Customer { get; set; }
     }
 }

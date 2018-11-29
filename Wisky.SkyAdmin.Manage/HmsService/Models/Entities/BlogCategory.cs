@@ -17,8 +17,8 @@ namespace HmsService.Models.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public BlogCategory()
         {
-            this.BlogPosts = new HashSet<BlogPost>();
             this.TagMappings = new HashSet<TagMapping>();
+            this.BlogPosts = new HashSet<BlogPost>();
         }
     
         public int Id { get; set; }
@@ -49,8 +49,8 @@ namespace HmsService.Models.Entities
         public Nullable<bool> IsDisplay { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<BlogPost> BlogPosts { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TagMapping> TagMappings { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<BlogPost> BlogPosts { get; set; }
     }
 }

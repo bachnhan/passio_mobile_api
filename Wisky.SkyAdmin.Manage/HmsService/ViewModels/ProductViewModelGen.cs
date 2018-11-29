@@ -67,6 +67,7 @@ namespace HmsService.ViewModels
     			public virtual Nullable<int> RatingTotal { get; set; }
     			public virtual Nullable<int> NumOfUserVoted { get; set; }
     			public virtual Nullable<int> Status { get; set; }
+    			public virtual string AlternativeCode { get; set; }
     	
     	public ProductViewModel() : base() { }
     	public ProductViewModel(HmsService.Models.Entities.Product entity) : base(entity) { }

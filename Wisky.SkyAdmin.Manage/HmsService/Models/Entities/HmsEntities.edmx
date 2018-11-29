@@ -252,6 +252,7 @@
           <Property Name="UserApprove" Type="nvarchar" MaxLength="500" />
           <Property Name="PublicDate" Type="datetime" />
           <Property Name="BlogPostCollectionNumber" Type="int" />
+          <Property Name="PresentType" Type="int" />
         </EntityType>
         <EntityType Name="BlogPostCollection">
           <Key>
@@ -504,9 +505,10 @@
           <Property Name="picURL" Type="nvarchar" MaxLength="250" />
           <Property Name="AccountPhone" Type="nvarchar" MaxLength="250" />
           <Property Name="FacebookId" Type="nvarchar" MaxLength="250" />
+          <Property Name="PartnerId" Type="int" />
         </EntityType>
         <!--Errors Found During Generation:
-warning 6002: The table/view 'passioStaging.dbo.CustomerFeedback' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+warning 6002: The table/view 'passio.dbo.CustomerFeedback' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
         <EntityType Name="CustomerFeedback">
           <Key>
             <PropertyRef Name="Id" />
@@ -697,6 +699,8 @@ warning 6002: The table/view 'passioStaging.dbo.CustomerFeedback' does not have 
           <Property Name="Active" Type="bit" />
           <Property Name="Type" Type="int" />
           <Property Name="isDefaultDeliveryInfo" Type="bit" />
+          <Property Name="Lat" Type="nvarchar" MaxLength="50" />
+          <Property Name="Lon" Type="nvarchar" MaxLength="50" />
         </EntityType>
         <EntityType Name="District">
           <Key>
@@ -1075,6 +1079,7 @@ warning 6002: The table/view 'passioStaging.dbo.CustomerFeedback' does not have 
           <Property Name="Content" Type="nvarchar(max)" />
           <Property Name="Active" Type="bit" />
           <Property Name="CustomerId" Type="int" />
+          <Property Name="Creator" Type="nvarchar" MaxLength="250" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -1421,6 +1426,7 @@ warning 6002: The table/view 'passioStaging.dbo.CustomerFeedback' does not have 
           <Property Name="RatingTotal" Type="int" />
           <Property Name="NumOfUserVoted" Type="int" />
           <Property Name="Status" Type="int" />
+          <Property Name="AlternativeCode" Type="nvarchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="ProductCategory">
           <Key>
@@ -1657,25 +1663,7 @@ warning 6002: The table/view 'passioStaging.dbo.CustomerFeedback' does not have 
           <Property Name="PointTrade" Type="int" />
           <Property Name="MinPoint" Type="int" />
           <Property Name="MaxPoint" Type="int" />
-        </EntityType>
-        <EntityType Name="PromotionPartner">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="int" Nullable="false" />
-          <Property Name="PartnerName" Type="nvarchar" MaxLength="255" />
-          <Property Name="Active" Type="bit" Nullable="false" />
-          <Property Name="Description" Type="nvarchar" MaxLength="255" />
-          <Property Name="CompanyName" Type="nvarchar" MaxLength="255" />
-          <Property Name="ContactPerson" Type="nvarchar" MaxLength="255" />
-          <Property Name="PhoneNumber" Type="nvarchar" MaxLength="255" />
-          <Property Name="Fax" Type="nvarchar" MaxLength="255" />
-          <Property Name="Website" Type="nvarchar" MaxLength="255" />
-          <Property Name="Address" Type="nvarchar" MaxLength="100" />
-          <Property Name="OrderPrefix" Type="varchar" MaxLength="10" Nullable="false" />
-          <Property Name="Token" Type="char" MaxLength="10" Nullable="false" />
-          <Property Name="CommissionRate" Type="decimal" Precision="3" Scale="2" Nullable="false" />
-          <Property Name="CustomerID" Type="int" Nullable="false" />
+          <Property Name="ExpirationPeriod" Type="int" />
         </EntityType>
         <EntityType Name="PromotionStoreMapping">
           <Key>
@@ -2154,6 +2142,7 @@ warning 6002: The table/view 'passioStaging.dbo.CustomerFeedback' does not have 
           <Property Name="IsGetted" Type="bit" />
           <Property Name="isUsed" Type="bit" />
           <Property Name="MembershipCardId" Type="int" />
+          <Property Name="CreatedDate" Type="datetime" />
         </EntityType>
         <EntityType Name="Ward">
           <Key>
@@ -2274,6 +2263,30 @@ warning 6002: The table/view 'passioStaging.dbo.CustomerFeedback' does not have 
             </Principal>
             <Dependent Role="ProductItemCompositionMapping">
               <PropertyRef Name="ProducID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Order__CustomerI__4668671F">
+          <End Role="Customer" Type="Self.Customer" Multiplicity="0..1" />
+          <End Role="Order" Type="Self.Order" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Customer">
+              <PropertyRef Name="CustomerID" />
+            </Principal>
+            <Dependent Role="Order">
+              <PropertyRef Name="CustomerID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Order__StoreID__438BFA74">
+          <End Role="Store" Type="Self.Store" Multiplicity="0..1" />
+          <End Role="Order" Type="Self.Order" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Order">
+              <PropertyRef Name="StoreID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -3055,6 +3068,30 @@ warning 6002: The table/view 'passioStaging.dbo.CustomerFeedback' does not have 
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_InventoryReceiptItem_InventoryReceipt">
+          <End Role="InventoryReceipt" Type="Self.InventoryReceipt" Multiplicity="1" />
+          <End Role="InventoryReceiptItem" Type="Self.InventoryReceiptItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="InventoryReceipt">
+              <PropertyRef Name="ReceiptID" />
+            </Principal>
+            <Dependent Role="InventoryReceiptItem">
+              <PropertyRef Name="ReceiptID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_InventoryReceiptItem_ProductItem">
+          <End Role="ProductItem" Type="Self.ProductItem" Multiplicity="1" />
+          <End Role="InventoryReceiptItem" Type="Self.InventoryReceiptItem" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ProductItem">
+              <PropertyRef Name="ItemID" />
+            </Principal>
+            <Dependent Role="InventoryReceiptItem">
+              <PropertyRef Name="ItemID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_InventoryReport_Store">
           <End Role="Store" Type="Self.Store" Multiplicity="1" />
           <End Role="InventoryDateReport" Type="Self.InventoryDateReport" Multiplicity="*" />
@@ -3184,6 +3221,30 @@ warning 6002: The table/view 'passioStaging.dbo.CustomerFeedback' does not have 
             </Principal>
             <Dependent Role="MenuRole">
               <PropertyRef Name="MenuId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Order_District">
+          <End Role="District" Type="Self.District" Multiplicity="0..1" />
+          <End Role="Order" Type="Self.Order" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="District">
+              <PropertyRef Name="DistrictCode" />
+            </Principal>
+            <Dependent Role="Order">
+              <PropertyRef Name="DistrictCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Order_Ward">
+          <End Role="Ward" Type="Self.Ward" Multiplicity="0..1" />
+          <End Role="Order" Type="Self.Order" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Ward">
+              <PropertyRef Name="WardCode" />
+            </Principal>
+            <Dependent Role="Order">
+              <PropertyRef Name="WardCode" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -3546,21 +3607,6 @@ warning 6002: The table/view 'passioStaging.dbo.CustomerFeedback' does not have 
             </Principal>
             <Dependent Role="ProductSpecification">
               <PropertyRef Name="ProductId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <!--Errors Found During Generation:
-warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that are not part of the key of the table on the primary side of the relationship. The relationship was excluded.
-        <Association Name="FK_PromotionDetail_Promotion" />-->
-        <Association Name="FK_PromotionPartner_PromotionPartner">
-          <End Role="PromotionPartner" Type="Self.PromotionPartner" Multiplicity="1" />
-          <End Role="PromotionPartner1" Type="Self.PromotionPartner" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="PromotionPartner">
-              <PropertyRef Name="ID" />
-            </Principal>
-            <Dependent Role="PromotionPartner1">
-              <PropertyRef Name="ID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -4364,7 +4410,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <EntitySet Name="Profiles" EntityType="Self.Profiles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Promotion" EntityType="Self.Promotion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PromotionDetail" EntityType="Self.PromotionDetail" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="PromotionPartner" EntityType="Self.PromotionPartner" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="PromotionStoreMapping" EntityType="Self.PromotionStoreMapping" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Provider" EntityType="Self.Provider" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ProviderProductItemMapping" EntityType="Self.ProviderProductItemMapping" Schema="dbo" store:Type="Tables" />
@@ -4431,6 +4476,14 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <AssociationSet Name="FK__Compositi__Produ__778AC167" Association="Self.FK__Compositi__Produ__778AC167">
             <End Role="Product" EntitySet="Product" />
             <End Role="ProductItemCompositionMapping" EntitySet="ProductItemCompositionMapping" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Order__CustomerI__4668671F" Association="Self.FK__Order__CustomerI__4668671F">
+            <End Role="Customer" EntitySet="Customer" />
+            <End Role="Order" EntitySet="Order" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Order__StoreID__438BFA74" Association="Self.FK__Order__StoreID__438BFA74">
+            <End Role="Store" EntitySet="Store" />
+            <End Role="Order" EntitySet="Order" />
           </AssociationSet>
           <AssociationSet Name="FK__ReportIte__ItemI__55009F39" Association="Self.FK__ReportIte__ItemI__55009F39">
             <End Role="ProductItem" EntitySet="ProductItem" />
@@ -4688,6 +4741,14 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             <End Role="Store" EntitySet="Store" />
             <End Role="InventoryReceipt" EntitySet="InventoryReceipt" />
           </AssociationSet>
+          <AssociationSet Name="FK_InventoryReceiptItem_InventoryReceipt" Association="Self.FK_InventoryReceiptItem_InventoryReceipt">
+            <End Role="InventoryReceipt" EntitySet="InventoryReceipt" />
+            <End Role="InventoryReceiptItem" EntitySet="InventoryReceiptItem" />
+          </AssociationSet>
+          <AssociationSet Name="FK_InventoryReceiptItem_ProductItem" Association="Self.FK_InventoryReceiptItem_ProductItem">
+            <End Role="ProductItem" EntitySet="ProductItem" />
+            <End Role="InventoryReceiptItem" EntitySet="InventoryReceiptItem" />
+          </AssociationSet>
           <AssociationSet Name="FK_InventoryReport_Store" Association="Self.FK_InventoryReport_Store">
             <End Role="Store" EntitySet="Store" />
             <End Role="InventoryDateReport" EntitySet="InventoryDateReport" />
@@ -4731,6 +4792,14 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <AssociationSet Name="FK_MenuRole_Menu" Association="Self.FK_MenuRole_Menu">
             <End Role="Menu" EntitySet="Menu" />
             <End Role="MenuRole" EntitySet="MenuRole" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Order_District" Association="Self.FK_Order_District">
+            <End Role="District" EntitySet="District" />
+            <End Role="Order" EntitySet="Order" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Order_Ward" Association="Self.FK_Order_Ward">
+            <End Role="Ward" EntitySet="Ward" />
+            <End Role="Order" EntitySet="Order" />
           </AssociationSet>
           <AssociationSet Name="FK_OrderDetail_Order" Association="Self.FK_OrderDetail_Order">
             <End Role="Order" EntitySet="Order" />
@@ -4851,10 +4920,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <AssociationSet Name="FK_ProductSpecification_Product" Association="Self.FK_ProductSpecification_Product">
             <End Role="Product" EntitySet="Product" />
             <End Role="ProductSpecification" EntitySet="ProductSpecification" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PromotionPartner_PromotionPartner" Association="Self.FK_PromotionPartner_PromotionPartner">
-            <End Role="PromotionPartner" EntitySet="PromotionPartner" />
-            <End Role="PromotionPartner1" EntitySet="PromotionPartner" />
           </AssociationSet>
           <AssociationSet Name="FK_PromotionStoreMapping_Promotion" Association="Self.FK_PromotionStoreMapping_Promotion">
             <End Role="Promotion" EntitySet="Promotion" />
@@ -5133,7 +5198,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <EntitySet Name="Attendances" EntityType="HmsEntities.Attendance" />
           <EntitySet Name="AttendanceDates" EntityType="HmsEntities.AttendanceDate" />
           <EntitySet Name="BlogCategories" EntityType="HmsEntities.BlogCategory" />
-          <EntitySet Name="BlogPosts" EntityType="HmsEntities.BlogPost" />
           <EntitySet Name="BlogPostCollectionItems" EntityType="HmsEntities.BlogPostCollectionItem" />
           <EntitySet Name="BlogPostCollectionItemMappings" EntityType="HmsEntities.BlogPostCollectionItemMapping" />
           <EntitySet Name="BlogPostImages" EntityType="HmsEntities.BlogPostImage" />
@@ -5155,7 +5219,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <EntitySet Name="DateHotelReports" EntityType="HmsEntities.DateHotelReport" />
           <EntitySet Name="DateProducts" EntityType="HmsEntities.DateProduct" />
           <EntitySet Name="DateProductItems" EntityType="HmsEntities.DateProductItem" />
-          <EntitySet Name="DeliveryInfoes" EntityType="HmsEntities.DeliveryInfo" />
           <EntitySet Name="Districts" EntityType="HmsEntities.District" />
           <EntitySet Name="Employees" EntityType="HmsEntities.Employee" />
           <EntitySet Name="EmployeeGroups" EntityType="HmsEntities.EmployeeGroup" />
@@ -5205,8 +5268,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <EntitySet Name="ProductItemCompositionMappings" EntityType="HmsEntities.ProductItemCompositionMapping" />
           <EntitySet Name="ProductSpecifications" EntityType="HmsEntities.ProductSpecification" />
           <EntitySet Name="Profiles" EntityType="HmsEntities.Profile" />
-          <EntitySet Name="PromotionPartners" EntityType="HmsEntities.PromotionPartner" />
-          <EntitySet Name="PromotionStoreMappings" EntityType="HmsEntities.PromotionStoreMapping" />
           <EntitySet Name="Providers" EntityType="HmsEntities.Provider" />
           <EntitySet Name="ProviderProductItemMappings" EntityType="HmsEntities.ProviderProductItemMapping" />
           <EntitySet Name="Provinces" EntityType="HmsEntities.Province" />
@@ -5288,24 +5349,8 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             <End Role="Employee" EntitySet="Employees" />
             <End Role="Attendance" EntitySet="Attendances" />
           </AssociationSet>
-          <AssociationSet Name="FK_BlogPost_BlogCategory" Association="HmsEntities.FK_BlogPost_BlogCategory">
-            <End Role="BlogCategory" EntitySet="BlogCategories" />
-            <End Role="BlogPost" EntitySet="BlogPosts" />
-          </AssociationSet>
           <AssociationSet Name="FK_TagMapping_BlogCategory" Association="HmsEntities.FK_TagMapping_BlogCategory">
             <End Role="BlogCategory" EntitySet="BlogCategories" />
-            <End Role="TagMapping" EntitySet="TagMappings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_BlogPostCollectionItem_BlogPost" Association="HmsEntities.FK_BlogPostCollectionItem_BlogPost">
-            <End Role="BlogPost" EntitySet="BlogPosts" />
-            <End Role="BlogPostCollectionItemMapping" EntitySet="BlogPostCollectionItemMappings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_BlogPostImage_BlogPost" Association="HmsEntities.FK_BlogPostImage_BlogPost">
-            <End Role="BlogPost" EntitySet="BlogPosts" />
-            <End Role="BlogPostImage" EntitySet="BlogPostImages" />
-          </AssociationSet>
-          <AssociationSet Name="FK_TagMapping_BlogPost" Association="HmsEntities.FK_TagMapping_BlogPost">
-            <End Role="BlogPost" EntitySet="BlogPosts" />
             <End Role="TagMapping" EntitySet="TagMappings" />
           </AssociationSet>
           <AssociationSet Name="FK_Contact_Brand" Association="HmsEntities.FK_Contact_Brand">
@@ -5568,10 +5613,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             <End Role="User" EntitySet="Users" />
             <End Role="Profile" EntitySet="Profiles" />
           </AssociationSet>
-          <AssociationSet Name="FK_PromotionPartner_PromotionPartner" Association="HmsEntities.FK_PromotionPartner_PromotionPartner">
-            <End Role="PromotionPartner" EntitySet="PromotionPartners" />
-            <End Role="PromotionPartner1" EntitySet="PromotionPartners" />
-          </AssociationSet>
           <AssociationSet Name="FK_ProviderProductItem_Provider" Association="HmsEntities.FK_ProviderProductItem_Provider">
             <End Role="Provider" EntitySet="Providers" />
             <End Role="ProviderProductItemMapping" EntitySet="ProviderProductItemMappings" />
@@ -5652,7 +5693,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <EntitySet Name="Orders" EntityType="HmsEntities.Order" />
           <EntitySet Name="Pos" EntityType="HmsEntities.Pos" />
           <EntitySet Name="Stores" EntityType="HmsEntities.Store" />
-          <EntitySet Name="Vouchers" EntityType="HmsEntities.Voucher" />
           <AssociationSet Name="FK_Article_Store" Association="HmsEntities.FK_Article_Store">
             <End Role="Store" EntitySet="Stores" />
             <End Role="Article" EntitySet="Articles" />
@@ -5672,10 +5712,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <AssociationSet Name="FK_AttendanceDate_Store" Association="HmsEntities.FK_AttendanceDate_Store">
             <End Role="Store" EntitySet="Stores" />
             <End Role="AttendanceDate" EntitySet="AttendanceDates" />
-          </AssociationSet>
-          <AssociationSet Name="FK_BlogPost_Store" Association="HmsEntities.FK_BlogPost_Store">
-            <End Role="Store" EntitySet="Stores" />
-            <End Role="BlogPost" EntitySet="BlogPosts" />
           </AssociationSet>
           <AssociationSet Name="FK_Store_Brand" Association="HmsEntities.FK_Store_Brand">
             <End Role="Brand" EntitySet="Brands" />
@@ -5700,10 +5736,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <AssociationSet Name="FK_CustomerStore_Customer" Association="HmsEntities.FK_CustomerStore_Customer">
             <End Role="Customer" EntitySet="Customers" />
             <End Role="CustomerStoreReportMapping" EntitySet="CustomerStoreReportMappings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_DeliveryInfo_Customer" Association="HmsEntities.FK_DeliveryInfo_Customer">
-            <End Role="Customer" EntitySet="Customers" />
-            <End Role="DeliveryInfo" EntitySet="DeliveryInfoes" />
           </AssociationSet>
           <AssociationSet Name="FK_Order_Customer" Association="HmsEntities.FK_Order_Customer">
             <End Role="Customer" EntitySet="Customers" />
@@ -5785,10 +5817,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             <End Role="PriceGroup" EntitySet="PriceGroups" />
             <End Role="Order" EntitySet="Orders" />
           </AssociationSet>
-          <AssociationSet Name="FK_Order_PromotionPartner" Association="HmsEntities.FK_Order_PromotionPartner">
-            <End Role="PromotionPartner" EntitySet="PromotionPartners" />
-            <End Role="Order" EntitySet="Orders" />
-          </AssociationSet>
           <AssociationSet Name="FK_Order_Province" Association="HmsEntities.FK_Order_Province">
             <End Role="Province" EntitySet="Provinces" />
             <End Role="Order" EntitySet="Orders" />
@@ -5844,10 +5872,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <AssociationSet Name="FK_ProductDetail_Store" Association="HmsEntities.FK_ProductDetail_Store">
             <End Role="Store" EntitySet="Stores" />
             <End Role="ProductDetailMapping" EntitySet="ProductDetailMappings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PromotionStoreMapping_Store" Association="HmsEntities.FK_PromotionStoreMapping_Store">
-            <End Role="Store" EntitySet="Stores" />
-            <End Role="PromotionStoreMapping" EntitySet="PromotionStoreMappings" />
           </AssociationSet>
           <AssociationSet Name="FK_ReportTracking_Store" Association="HmsEntities.FK_ReportTracking_Store">
             <End Role="Store" EntitySet="Stores" />
@@ -5910,10 +5934,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             <End Role="MembershipCardType" EntitySet="MembershipCardTypes" />
             <End Role="MembershipCard" EntitySet="MembershipCards" />
           </AssociationSet>
-          <AssociationSet Name="FK_Voucher_MembershipCard" Association="HmsEntities.FK_Voucher_MembershipCard">
-            <End Role="MembershipCard" EntitySet="MembershipCards" />
-            <End Role="Voucher" EntitySet="Vouchers" />
-          </AssociationSet>
           <EntitySet Name="Promotions" EntityType="HmsEntities.Promotion" />
           <AssociationSet Name="FK_OrderDetailPromotionMapping_Promotion" Association="HmsEntities.FK_OrderDetailPromotionMapping_Promotion">
             <End Role="Promotion" EntitySet="Promotions" />
@@ -5922,14 +5942,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <AssociationSet Name="FK_OrderPromotionMapping_Promotion" Association="HmsEntities.FK_OrderPromotionMapping_Promotion">
             <End Role="Promotion" EntitySet="Promotions" />
             <End Role="OrderPromotionMapping" EntitySet="OrderPromotionMappings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_PromotionStoreMapping_Promotion" Association="HmsEntities.FK_PromotionStoreMapping_Promotion">
-            <End Role="Promotion" EntitySet="Promotions" />
-            <End Role="PromotionStoreMapping" EntitySet="PromotionStoreMappings" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Voucher_Promotion" Association="HmsEntities.FK_Voucher_Promotion">
-            <End Role="Promotion" EntitySet="Promotions" />
-            <End Role="Voucher" EntitySet="Vouchers" />
           </AssociationSet>
           <EntitySet Name="BlogPostCollections" EntityType="HmsEntities.BlogPostCollection" />
           <AssociationSet Name="FK_BlogPostCollection_BlogPostCollection" Association="HmsEntities.FK_BlogPostCollection_BlogPostCollection">
@@ -5948,7 +5960,51 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             <End Role="BlogPostCollection" EntitySet="BlogPostCollections" />
             <End Role="BlogPostCollectionItem" EntitySet="BlogPostCollectionItems" />
           </AssociationSet>
+          <EntitySet Name="DeliveryInfoes" EntityType="HmsEntities.DeliveryInfo" />
+          <AssociationSet Name="FK_DeliveryInfo_Customer" Association="HmsEntities.FK_DeliveryInfo_Customer">
+            <End Role="Customer" EntitySet="Customers" />
+            <End Role="DeliveryInfo" EntitySet="DeliveryInfoes" />
+          </AssociationSet>
+          <EntitySet Name="BlogPosts" EntityType="HmsEntities.BlogPost" />
           <EntitySet Name="PromotionDetails" EntityType="HmsEntities.PromotionDetail" />
+          <EntitySet Name="PromotionStoreMappings" EntityType="HmsEntities.PromotionStoreMapping" />
+          <AssociationSet Name="FK_BlogPost_BlogCategory" Association="HmsEntities.FK_BlogPost_BlogCategory">
+            <End Role="BlogCategory" EntitySet="BlogCategories" />
+            <End Role="BlogPost" EntitySet="BlogPosts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlogPost_Store" Association="HmsEntities.FK_BlogPost_Store">
+            <End Role="Store" EntitySet="Stores" />
+            <End Role="BlogPost" EntitySet="BlogPosts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlogPostCollectionItem_BlogPost" Association="HmsEntities.FK_BlogPostCollectionItem_BlogPost">
+            <End Role="BlogPost" EntitySet="BlogPosts" />
+            <End Role="BlogPostCollectionItemMapping" EntitySet="BlogPostCollectionItemMappings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_BlogPostImage_BlogPost" Association="HmsEntities.FK_BlogPostImage_BlogPost">
+            <End Role="BlogPost" EntitySet="BlogPosts" />
+            <End Role="BlogPostImage" EntitySet="BlogPostImages" />
+          </AssociationSet>
+          <AssociationSet Name="FK_TagMapping_BlogPost" Association="HmsEntities.FK_TagMapping_BlogPost">
+            <End Role="BlogPost" EntitySet="BlogPosts" />
+            <End Role="TagMapping" EntitySet="TagMappings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PromotionStoreMapping_Promotion" Association="HmsEntities.FK_PromotionStoreMapping_Promotion">
+            <End Role="Promotion" EntitySet="Promotions" />
+            <End Role="PromotionStoreMapping" EntitySet="PromotionStoreMappings" />
+          </AssociationSet>
+          <AssociationSet Name="FK_PromotionStoreMapping_Store" Association="HmsEntities.FK_PromotionStoreMapping_Store">
+            <End Role="Store" EntitySet="Stores" />
+            <End Role="PromotionStoreMapping" EntitySet="PromotionStoreMappings" />
+          </AssociationSet>
+          <EntitySet Name="Vouchers" EntityType="HmsEntities.Voucher" />
+          <AssociationSet Name="FK_Voucher_MembershipCard" Association="HmsEntities.FK_Voucher_MembershipCard">
+            <End Role="MembershipCard" EntitySet="MembershipCards" />
+            <End Role="Voucher" EntitySet="Vouchers" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Voucher_Promotion" Association="HmsEntities.FK_Voucher_Promotion">
+            <End Role="Promotion" EntitySet="Promotions" />
+            <End Role="Voucher" EntitySet="Vouchers" />
+          </AssociationSet>
           <AssociationSet Name="FK_Voucher_PromotionDetail" Association="HmsEntities.FK_Voucher_PromotionDetail">
             <End Role="PromotionDetail" EntitySet="PromotionDetails" />
             <End Role="Voucher" EntitySet="Vouchers" />
@@ -6195,58 +6251,8 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <Property Name="PositionTopicHomePage" Type="Int32" Nullable="false" />
           <Property Name="BrandId" Type="Int32" Nullable="false" />
           <Property Name="IsDisplay" Type="Boolean" />
-          <NavigationProperty Name="BlogPosts" Relationship="HmsEntities.FK_BlogPost_BlogCategory" FromRole="BlogCategory" ToRole="BlogPost" />
           <NavigationProperty Name="TagMappings" Relationship="HmsEntities.FK_TagMapping_BlogCategory" FromRole="BlogCategory" ToRole="TagMapping" />
-        </EntityType>
-        <EntityType Name="BlogPost">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Title_En" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Opening" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Opening_En" Type="Int32" />
-          <Property Name="BlogContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="BlogContent_En" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <Property Name="StoreId" Type="Int32" Nullable="false" />
-          <Property Name="Image" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Author" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="CreatedTime" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="UpdatedTime" Type="DateTime" Nullable="false" Precision="3" />
-          <Property Name="SeoName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="MetaKeyword" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="TotalVisit" Type="Int32" />
-          <Property Name="EndDate" Type="DateTime" Precision="3" />
-          <Property Name="StartDate" Type="DateTime" Precision="3" />
-          <Property Name="BrandId" Type="Int32" Nullable="false" />
-          <Property Name="Excerpt" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="URL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="BlogCategoryId" Type="Int32" />
-          <Property Name="PageTitle" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="PageTitle_En" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="MetaDescription" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Position" Type="Int32" Nullable="false" />
-          <Property Name="Status" Type="Int32" />
-          <Property Name="LastUpdatePerson" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="Reference" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="LinkRef1" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="LinkRef2" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="LinkRef3" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="LinkRef4" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="LinkRef5" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="BlogType" Type="Int32" />
-          <Property Name="LocationId" Type="Int32" />
-          <Property Name="AuthorRefer" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="UserApprove" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
-          <Property Name="PublicDate" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="BlogCategory" Relationship="HmsEntities.FK_BlogPost_BlogCategory" FromRole="BlogPost" ToRole="BlogCategory" />
-          <NavigationProperty Name="BlogPostCollectionItemMappings" Relationship="HmsEntities.FK_BlogPostCollectionItem_BlogPost" FromRole="BlogPost" ToRole="BlogPostCollectionItemMapping" />
-          <NavigationProperty Name="BlogPostImages" Relationship="HmsEntities.FK_BlogPostImage_BlogPost" FromRole="BlogPost" ToRole="BlogPostImage" />
-          <NavigationProperty Name="TagMappings" Relationship="HmsEntities.FK_TagMapping_BlogPost" FromRole="BlogPost" ToRole="TagMapping" />
-          <Property Name="BlogPostCollectionNumber" Type="Int32" />
-          <NavigationProperty Name="Store" Relationship="HmsEntities.FK_BlogPost_Store" FromRole="BlogPost" ToRole="Store" />
+          <NavigationProperty Name="BlogPosts" Relationship="HmsEntities.FK_BlogPost_BlogCategory" FromRole="BlogCategory" ToRole="BlogPost" />
         </EntityType>
         <EntityType Name="BlogPostCollectionItem">
           <Key>
@@ -6268,8 +6274,8 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <Property Name="BlogPostId" Type="Int32" Nullable="false" />
           <Property Name="Position" Type="Int32" Nullable="false" />
           <Property Name="Active" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="BlogPost" Relationship="HmsEntities.FK_BlogPostCollectionItem_BlogPost" FromRole="BlogPostCollectionItemMapping" ToRole="BlogPost" />
           <NavigationProperty Name="BlogPostCollection" Relationship="HmsEntities.FK_BlogPostCollectionItem_BlogPostCollection" FromRole="BlogPostCollectionItemMapping" ToRole="BlogPostCollection" />
+          <NavigationProperty Name="BlogPost" Relationship="HmsEntities.FK_BlogPostCollectionItem_BlogPost" FromRole="BlogPostCollectionItemMapping" ToRole="BlogPost" />
         </EntityType>
         <EntityType Name="BlogPostImage">
           <Key>
@@ -6619,20 +6625,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <Property Name="Unit" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
           <Property Name="StoreId" Type="Int32" />
           <NavigationProperty Name="Store" Relationship="HmsEntities.FK_DateProductItem_Store" FromRole="DateProductItem" ToRole="Store" />
-        </EntityType>
-        <EntityType Name="DeliveryInfo">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="CustomerId" Type="Int32" />
-          <Property Name="CustomerName" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
-          <Property Name="Address" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Phone" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
-          <Property Name="Active" Type="Boolean" />
-          <Property Name="Type" Type="Int32" />
-          <Property Name="isDefaultDeliveryInfo" Type="Boolean" />
-          <NavigationProperty Name="Customer" Relationship="HmsEntities.FK_DeliveryInfo_Customer" FromRole="DeliveryInfo" ToRole="Customer" />
         </EntityType>
         <EntityType Name="District">
           <Key>
@@ -7274,6 +7266,7 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <NavigationProperty Name="RatingProducts" Relationship="HmsEntities.FK_RatingProduct_Product" FromRole="Product" ToRole="RatingProduct" />
           <NavigationProperty Name="RatingStars" Relationship="HmsEntities.FK_RatingStar_Product" FromRole="Product" ToRole="RatingStar" />
           <Property Name="Status" Type="Int32" />
+          <Property Name="AlternativeCode" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ProductCategory">
           <Key>
@@ -7486,39 +7479,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <Property Name="LastUpdatedDate" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="User" Relationship="HmsEntities.UserProfile" FromRole="Profile" ToRole="User" />
         </EntityType>
-        <EntityType Name="PromotionPartner">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="ID" Type="Int32" Nullable="false" />
-          <Property Name="PartnerName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <Property Name="Description" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="CompanyName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="ContactPerson" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="PhoneNumber" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="Fax" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="Website" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="Address" Type="String" MaxLength="100" FixedLength="false" Unicode="true" />
-          <Property Name="OrderPrefix" Type="String" Nullable="false" MaxLength="10" FixedLength="false" Unicode="false" />
-          <Property Name="Token" Type="String" Nullable="false" MaxLength="10" FixedLength="true" Unicode="false" />
-          <Property Name="CommissionRate" Type="Decimal" Nullable="false" Precision="3" Scale="2" />
-          <Property Name="CustomerID" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="PromotionPartner1" Relationship="HmsEntities.FK_PromotionPartner_PromotionPartner" FromRole="PromotionPartner" ToRole="PromotionPartner1" />
-          <NavigationProperty Name="PromotionPartner2" Relationship="HmsEntities.FK_PromotionPartner_PromotionPartner" FromRole="PromotionPartner1" ToRole="PromotionPartner" />
-          <NavigationProperty Name="Orders" Relationship="HmsEntities.FK_Order_PromotionPartner" FromRole="PromotionPartner" ToRole="Order" />
-        </EntityType>
-        <EntityType Name="PromotionStoreMapping">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="PromotionId" Type="Int32" Nullable="false" />
-          <Property Name="StoreId" Type="Int32" Nullable="false" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Store" Relationship="HmsEntities.FK_PromotionStoreMapping_Store" FromRole="PromotionStoreMapping" ToRole="Store" />
-          <NavigationProperty Name="Promotion" Relationship="HmsEntities.FK_PromotionStoreMapping_Promotion" FromRole="PromotionStoreMapping" ToRole="Promotion" />
-          </EntityType>
         <EntityType Name="Provider">
           <Key>
             <PropertyRef Name="Id" />
@@ -7841,8 +7801,8 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <Property Name="CategoryId" Type="Int32" Nullable="false" />
           <Property Name="TagBlogId" Type="Int32" Nullable="false" />
           <NavigationProperty Name="BlogCategory" Relationship="HmsEntities.FK_TagMapping_BlogCategory" FromRole="TagMapping" ToRole="BlogCategory" />
-          <NavigationProperty Name="BlogPost" Relationship="HmsEntities.FK_TagMapping_BlogPost" FromRole="TagMapping" ToRole="BlogPost" />
           <NavigationProperty Name="Tag" Relationship="HmsEntities.FK_TagMapping_Tag" FromRole="TagMapping" ToRole="Tag" />
+          <NavigationProperty Name="BlogPost" Relationship="HmsEntities.FK_TagMapping_BlogPost" FromRole="TagMapping" ToRole="BlogPost" />
         </EntityType>
         <EntityType Name="TemplateReportProductItemMapping">
           <Key>
@@ -8230,18 +8190,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_BlogPost_BlogCategory">
-          <End Type="HmsEntities.BlogCategory" Role="BlogCategory" Multiplicity="0..1" />
-          <End Type="HmsEntities.BlogPost" Role="BlogPost" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="BlogCategory">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="BlogPost">
-              <PropertyRef Name="Opening_En" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_TagMapping_BlogCategory">
           <End Type="HmsEntities.BlogCategory" Role="BlogCategory" Multiplicity="1" />
           <End Type="HmsEntities.TagMapping" Role="TagMapping" Multiplicity="*" />
@@ -8251,42 +8199,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             </Principal>
             <Dependent Role="TagMapping">
               <PropertyRef Name="CategoryId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_BlogPostCollectionItem_BlogPost">
-          <End Type="HmsEntities.BlogPost" Role="BlogPost" Multiplicity="1" />
-          <End Type="HmsEntities.BlogPostCollectionItemMapping" Role="BlogPostCollectionItemMapping" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="BlogPost">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="BlogPostCollectionItemMapping">
-              <PropertyRef Name="BlogPostId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_BlogPostImage_BlogPost">
-          <End Type="HmsEntities.BlogPost" Role="BlogPost" Multiplicity="1" />
-          <End Type="HmsEntities.BlogPostImage" Role="BlogPostImage" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="BlogPost">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="BlogPostImage">
-              <PropertyRef Name="BlogPostId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_TagMapping_BlogPost">
-          <End Type="HmsEntities.BlogPost" Role="BlogPost" Multiplicity="1" />
-          <End Type="HmsEntities.TagMapping" Role="TagMapping" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="BlogPost">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="TagMapping">
-              <PropertyRef Name="TagBlogId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -9072,18 +8984,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_PromotionPartner_PromotionPartner">
-          <End Type="HmsEntities.PromotionPartner" Role="PromotionPartner" Multiplicity="1" />
-          <End Type="HmsEntities.PromotionPartner" Role="PromotionPartner1" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="PromotionPartner">
-              <PropertyRef Name="ID" />
-            </Principal>
-            <Dependent Role="PromotionPartner1">
-              <PropertyRef Name="ID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_ProviderProductItem_Provider">
           <End Type="HmsEntities.Provider" Role="Provider" Multiplicity="1" />
           <End Type="HmsEntities.ProviderProductItemMapping" Role="ProviderProductItemMapping" Multiplicity="*" />
@@ -9310,10 +9210,11 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <NavigationProperty Name="CustomerType" Relationship="HmsEntities.FK_Customer_CustomerType" FromRole="Customer" ToRole="CustomerType" />
           <NavigationProperty Name="CustomerProductMappings" Relationship="HmsEntities.FK_CustomerProduct_Customer" FromRole="Customer" ToRole="CustomerProductMapping" />
           <NavigationProperty Name="CustomerStoreReportMappings" Relationship="HmsEntities.FK_CustomerStore_Customer" FromRole="Customer" ToRole="CustomerStoreReportMapping" />
-          <NavigationProperty Name="DeliveryInfoes" Relationship="HmsEntities.FK_DeliveryInfo_Customer" FromRole="Customer" ToRole="DeliveryInfo" />
           <NavigationProperty Name="Orders" Relationship="HmsEntities.FK_Order_Customer" FromRole="Customer" ToRole="Order" />
           <NavigationProperty Name="OrderGroups" Relationship="HmsEntities.FK_RentGroup_Customer" FromRole="Customer" ToRole="OrderGroup" />
           <NavigationProperty Name="MembershipCards" Relationship="HmsEntities.FK_MembershipCard_Customer" FromRole="Customer" ToRole="MembershipCard" />
+          <Property Name="PartnerId" Type="Int32" />
+          <NavigationProperty Name="DeliveryInfoes" Relationship="HmsEntities.FK_DeliveryInfo_Customer" FromRole="Customer" ToRole="DeliveryInfo" />
         </EntityType>
         <EntityType Name="DateReport">
           <Key>
@@ -9401,6 +9302,7 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <Property Name="Content" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Active" Type="Boolean" />
           <Property Name="CustomerId" Type="Int32" />
+          <Property Name="Creator" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Order">
           <Key>
@@ -9468,7 +9370,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <NavigationProperty Name="Customer" Relationship="HmsEntities.FK_Order_Customer" FromRole="Order" ToRole="Customer" />
           <NavigationProperty Name="District" Relationship="HmsEntities.FK_Order_District" FromRole="Order" ToRole="District" />
           <NavigationProperty Name="PriceGroup" Relationship="HmsEntities.FK_Order_PriceGroup" FromRole="Order" ToRole="PriceGroup" />
-          <NavigationProperty Name="PromotionPartner" Relationship="HmsEntities.FK_Order_PromotionPartner" FromRole="Order" ToRole="PromotionPartner" />
           <NavigationProperty Name="Province" Relationship="HmsEntities.FK_Order_Province" FromRole="Order" ToRole="Province" />
           <NavigationProperty Name="Room" Relationship="HmsEntities.FK_Order_Room" FromRole="Order" ToRole="Room" />
           <NavigationProperty Name="Store" Relationship="HmsEntities.FK_Order_Store" FromRole="Order" ToRole="Store" />
@@ -9539,7 +9440,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <NavigationProperty Name="AspNetUsers" Relationship="HmsEntities.FK_AspNetUsers_Store" FromRole="Store" ToRole="AspNetUser" />
           <NavigationProperty Name="Attendances" Relationship="HmsEntities.FK_Attendance_Store" FromRole="Store" ToRole="Attendance" />
           <NavigationProperty Name="AttendanceDates" Relationship="HmsEntities.FK_AttendanceDate_Store" FromRole="Store" ToRole="AttendanceDate" />
-          <NavigationProperty Name="BlogPosts" Relationship="HmsEntities.FK_BlogPost_Store" FromRole="Store" ToRole="BlogPost" />
           <NavigationProperty Name="Brand" Relationship="HmsEntities.FK_Store_Brand" FromRole="Store" ToRole="Brand" />
           <NavigationProperty Name="Costs" Relationship="HmsEntities.FK_Cost_Store" FromRole="Store" ToRole="Cost" />
           <NavigationProperty Name="Coupons" Relationship="HmsEntities.FK_Voucher_Store" FromRole="Store" ToRole="Coupon" />
@@ -9561,7 +9461,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <NavigationProperty Name="Pos" Relationship="HmsEntities.FK_Store_POS" FromRole="Store" ToRole="Pos" />
           <NavigationProperty Name="ProductCollections" Relationship="HmsEntities.FK_ProductCollection_Store" FromRole="Store" ToRole="ProductCollection" />
           <NavigationProperty Name="ProductDetailMappings" Relationship="HmsEntities.FK_ProductDetail_Store" FromRole="Store" ToRole="ProductDetailMapping" />
-          <NavigationProperty Name="PromotionStoreMappings" Relationship="HmsEntities.FK_PromotionStoreMapping_Store" FromRole="Store" ToRole="PromotionStoreMapping" />
           <NavigationProperty Name="ReportTrackings" Relationship="HmsEntities.FK_ReportTracking_Store" FromRole="Store" ToRole="ReportTracking" />
           <NavigationProperty Name="RoomCategories" Relationship="HmsEntities.FK_RoomCategory_Store" FromRole="Store" ToRole="RoomCategory" />
           <NavigationProperty Name="StoreDomains" Relationship="HmsEntities.FK_StoreDomain_Store" FromRole="Store" ToRole="StoreDomain" />
@@ -9576,24 +9475,8 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <NavigationProperty Name="WebPages" Relationship="HmsEntities.FK_WebPage_Store" FromRole="Store" ToRole="WebPage" />
           <Property Name="Active" Type="Boolean" />
           <NavigationProperty Name="BlogPostCollections" Relationship="HmsEntities.FK_BlogPostCollection_Store" FromRole="Store" ToRole="BlogPostCollection" />
-        </EntityType>
-        <EntityType Name="Voucher">
-          <Key>
-            <PropertyRef Name="VoucherID" />
-          </Key>
-          <Property Name="VoucherID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="VoucherCode" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
-          <Property Name="PromotionDetailID" Type="Int32" />
-          <Property Name="PromotionID" Type="Int32" Nullable="false" />
-          <Property Name="Quantity" Type="Int32" Nullable="false" />
-          <Property Name="UsedQuantity" Type="Int32" Nullable="false" />
-          <Property Name="Active" Type="Boolean" Nullable="false" />
-          <Property Name="IsGetted" Type="Boolean" />
-          <Property Name="isUsed" Type="Boolean" />
-          <Property Name="MembershipCardId" Type="Int32" />
-          <NavigationProperty Name="MembershipCard" Relationship="HmsEntities.FK_Voucher_MembershipCard" FromRole="Voucher" ToRole="MembershipCard" />
-          <NavigationProperty Name="Promotion" Relationship="HmsEntities.FK_Voucher_Promotion" FromRole="Voucher" ToRole="Promotion" />
-          <NavigationProperty Name="PromotionDetail" Relationship="HmsEntities.FK_Voucher_PromotionDetail" FromRole="Voucher" ToRole="PromotionDetail" />
+          <NavigationProperty Name="BlogPosts" Relationship="HmsEntities.FK_BlogPost_Store" FromRole="Store" ToRole="BlogPost" />
+          <NavigationProperty Name="PromotionStoreMappings" Relationship="HmsEntities.FK_PromotionStoreMapping_Store" FromRole="Store" ToRole="PromotionStoreMapping" />
         </EntityType>
         <Association Name="FK_Article_Store">
           <End Type="HmsEntities.Store" Role="Store" Multiplicity="1" />
@@ -9651,18 +9534,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
               <PropertyRef Name="ID" />
             </Principal>
             <Dependent Role="AttendanceDate">
-              <PropertyRef Name="StoreId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_BlogPost_Store">
-          <End Type="HmsEntities.Store" Role="Store" Multiplicity="1" />
-          <End Type="HmsEntities.BlogPost" Role="BlogPost" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Store">
-              <PropertyRef Name="ID" />
-            </Principal>
-            <Dependent Role="BlogPost">
               <PropertyRef Name="StoreId" />
             </Dependent>
           </ReferentialConstraint>
@@ -9736,18 +9607,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             </Principal>
             <Dependent Role="CustomerStoreReportMapping">
               <PropertyRef Name="CustomerID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_DeliveryInfo_Customer">
-          <End Type="HmsEntities.Customer" Role="Customer" Multiplicity="0..1" />
-          <End Type="HmsEntities.DeliveryInfo" Role="DeliveryInfo" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Customer">
-              <PropertyRef Name="CustomerID" />
-            </Principal>
-            <Dependent Role="DeliveryInfo">
-              <PropertyRef Name="CustomerId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -9993,18 +9852,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Order_PromotionPartner">
-          <End Type="HmsEntities.PromotionPartner" Role="PromotionPartner" Multiplicity="0..1" />
-          <End Type="HmsEntities.Order" Role="Order" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="PromotionPartner">
-              <PropertyRef Name="ID" />
-            </Principal>
-            <Dependent Role="Order">
-              <PropertyRef Name="PromotionPartnerId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <Association Name="FK_Order_Province">
           <End Type="HmsEntities.Province" Role="Province" Multiplicity="0..1" />
           <End Type="HmsEntities.Order" Role="Order" Multiplicity="*" />
@@ -10170,18 +10017,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             </Principal>
             <Dependent Role="ProductDetailMapping">
               <PropertyRef Name="StoreID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PromotionStoreMapping_Store">
-          <End Type="HmsEntities.Store" Role="Store" Multiplicity="1" />
-          <End Type="HmsEntities.PromotionStoreMapping" Role="PromotionStoreMapping" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Store">
-              <PropertyRef Name="ID" />
-            </Principal>
-            <Dependent Role="PromotionStoreMapping">
-              <PropertyRef Name="StoreId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -10390,18 +10225,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Voucher_MembershipCard">
-          <End Type="HmsEntities.MembershipCard" Role="MembershipCard" Multiplicity="0..1" />
-          <End Type="HmsEntities.Voucher" Role="Voucher" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="MembershipCard">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Voucher">
-              <PropertyRef Name="MembershipCardId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityType Name="Promotion">
           <Key>
             <PropertyRef Name="PromotionID" />
@@ -10460,30 +10283,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             </Principal>
             <Dependent Role="OrderPromotionMapping">
               <PropertyRef Name="PromotionId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_PromotionStoreMapping_Promotion">
-          <End Type="HmsEntities.Promotion" Role="Promotion" Multiplicity="1" />
-          <End Type="HmsEntities.PromotionStoreMapping" Role="PromotionStoreMapping" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Promotion">
-              <PropertyRef Name="PromotionID" />
-            </Principal>
-            <Dependent Role="PromotionStoreMapping">
-              <PropertyRef Name="PromotionId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Voucher_Promotion">
-          <End Type="HmsEntities.Promotion" Role="Promotion" Multiplicity="1" />
-          <End Type="HmsEntities.Voucher" Role="Voucher" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Promotion">
-              <PropertyRef Name="PromotionID" />
-            </Principal>
-            <Dependent Role="Voucher">
-              <PropertyRef Name="PromotionID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -10561,6 +10360,85 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="DeliveryInfo">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="CustomerId" Type="Int32" />
+          <Property Name="CustomerName" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="Address" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Phone" Type="String" MaxLength="250" FixedLength="false" Unicode="false" />
+          <Property Name="Active" Type="Boolean" />
+          <Property Name="Type" Type="Int32" />
+          <Property Name="isDefaultDeliveryInfo" Type="Boolean" />
+          <Property Name="Lat" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Lon" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="Customer" Relationship="HmsEntities.FK_DeliveryInfo_Customer" FromRole="DeliveryInfo" ToRole="Customer" />
+        </EntityType>
+        <Association Name="FK_DeliveryInfo_Customer">
+          <End Type="HmsEntities.Customer" Role="Customer" Multiplicity="0..1" />
+          <End Type="HmsEntities.DeliveryInfo" Role="DeliveryInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Customer">
+              <PropertyRef Name="CustomerID" />
+            </Principal>
+            <Dependent Role="DeliveryInfo">
+              <PropertyRef Name="CustomerId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="BlogPost">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Title" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Title_En" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Opening" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Opening_En" Type="Int32" />
+          <Property Name="BlogContent" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="BlogContent_En" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="StoreId" Type="Int32" Nullable="false" />
+          <Property Name="Image" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Author" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="CreatedTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="UpdatedTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="SeoName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="MetaKeyword" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="TotalVisit" Type="Int32" />
+          <Property Name="EndDate" Type="DateTime" Precision="3" />
+          <Property Name="StartDate" Type="DateTime" Precision="3" />
+          <Property Name="BrandId" Type="Int32" Nullable="false" />
+          <Property Name="Excerpt" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="URL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="BlogCategoryId" Type="Int32" />
+          <Property Name="PageTitle" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="PageTitle_En" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="MetaDescription" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Position" Type="Int32" Nullable="false" />
+          <Property Name="Status" Type="Int32" />
+          <Property Name="LastUpdatePerson" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Reference" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="LinkRef1" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LinkRef2" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LinkRef3" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LinkRef4" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LinkRef5" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="BlogType" Type="Int32" />
+          <Property Name="LocationId" Type="Int32" />
+          <Property Name="AuthorRefer" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="UserApprove" Type="String" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="PublicDate" Type="DateTime" Precision="3" />
+          <Property Name="BlogPostCollectionNumber" Type="Int32" />
+          <Property Name="PresentType" Type="Int32" />
+          <NavigationProperty Name="BlogCategory" Relationship="HmsEntities.FK_BlogPost_BlogCategory" FromRole="BlogPost" ToRole="BlogCategory" />
+          <NavigationProperty Name="Store" Relationship="HmsEntities.FK_BlogPost_Store" FromRole="BlogPost" ToRole="Store" />
+          <NavigationProperty Name="BlogPostCollectionItemMappings" Relationship="HmsEntities.FK_BlogPostCollectionItem_BlogPost" FromRole="BlogPost" ToRole="BlogPostCollectionItemMapping" />
+          <NavigationProperty Name="BlogPostImages" Relationship="HmsEntities.FK_BlogPostImage_BlogPost" FromRole="BlogPost" ToRole="BlogPostImage" />
+          <NavigationProperty Name="TagMappings" Relationship="HmsEntities.FK_TagMapping_BlogPost" FromRole="BlogPost" ToRole="TagMapping" />
+        </EntityType>
         <EntityType Name="PromotionDetail">
           <Key>
             <PropertyRef Name="PromotionDetailID" />
@@ -10581,8 +10459,147 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <Property Name="PointTrade" Type="Int32" />
           <Property Name="MinPoint" Type="Int32" />
           <Property Name="MaxPoint" Type="Int32" />
+          <Property Name="ExpirationPeriod" Type="Int32" />
           <NavigationProperty Name="Vouchers" Relationship="HmsEntities.FK_Voucher_PromotionDetail" FromRole="PromotionDetail" ToRole="Voucher" />
         </EntityType>
+        <EntityType Name="PromotionStoreMapping">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PromotionId" Type="Int32" Nullable="false" />
+          <Property Name="StoreId" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <NavigationProperty Name="Promotion" Relationship="HmsEntities.FK_PromotionStoreMapping_Promotion" FromRole="PromotionStoreMapping" ToRole="Promotion" />
+          <NavigationProperty Name="Store" Relationship="HmsEntities.FK_PromotionStoreMapping_Store" FromRole="PromotionStoreMapping" ToRole="Store" />
+        </EntityType>
+        <Association Name="FK_BlogPost_BlogCategory">
+          <End Type="HmsEntities.BlogCategory" Role="BlogCategory" Multiplicity="0..1" />
+          <End Type="HmsEntities.BlogPost" Role="BlogPost" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BlogCategory">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="BlogPost">
+              <PropertyRef Name="Opening_En" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlogPost_Store">
+          <End Type="HmsEntities.Store" Role="Store" Multiplicity="1" />
+          <End Type="HmsEntities.BlogPost" Role="BlogPost" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="BlogPost">
+              <PropertyRef Name="StoreId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlogPostCollectionItem_BlogPost">
+          <End Type="HmsEntities.BlogPost" Role="BlogPost" Multiplicity="1" />
+          <End Type="HmsEntities.BlogPostCollectionItemMapping" Role="BlogPostCollectionItemMapping" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BlogPost">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="BlogPostCollectionItemMapping">
+              <PropertyRef Name="BlogPostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_BlogPostImage_BlogPost">
+          <End Type="HmsEntities.BlogPost" Role="BlogPost" Multiplicity="1" />
+          <End Type="HmsEntities.BlogPostImage" Role="BlogPostImage" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BlogPost">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="BlogPostImage">
+              <PropertyRef Name="BlogPostId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_TagMapping_BlogPost">
+          <End Type="HmsEntities.BlogPost" Role="BlogPost" Multiplicity="1" />
+          <End Type="HmsEntities.TagMapping" Role="TagMapping" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="BlogPost">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="TagMapping">
+              <PropertyRef Name="TagBlogId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PromotionStoreMapping_Promotion">
+          <End Type="HmsEntities.Promotion" Role="Promotion" Multiplicity="1" />
+          <End Type="HmsEntities.PromotionStoreMapping" Role="PromotionStoreMapping" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Promotion">
+              <PropertyRef Name="PromotionID" />
+            </Principal>
+            <Dependent Role="PromotionStoreMapping">
+              <PropertyRef Name="PromotionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_PromotionStoreMapping_Store">
+          <End Type="HmsEntities.Store" Role="Store" Multiplicity="1" />
+          <End Type="HmsEntities.PromotionStoreMapping" Role="PromotionStoreMapping" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Store">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="PromotionStoreMapping">
+              <PropertyRef Name="StoreId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Voucher">
+          <Key>
+            <PropertyRef Name="VoucherID" />
+          </Key>
+          <Property Name="VoucherID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="VoucherCode" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="PromotionDetailID" Type="Int32" />
+          <Property Name="PromotionID" Type="Int32" Nullable="false" />
+          <Property Name="Quantity" Type="Int32" Nullable="false" />
+          <Property Name="UsedQuantity" Type="Int32" Nullable="false" />
+          <Property Name="Active" Type="Boolean" Nullable="false" />
+          <Property Name="IsGetted" Type="Boolean" />
+          <Property Name="isUsed" Type="Boolean" />
+          <Property Name="MembershipCardId" Type="Int32" />
+          <Property Name="CreatedDate" Type="DateTime" Precision="3" />
+          <NavigationProperty Name="MembershipCard" Relationship="HmsEntities.FK_Voucher_MembershipCard" FromRole="Voucher" ToRole="MembershipCard" />
+          <NavigationProperty Name="Promotion" Relationship="HmsEntities.FK_Voucher_Promotion" FromRole="Voucher" ToRole="Promotion" />
+          <NavigationProperty Name="PromotionDetail" Relationship="HmsEntities.FK_Voucher_PromotionDetail" FromRole="Voucher" ToRole="PromotionDetail" />
+        </EntityType>
+        <Association Name="FK_Voucher_MembershipCard">
+          <End Type="HmsEntities.MembershipCard" Role="MembershipCard" Multiplicity="0..1" />
+          <End Type="HmsEntities.Voucher" Role="Voucher" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="MembershipCard">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Voucher">
+              <PropertyRef Name="MembershipCardId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Voucher_Promotion">
+          <End Type="HmsEntities.Promotion" Role="Promotion" Multiplicity="1" />
+          <End Type="HmsEntities.Voucher" Role="Voucher" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Promotion">
+              <PropertyRef Name="PromotionID" />
+            </Principal>
+            <Dependent Role="Voucher">
+              <PropertyRef Name="PromotionID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Voucher_PromotionDetail">
           <End Type="HmsEntities.PromotionDetail" Role="PromotionDetail" Multiplicity="0..1" />
           <End Type="HmsEntities.Voucher" Role="Voucher" Multiplicity="*" />
@@ -10815,52 +10832,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
                 <ScalarProperty Name="PicUrl" ColumnName="PicUrl" />
                 <ScalarProperty Name="BlogCateName_EN" ColumnName="BlogCateName_EN" />
                 <ScalarProperty Name="BlogCateName" ColumnName="BlogCateName" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="BlogPosts">
-            <EntityTypeMapping TypeName="HmsEntities.BlogPost">
-              <MappingFragment StoreEntitySet="BlogPost">
-                <ScalarProperty Name="BlogPostCollectionNumber" ColumnName="BlogPostCollectionNumber" />
-                <ScalarProperty Name="PublicDate" ColumnName="PublicDate" />
-                <ScalarProperty Name="UserApprove" ColumnName="UserApprove" />
-                <ScalarProperty Name="AuthorRefer" ColumnName="AuthorRefer" />
-                <ScalarProperty Name="LocationId" ColumnName="LocationId" />
-                <ScalarProperty Name="BlogType" ColumnName="BlogType" />
-                <ScalarProperty Name="LinkRef5" ColumnName="LinkRef5" />
-                <ScalarProperty Name="LinkRef4" ColumnName="LinkRef4" />
-                <ScalarProperty Name="LinkRef3" ColumnName="LinkRef3" />
-                <ScalarProperty Name="LinkRef2" ColumnName="LinkRef2" />
-                <ScalarProperty Name="LinkRef1" ColumnName="LinkRef1" />
-                <ScalarProperty Name="Reference" ColumnName="Reference" />
-                <ScalarProperty Name="LastUpdatePerson" ColumnName="LastUpdatePerson" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="Position" ColumnName="Position" />
-                <ScalarProperty Name="MetaDescription" ColumnName="MetaDescription" />
-                <ScalarProperty Name="PageTitle_En" ColumnName="PageTitle_En" />
-                <ScalarProperty Name="PageTitle" ColumnName="PageTitle" />
-                <ScalarProperty Name="BlogCategoryId" ColumnName="BlogCategoryId" />
-                <ScalarProperty Name="URL" ColumnName="URL" />
-                <ScalarProperty Name="Excerpt" ColumnName="Excerpt" />
-                <ScalarProperty Name="BrandId" ColumnName="BrandId" />
-                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
-                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
-                <ScalarProperty Name="TotalVisit" ColumnName="TotalVisit" />
-                <ScalarProperty Name="MetaKeyword" ColumnName="MetaKeyword" />
-                <ScalarProperty Name="SeoName" ColumnName="SeoName" />
-                <ScalarProperty Name="UpdatedTime" ColumnName="UpdatedTime" />
-                <ScalarProperty Name="CreatedTime" ColumnName="CreatedTime" />
-                <ScalarProperty Name="Author" ColumnName="Author" />
-                <ScalarProperty Name="Image" ColumnName="Image" />
-                <ScalarProperty Name="StoreId" ColumnName="StoreId" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="BlogContent_En" ColumnName="BlogContent_En" />
-                <ScalarProperty Name="BlogContent" ColumnName="BlogContent" />
-                <ScalarProperty Name="Opening_En" ColumnName="Opening_En" />
-                <ScalarProperty Name="Opening" ColumnName="Opening" />
-                <ScalarProperty Name="Title_En" ColumnName="Title_En" />
-                <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -11214,20 +11185,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
                 <ScalarProperty Name="ProductItemID" ColumnName="ProductItemID" />
                 <ScalarProperty Name="Date" ColumnName="Date" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="DeliveryInfoes">
-            <EntityTypeMapping TypeName="HmsEntities.DeliveryInfo">
-              <MappingFragment StoreEntitySet="DeliveryInfo">
-                <ScalarProperty Name="isDefaultDeliveryInfo" ColumnName="isDefaultDeliveryInfo" />
-                <ScalarProperty Name="Type" ColumnName="Type" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="Phone" ColumnName="Phone" />
-                <ScalarProperty Name="Address" ColumnName="Address" />
-                <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
-                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -11763,6 +11720,7 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <EntitySetMapping Name="Products">
             <EntityTypeMapping TypeName="HmsEntities.Product">
               <MappingFragment StoreEntitySet="Product">
+                <ScalarProperty Name="AlternativeCode" ColumnName="AlternativeCode" />
                 <ScalarProperty Name="Status" ColumnName="Status" />
                 <ScalarProperty Name="NumOfUserVoted" ColumnName="NumOfUserVoted" />
                 <ScalarProperty Name="RatingTotal" ColumnName="RatingTotal" />
@@ -12008,36 +11966,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
                 <ScalarProperty Name="PropertyValueStrings" ColumnName="PropertyValueStrings" />
                 <ScalarProperty Name="PropertyNames" ColumnName="PropertyNames" />
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="PromotionPartners">
-            <EntityTypeMapping TypeName="HmsEntities.PromotionPartner">
-              <MappingFragment StoreEntitySet="PromotionPartner">
-                <ScalarProperty Name="CustomerID" ColumnName="CustomerID" />
-                <ScalarProperty Name="CommissionRate" ColumnName="CommissionRate" />
-                <ScalarProperty Name="Token" ColumnName="Token" />
-                <ScalarProperty Name="OrderPrefix" ColumnName="OrderPrefix" />
-                <ScalarProperty Name="Address" ColumnName="Address" />
-                <ScalarProperty Name="Website" ColumnName="Website" />
-                <ScalarProperty Name="Fax" ColumnName="Fax" />
-                <ScalarProperty Name="PhoneNumber" ColumnName="PhoneNumber" />
-                <ScalarProperty Name="ContactPerson" ColumnName="ContactPerson" />
-                <ScalarProperty Name="CompanyName" ColumnName="CompanyName" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="PartnerName" ColumnName="PartnerName" />
-                <ScalarProperty Name="ID" ColumnName="ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="PromotionStoreMappings">
-            <EntityTypeMapping TypeName="HmsEntities.PromotionStoreMapping">
-              <MappingFragment StoreEntitySet="PromotionStoreMapping">
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="StoreId" ColumnName="StoreId" />
-                <ScalarProperty Name="PromotionId" ColumnName="PromotionId" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -12623,6 +12551,7 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <EntitySetMapping Name="Customers">
             <EntityTypeMapping TypeName="HmsEntities.Customer">
               <MappingFragment StoreEntitySet="Customer">
+                <ScalarProperty Name="PartnerId" ColumnName="PartnerId" />
                 <ScalarProperty Name="FacebookId" ColumnName="FacebookId" />
                 <ScalarProperty Name="AccountPhone" ColumnName="AccountPhone" />
                 <ScalarProperty Name="picURL" ColumnName="picURL" />
@@ -12720,6 +12649,7 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
           <EntitySetMapping Name="Notifications">
             <EntityTypeMapping TypeName="HmsEntities.Notification">
               <MappingFragment StoreEntitySet="Notifications">
+                <ScalarProperty Name="Creator" ColumnName="Creator" />
                 <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
                 <ScalarProperty Name="Active" ColumnName="Active" />
                 <ScalarProperty Name="Content" ColumnName="Content" />
@@ -12859,22 +12789,6 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Vouchers">
-            <EntityTypeMapping TypeName="HmsEntities.Voucher">
-              <MappingFragment StoreEntitySet="Voucher">
-                <ScalarProperty Name="MembershipCardId" ColumnName="MembershipCardId" />
-                <ScalarProperty Name="isUsed" ColumnName="isUsed" />
-                <ScalarProperty Name="IsGetted" ColumnName="IsGetted" />
-                <ScalarProperty Name="Active" ColumnName="Active" />
-                <ScalarProperty Name="UsedQuantity" ColumnName="UsedQuantity" />
-                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
-                <ScalarProperty Name="PromotionID" ColumnName="PromotionID" />
-                <ScalarProperty Name="PromotionDetailID" ColumnName="PromotionDetailID" />
-                <ScalarProperty Name="VoucherCode" ColumnName="VoucherCode" />
-                <ScalarProperty Name="VoucherID" ColumnName="VoucherID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
           <EntitySetMapping Name="MembershipCards">
             <EntityTypeMapping TypeName="HmsEntities.MembershipCard">
               <MappingFragment StoreEntitySet="MembershipCard">
@@ -12953,9 +12867,73 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="DeliveryInfoes">
+            <EntityTypeMapping TypeName="HmsEntities.DeliveryInfo">
+              <MappingFragment StoreEntitySet="DeliveryInfo">
+                <ScalarProperty Name="Lon" ColumnName="Lon" />
+                <ScalarProperty Name="Lat" ColumnName="Lat" />
+                <ScalarProperty Name="isDefaultDeliveryInfo" ColumnName="isDefaultDeliveryInfo" />
+                <ScalarProperty Name="Type" ColumnName="Type" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="Phone" ColumnName="Phone" />
+                <ScalarProperty Name="Address" ColumnName="Address" />
+                <ScalarProperty Name="CustomerName" ColumnName="CustomerName" />
+                <ScalarProperty Name="CustomerId" ColumnName="CustomerId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="BlogPosts">
+            <EntityTypeMapping TypeName="HmsEntities.BlogPost">
+              <MappingFragment StoreEntitySet="BlogPost">
+                <ScalarProperty Name="PresentType" ColumnName="PresentType" />
+                <ScalarProperty Name="BlogPostCollectionNumber" ColumnName="BlogPostCollectionNumber" />
+                <ScalarProperty Name="PublicDate" ColumnName="PublicDate" />
+                <ScalarProperty Name="UserApprove" ColumnName="UserApprove" />
+                <ScalarProperty Name="AuthorRefer" ColumnName="AuthorRefer" />
+                <ScalarProperty Name="LocationId" ColumnName="LocationId" />
+                <ScalarProperty Name="BlogType" ColumnName="BlogType" />
+                <ScalarProperty Name="LinkRef5" ColumnName="LinkRef5" />
+                <ScalarProperty Name="LinkRef4" ColumnName="LinkRef4" />
+                <ScalarProperty Name="LinkRef3" ColumnName="LinkRef3" />
+                <ScalarProperty Name="LinkRef2" ColumnName="LinkRef2" />
+                <ScalarProperty Name="LinkRef1" ColumnName="LinkRef1" />
+                <ScalarProperty Name="Reference" ColumnName="Reference" />
+                <ScalarProperty Name="LastUpdatePerson" ColumnName="LastUpdatePerson" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="Position" ColumnName="Position" />
+                <ScalarProperty Name="MetaDescription" ColumnName="MetaDescription" />
+                <ScalarProperty Name="PageTitle_En" ColumnName="PageTitle_En" />
+                <ScalarProperty Name="PageTitle" ColumnName="PageTitle" />
+                <ScalarProperty Name="BlogCategoryId" ColumnName="BlogCategoryId" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="Excerpt" ColumnName="Excerpt" />
+                <ScalarProperty Name="BrandId" ColumnName="BrandId" />
+                <ScalarProperty Name="StartDate" ColumnName="StartDate" />
+                <ScalarProperty Name="EndDate" ColumnName="EndDate" />
+                <ScalarProperty Name="TotalVisit" ColumnName="TotalVisit" />
+                <ScalarProperty Name="MetaKeyword" ColumnName="MetaKeyword" />
+                <ScalarProperty Name="SeoName" ColumnName="SeoName" />
+                <ScalarProperty Name="UpdatedTime" ColumnName="UpdatedTime" />
+                <ScalarProperty Name="CreatedTime" ColumnName="CreatedTime" />
+                <ScalarProperty Name="Author" ColumnName="Author" />
+                <ScalarProperty Name="Image" ColumnName="Image" />
+                <ScalarProperty Name="StoreId" ColumnName="StoreId" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="BlogContent_En" ColumnName="BlogContent_En" />
+                <ScalarProperty Name="BlogContent" ColumnName="BlogContent" />
+                <ScalarProperty Name="Opening_En" ColumnName="Opening_En" />
+                <ScalarProperty Name="Opening" ColumnName="Opening" />
+                <ScalarProperty Name="Title_En" ColumnName="Title_En" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="PromotionDetails">
             <EntityTypeMapping TypeName="HmsEntities.PromotionDetail">
               <MappingFragment StoreEntitySet="PromotionDetail">
+                <ScalarProperty Name="ExpirationPeriod" ColumnName="ExpirationPeriod" />
                 <ScalarProperty Name="MaxPoint" ColumnName="MaxPoint" />
                 <ScalarProperty Name="MinPoint" ColumnName="MinPoint" />
                 <ScalarProperty Name="PointTrade" ColumnName="PointTrade" />
@@ -12972,6 +12950,33 @@ warning 6035: The relationship 'FK_PromotionDetail_Promotion' has columns that a
                 <ScalarProperty Name="PromotionDetailCode" ColumnName="PromotionDetailCode" />
                 <ScalarProperty Name="PromotionCode" ColumnName="PromotionCode" />
                 <ScalarProperty Name="PromotionDetailID" ColumnName="PromotionDetailID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PromotionStoreMappings">
+            <EntityTypeMapping TypeName="HmsEntities.PromotionStoreMapping">
+              <MappingFragment StoreEntitySet="PromotionStoreMapping">
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="StoreId" ColumnName="StoreId" />
+                <ScalarProperty Name="PromotionId" ColumnName="PromotionId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Vouchers">
+            <EntityTypeMapping TypeName="HmsEntities.Voucher">
+              <MappingFragment StoreEntitySet="Voucher">
+                <ScalarProperty Name="CreatedDate" ColumnName="CreatedDate" />
+                <ScalarProperty Name="MembershipCardId" ColumnName="MembershipCardId" />
+                <ScalarProperty Name="isUsed" ColumnName="isUsed" />
+                <ScalarProperty Name="IsGetted" ColumnName="IsGetted" />
+                <ScalarProperty Name="Active" ColumnName="Active" />
+                <ScalarProperty Name="UsedQuantity" ColumnName="UsedQuantity" />
+                <ScalarProperty Name="Quantity" ColumnName="Quantity" />
+                <ScalarProperty Name="PromotionID" ColumnName="PromotionID" />
+                <ScalarProperty Name="PromotionDetailID" ColumnName="PromotionDetailID" />
+                <ScalarProperty Name="VoucherCode" ColumnName="VoucherCode" />
+                <ScalarProperty Name="VoucherID" ColumnName="VoucherID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

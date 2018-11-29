@@ -62,14 +62,15 @@ namespace HmsService.Models.Entities
         public string UserApprove { get; set; }
         public Nullable<System.DateTime> PublicDate { get; set; }
         public Nullable<int> BlogPostCollectionNumber { get; set; }
+        public Nullable<int> PresentType { get; set; }
     
         public virtual BlogCategory BlogCategory { get; set; }
+        public virtual Store Store { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BlogPostCollectionItemMapping> BlogPostCollectionItemMappings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BlogPostImage> BlogPostImages { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<TagMapping> TagMappings { get; set; }
-        public virtual Store Store { get; set; }
     }
 }

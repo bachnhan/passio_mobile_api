@@ -28,6 +28,7 @@ namespace HmsService.ViewModels
     			public virtual string Content { get; set; }
     			public virtual Nullable<bool> Active { get; set; }
     			public virtual Nullable<int> CustomerId { get; set; }
+    			public virtual string Creator { get; set; }
     	
     	public NotificationViewModel() : base() { }
     	public NotificationViewModel(HmsService.Models.Entities.Notification entity) : base(entity) { }

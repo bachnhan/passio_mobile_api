@@ -84,6 +84,7 @@ namespace HmsService.Models.Entities
         public Nullable<int> RatingTotal { get; set; }
         public Nullable<int> NumOfUserVoted { get; set; }
         public Nullable<int> Status { get; set; }
+        public string AlternativeCode { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CustomerProductMapping> CustomerProductMappings { get; set; }

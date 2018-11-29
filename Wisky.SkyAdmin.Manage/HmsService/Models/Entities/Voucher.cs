@@ -24,6 +24,7 @@ namespace HmsService.Models.Entities
         public Nullable<bool> IsGetted { get; set; }
         public Nullable<bool> isUsed { get; set; }
         public Nullable<int> MembershipCardId { get; set; }
+        public Nullable<System.DateTime> CreatedDate { get; set; }
     
         public virtual MembershipCard MembershipCard { get; set; }
         public virtual Promotion Promotion { get; set; }

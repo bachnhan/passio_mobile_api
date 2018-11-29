@@ -22,6 +22,7 @@ using AutoMapper;
 using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Web.Configuration;
 
 namespace Wisky.Api.Controllers.API
 {
@@ -55,6 +56,7 @@ namespace Wisky.Api.Controllers.API
             voucher.VoucherCode = voucherCode;
             voucher.UsedQuantity = 0;
             voucher.IsGetted = true;
+            voucher.CreatedDate = DateTime.Now.Date;
 
             bool check = voucherApi.CreateVoucher(voucher);
             return check;
@@ -86,7 +88,6 @@ namespace Wisky.Api.Controllers.API
                 string fbId = me.id;
                 string fbEmail = me.email;
                 string fbName = me.name;
-                bool? fbGender = null;
                 string fbpicUrl = "";
                 var jsonPic = me.picture;
                 //get picture
@@ -161,6 +162,8 @@ namespace Wisky.Api.Controllers.API
                                 phone = customer.AccountPhone,
                                 email = customer.Email,
                                 pic_url = customer.picURL,
+                                birthday = customer.BirthDay,
+                                gender = customer.Gender,
                                 membershicard = new
                                 {
                                     code = card.PhysicalCardCode != null ? card.PhysicalCardCode : card.MembershipCardCode,
@@ -178,7 +181,6 @@ namespace Wisky.Api.Controllers.API
                     //Create customer by facebook profile data
                     CustomerViewModel newCustomer = new CustomerViewModel();
                     newCustomer.Name = fbName;
-                    newCustomer.Gender = fbGender;
                     newCustomer.FacebookId = fbId;
                     newCustomer.Email = fbEmail;
                     newCustomer.BrandId = brandID;
@@ -539,7 +541,6 @@ namespace Wisky.Api.Controllers.API
                 string fbId = me.id;
                 string fbEmail = me.email;
                 string fbName = me.name;
-                bool? fbGender = null;
                 string fbpicUrl = "";
                 var jsonPic = me.picture;
                 //get picture
@@ -958,6 +959,8 @@ namespace Wisky.Api.Controllers.API
                                 phone = createdCustomer.AccountPhone,
                                 pic_url = createdCustomer.picURL,
                                 email = createdCustomer.Email,
+                                birthday = customer.BirthDay,
+                                gender = customer.Gender,
                                 membershicard = new
                                 {
                                     code = card.MembershipCardCode,
@@ -1164,7 +1167,7 @@ namespace Wisky.Api.Controllers.API
             notifiApi.Create(notification2);
         }
         [System.Web.Mvc.HttpPost]
-        public JsonResult updateProfileUser(string accessToken, string fullName, string phoneNumber, string email, string birthDay)
+        public JsonResult updateProfileUser(string accessToken, string fullName, string phoneNumber, string email, string birthDay, string gender)
         {
             //Get image from request
             byte[] avatarImage = null;
@@ -1204,14 +1207,23 @@ namespace Wisky.Api.Controllers.API
                     }
                     customer.Name = fullName;
                     customer.AccountPhone = phoneNumber;
+                    customer.Phone = phoneNumber;
                     customer.Email = email;
 
+                    //Update gender
+                    bool genderParsed;
+                    if (Boolean.TryParse(gender, out genderParsed))
+                    {
+                        customer.Gender = genderParsed;
+                    }
+
                     //Update birthday 
-                    var birthDayFormatted = new DateTime();
-                    if (DateTime.TryParseExact(birthDay, ConstantManager.FORMART_DATETIME_3, CultureInfo.InvariantCulture, DateTimeStyles.None, out birthDayFormatted) && customer.BirthDay == null){
+                    DateTime birthDayFormatted;
+                    if (DateTime.TryParseExact(birthDay, ConstantManager.FORMART_DATETIME_3, CultureInfo.InvariantCulture, DateTimeStyles.None, out birthDayFormatted) && customer.BirthDay == null)
+                    {
                         customer.BirthDay = birthDayFormatted;
                     }
-                    
+
                     //Update Customer
                     customerApi.UpdateEntityCustomer(customer);
                     decimal balance = 0;
@@ -1248,6 +1260,7 @@ namespace Wisky.Api.Controllers.API
                                 phone = customer.AccountPhone,
                                 pic_url = customer.picURL,
                                 birth_day = (customer.BirthDay != null) ? ((DateTime)customer.BirthDay).ToString(ConstantManager.FORMART_DATETIME_3) : "",
+                                gender = customer.Gender,
                                 point = point,
                                 balance = balance,
                                 card_code = membershipcard.MembershipCardCode
@@ -1919,7 +1932,13 @@ namespace Wisky.Api.Controllers.API
             {
                 return null;
             }
-            else if (!(promotion.ApplyFromTime <= now.Hour && now.Hour <= promotion.ApplyToTime))
+            else if (now.Hour < promotion.ApplyFromTime || now.Hour > promotion.ApplyToTime)
+            {
+                return null;
+            }
+
+            //Check Promotion Expire date
+            if (now.Date < promotion.FromDate || now.Date > promotion.ToDate)
             {
                 return null;
             }
@@ -1940,6 +1959,17 @@ namespace Wisky.Api.Controllers.API
             {
                 return null;
             }
+
+            //Check Promotion detail expire base on expiration period and create date
+            if (promotionDetail.ExpirationPeriod != null)
+            {
+                if (voucher.CreatedDate.Value.AddDays((int)promotionDetail.ExpirationPeriod) < now.Date)
+                {
+                    return null;
+                }
+
+            }
+
             //check promotion detail is have min, max order != null ???
             if (promotionDetail.MinOrderAmount != null || promotionDetail.MaxOrderAmount != null)
             {
@@ -2077,7 +2107,7 @@ namespace Wisky.Api.Controllers.API
                     }
                 }, JsonRequestBehavior.AllowGet);
             }
-            else if (!(promotion.ApplyFromTime <= now.Hour && now.Hour <= promotion.ApplyToTime))
+            else if (now.Hour < promotion.ApplyFromTime || now.Hour > promotion.ApplyToTime)
             {
                 return Json(new
                 {
@@ -2086,6 +2116,23 @@ namespace Wisky.Api.Controllers.API
                         success = false,
                         status = ConstantManager.STATUS_SUCCESS,
                         message = ConstantManager.MES_PROMOTION_DATE_FAIL,
+                    },
+                    data = new
+                    {
+                    }
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            //Check Promotion Expire date
+            if (now.Date < promotion.FromDate || now.Date > promotion.ToDate)
+            {
+                return Json(new
+                {
+                    status = new
+                    {
+                        success = false,
+                        status = ConstantManager.STATUS_SUCCESS,
+                        message = ConstantManager.MES_PROMOTION_FAIL,
                     },
                     data = new
                     {
@@ -2140,6 +2187,27 @@ namespace Wisky.Api.Controllers.API
                     }
                 }, JsonRequestBehavior.AllowGet);
             }
+
+            //Check Promotion detail expire base on expiration period and create date
+            if (promotionDetail.ExpirationPeriod != null)
+            {
+                if (voucher.CreatedDate.Value.AddDays((int)promotionDetail.ExpirationPeriod) < now.Date)
+                {
+                    return Json(new
+                    {
+                        status = new
+                        {
+                            success = false,
+                            status = ConstantManager.STATUS_SUCCESS,
+                            message = ConstantManager.MES_PROMOTION_FAIL,
+                        },
+                        data = new
+                        {
+                        }
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+
             //biên trả về cho client
             double result = 0;
             //check promotion detail is have min, max order != null ???
@@ -2545,10 +2613,11 @@ namespace Wisky.Api.Controllers.API
                     customerId = Int32.Parse(getCustomerIdFromToken(accessToken.FirstOrDefault()));
                 }
                 //fill data
-                var blogPostNews = blogPostApi.GetBlogPostOrderUpdateTimeAndType((int)BlogTypeEnum.News);
-                var blogPostVote = blogPostApi.GetBlogPostOrderUpdateTimeAndType((int)BlogTypeEnum.Vote);
+                var blogPostNews = blogPostApi.GetBlogPostByBlogTypeAndDate((int)BlogTypeEnum.News);
+                var blogPostVote = blogPostApi.GetBlogPostByBlogTypeAndDate((int)BlogTypeEnum.Vote);
                 var blogPost = blogPostNews.Union(blogPostVote);
-                var blogPostForYou = blogPostApi.GetBlogPostOrderUpdateTimeAndType((int)BlogTypeEnum.ForYou);
+                var blogPostForYou = blogPostApi.GetBlogPostByPresentTypeAndDate((int)BlogPresentTypeEnum.ForYou);
+                var blogPostPopUp = blogPostApi.GetBlogPostByPresentTypeAndDate((int)BlogPresentTypeEnum.PopUp);
                 //string domainName = "http://" + HttpContext.Request.Url.Authority;
                 string domainName = ConstantManager.IMAGE_SERVER_URL;
                 if (blogPost.Count() == 0) //check blogpost is empty
@@ -2579,6 +2648,7 @@ namespace Wisky.Api.Controllers.API
                                       url = (String.IsNullOrEmpty(b.URL)) ? "" :
                                      ((b.BlogType == (int)BlogTypeEnum.Vote) ?
                                      b.URL + "?cusId=" + customerId.ToString() : b.URL),
+                                      blog_type = b.BlogType,
                                       position = b.Position
                                   }).OrderBy(q => q.position);
                     var resultForYou = (from b in blogPostForYou
@@ -2592,6 +2662,21 @@ namespace Wisky.Api.Controllers.API
                                             image = domainName + b.Image,
                                             short_description = b.Opening,
                                             url = b.URL == null ? "" : b.URL,
+                                            blog_type = b.BlogType,
+                                            position = b.Position
+                                        }).OrderBy(q => q.position);
+                    var resultPopUp = (from b in blogPostPopUp
+                                        select new
+                                        {
+                                            id = b.Id,
+                                            title = b.Title,
+                                            title_en = b.Title_En,
+                                            description = b.BlogContent == null ? "" : b.BlogContent,
+                                            description_en = b.BlogContent_En == null ? "" : b.BlogContent_En,
+                                            image = domainName + b.Image,
+                                            short_description = b.Opening,
+                                            url = b.URL == null ? "" : b.URL,
+                                            blog_type = b.BlogType,
                                             position = b.Position
                                         }).OrderBy(q => q.position);
                     return Json(new
@@ -2607,7 +2692,8 @@ namespace Wisky.Api.Controllers.API
                             data = new
                             {
                                 data = result,
-                                for_you = resultForYou
+                                for_you = resultForYou,
+                                pop_up = resultPopUp
                             }
                         }
                     }, JsonRequestBehavior.AllowGet);
@@ -2658,7 +2744,7 @@ namespace Wisky.Api.Controllers.API
         }
         public JsonResult getDeliveryInfo(string accessToken)
         {
-
+            int maxDistance = Int32.Parse(WebConfigurationManager.AppSettings["MaxDistance"]);
             int customerId = Int32.Parse(getCustomerIdFromToken(accessToken));
             DeliveryInfoApi deliveryInfoApi = new DeliveryInfoApi();
             CustomerApi customerApi = new CustomerApi();
@@ -2674,6 +2760,8 @@ namespace Wisky.Api.Controllers.API
                                     phone = d.Phone,
                                     type = d.Type,
                                     active = d.Active,
+                                    lat = d.Lat,
+                                    lon = d.Lon,
                                     is_default_delivery_info = d.isDefaultDeliveryInfo
                                 };
             if (delivery.Count() == 0)
@@ -2688,6 +2776,7 @@ namespace Wisky.Api.Controllers.API
                     },
                     data = new
                     {
+                        max_distance = maxDistance,
                         data = delivery
                     }
                 }, JsonRequestBehavior.AllowGet);
@@ -2709,6 +2798,7 @@ namespace Wisky.Api.Controllers.API
                 },
                 data = new
                 {
+                    max_distance = maxDistance,
                     data = delivery_info.ToList()
                 }
             }, JsonRequestBehavior.AllowGet);
@@ -2912,7 +3002,15 @@ namespace Wisky.Api.Controllers.API
                 voucherModel.code = item.VoucherCode;
                 voucherModel.is_used = item.isUsed;
                 var promotion = promotionApi.Get(item.PromotionID);
-                voucherModel.is_expired = (DateTime.Now > promotion.ToDate);
+                //if voucher do not have CreateDate or PromotionDetail or PromotionDetail ExpirationPeriod use PromotionToDate else use Voucher CreateDate plus ExpirationPeriod date
+                var voucherExpiredDate = promotion.ToDate;
+                if (item.CreatedDate != null && item.PromotionDetail != null && item.PromotionDetail.ExpirationPeriod != null) {
+                    var tmpVoucherExpiredDate = item.CreatedDate.Value.AddDays(item.PromotionDetail.ExpirationPeriod.Value);
+                    if ( tmpVoucherExpiredDate < promotion.ToDate) {
+                        voucherExpiredDate = tmpVoucherExpiredDate;
+                    }
+                }
+                voucherModel.is_expired = (DateTime.Now > voucherExpiredDate);
                 voucherModel.is_infinity = ((promotion.ToDate.Year - promotion.FromDate.Year) > 10);
                 PromotionAppModel promotionModel = new PromotionAppModel();
                 if (promotion != null)
@@ -2923,7 +3021,8 @@ namespace Wisky.Api.Controllers.API
                     promotionModel.short_description = promotion.ShortDescription;
                     promotionModel.description = promotion.Description;
                     promotionModel.from_date = promotion.FromDate.ToString(ConstantManager.FORMART_DATETIME);
-                    promotionModel.to_date = promotion.ToDate.ToString(ConstantManager.FORMART_DATETIME);
+                    //if voucher do not have CreateDate or PromotionDetail or PromotionDetail ExpirationPeriod use PromotionToDate else use Voucher CreateDate plus ExpirationPeriod date 
+                    promotionModel.to_date = voucherExpiredDate.ToString(ConstantManager.FORMART_DATETIME);
                     promotionModel.promotion_name = promotion.PromotionName;
                     promotionModel.promotion_id = promotion.PromotionID;
                     promotionModel.image_url = promotion.ImageUrl;
@@ -3214,6 +3313,8 @@ namespace Wisky.Api.Controllers.API
             entity.Phone = deliveryInfo.Phone;
             entity.Id = deliveryInfo.Id;
             entity.Type = deliveryInfo.Type;
+            entity.Lat = deliveryInfo.Lat;
+            entity.Lon = deliveryInfo.Lon;
             entity.isDefaultDeliveryInfo = deliveryInfo.isDefaultDeliveryInfo;
             try
             {
@@ -3258,7 +3359,9 @@ namespace Wisky.Api.Controllers.API
                             active = result.Active,
                             is_default_delivery_info = result.isDefaultDeliveryInfo,
                             phone = result.Phone,
-                            type = result.Type
+                            type = result.Type,
+                            lat = result.Lat,
+                            lon = result.Lon
                         }
                     }
                 }, JsonRequestBehavior.AllowGet);
@@ -3371,7 +3474,15 @@ namespace Wisky.Api.Controllers.API
                 result.discountAmount = 0;
                 return result;
             }
-            else if (!(promotion.ApplyFromTime <= now.Hour && now.Hour <= promotion.ApplyToTime))
+            else if (now.Hour < promotion.ApplyFromTime || now.Hour > promotion.ApplyToTime)
+            {
+                result.rule = 0;
+                result.discountAmount = 0;
+                return result;
+            }
+
+            //Check Promotion Expire date
+            if (now.Date < promotion.FromDate || now.Date > promotion.ToDate)
             {
                 result.rule = 0;
                 result.discountAmount = 0;
@@ -3407,6 +3518,18 @@ namespace Wisky.Api.Controllers.API
                 result.discountAmount = 0;
                 return result;
             }
+
+            //Check Promotion detail expire base on expiration period and create date
+            if (promotionDetail.ExpirationPeriod != null)
+            {
+                if (voucher.CreatedDate.Value.AddDays((int)promotionDetail.ExpirationPeriod) < now.Date)
+                {
+                    result.rule = 0;
+                    result.discountAmount = 0;
+                    return result;
+                }
+            }
+
             //check promotion detail is have min, max order != null ???
             if (promotionDetail.MinOrderAmount != null || promotionDetail.MaxOrderAmount != null)
             {
@@ -3568,9 +3691,8 @@ namespace Wisky.Api.Controllers.API
         public JsonResult setOrder([FromBody]OrderViewModel order, int brandId,
             int paymentType, string accessToken, string voucherCode, int deliveryInfoId)
         {
-            //Block
-            if (paymentType == (int)PaymentTypeEnum.MemberPayment)
-            {
+            //Block 
+            if (paymentType == (int)PaymentTypeEnum.MemberPayment) {
                 return Json(new
                 {
                     status = new

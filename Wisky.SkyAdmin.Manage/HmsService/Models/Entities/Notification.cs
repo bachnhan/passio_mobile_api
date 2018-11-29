@@ -27,5 +27,6 @@ namespace HmsService.Models.Entities
         public string Content { get; set; }
         public Nullable<bool> Active { get; set; }
         public Nullable<int> CustomerId { get; set; }
+        public string Creator { get; set; }
     }
 }

@@ -55,6 +55,7 @@ namespace HmsService.ViewModels
     			public virtual string UserApprove { get; set; }
     			public virtual Nullable<System.DateTime> PublicDate { get; set; }
     			public virtual Nullable<int> BlogPostCollectionNumber { get; set; }
+    			public virtual Nullable<int> PresentType { get; set; }
     	
     	public BlogPostViewModel() : base() { }
     	public BlogPostViewModel(HmsService.Models.Entities.BlogPost entity) : base(entity) { }

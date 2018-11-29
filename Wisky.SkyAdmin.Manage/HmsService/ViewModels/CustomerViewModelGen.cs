@@ -39,6 +39,7 @@ namespace HmsService.ViewModels
     			public virtual string picURL { get; set; }
     			public virtual string AccountPhone { get; set; }
     			public virtual string FacebookId { get; set; }
+    			public virtual Nullable<int> PartnerId { get; set; }
     	
     	public CustomerViewModel() : base() { }
     	public CustomerViewModel(HmsService.Models.Entities.Customer entity) : base(entity) { }

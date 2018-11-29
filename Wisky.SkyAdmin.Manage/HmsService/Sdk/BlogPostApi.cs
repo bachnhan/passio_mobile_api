@@ -194,6 +194,16 @@ namespace HmsService.Sdk
             var blogPost = this.Get().Where(q => q.Active == true && q.BlogType == type).OrderByDescending(q => q.UpdatedTime).Take(ConstantManager.NUMBER_BLOG_POST);
             return blogPost;
         }
+        public IEnumerable<BlogPostViewModel> GetBlogPostByBlogTypeAndDate(int type)
+        {
+            var blogPost = this.Get().Where(q => q.Active == true && q.BlogType == type && (q.StartDate == null || q.StartDate <= DateTime.Now) && (q.EndDate == null || q.EndDate >= DateTime.Now));
+            return blogPost;
+        }
 
+        public IEnumerable<BlogPostViewModel> GetBlogPostByPresentTypeAndDate(int type)
+        {
+            var blogPost = this.Get().Where(q => q.Active == true && q.PresentType == type && (q.StartDate == null || q.StartDate <= DateTime.Now) && (q.EndDate == null || q.EndDate >= DateTime.Now));
+            return blogPost;
+        }
     }
 }

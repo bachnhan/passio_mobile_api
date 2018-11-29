@@ -21,7 +21,6 @@ namespace HmsService.Models.Entities
             this.AspNetUsers = new HashSet<AspNetUser>();
             this.Attendances = new HashSet<Attendance>();
             this.AttendanceDates = new HashSet<AttendanceDate>();
-            this.BlogPosts = new HashSet<BlogPost>();
             this.Costs = new HashSet<Cost>();
             this.Coupons = new HashSet<Coupon>();
             this.CustomerStoreReportMappings = new HashSet<CustomerStoreReportMapping>();
@@ -40,7 +39,6 @@ namespace HmsService.Models.Entities
             this.PaymentReports = new HashSet<PaymentReport>();
             this.ProductCollections = new HashSet<ProductCollection>();
             this.ProductDetailMappings = new HashSet<ProductDetailMapping>();
-            this.PromotionStoreMappings = new HashSet<PromotionStoreMapping>();
             this.ReportTrackings = new HashSet<ReportTracking>();
             this.RoomCategories = new HashSet<RoomCategory>();
             this.StoreDomains = new HashSet<StoreDomain>();
@@ -54,6 +52,8 @@ namespace HmsService.Models.Entities
             this.WebMenuCategories = new HashSet<WebMenuCategory>();
             this.WebPages = new HashSet<WebPage>();
             this.BlogPostCollections = new HashSet<BlogPostCollection>();
+            this.BlogPosts = new HashSet<BlogPost>();
+            this.PromotionStoreMappings = new HashSet<PromotionStoreMapping>();
         }
     
         public int ID { get; set; }
@@ -104,8 +104,6 @@ namespace HmsService.Models.Entities
         public virtual ICollection<Attendance> Attendances { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AttendanceDate> AttendanceDates { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<BlogPost> BlogPosts { get; set; }
         public virtual Brand Brand { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Cost> Costs { get; set; }
@@ -146,8 +144,6 @@ namespace HmsService.Models.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ProductDetailMapping> ProductDetailMappings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<PromotionStoreMapping> PromotionStoreMappings { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ReportTracking> ReportTrackings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<RoomCategory> RoomCategories { get; set; }
@@ -173,5 +169,9 @@ namespace HmsService.Models.Entities
         public virtual ICollection<WebPage> WebPages { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<BlogPostCollection> BlogPostCollections { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<BlogPost> BlogPosts { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<PromotionStoreMapping> PromotionStoreMappings { get; set; }
     }
 }

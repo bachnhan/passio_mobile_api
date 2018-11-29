@@ -20,7 +20,7 @@ namespace HmsService.Models.Entities
         public int TagBlogId { get; set; }
     
         public virtual BlogCategory BlogCategory { get; set; }
-        public virtual BlogPost BlogPost { get; set; }
         public virtual Tag Tag { get; set; }
+        public virtual BlogPost BlogPost { get; set; }
     }
 }

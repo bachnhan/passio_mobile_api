@@ -1,4 +1,4 @@
-﻿// T4 code generation is enabled for model 'C:\Users\Nhan\Documents\Wisky.SkyAdmin\Wisky.SkyAdmin.Manage\HmsService\Models\Entities\HmsEntities.edmx'. 
+﻿// T4 code generation is enabled for model 'C:\Users\Nhan\Documents\passio_mobile_api\Wisky.SkyAdmin.Manage\HmsService\Models\Entities\HmsEntities.edmx'. 
 // To enable legacy code generation, change the value of the 'Code Generation Strategy' designer
 // property to 'Legacy ObjectContext'. This property is available in the Properties Window when the model
 // is open in the designer.

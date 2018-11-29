@@ -46,7 +46,6 @@ namespace HmsService.Models
     }
     public enum BlogTypeEnum
     {
-
         [Display(Name = "Tin tức")]
         News = 1,
         [Display(Name = "Video")]
@@ -64,8 +63,21 @@ namespace HmsService.Models
         [Display(Name = "ForYou")]
         ForYou = 8,
         [Display(Name = "Bình chọn")]
-        Vote = 9
+        Vote = 9,
+        [Display(Name = "Coupon")]
+        Coupon = 10
     }
+
+    public enum BlogPresentTypeEnum
+    {
+        [Display(Name = "Tin tức")]
+        News = 1,
+        [Display(Name = "For you")]
+        ForYou = 2,
+        [Display(Name = "Pop up")]
+        PopUp = 3
+    }
+
     public enum BlogStatusEnum
     {
         [Display(Name = "Đang xử lý")]

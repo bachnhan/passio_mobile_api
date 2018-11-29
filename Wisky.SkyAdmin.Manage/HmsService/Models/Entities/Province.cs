@@ -17,7 +17,6 @@ namespace HmsService.Models.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Province()
         {
-            this.DeliveryInformations = new HashSet<DeliveryInformation>();
             this.Districts = new HashSet<District>();
             this.Orders = new HashSet<Order>();
         }
@@ -29,8 +28,6 @@ namespace HmsService.Models.Entities
         public Nullable<int> AreaProvinceId { get; set; }
     
         public virtual AreaDelivery AreaDelivery { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<DeliveryInformation> DeliveryInformations { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<District> Districts { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

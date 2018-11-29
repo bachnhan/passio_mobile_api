@@ -25,6 +25,7 @@ namespace HmsService.ViewModels
     			public virtual Nullable<bool> IsGetted { get; set; }
     			public virtual Nullable<bool> isUsed { get; set; }
     			public virtual Nullable<int> MembershipCardId { get; set; }
+    			public virtual Nullable<System.DateTime> CreatedDate { get; set; }
     	
     	public VoucherViewModel() : base() { }
     	public VoucherViewModel(HmsService.Models.Entities.Voucher entity) : base(entity) { }

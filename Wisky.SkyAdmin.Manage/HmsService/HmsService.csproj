@@ -377,12 +377,6 @@
     <Compile Include="Models\Entities\DeliveryInfoRefined.cs">
       <DependentUpon>EntityRefinery.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\DeliveryInformation.cs">
-      <DependentUpon>HmsEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\DeliveryInformationRefined.cs">
-      <DependentUpon>EntityRefinery.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Entities\District.cs">
       <DependentUpon>HmsEntities.tt</DependentUpon>
     </Compile>
@@ -748,12 +742,6 @@
     <Compile Include="Models\Entities\PromotionDetailRefined.cs">
       <DependentUpon>EntityRefinery.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\PromotionPartner.cs">
-      <DependentUpon>HmsEntities.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\PromotionPartnerRefined.cs">
-      <DependentUpon>EntityRefinery.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Entities\PromotionRefined.cs">
       <DependentUpon>EntityRefinery.tt</DependentUpon>
     </Compile>
@@ -914,9 +902,6 @@
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Repositories\DeliveryInfoRepositoryGen.cs">
-      <DependentUpon>Repositories.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\Repositories\DeliveryInformationRepositoryGen.cs">
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Repositories\DistrictRepositoryGen.cs">
@@ -1088,9 +1073,6 @@
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Repositories\PromotionDetailRepositoryGen.cs">
-      <DependentUpon>Repositories.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\Repositories\PromotionPartnerRepositoryGen.cs">
       <DependentUpon>Repositories.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Repositories\PromotionRepositoryGen.cs">
@@ -1384,9 +1366,6 @@
     <Compile Include="Models\Entities\Services\DateReportServiceGen.cs">
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\Entities\Services\DeliveryInformationServiceGen.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
     <Compile Include="Models\Entities\Services\DeliveryInfoService.cs" />
     <Compile Include="Models\Entities\Services\DeliveryInfoServiceGen.cs">
       <DependentUpon>Services.tt</DependentUpon>
@@ -1575,9 +1554,6 @@
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Services\PromotionDetailServiceGen.cs">
-      <DependentUpon>Services.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\Entities\Services\PromotionPartnerServiceGen.cs">
       <DependentUpon>Services.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Entities\Services\PromotionServiceGen.cs">
@@ -2110,9 +2086,6 @@
     <Compile Include="Sdk\DeliveryInfoApiGen.cs">
       <DependentUpon>Sdk.tt</DependentUpon>
     </Compile>
-    <Compile Include="Sdk\DeliveryInformationApiGen.cs">
-      <DependentUpon>Sdk.tt</DependentUpon>
-    </Compile>
     <Compile Include="Sdk\DistrictApi.cs" />
     <Compile Include="Sdk\DistrictApiGen.cs">
       <DependentUpon>Sdk.tt</DependentUpon>
@@ -2301,9 +2274,6 @@
       <DependentUpon>Sdk.tt</DependentUpon>
     </Compile>
     <Compile Include="Sdk\PromotionDetailApiGen.cs">
-      <DependentUpon>Sdk.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Sdk\PromotionPartnerApiGen.cs">
       <DependentUpon>Sdk.tt</DependentUpon>
     </Compile>
     <Compile Include="Sdk\PromotionStoreMappingApiGen.cs">
@@ -2561,9 +2531,6 @@
     <Compile Include="ViewModels\DateReportViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\DeliveryInformationViewModelGen.cs">
-      <DependentUpon>ViewModel.tt</DependentUpon>
-    </Compile>
     <Compile Include="ViewModels\DeliveryInfoViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
@@ -2749,9 +2716,6 @@
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\PromotionDetailViewModelGen.cs">
-      <DependentUpon>ViewModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="ViewModels\PromotionPartnerViewModelGen.cs">
       <DependentUpon>ViewModel.tt</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\PromotionStoreMappingViewModelGen.cs">

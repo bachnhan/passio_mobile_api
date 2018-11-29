@@ -90,7 +90,6 @@ namespace HmsService.Models.Entities
         public virtual Customer Customer { get; set; }
         public virtual District District { get; set; }
         public virtual PriceGroup PriceGroup { get; set; }
-        public virtual PromotionPartner PromotionPartner { get; set; }
         public virtual Province Province { get; set; }
         public virtual Room Room { get; set; }
         public virtual Store Store { get; set; }

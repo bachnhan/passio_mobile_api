@@ -23,10 +23,10 @@ namespace HmsService.ViewModels
     			public virtual Nullable<bool> Active { get; set; }
     			public virtual Nullable<int> Type { get; set; }
     			public virtual Nullable<bool> isDefaultDeliveryInfo { get; set; }
-                public virtual string Lat { get; set; }
-                public virtual string Lon { get; set; }
-
-        public DeliveryInfoViewModel() : base() { }
+    			public virtual string Lat { get; set; }
+    			public virtual string Lon { get; set; }
+    	
+    	public DeliveryInfoViewModel() : base() { }
     	public DeliveryInfoViewModel(HmsService.Models.Entities.DeliveryInfo entity) : base(entity) { }
     
     }

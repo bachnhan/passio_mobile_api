@@ -36,6 +36,7 @@ namespace HmsService.Models.Entities
         public Nullable<int> PointTrade { get; set; }
         public Nullable<int> MinPoint { get; set; }
         public Nullable<int> MaxPoint { get; set; }
+        public Nullable<int> ExpirationPeriod { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Voucher> Vouchers { get; set; }

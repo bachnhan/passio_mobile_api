@@ -20,7 +20,7 @@ namespace HmsService.Models.Entities
         public int Position { get; set; }
         public bool Active { get; set; }
     
-        public virtual BlogPost BlogPost { get; set; }
         public virtual BlogPostCollection BlogPostCollection { get; set; }
+        public virtual BlogPost BlogPost { get; set; }
     }
 }

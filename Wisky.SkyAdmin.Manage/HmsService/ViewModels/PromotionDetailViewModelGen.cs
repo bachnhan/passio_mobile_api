@@ -31,6 +31,7 @@ namespace HmsService.ViewModels
     			public virtual Nullable<int> PointTrade { get; set; }
     			public virtual Nullable<int> MinPoint { get; set; }
     			public virtual Nullable<int> MaxPoint { get; set; }
+    			public virtual Nullable<int> ExpirationPeriod { get; set; }
     	
     	public PromotionDetailViewModel() : base() { }
     	public PromotionDetailViewModel(HmsService.Models.Entities.PromotionDetail entity) : base(entity) { }

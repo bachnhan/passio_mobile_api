@@ -355,7 +355,8 @@ namespace CalculateMemberPoint
                         PromotionID = _db.Promotions.Where(q => q.PromotionCode == promotionDetail.PromotionCode).FirstOrDefault().PromotionID,
                         Quantity = 1,
                         UsedQuantity = 0,
-                        VoucherCode = newVoucherCode
+                        VoucherCode = newVoucherCode,
+                        CreatedDate = DateTime.Now.Date
                     };
                     _db.Vouchers.Add(voucher);
                     Console.WriteLine("Created voucher {0}", newVoucherCode);

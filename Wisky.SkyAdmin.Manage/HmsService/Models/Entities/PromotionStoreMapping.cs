@@ -19,7 +19,7 @@ namespace HmsService.Models.Entities
         public int StoreId { get; set; }
         public bool Active { get; set; }
     
-        public virtual Store Store { get; set; }
         public virtual Promotion Promotion { get; set; }
+        public virtual Store Store { get; set; }
     }
 }

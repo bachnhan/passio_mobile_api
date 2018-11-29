@@ -20,10 +20,10 @@ namespace HmsService.Models.Entities
             this.AspNetUsers = new HashSet<AspNetUser>();
             this.CustomerProductMappings = new HashSet<CustomerProductMapping>();
             this.CustomerStoreReportMappings = new HashSet<CustomerStoreReportMapping>();
-            this.DeliveryInfoes = new HashSet<DeliveryInfo>();
             this.Orders = new HashSet<Order>();
             this.OrderGroups = new HashSet<OrderGroup>();
             this.MembershipCards = new HashSet<MembershipCard>();
+            this.DeliveryInfoes = new HashSet<DeliveryInfo>();
         }
     
         public int CustomerID { get; set; }
@@ -50,6 +50,7 @@ namespace HmsService.Models.Entities
         public string picURL { get; set; }
         public string AccountPhone { get; set; }
         public string FacebookId { get; set; }
+        public Nullable<int> PartnerId { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<AspNetUser> AspNetUsers { get; set; }
@@ -59,12 +60,12 @@ namespace HmsService.Models.Entities
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<CustomerStoreReportMapping> CustomerStoreReportMappings { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<DeliveryInfo> DeliveryInfoes { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Order> Orders { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<OrderGroup> OrderGroups { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<MembershipCard> MembershipCards { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<DeliveryInfo> DeliveryInfoes { get; set; }
     }
 }
