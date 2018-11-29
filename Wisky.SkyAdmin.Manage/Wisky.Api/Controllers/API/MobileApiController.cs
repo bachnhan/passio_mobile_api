@@ -1167,7 +1167,7 @@ namespace Wisky.Api.Controllers.API
             notifiApi.Create(notification2);
         }
         [System.Web.Mvc.HttpPost]
-        public JsonResult updateProfileUser(string accessToken, string fullName, string phoneNumber, string email, string birthDay, string gender)
+        public JsonResult updateProfileUser(string accessToken, string fullName, string phoneNumber, string email, string birthday, string gender)
         {
             //Get image from request
             byte[] avatarImage = null;
@@ -1218,10 +1218,10 @@ namespace Wisky.Api.Controllers.API
                     }
 
                     //Update birthday 
-                    DateTime birthDayFormatted;
-                    if (DateTime.TryParseExact(birthDay, ConstantManager.FORMART_DATETIME_3, CultureInfo.InvariantCulture, DateTimeStyles.None, out birthDayFormatted) && customer.BirthDay == null)
+                    DateTime birthdayFormatted;
+                    if (DateTime.TryParseExact(birthday, ConstantManager.FORMART_DATETIME_3, CultureInfo.InvariantCulture, DateTimeStyles.None, out birthdayFormatted) && customer.BirthDay == null)
                     {
-                        customer.BirthDay = birthDayFormatted;
+                        customer.BirthDay = birthdayFormatted;
                     }
 
                     //Update Customer
@@ -1259,7 +1259,7 @@ namespace Wisky.Api.Controllers.API
                                 email = customer.Email,
                                 phone = customer.AccountPhone,
                                 pic_url = customer.picURL,
-                                birth_day = (customer.BirthDay != null) ? ((DateTime)customer.BirthDay).ToString(ConstantManager.FORMART_DATETIME_3) : "",
+                                birthday = (customer.BirthDay != null) ? ((DateTime)customer.BirthDay).ToString(ConstantManager.FORMART_DATETIME_3) : "",
                                 gender = customer.Gender,
                                 point = point,
                                 balance = balance,
@@ -2613,11 +2613,12 @@ namespace Wisky.Api.Controllers.API
                     customerId = Int32.Parse(getCustomerIdFromToken(accessToken.FirstOrDefault()));
                 }
                 //fill data
-                var blogPostNews = blogPostApi.GetBlogPostByBlogTypeAndDate((int)BlogTypeEnum.News);
-                var blogPostVote = blogPostApi.GetBlogPostByBlogTypeAndDate((int)BlogTypeEnum.Vote);
+                var blogPostPresentNews = blogPostApi.GetBlogPostByPresentTypeAndDate((int)BlogPresentTypeEnum.News);
+                var blogPostNews = blogPostPresentNews.Where(q => q.BlogType == (int)BlogTypeEnum.News);
+                var blogPostVote = blogPostPresentNews.Where(q => q.BlogType == (int)BlogTypeEnum.Vote);
                 var blogPost = blogPostNews.Union(blogPostVote);
-                var blogPostForYou = blogPostApi.GetBlogPostByPresentTypeAndDate((int)BlogPresentTypeEnum.ForYou);
-                var blogPostPopUp = blogPostApi.GetBlogPostByPresentTypeAndDate((int)BlogPresentTypeEnum.PopUp);
+                var blogPostPresentForYou = blogPostApi.GetBlogPostByPresentTypeAndDate((int)BlogPresentTypeEnum.ForYou);
+                var blogPostPresentPopUp = blogPostApi.GetBlogPostByPresentTypeAndDate((int)BlogPresentTypeEnum.PopUp);
                 //string domainName = "http://" + HttpContext.Request.Url.Authority;
                 string domainName = ConstantManager.IMAGE_SERVER_URL;
                 if (blogPost.Count() == 0) //check blogpost is empty
@@ -2651,7 +2652,7 @@ namespace Wisky.Api.Controllers.API
                                       blog_type = b.BlogType,
                                       position = b.Position
                                   }).OrderBy(q => q.position);
-                    var resultForYou = (from b in blogPostForYou
+                    var resultForYou = (from b in blogPostPresentForYou
                                         select new
                                         {
                                             id = b.Id,
@@ -2661,24 +2662,28 @@ namespace Wisky.Api.Controllers.API
                                             description_en = b.BlogContent_En == null ? "" : b.BlogContent_En,
                                             image = domainName + b.Image,
                                             short_description = b.Opening,
-                                            url = b.URL == null ? "" : b.URL,
+                                            url = (String.IsNullOrEmpty(b.URL)) ? "" :
+                                            ((b.BlogType == (int)BlogTypeEnum.Vote) ?
+                                            b.URL + "?cusId=" + customerId.ToString() : b.URL),
                                             blog_type = b.BlogType,
                                             position = b.Position
                                         }).OrderBy(q => q.position);
-                    var resultPopUp = (from b in blogPostPopUp
-                                        select new
-                                        {
-                                            id = b.Id,
-                                            title = b.Title,
-                                            title_en = b.Title_En,
-                                            description = b.BlogContent == null ? "" : b.BlogContent,
-                                            description_en = b.BlogContent_En == null ? "" : b.BlogContent_En,
-                                            image = domainName + b.Image,
-                                            short_description = b.Opening,
-                                            url = b.URL == null ? "" : b.URL,
-                                            blog_type = b.BlogType,
-                                            position = b.Position
-                                        }).OrderBy(q => q.position);
+                    var resultPopUp = (from b in blogPostPresentPopUp
+                                       select new
+                                       {
+                                           id = b.Id,
+                                           title = b.Title,
+                                           title_en = b.Title_En,
+                                           description = b.BlogContent == null ? "" : b.BlogContent,
+                                           description_en = b.BlogContent_En == null ? "" : b.BlogContent_En,
+                                           image = domainName + b.Image,
+                                           short_description = b.Opening,
+                                           url = (String.IsNullOrEmpty(b.URL)) ? "" :
+                                           ((b.BlogType == (int)BlogTypeEnum.Vote) ?
+                                           b.URL + "?cusId=" + customerId.ToString() : b.URL),
+                                           blog_type = b.BlogType,
+                                           position = b.Position
+                                       }).OrderBy(q => q.position);
                     return Json(new
                     {
                         status = new
@@ -2883,6 +2888,8 @@ namespace Wisky.Api.Controllers.API
                         name = customer.Name,
                         phone = customer.AccountPhone,
                         email = customer.Email,
+                        birthday = (customer.BirthDay != null ) ? customer.BirthDay.Value.ToString(ConstantManager.FORMART_DATETIME_3) : "",
+                        gender = customer.Gender,
                         is_connected = string.IsNullOrEmpty(customer.FacebookId) ? false : true
                     };
 
@@ -3004,9 +3011,11 @@ namespace Wisky.Api.Controllers.API
                 var promotion = promotionApi.Get(item.PromotionID);
                 //if voucher do not have CreateDate or PromotionDetail or PromotionDetail ExpirationPeriod use PromotionToDate else use Voucher CreateDate plus ExpirationPeriod date
                 var voucherExpiredDate = promotion.ToDate;
-                if (item.CreatedDate != null && item.PromotionDetail != null && item.PromotionDetail.ExpirationPeriod != null) {
+                if (item.CreatedDate != null && item.PromotionDetail != null && item.PromotionDetail.ExpirationPeriod != null)
+                {
                     var tmpVoucherExpiredDate = item.CreatedDate.Value.AddDays(item.PromotionDetail.ExpirationPeriod.Value);
-                    if ( tmpVoucherExpiredDate < promotion.ToDate) {
+                    if (tmpVoucherExpiredDate < promotion.ToDate)
+                    {
                         voucherExpiredDate = tmpVoucherExpiredDate;
                     }
                 }
@@ -3692,18 +3701,19 @@ namespace Wisky.Api.Controllers.API
             int paymentType, string accessToken, string voucherCode, int deliveryInfoId)
         {
             //Block 
-            if (paymentType == (int)PaymentTypeEnum.MemberPayment) {
-                return Json(new
-                {
-                    status = new
-                    {
-                        success = false,
-                        status = ConstantManager.STATUS_SUCCESS,
-                        message = ConstantManager.MES_BLOCK_ORDER_BY_MEMBER_PAYMENT
-                    },
-                    data = new { }
-                });
-            }
+            //if (paymentType == (int)PaymentTypeEnum.MemberPayment)
+            //{
+            //    return Json(new
+            //    {
+            //        status = new
+            //        {
+            //            success = false,
+            //            status = ConstantManager.STATUS_SUCCESS,
+            //            message = ConstantManager.MES_BLOCK_ORDER_BY_MEMBER_PAYMENT
+            //        },
+            //        data = new { }
+            //    });
+            //}
             try
             {
                 order.CustomerID = Int32.Parse(getCustomerIdFromToken(accessToken));
@@ -3982,11 +3992,12 @@ namespace Wisky.Api.Controllers.API
                 {
                     //thanh toán bằng tiền mặt
                     case (int)PaymentTypeEnum.Cash:
-                        payment.Amount = tmpAmountCard;
-                        payment.Type = (int)PaymentTypeEnum.Cash;
-                        payment.PayTime = time;
-                        payment.ToRentID = order.RentID;
-                        paymentList.Add(payment);
+                        //Commented create payment for ship COD
+                        //payment.Amount = tmpAmountCard;
+                        //payment.Type = (int)PaymentTypeEnum.Cash;
+                        //payment.PayTime = time;
+                        //payment.ToRentID = order.RentID;
+                        //paymentList.Add(payment);
                         break;
                     //thanh toán bằng thẻ
                     case (int)PaymentTypeEnum.MemberPayment:
