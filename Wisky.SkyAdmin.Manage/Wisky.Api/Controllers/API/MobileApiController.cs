@@ -3074,7 +3074,7 @@ namespace Wisky.Api.Controllers.API
             if (deliveryInfo != null)
             {
                 var deliveryInfoOld = deliveryInfoApi.getDeliveryByCustomerId(customerId);
-                if (deliveryInfoOld.Count() == (int)ConstantManager.MAX_DELIVERYINFO)
+                if (deliveryInfoOld.Count() > (int)ConstantManager.MAX_DELIVERYINFO)
                 {
                     return Json(new
                     {
@@ -3701,19 +3701,19 @@ namespace Wisky.Api.Controllers.API
             int paymentType, string accessToken, string voucherCode, int deliveryInfoId)
         {
             //Block 
-            //if (paymentType == (int)PaymentTypeEnum.MemberPayment)
-            //{
-            //    return Json(new
-            //    {
-            //        status = new
-            //        {
-            //            success = false,
-            //            status = ConstantManager.STATUS_SUCCESS,
-            //            message = ConstantManager.MES_BLOCK_ORDER_BY_MEMBER_PAYMENT
-            //        },
-            //        data = new { }
-            //    });
-            //}
+            if (paymentType == (int)PaymentTypeEnum.MemberPayment)
+            {
+                return Json(new
+                {
+                    status = new
+                    {
+                        success = false,
+                        status = ConstantManager.STATUS_SUCCESS,
+                        message = ConstantManager.MES_BLOCK_ORDER_BY_MEMBER_PAYMENT
+                    },
+                    data = new { }
+                });
+            }
             try
             {
                 order.CustomerID = Int32.Parse(getCustomerIdFromToken(accessToken));
@@ -3993,11 +3993,11 @@ namespace Wisky.Api.Controllers.API
                     //thanh toán bằng tiền mặt
                     case (int)PaymentTypeEnum.Cash:
                         //Commented create payment for ship COD
-                        //payment.Amount = tmpAmountCard;
-                        //payment.Type = (int)PaymentTypeEnum.Cash;
-                        //payment.PayTime = time;
-                        //payment.ToRentID = order.RentID;
-                        //paymentList.Add(payment);
+                        payment.Amount = tmpAmountCard;
+                        payment.Type = (int)PaymentTypeEnum.Cash;
+                        payment.PayTime = time;
+                        payment.ToRentID = order.RentID;
+                        paymentList.Add(payment);
                         break;
                     //thanh toán bằng thẻ
                     case (int)PaymentTypeEnum.MemberPayment:
@@ -4280,7 +4280,6 @@ namespace Wisky.Api.Controllers.API
             }
             #endregion
         }
-
     }
     public class ConfirmPaymentResponse
     {

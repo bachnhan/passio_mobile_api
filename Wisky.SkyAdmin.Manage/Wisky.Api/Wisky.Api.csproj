@@ -244,6 +244,7 @@
     <Compile Include="Areas\RouteDebugger\RouteDebuggerConfig.cs" />
     <Compile Include="Controllers\API\MobileApiController.cs" />
     <Compile Include="Controllers\API\MobileReportApiController.cs" />
+    <Compile Include="Controllers\API\TravelMobileAPI\Controller\TravelMobileApiController.cs" />
     <Compile Include="Controllers\Connection\GiftTalkConnectApi.cs" />
     <Compile Include="Controllers\Connection\IConnectAPI.cs" />
     <Compile Include="Controllers\AccountController.cs" />
@@ -351,6 +352,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Controllers\API\TravelMobileAPI\Model\" />
     <Folder Include="Views\CategoryApi\" />
     <Folder Include="Views\CheckFingerApi\" />
     <Folder Include="Views\Default\" />

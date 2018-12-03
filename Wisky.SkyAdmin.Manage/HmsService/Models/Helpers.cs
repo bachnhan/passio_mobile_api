@@ -99,5 +99,10 @@ namespace HmsService.Models
         public static string APP_AUTHORIZATION = "key=AIzaSyD6dQmAfR1Zl6vwhe34poCnviuyPGhEcak";
         public const string MES_CHECK_PERMISSION_FAIL = "Người dùng chưa được cấp quyền để xem báo cáo này";
         public static List<int> LIST_MOBILE_TYPE_ID = new List<int>{ (int)MembershipCardTypeEnum.Green, (int)MembershipCardTypeEnum.Silver, (int)MembershipCardTypeEnum.Gold, (int)MembershipCardTypeEnum.Platinum };
+
+        //Travel Api mobile error message
+        public const string MES_CONFIRM_PASSWORD_NOT_MATCH = "Confirm password is not matched";
+        public const string MES_USER_EXISTED = "User existed";
+        public const string MES_EMAIL_EXISTED = "User existed";
     }
 }
